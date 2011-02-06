@@ -6,8 +6,9 @@ module Slingshot
       attr_reader :indices
 
       def initialize(*indices, &block)
+        raise ArgumentError, 'Please pass index or indices to search' if indices.empty?
         @indices = indices
-        instance_eval(&block)
+        instance_eval(&block) if block_given?
       end
 
       def query(&block)
