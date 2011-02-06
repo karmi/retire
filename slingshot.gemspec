@@ -24,6 +24,10 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = ">= 1.3.6"
 
+  s.add_dependency "bundler",     "~> 1.0.0"
+  s.add_dependency "rest-client", "~> 1.6.0"
+  s.add_dependency "yajl-ruby",   "> 0.7.9"
+
   s.add_development_dependency "turn"
   s.add_development_dependency "shoulda"
 
