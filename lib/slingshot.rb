@@ -12,4 +12,7 @@ module Slingshot
   module Search
     autoload :Query,       File.dirname(__FILE__) + '/slingshot/search/query'
   end
+  module Results
+    autoload :Collection,       File.dirname(__FILE__) + '/slingshot/results/collection'
+  end
 end
