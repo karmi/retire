@@ -3,7 +3,7 @@ module Slingshot
   
     class Search
 
-      attr_reader :indices
+      attr_reader :indices, :url, :results
 
       def initialize(*indices, &block)
         raise ArgumentError, 'Please pass index or indices to search' if indices.empty?
@@ -15,6 +15,16 @@ module Slingshot
         @query = Query.new
         @query.instance_eval(&block)
         @query
+      end
+
+      def perform
+        @url     = "#{Configuration.url}/#{indices.join(',')}/_search"
+        response = JSON.parse( Configuration.client.post(@url, self.to_json) )
+        @results = Results::Collection.new(response)
+      end
+
+      def to_curl
+        %Q|curl -X POST "http://localhost:9200/#{indices}/_search?pretty=true" -d '#{self.to_json}'|
       end
 
       def to_json
