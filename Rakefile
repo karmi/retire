@@ -10,6 +10,14 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
+namespace :test do
+  Rake::TestTask.new(:unit) do |test|
+    test.libs << 'lib' << 'test'
+    test.pattern = 'test/unit/*_test.rb'
+    test.verbose = true
+  end
+end
+
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
