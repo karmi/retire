@@ -7,5 +7,9 @@ module Slingshot
   autoload :Client,        File.dirname(__FILE__) + '/slingshot/client'
   autoload :RestClient,    File.dirname(__FILE__) + '/slingshot/client'
 
-  autoload :Search,    File.dirname(__FILE__) + '/slingshot/search'
+  autoload :Search,        File.dirname(__FILE__) + '/slingshot/search'
+
+  module Search
+    autoload :Query,       File.dirname(__FILE__) + '/slingshot/search/query'
+  end
 end

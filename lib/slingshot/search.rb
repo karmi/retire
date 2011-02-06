@@ -10,6 +10,17 @@ module Slingshot
         instance_eval(&block)
       end
 
+      def query(&block)
+        @query = Query.new
+        @query.instance_eval(&block)
+        @query
+      end
+
+      def to_json
+        request = { :query => @query }
+        request.to_json
+      end
+
     end
 
   end

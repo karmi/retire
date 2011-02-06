@@ -11,6 +11,11 @@ module Slingshot::Search
         assert_raise(ArgumentError) { Search.new 'index' }
       end
 
+      should "have the query method" do
+        q = ( Search.new('index') do;end ).query do;end
+        assert_kind_of(Query, q)
+      end
+
     end
 
   end
