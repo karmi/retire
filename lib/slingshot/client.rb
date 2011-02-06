@@ -12,10 +12,10 @@ module Slingshot
     end
 
     class RestClient < Base
-      def post(url, data)
+      def self.post(url, data)
         ::RestClient.post url, data
       end
-      def delete(url)
+      def self.delete(url)
         ::RestClient.delete url rescue nil
       end
     end
