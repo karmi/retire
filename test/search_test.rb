@@ -16,6 +16,14 @@ module Slingshot::Search
         assert_kind_of(Query, q)
       end
 
+      should "store indices as an array" do
+        s = Search.new('index1') do;end
+        assert_equal ['index1'], s.indices
+
+        s = Search.new('index1', 'index2') do;end
+        assert_equal ['index1', 'index2'], s.indices
+      end
+
     end
 
   end

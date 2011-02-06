@@ -5,7 +5,7 @@ module Slingshot
 
       attr_reader :indices
 
-      def initialize(indices, &block)
+      def initialize(*indices, &block)
         @indices = indices
         instance_eval(&block)
       end
