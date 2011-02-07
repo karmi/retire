@@ -21,9 +21,9 @@ module Slingshot
         self
       end
 
-      def facet(name, &block)
+      def facet(name, options={}, &block)
         @facets ||= {}
-        @facets.update Facet.new(name, &block).to_hash
+        @facets.update Facet.new(name, options, &block).to_hash
         self
       end
 

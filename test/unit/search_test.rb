@@ -65,11 +65,13 @@ module Slingshot
         should "allow searching for facets" do
           s = Search::Search.new('index') do
             facet('foo1') { terms :bar, :global => true }
-            facet('foo2') { terms :baz }
+            facet('foo2', :global => true) { terms :bar }
+            facet('foo3') { terms :baz }
           end
-          assert_equal 2, s.facets.keys.size
+          assert_equal 3, s.facets.keys.size
           assert_not_nil s.facets['foo1']
           assert_not_nil s.facets['foo2']
+          assert_not_nil s.facets['foo3']
         end
 
       end
