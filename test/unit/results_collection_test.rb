@@ -11,6 +11,10 @@ module Slingshot
 
       should "be iterable" do
         assert_respond_to Results::Collection.new(@default_response), :each
+        assert_nothing_raised do
+          Results::Collection.new(@default_response).each { |item| item + 1 }
+          Results::Collection.new(@default_response).map { |item| item + 1 }
+        end
       end
 
       should "be initialized with parsed json" do
