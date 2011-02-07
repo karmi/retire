@@ -41,6 +41,22 @@ module Slingshot
         s.perform
       end
 
+      context "sort" do
+
+        should "allow sorting by multiple fields" do
+          s = Search::Search.new('index') do
+            query { query 'foo' }
+            sort do
+              title 'desc'
+              _score
+            end
+          end
+          hash = JSON.load( s.to_json )
+          assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
+        end
+        
+      end
+
       context "facets" do
 
         should "allow searching for facets" do
