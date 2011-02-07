@@ -1,9 +1,40 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-
 require 'rubygems'
 require 'test/unit'
 require 'shoulda'
 require 'mocha'
 require 'turn' unless ENV["TM_FILEPATH"]
+require 'pathname'
 
 require 'slingshot'
+
+class Test::Unit::TestCase
+
+  def fixtures_path
+    Pathname( File.expand_path( 'fixtures', File.dirname(__FILE__) ) )
+  end
+
+  def fixture_file(path)
+    File.read File.expand_path( path, fixtures_path )
+  end
+
+end
+
+module Test::Integration
+  URL = "http://localhost:9200"
+
+  def setup
+    ::RestClient.delete "#{URL}/articles-test"     rescue nil
+    ::RestClient.post   "#{URL}/articles-test", ''
+    fixtures_path.join('articles').entries.each do |f|
+      filename = f.to_s
+      next if filename =~ /^\./
+      ::RestClient.put "#{URL}/articles-test/article/#{File.basename(filename, '.*')}",
+                       fixtures_path.join('articles').join(f).read
+    end
+    ::RestClient.post "#{URL}/articles-test/_refresh", ''
+  end
+
+  def teardown
+    ::RestClient.delete "#{URL}/articles-test"  rescue nil
+  end
+end

@@ -16,6 +16,11 @@ namespace :test do
     test.pattern = 'test/unit/*_test.rb'
     test.verbose = true
   end
+  Rake::TestTask.new(:integration) do |test|
+    test.libs << 'lib' << 'test'
+    test.pattern = 'test/integration/*_test.rb'
+    test.verbose = true
+  end
 end
 
 # Generate documentation
