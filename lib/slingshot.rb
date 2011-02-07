@@ -17,4 +17,6 @@ module Slingshot
   module Results
     autoload :Collection,  File.dirname(__FILE__) + '/slingshot/results/collection'
   end
+
+  autoload :Index,         File.dirname(__FILE__) + '/slingshot/index'
 end
