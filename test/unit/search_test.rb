@@ -41,6 +41,21 @@ module Slingshot
         s.perform
       end
 
+      context "facets" do
+
+        should "allow searching for facets" do
+          s = Search::Search.new('index') do
+            query { query 'title:foo' }
+            facet('foo1') { terms :bar, :global => true }
+            facet('foo2') { terms :baz }
+          end
+          assert_equal 2, s.facets.keys.size
+          assert_not_nil s.facets['foo1']
+          assert_not_nil s.facets['foo2']
+        end
+
+      end
+
     end
 
   end

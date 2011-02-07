@@ -3,7 +3,7 @@ module Slingshot
   
     class Search
 
-      attr_reader :indices, :url, :results
+      attr_reader :indices, :url, :results, :query, :facets
 
       def initialize(*indices, &block)
         raise ArgumentError, 'Please pass index or indices to search' if indices.empty?
@@ -19,8 +19,9 @@ module Slingshot
         @sort = Sort.new(&block)
       end
 
-      def facets(name, &block)
-        @facets = Facets.new(name, &block)
+      def facet(name, &block)
+        @facets ||= {}
+        @facets.update Facet.new(name, &block).to_hash
       end
 
       def perform
