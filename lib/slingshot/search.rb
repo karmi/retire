@@ -32,6 +32,10 @@ module Slingshot
         @size = value
       end
 
+      def fields(fields=[])
+        @fields = fields
+      end
+
       def perform
         @url     = "#{Configuration.url}/#{indices.join(',')}/_search"
         response = JSON.parse( Configuration.client.post(@url, self.to_json) )
@@ -49,6 +53,7 @@ module Slingshot
         request.update( { :facets => @facets } ) if @facets
         request.update( { :size => @size } )     if @size
         request.update( { :from => @from } )     if @from
+        request.update( { :fields => @fields } ) if @fields
         request.to_json
       end
 

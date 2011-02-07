@@ -69,6 +69,15 @@ module Slingshot
           assert_equal 3, hash['from']
         end
 
+        should "set the fields limit in request" do
+          s = Search::Search.new('index') do
+            query { query 'foo' }
+            fields :title
+          end
+          hash = JSON.load( s.to_json )
+          assert_equal 'title', hash['fields']
+        end
+
       end
 
     end
