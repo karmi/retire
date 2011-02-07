@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.require_paths = ["lib"]
 
-  s.extra_rdoc_files  = [ "README.rdoc", "MIT-LICENSE" ]
+  s.extra_rdoc_files  = [ "README.markdown", "MIT-LICENSE" ]
   s.rdoc_options      = [ "--charset=UTF-8" ]
 
   s.required_rubygems_version = ">= 1.3.6"

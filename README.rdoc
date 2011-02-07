@@ -1,3 +1,0 @@
-= Slingshot
-
-Ruby API for the ElasticSearch search engine/database.
