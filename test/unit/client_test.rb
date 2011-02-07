@@ -23,6 +23,10 @@ module Slingshot
         assert_equal Client::RestClient, Configuration.client
       end
 
+      should "respond to post and delete" do
+        assert_respond_to Client::RestClient, :post
+        assert_respond_to Client::RestClient, :delete
+      end
       
     end
 
