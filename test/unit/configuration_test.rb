@@ -6,8 +6,8 @@ module Slingshot
 
     context "Configuration" do
       setup do
-        Configuration.url    = nil
-        Configuration.client = nil
+        Configuration.instance_variable_set(:@url,    nil)
+        Configuration.instance_variable_set(:@client, nil)
       end
 
       should "return default URL" do
@@ -15,7 +15,7 @@ module Slingshot
       end
 
       should "allow setting and retrieving the URL" do
-        assert_nothing_raised { Configuration.url = 'http://example.com' }
+        assert_nothing_raised { Configuration.url 'http://example.com' }
         assert_equal 'http://example.com', Configuration.url
       end
 
@@ -24,7 +24,7 @@ module Slingshot
       end
 
       should "allow setting and retrieving the client" do
-        assert_nothing_raised { Configuration.client = Client::Base }
+        assert_nothing_raised { Configuration.client Client::Base }
         assert_equal Client::Base, Configuration.client
       end
     end
