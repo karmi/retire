@@ -3,4 +3,5 @@
 Gemfile.lock
 pkg/*
 rdoc/
+coverage/
 scratch/
