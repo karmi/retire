@@ -13,33 +13,40 @@ module Slingshot
 
       def query(&block)
         @query = Query.new(&block)
+        self
       end
 
       def sort(&block)
         @sort = Sort.new(&block)
+        self
       end
 
       def facet(name, &block)
         @facets ||= {}
         @facets.update Facet.new(name, &block).to_hash
+        self
       end
 
       def from(value)
         @from = value
+        self
       end
 
       def size(value)
         @size = value
+        self
       end
 
       def fields(fields=[])
         @fields = fields
+        self
       end
 
       def perform
         @url     = "#{Configuration.url}/#{indices.join(',')}/_search"
         response = JSON.parse( Configuration.client.post(@url, self.to_json) )
         @results = Results::Collection.new(response)
+        self
       end
 
       def to_curl

@@ -11,8 +11,7 @@ module Slingshot
       end
 
       should "have the query method" do
-        q = Search::Search.new('index').query do;end
-        assert_kind_of(Search::Query, q)
+        assert_respond_to Search::Search.new('index'), :query
       end
 
       should "store indices as an array" do
@@ -30,6 +29,12 @@ module Slingshot
         assert_equal %q|curl -X POST "http://localhost:9200/index/_search?pretty=true" -d | +
                      %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
                      s.to_curl
+      end
+
+      should "allow chaining" do
+        assert_nothing_raised do
+          Search::Search.new('index').query { query 'title:foo' }.sort { title 'desc' }.size(5).sort { name 'asc' }.from(1)
+        end
       end
 
       should "perform the search" do
