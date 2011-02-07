@@ -25,12 +25,12 @@ module Slingshot::Search
 
       should "allow search with a query string" do
         assert_equal( { :query_string => { :query => 'title:foo' } },
-                      Query.new.query('title:foo') ) 
+                      Query.new.string('title:foo') )
       end
 
       should "allow set default field when searching with a query string" do
         assert_equal( { :query_string => { :query => 'foo', :default_field => 'title' } },
-                      Query.new.query('foo', :default_field => 'title') ) 
+                      Query.new.string('foo', :default_field => 'title') )
       end
 
     end

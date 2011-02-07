@@ -24,7 +24,7 @@ module Slingshot
 
       should "return curl snippet for debugging" do
         s = Search::Search.new('index') do
-          query { query 'title:foo' }
+          query { string 'title:foo' }
         end
         assert_equal %q|curl -X POST "http://localhost:9200/index/_search?pretty=true" -d | +
                      %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
@@ -33,7 +33,7 @@ module Slingshot
 
       should "allow chaining" do
         assert_nothing_raised do
-          Search::Search.new('index').query { query 'title:foo' }.sort { title 'desc' }.size(5).sort { name 'asc' }.from(1)
+          Search::Search.new('index').query { }.sort { title 'desc' }.size(5).sort { name 'asc' }.from(1)
         end
       end
 
@@ -41,7 +41,6 @@ module Slingshot
         Configuration.client.expects(:post).returns("{}")
         Results::Collection.expects(:new)
         s = Search::Search.new('index') do
-          query { query 'title:foo' }
         end
         s.perform
       end
@@ -50,7 +49,6 @@ module Slingshot
 
         should "allow sorting by multiple fields" do
           s = Search::Search.new('index') do
-            query { query 'foo' }
             sort do
               title 'desc'
               _score
@@ -66,7 +64,6 @@ module Slingshot
 
         should "allow searching for facets" do
           s = Search::Search.new('index') do
-            query { query 'title:foo' }
             facet('foo1') { terms :bar, :global => true }
             facet('foo2') { terms :baz }
           end
@@ -81,7 +78,6 @@ module Slingshot
 
         should "set the values in request" do
           s = Search::Search.new('index') do
-            query { query 'foo' }
             size 5
             from 3
           end
@@ -92,7 +88,6 @@ module Slingshot
 
         should "set the fields limit in request" do
           s = Search::Search.new('index') do
-            query { query 'foo' }
             fields :title
           end
           hash = JSON.load( s.to_json )
