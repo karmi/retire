@@ -38,11 +38,12 @@ module Slingshot
       end
 
       should "perform the search" do
-        Configuration.client.expects(:post).returns("{}")
-        Results::Collection.expects(:new)
-        s = Search::Search.new('index') do
-        end
+        Configuration.client.expects(:post).returns('{"hits":[]}')
+        Results::Collection.expects(:new).returns([])
+        s = Search::Search.new('index')
         s.perform
+        assert_not_nil s.results
+        assert_not_nil s.response
       end
 
       context "sort" do
