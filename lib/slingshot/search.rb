@@ -15,6 +15,10 @@ module Slingshot
         @query = Query.new(&block)
       end
 
+      def sort(&block)
+        @sort = Sort.new(&block)
+      end
+
       def perform
         @url     = "#{Configuration.url}/#{indices.join(',')}/_search"
         response = JSON.parse( Configuration.client.post(@url, self.to_json) )
@@ -26,7 +30,10 @@ module Slingshot
       end
 
       def to_json
-        request = { :query => @query }
+        request = {}
+        request.update( { :query => @query } )
+        request.update( { :sort  => @sort } ) if @sort
+        p request
         request.to_json
       end
 
