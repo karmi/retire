@@ -37,6 +37,33 @@ module Slingshot
         assert_nothing_raised { assert @index.refresh }
       end
 
+      context "when storing" do
+
+        should "properly set type from args" do
+          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').returns('{"ok":true,"_id":"test"}').twice
+          @index.store 'article', :title => 'Test'
+          @index.store :article,  :title => 'Test'
+        end
+
+        should "set default type" do
+          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/", '{"title":"Test"}').returns('{"ok":true,"_id":"test"}')
+          @index.store :title => 'Test'
+        end
+
+        should "call #to_indexed_json on non-String documents" do
+          document = { :title => 'Test' }
+          Configuration.client.expects(:post).returns('{"ok":true,"_id":"test"}')
+          document.expects(:to_indexed_json)
+          @index.store document
+        end
+
+        should "raise error when storing neither String nor object with #to_indexed_json method" do
+          class MyDocument;end; document = MyDocument.new
+          assert_raise(ArgumentError) { @index.store document }
+        end
+
+      end
+
     end
 
   end

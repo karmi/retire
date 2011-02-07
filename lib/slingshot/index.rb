@@ -19,6 +19,21 @@ module Slingshot
       false
     end
 
+    def store(*args)
+      if args.size > 1
+        (type, document = args)
+      else
+        (document = args.pop; type = :document)
+      end
+      document = case true
+        when document.is_a?(String) then document
+        when document.respond_to?(:to_indexed_json) then document.to_indexed_json
+        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
+      end
+      result = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/", document
+      JSON.parse(result)
+    end
+
     def refresh
       Configuration.client.post "#{Configuration.url}/#{@name}/_refresh", ''
     end
