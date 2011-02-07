@@ -14,4 +14,5 @@ require 'slingshot/index'
 require 'slingshot/dsl'
 
 module Slingshot
+  extend DSL
 end
