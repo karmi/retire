@@ -2,7 +2,9 @@ module Slingshot
   module Search
 
     class Query
-      attr_reader :value
+      def initialize(&block)
+        self.instance_eval(&block) if block_given?
+      end
 
       def term(field, value)
         @value = { :term => { field => value } }

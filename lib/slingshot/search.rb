@@ -12,9 +12,7 @@ module Slingshot
       end
 
       def query(&block)
-        @query = Query.new
-        @query.instance_eval(&block)
-        @query
+        @query = Query.new(&block)
       end
 
       def perform
