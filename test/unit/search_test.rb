@@ -56,6 +56,21 @@ module Slingshot
 
       end
 
+      context "with from/size" do
+
+        should "set the values in request" do
+          s = Search::Search.new('index') do
+            query { query 'foo' }
+            size 5
+            from 3
+          end
+          hash = JSON.load( s.to_json )
+          assert_equal 5, hash['size']
+          assert_equal 3, hash['from']
+        end
+
+      end
+
     end
 
   end

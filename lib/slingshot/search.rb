@@ -24,6 +24,14 @@ module Slingshot
         @facets.update Facet.new(name, &block).to_hash
       end
 
+      def from(value)
+        @from = value
+      end
+
+      def size(value)
+        @size = value
+      end
+
       def perform
         @url     = "#{Configuration.url}/#{indices.join(',')}/_search"
         response = JSON.parse( Configuration.client.post(@url, self.to_json) )
@@ -37,8 +45,10 @@ module Slingshot
       def to_json
         request = {}
         request.update( { :query  => @query } )
-        request.update( { :sort   => @sort } ) if @sort
+        request.update( { :sort   => @sort } )   if @sort
         request.update( { :facets => @facets } ) if @facets
+        request.update( { :size => @size } )     if @size
+        request.update( { :from => @from } )     if @from
         request.to_json
       end
 
