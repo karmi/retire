@@ -1,6 +1,8 @@
 Slingshot
 =========
 
+![Slingshot](https://github.com/karmi/slingshot/raw/master/slingshot.png)
+
 _Slingshot_ aims to provide a rich Ruby API and DSL for the
 [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
 
