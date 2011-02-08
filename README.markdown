@@ -132,6 +132,7 @@ Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [S
 
 See the [`examples/dsl.rb`](blob/master/examples/dsl.rb).
 
+
 Todo & Plans
 ------------
 
@@ -154,6 +155,13 @@ In order of importance:
 * [Highligting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) support
 * [Bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) API
 * Embedded webserver to display cluster statistics and allow easy searches
+
+
+Other Clients
+-------------
+
+Check out [other _ElasticSearch_ clients](http://www.elasticsearch.org/guide/appendix/clients.html).
+
 
 Feedback
 --------
