@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "slingshot/version"
 
 Gem::Specification.new do |s|
-  s.name        = "slingshot"
+  s.name        = "slingshot-rb"
   s.version     = Slingshot::VERSION
   s.platform    = Gem::Platform::RUBY
   s.summary       = "Ruby API for ElasticSearch"
