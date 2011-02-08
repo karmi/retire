@@ -137,9 +137,9 @@ Todo & Plans
 
 In order of importance:
 
+* Allowing to set custom non-ActiveModel wrapper class (raw Hash, your own, etc)
 * Getting document [by ID](http://www.elasticsearch.org/guide/reference/api/get.html)
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
-* Allowing to set custom non-ActiveModel wrapper class (your own)
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
