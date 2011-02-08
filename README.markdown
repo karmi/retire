@@ -27,7 +27,7 @@ First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's d
 
 OK, easy. Now, install the gem via Rubygems:
 
-    $ gem install slingshot
+    $ gem install slingshot-rb
 
 or from source:
 
