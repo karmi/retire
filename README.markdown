@@ -88,7 +88,7 @@ from the database:
 Let's display the results:
 
     s.results.each do |document|
-      puts "* #{ document['_source']['title'] }"
+      puts "* #{ document.title }"
     end
 
     # * Two
@@ -137,7 +137,6 @@ Todo & Plans
 
 In order of importance:
 
-* Basic wrapper class for _hits_ in results, so we could write `results.first.document.title` instead of using the raw Hash
 * Getting document [by ID](http://www.elasticsearch.org/guide/reference/api/get.html)
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
 * Allowing to set custom non-ActiveModel wrapper class (your own)

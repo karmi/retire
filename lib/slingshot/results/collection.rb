@@ -8,7 +8,11 @@ module Slingshot
       def initialize(response)
         @time    = response['took']
         @total   = response['hits']['total']
-        @results = response['hits']['hits']
+        @results = response['hits']['hits'].map do |h|
+                     document = h['_source'] ? h['_source'] : h['fields']
+                     h.update document if document
+                     Item.new h
+                   end
         @facets  = response['facets']
       end
 

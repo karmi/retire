@@ -56,7 +56,7 @@ puts s.to_curl
 
 puts "", "Results:", "-"*80
 s.results.each_with_index do |document, i|
-  puts "#{i+1}. #{ document['_source']['title'].ljust(20) } [id] #{document['_id']}"
+  puts "#{i+1}. #{ document.title.ljust(20) } [id] #{document._id}"
 end
 
 puts "", "Facets: tags distribution across the whole database:", "-"*80
