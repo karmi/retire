@@ -13,7 +13,7 @@ You should seriously consider it to power search in your Ruby applications:
 it will deliver all the features you want — and many more you may have not
 imagined yet (native geo search? histogram facets?)
 
-_Slingshot_ currently allow basic operation with the index and searching. See chapters below.
+_Slingshot_ currently allows basic operation with the index and searching. More is planned.
 
 
 Installation
@@ -32,6 +32,7 @@ OK, easy. Now, install the gem via Rubygems:
 or from source:
 
     $ git clone git://github.com/karmi/slingshot.git
+    $ cd slingshot
     $ rake install
 
 
