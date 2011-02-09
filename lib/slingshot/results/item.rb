@@ -13,7 +13,7 @@ module Slingshot
           end
           super.replace self
         else
-          super()
+          super
         end
       end
 

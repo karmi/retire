@@ -10,6 +10,21 @@ module Slingshot
         @document = Results::Item.new :title => 'Test', :author => { :name => 'Kafka' }
       end
 
+      should "be initialized with a Hash" do
+        assert_nothing_raised do
+          d = Results::Item.new(:id => 1)
+          assert_instance_of Results::Item, d
+        end
+      end
+
+      should "delegate non-Hash params to Hash when initializing" do
+        assert_nothing_raised do
+          d = Results::Item.new('foo')
+          assert_instance_of Results::Item, d
+          assert_equal 'foo', d[:bar] # See http://www.ruby-doc.org/core/classes/Hash.html#M000718
+        end
+      end
+
       should "respond to :to_indexed_json" do
         assert_respond_to Results::Item.new, :to_indexed_json
       end
