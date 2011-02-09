@@ -1,11 +1,24 @@
 require 'test_helper'
 
+class Article
+  attr_reader :title, :body
+  def initialize(attributes={})
+    @title = attributes[:title]
+    @body  = attributes[:body]
+  end
+  def to_json
+    { :title => @title, :body => @body }.to_json
+  end
+  alias :to_indexed_json :to_json
+end
+
 module Slingshot
 
   class ResultsCollectionTest < Test::Unit::TestCase
 
     context "Collection" do
       setup do
+        Configuration.reset :wrapper
         @default_response = { 'hits' => { 'hits' => [{:_id => 1}, {:_id => 2}, {:_id => 3}] } }
       end
 
@@ -26,18 +39,37 @@ module Slingshot
 
       context "wrapping results" do
 
-        should "wrap hits in Item" do
-          response = { 'hits' => { 'hits' => [ { '_id' => 1, '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
-          document =  Results::Collection.new(response).first
+        setup do
+          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
+        end
+
+        should "wrap hits in Item by default" do
+          document =  Results::Collection.new(@response).first
           assert_kind_of Results::Item, document
           assert_equal 'Test', document.title
         end
 
-        should "allow access to raw underlying Hash" do
-          response = { 'hits' => { 'hits' => [ { '_id' => 1, '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
-          document = Results::Collection.new(response).first
+        should "allow access to raw underlying Hash in Item" do
+          document = Results::Collection.new(@response).first
           assert_not_nil document[:_source][:title]
           assert_equal 'Test', document[:_source][:title]
+        end
+
+        should "allow wrapping hits in a Hash" do
+          Configuration.wrapper(Hash)
+
+          document =  Results::Collection.new(@response).first
+          assert_kind_of Hash, document
+          assert_raise(NoMethodError) { document.title }
+          assert_equal   'Test', document['_source'][:title]
+        end
+
+        should "allow wrapping hits in custom class" do
+          Configuration.wrapper(Article)
+
+          article =  Results::Collection.new(@response).first
+          assert_kind_of Article, article
+          assert_equal   'Test',  article.title
         end
 
       end

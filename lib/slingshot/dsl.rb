@@ -5,8 +5,8 @@ module Slingshot
       Configuration.class_eval(&block)
     end
 
-    def search(indices, &block)
-      Search::Search.new(indices, &block).perform
+    def search(indices, options={}, &block)
+      Search::Search.new(indices, options, &block).perform
     end
 
     def index(name, &block)

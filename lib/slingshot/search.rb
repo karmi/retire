@@ -6,8 +6,12 @@ module Slingshot
       attr_reader :indices, :url, :results, :response, :query, :facets
 
       def initialize(*indices, &block)
-        raise ArgumentError, 'Please pass index or indices to search' if indices.empty?
+        @options = indices.pop if indices.last.is_a?(Hash)
         @indices = indices
+        raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
+        if @options
+          Configuration.wrapper @options[:wrapper] if @options[:wrapper]
+        end
         instance_eval(&block) if block_given?
       end
 

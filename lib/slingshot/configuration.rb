@@ -10,6 +10,10 @@ module Slingshot
       @client = klass || @client || Client::RestClient
     end
 
+    def self.wrapper(klass=nil)
+      @wrapper = klass || @wrapper || Results::Item
+    end
+
     def self.reset(*properties)
       reset_variables = properties.empty? ? instance_variables : instance_variables & properties.map { |p| "@#{p}" }
       reset_variables.each { |v| instance_variable_set(v, nil) }

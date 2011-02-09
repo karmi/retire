@@ -9,9 +9,13 @@ module Slingshot
         @time    = response['took']
         @total   = response['hits']['total']
         @results = response['hits']['hits'].map do |h|
-                     document = h['_source'] ? h['_source'] : h['fields']
-                     h.update document if document
-                     Item.new h
+                     if Configuration.wrapper == Hash
+                       h
+                     else
+                       document = h['_source'] ? h['_source'] : h['fields']
+                       h.update document if document
+                       Configuration.wrapper.new(h)
+                     end
                    end
         @facets  = response['facets']
       end

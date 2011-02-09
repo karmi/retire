@@ -133,13 +133,18 @@ Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [S
 
 See the [`examples/dsl.rb`](blob/master/examples/dsl.rb).
 
+_Slingshot_ wraps the results in a enumerable `Results::Collection` class, and every result in a `Results::Item` class,
+which looks like a child of `Hash` and `Openstruct`.
+
+You may wrap the result items in your own class by setting the `Configuration.wrapper` property.
+Check out file `test/unit/results_collection_test.rb` to see how to do that.
+
 
 Todo & Plans
 ------------
 
 In order of importance:
 
-* Allowing to set custom non-ActiveModel wrapper class (raw Hash, your own, etc)
 * Getting document [by ID](http://www.elasticsearch.org/guide/reference/api/get.html)
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
