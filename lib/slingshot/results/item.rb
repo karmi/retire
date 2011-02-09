@@ -25,7 +25,7 @@ module Slingshot
       end
 
       def inspect
-        s = []; self.each { |k,v| s << ":#{k} => #{v.inspect}" }
+        s = []; self.each { |k,v| s << "#{k}: #{v.inspect}" }
         %Q|<Item #{s.join(', ')}>|
       end
 
