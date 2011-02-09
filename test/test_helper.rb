@@ -7,6 +7,8 @@ require 'pathname'
 
 require 'slingshot'
 
+Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
+
 class Test::Unit::TestCase
 
   def fixtures_path

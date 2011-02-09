@@ -1,17 +1,5 @@
 require 'test_helper'
 
-class Article
-  attr_reader :title, :body
-  def initialize(attributes={})
-    @title = attributes[:title]
-    @body  = attributes[:body]
-  end
-  def to_json
-    { :title => @title, :body => @body }.to_json
-  end
-  alias :to_indexed_json :to_json
-end
-
 module Slingshot
 
   class ResultsCollectionTest < Test::Unit::TestCase
