@@ -3,6 +3,9 @@ module Slingshot
   module Client
 
     class Base
+      def get(url)
+        raise NoMethodError, "Implement this method in your client class"
+      end
       def post(url, data)
         raise NoMethodError, "Implement this method in your client class"
       end
@@ -12,6 +15,9 @@ module Slingshot
     end
 
     class RestClient < Base
+      def self.get(url)
+        ::RestClient.get url
+      end
       def self.post(url, data)
         ::RestClient.post url, data
       end

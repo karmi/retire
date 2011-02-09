@@ -8,6 +8,9 @@ module Slingshot
       setup { @http ||= Client::Base.new }
 
       should "have abstract methods" do
+        assert_raise(ArgumentError) { @http.get                }
+        assert_raise(NoMethodError) { @http.get 'URL'          }
+
         assert_raise(ArgumentError) { @http.post               }
         assert_raise(ArgumentError) { @http.post 'URL'         }
         assert_raise(NoMethodError) { @http.post 'URL', 'DATA' }
@@ -23,7 +26,8 @@ module Slingshot
         assert_equal Client::RestClient, Configuration.client
       end
 
-      should "respond to post and delete" do
+      should "respond to HTTP methods" do
+        assert_respond_to Client::RestClient, :get
         assert_respond_to Client::RestClient, :post
         assert_respond_to Client::RestClient, :delete
       end
