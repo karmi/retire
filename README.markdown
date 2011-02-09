@@ -151,6 +151,7 @@ In order of importance:
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
 * [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) management
+* Proper RDoc annotations for the source code
 * Infrastructure for query filters
 * [Range](http://www.elasticsearch.org/guide/reference/query-dsl/range-filter.html) filters and queries
 * [Geo Filters](http://www.elasticsearch.org/blog/2010/08/16/geo_location_and_search.html) for queries
