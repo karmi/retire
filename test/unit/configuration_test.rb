@@ -27,6 +27,25 @@ module Slingshot
         assert_nothing_raised { Configuration.client Client::Base }
         assert_equal Client::Base, Configuration.client
       end
+
+      should "allow to reset the configuration for specific property" do
+        Configuration.url 'http://example.com'
+        Configuration.client Client::Base
+        assert_equal 'http://example.com', Configuration.url
+        Configuration.reset :url
+        assert_equal 'http://localhost:9200', Configuration.url
+        assert_equal Client::Base, Configuration.client
+      end
+
+      should "allow to reset the configuration for all properties" do
+        Configuration.url 'http://example.com'
+        Configuration.client Client::Base
+        assert_equal 'http://example.com', Configuration.url
+        assert_equal Client::Base, Configuration.client
+        Configuration.reset
+        assert_equal 'http://localhost:9200', Configuration.url
+        assert_equal Client::RestClient, Configuration.client
+      end
     end
 
   end
