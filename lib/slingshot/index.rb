@@ -34,6 +34,17 @@ module Slingshot
       JSON.parse(result)
     end
 
+    def retrieve(type, id)
+      result = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      h = JSON.parse(result)
+      if Configuration.wrapper == Hash then h
+      else
+        document = h['_source'] ? h['_source'] : h['fields']
+        h.update document if document
+        Configuration.wrapper.new(h)
+      end
+    end
+
     def refresh
       Configuration.client.post "#{Configuration.url}/#{@name}/_refresh", ''
     end

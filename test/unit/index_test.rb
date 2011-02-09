@@ -64,6 +64,46 @@ module Slingshot
 
       end
 
+      context "when retrieving" do
+
+        setup do
+          Configuration.reset :wrapper
+
+          Configuration.client.stubs(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').
+                                            returns('{"ok":true,"_id":"id-1"}')
+          @index.store :article, :title => 'Test'
+        end
+
+        should "return document in default wrapper" do
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+                                             returns('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}')
+          article = @index.retrieve :article, 'id-1'
+          assert_instance_of Results::Item, article
+          assert_equal 'Test', article['_source']['title']
+          assert_equal 'Test', article.title
+        end
+
+        should "return document as a hash" do
+          Configuration.wrapper Hash
+
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+                                             returns('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}')
+          article = @index.retrieve :article, 'id-1'
+          assert_instance_of Hash, article
+        end
+
+        should "return document in custom wrapper" do
+          Configuration.wrapper Article
+
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+                                             returns('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}')
+          article = @index.retrieve :article, 'id-1'
+          assert_instance_of Article, article
+          assert_equal 'Test', article.title
+        end
+
+      end
+
     end
 
   end

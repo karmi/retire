@@ -145,7 +145,6 @@ Todo & Plans
 
 In order of importance:
 
-* Getting document [by ID](http://www.elasticsearch.org/guide/reference/api/get.html)
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
