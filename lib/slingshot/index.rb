@@ -20,17 +20,32 @@ module Slingshot
     end
 
     def store(*args)
+      # TODO: Infer type from the document (hash property, method)
+
       if args.size > 1
         (type, document = args)
       else
         (document = args.pop; type = :document)
       end
+
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
+      id = case true
+        when document.is_a?(Hash)                                           then document[:id] || document['id']
+        when document.respond_to?(:id) && document.id != document.object_id then document.id
+      end
+      $VERBOSE = old_verbose
+
       document = case true
         when document.is_a?(String) then document
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
       end
-      result = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/", document
+
+      if id
+        result = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/#{id}", document
+      else
+        result = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/", document
+      end
       JSON.parse(result)
     end
 

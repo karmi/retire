@@ -62,6 +62,24 @@ module Slingshot
           assert_raise(ArgumentError) { @index.store document }
         end
 
+        context "document with ID" do
+
+          should "store Hash it under its ID property" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
+                                                     {:id => 123, :title => 'Test'}.to_json).
+                                                returns('{"ok":true,"_id":"123"}')
+            @index.store :id => 123, :title => 'Test'
+          end
+
+          should "store a custom class under its ID property" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
+                                                     {:id => 123, :title => 'Test', :body => 'Lorem'}.to_json).
+                                                returns('{"ok":true,"_id":"123"}')
+            @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
+          end
+
+        end
+
       end
 
       context "when retrieving" do
