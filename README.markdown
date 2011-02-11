@@ -147,9 +147,10 @@ In order of importance:
 
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
+* [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) management
+* Alow to [specify settings and mapping](http://elasticsearch.karmi.cz//guide/reference/api/admin-indices-create-index.html) when creating index
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
-* [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) management
 * Proper RDoc annotations for the source code
 * Infrastructure for query filters
 * [Range](http://www.elasticsearch.org/guide/reference/query-dsl/range-filter.html) filters and queries
