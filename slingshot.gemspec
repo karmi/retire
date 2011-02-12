@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mocha"
   s.add_development_dependency "sdoc"
   s.add_development_dependency "rcov"
+  s.add_development_dependency "activemodel"
 
   s.description = <<-DESC
    Ruby API for the ElasticSearch search engine/database.
