@@ -35,6 +35,14 @@ module Slingshot::Search
         assert_equal [ :foo, {:bar => 'desc'}, :_score ].to_json, s.to_json
       end
 
+      should "encode fields deeper in json" do
+        s = Sort.new { field 'author.name' }
+        assert_equal [ 'author.name' ].to_json, s.to_json
+
+        s = Sort.new { field 'author.name', :desc }
+        assert_equal [ {'author.name' => 'desc'} ].to_json, s.to_json
+      end
+
     end
 
   end
