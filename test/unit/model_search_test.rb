@@ -7,6 +7,10 @@ module Slingshot
 
       context "Model::Search" do
 
+        setup do
+          @stub = stub('search') { stubs(:query).returns(self); stubs(:perform).returns(self); stubs(:results).returns([]) }
+        end
+
         should "have the search method" do
           assert_respond_to Model::Search, :search
           assert_respond_to ActiveModelArticle, :search
@@ -15,17 +19,30 @@ module Slingshot
         should "search in specific index" do
           i = 'active_model_articles'
           q = 'foo'
-          s = stub('search') { stubs(:query).returns(self); stubs(:perform).returns(self) }
-          Slingshot::Search::Search.expects(:new).with(i, {}).returns(s)
+          Slingshot::Search::Search.expects(:new).with(i, {}).returns(@stub)
 
           ActiveModelArticle.search q
+        end
+
+        should "wrap results in proper class and do not change the original wrapper" do
+          response = { 'hits' => { 'hits' => [{'_id' => 1, '_source' => { :title => 'Article' }}] } }
+          Configuration.client.expects(:post).returns(response.to_json)
+
+          collection = ActiveModelArticle.search 'foo'
+          assert_instance_of Results::Collection, collection
+
+          assert_equal Results::Item, Slingshot::Configuration.wrapper
+
+          document = collection.first
+          assert_instance_of ActiveModelArticle, document
+          assert_equal 'Article', document.title
         end
 
         context "searching with a block" do
 
           should "pass on whatever block it received" do
-            Slingshot::Search::Search.any_instance.expects(:perform)
-            Slingshot::Search::Query.any_instance.expects(:string).with('foo')
+            Slingshot::Search::Search.any_instance.expects(:perform).returns(@stub)
+            Slingshot::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
 
             ActiveModelArticle.search { query { string 'foo' } }
           end
@@ -37,8 +54,8 @@ module Slingshot
           setup do
             @q = 'foo AND bar'
 
-            Slingshot::Search::Query.any_instance.expects(:string).with( @q )
-            Slingshot::Search::Search.any_instance.expects(:perform).returns(true)
+            Slingshot::Search::Query.any_instance.expects(:string).with( @q ).returns(@stub)
+            Slingshot::Search::Search.any_instance.expects(:perform).returns(@stub)
           end
 
           should "search for query string" do

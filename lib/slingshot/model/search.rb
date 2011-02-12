@@ -10,6 +10,8 @@ module Slingshot
       module ClassMethods
 
         def search(query=nil, options={}, &block)
+          old_wrapper = Slingshot::Configuration.wrapper
+          Slingshot::Configuration.wrapper self
           index = model_name.plural
           sort  = options[:order] || options[:sort]
           sort  = Array(sort)
@@ -22,10 +24,12 @@ module Slingshot
                 field_name.include?('.') ? field(field_name, direction) : send(field_name, direction)
               end
             end unless sort.empty?
-            s.perform
+            s.perform.results
           else
-            Slingshot::Search::Search.new(index, options, &block).perform
+            s = Slingshot::Search::Search.new(index, options, &block).perform.results
           end
+        ensure
+          Slingshot::Configuration.wrapper old_wrapper
         end
 
       end
