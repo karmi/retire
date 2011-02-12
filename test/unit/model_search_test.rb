@@ -34,14 +34,40 @@ module Slingshot
 
         context "searching with query string" do
 
+          setup do
+            @q = 'foo AND bar'
+
+            Slingshot::Search::Query.any_instance.expects(:string).with( @q )
+            Slingshot::Search::Search.any_instance.expects(:perform).returns(true)
+          end
 
           should "search for query string" do
-            q = 'foo AND bar'
+            ActiveModelArticle.search @q
+          end
 
-            Slingshot::Search::Query.any_instance.expects(:string).with( q )
-            Slingshot::Search::Search.any_instance.expects(:perform).returns(true)
+          should "allow to pass :order option" do
+            Slingshot::Search::Sort.any_instance.expects(:title)
 
-            ActiveModelArticle.search q
+            ActiveModelArticle.search @q, :order => 'title'
+          end
+
+          should "allow to pass :sort option as :order option" do
+            Slingshot::Search::Sort.any_instance.expects(:title)
+
+            ActiveModelArticle.search @q, :sort => 'title'
+          end
+
+          should "allow to specify sort direction" do
+            Slingshot::Search::Sort.any_instance.expects(:title).with('DESC')
+
+            ActiveModelArticle.search @q, :order => 'title DESC'
+          end
+
+          should "allow to specify more fields to sort on" do
+            Slingshot::Search::Sort.any_instance.expects(:title).with('DESC')
+            Slingshot::Search::Sort.any_instance.expects(:field).with('author.name', nil)
+
+            ActiveModelArticle.search @q, :order => ['title DESC', 'author.name']
           end
 
         end
