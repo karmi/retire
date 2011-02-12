@@ -7,6 +7,11 @@ module Slingshot
         self.instance_eval(&block) if block_given?
       end
 
+      def field(name, direction=nil)
+        @value << ( direction ? { name => direction } : name )
+        self
+      end
+
       def method_missing(id, *args, &block)
         case arg = args.shift
           when String, Symbol, Hash then @value << { id => arg }
