@@ -60,6 +60,17 @@ module Slingshot
           assert_equal   'Test',  article.title
         end
 
+        should "delegate results to wrapper find method for :searchable wrappers" do
+          class FakeModel
+            def self.find(*args); end
+            def self.mode; :searchable; end
+          end
+          Configuration.wrapper FakeModel
+          FakeModel.expects(:find).with([1])
+
+          Results::Collection.new(@response)
+        end
+
       end
 
     end

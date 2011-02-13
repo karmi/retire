@@ -44,6 +44,10 @@ module Slingshot
           Index.new(model_name.plural).create
         end
 
+        def mode
+          :searchable
+        end
+
       end
 
       module InstanceMethods
@@ -55,6 +59,11 @@ module Slingshot
             Index.new(self.class.model_name.plural).store  self.class.model_name.plural, self
           end
         end
+
+        def to_indexed_json
+          to_json(:root => false)
+        end
+
 
       end
 
