@@ -66,6 +66,27 @@ module Slingshot
       logged(error, "/#{@name}/#{type}/", curl)
     end
 
+    def remove(*args)
+      # TODO: Infer type from the document (hash property, method)
+
+      if args.size > 1
+        (type, document = args)
+      else
+        (document = args.pop; type = :document)
+      end
+
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
+      id = case true
+        when document.is_a?(Hash)                                           then document[:id] || document['id']
+        when document.respond_to?(:id) && document.id != document.object_id then document.id
+        else document
+      end
+      $VERBOSE = old_verbose
+
+      result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      JSON.parse(result) if result
+    end
+
     def retrieve(type, id)
       @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
       h = JSON.parse(@response.body)
