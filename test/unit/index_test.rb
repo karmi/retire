@@ -160,6 +160,42 @@ module Slingshot
 
       end
 
+      context "when removing" do
+
+        should "properly set type from args" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/").
+                                                returns('{"ok":true,"_id":"test"}').twice
+          @index.remove 'article', :title => 'Test'
+          @index.remove :article,  :title => 'Test'
+        end
+
+        should "set default type" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/").
+                                                returns('{"ok":true,"_id":"test"}')
+          @index.remove :title => 'Test'
+        end
+
+        should "get ID from hash" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+                                                returns('{"ok":true,"_id":"1"}')
+          @index.remove :id => 1
+        end
+
+        should "get ID from method" do
+          document = stub('document', :id => 1)
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+                                                returns('{"ok":true,"_id":"1"}')
+          @index.remove document
+        end
+
+        should "get ID from arguments" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+                                                returns('{"ok":true,"_id":"1"}')
+          @index.remove :document, 1
+        end
+
+      end
+
     end
 
   end

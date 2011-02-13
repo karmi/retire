@@ -36,6 +36,33 @@ module Slingshot
 
     end
 
+    context "Removing documents from the index" do
+
+      teardown { Slingshot.index('articles-test-remove').delete }
+
+      setup do
+        Slingshot.index 'articles-test-remove' do
+          delete
+          create
+          store :id => 1, :title => 'One'
+          store :id => 2, :title => 'Two'
+          refresh
+        end
+      end
+
+      should "remove document from the index" do
+
+        assert_equal 2, Slingshot.search('articles-test-remove') { query { string '*' } }.results.count
+
+        assert_nothing_raised do
+          assert Slingshot.index('articles-test-remove').remove 1
+          assert ! Slingshot.index('articles-test-remove').remove(1)
+        end
+
+      end
+
+    end
+
   end
 
 end
