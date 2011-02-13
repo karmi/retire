@@ -27,6 +27,7 @@ module Slingshot
         should "wrap results in proper class and do not change the original wrapper" do
           response = { 'hits' => { 'hits' => [{'_id' => 1, '_source' => { :title => 'Article' }}] } }
           Configuration.client.expects(:post).returns(response.to_json)
+          ActiveModelArticle.expects(:find).with([1]).returns([ActiveModelArticle.new :title => 'Article'])
 
           collection = ActiveModelArticle.search 'foo'
           assert_instance_of Results::Collection, collection

@@ -8,16 +8,21 @@ module Slingshot
       def initialize(response)
         @time    = response['took']
         @total   = response['hits']['total']
-        @results = response['hits']['hits'].map do |h|
-                     if Configuration.wrapper == Hash
-                       h
-                     else
-                       document = h['_source'] ? h['_source'] : h['fields']
-                       document['highlight'] = h['highlight'] if h['highlight']
-                       h.update document if document
-                       Configuration.wrapper.new(h)
-                     end
-                   end
+        @results = if Configuration.wrapper.respond_to?(:mode) && Configuration.wrapper.mode == :searchable
+          # FIXME: `SELECT ... IN` SQL query does not preserve sort order
+          Configuration.wrapper.find response['hits']['hits'].map { |h| h['_id'] }
+        else
+          response['hits']['hits'].map do |h|
+                       if Configuration.wrapper == Hash
+                         h
+                       else
+                         document = h['_source'] ? h['_source'] : h['fields']
+                         document['highlight'] = h['highlight'] if h['highlight']
+                         h.update document if document
+                         Configuration.wrapper.new(h)
+                       end
+          end
+        end
         @facets  = response['facets']
       end
 
