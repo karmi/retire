@@ -4,7 +4,15 @@ module Slingshot
     module Search
 
       def self.included(base)
-        base.send :extend, ClassMethods
+        base.send :extend,  ClassMethods
+        base.send :include, InstanceMethods
+
+        if base.respond_to?(:after_save) && base.respond_to?(:after_destroy)
+          base.send :after_save,    :update_index
+          base.send :after_destroy, :update_index
+        end
+
+        base.create_index
       end
 
       module ClassMethods
@@ -30,6 +38,22 @@ module Slingshot
           end
         ensure
           Slingshot::Configuration.wrapper old_wrapper
+        end
+
+        def create_index
+          Index.new(model_name.plural).create
+        end
+
+      end
+
+      module InstanceMethods
+
+        def update_index
+          if destroyed?
+            Index.new(self.class.model_name.plural).remove self.class.model_name.plural, self
+          else
+            Index.new(self.class.model_name.plural).store  self.class.model_name.plural, self
+          end
         end
 
       end
