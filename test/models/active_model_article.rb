@@ -1,8 +1,10 @@
 # Example ActiveModel class
+
 require 'rubygems'
 require 'active_model'
 
 class ActiveModelArticle
+
   include ActiveModel::AttributeMethods
   include ActiveModel::Validations
   include ActiveModel::Serialization
@@ -20,5 +22,8 @@ class ActiveModelArticle
   def method_missing(id, *args, &block)
     attributes[id.to_sym] || attributes[id.to_s] || super
   end
+
+  def persisted?; true; end
+  def save;       true; end
 
 end

@@ -89,6 +89,50 @@ module Slingshot
 
         end
 
+        should "create the index when included in class" do
+          i = mock('index') { expects(:create) }
+          Slingshot::Index.expects(:new).with('active_model_articles').returns(i)
+
+          ActiveModelArticle.send :include, Slingshot::Model::Search
+        end
+
+        should "not set callback when hooks are missing" do
+          @model = ActiveModelArticle.new
+          @model.expects(:update_index).never
+
+          @model.save
+        end
+
+        should "fire :after_save callbacks" do
+          @model = ActiveModelArticleWithCallbacks.new
+          @model.expects(:update_index)
+
+          @model.save
+        end
+
+        should "fire :after_destroy callbacks" do
+          @model = ActiveModelArticleWithCallbacks.new
+          @model.expects(:update_index)
+
+          @model.destroy
+        end
+
+        should "store the record in index on :update_index when saved" do
+          @model = ActiveModelArticleWithCallbacks.new
+          i = mock('index') { expects(:store) }
+          Slingshot::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)
+
+          @model.save
+        end
+
+        should "remove the record from index on :update_index when destroyed" do
+          @model = ActiveModelArticleWithCallbacks.new
+          i = mock('index') { expects(:remove) }
+          Slingshot::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)
+
+          @model.destroy
+        end
+
       end
 
     end
