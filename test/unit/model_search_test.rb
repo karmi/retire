@@ -136,6 +136,15 @@ module Slingshot
 
       end
 
+      context "ActiveModel" do
+
+        should "serialize itself into JSON without 'root'" do
+          @model = ActiveModelArticle.new :name => 'Test'
+          assert_equal({:name => 'Test'}.to_json, @model.to_indexed_json)
+        end
+        
+      end
+
     end
 
   end

@@ -45,7 +45,4 @@ class ActiveModelArticleWithCallbacks
 
   def destroyed?; !!@destroyed; end
 
-  alias :to_indexed_json :to_json
-  self.include_root_in_json = false
-
 end

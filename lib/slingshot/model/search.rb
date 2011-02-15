@@ -61,7 +61,7 @@ module Slingshot
         end
 
         def to_indexed_json
-          to_json(:root => false)
+          self.serializable_hash.to_json
         end
 
 
