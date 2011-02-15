@@ -90,13 +90,6 @@ module Slingshot
 
         end
 
-        should "create the index when included in class" do
-          i = mock('index') { expects(:create) }
-          Slingshot::Index.expects(:new).with('active_model_articles').returns(i)
-
-          ActiveModelArticle.send :include, Slingshot::Model::Search
-        end
-
         should "not set callback when hooks are missing" do
           @model = ActiveModelArticle.new
           @model.expects(:update_index).never
