@@ -7,7 +7,7 @@ class SupermodelArticle < SuperModel::Base
   include SuperModel::RandomID
 
   include Slingshot::Model::Search
-
+  include Slingshot::Model::Callbacks
 
   alias :persisted? :exists?
 
