@@ -6,8 +6,6 @@ module Slingshot
       def self.included(base)
         base.send :extend,  ClassMethods
         base.send :include, InstanceMethods
-
-        base.create_index
       end
 
       module ClassMethods
@@ -33,10 +31,6 @@ module Slingshot
           end
         ensure
           Slingshot::Configuration.wrapper old_wrapper
-        end
-
-        def create_index
-          Index.new(model_name.plural).create
         end
 
         def mode
