@@ -26,9 +26,6 @@ module Slingshot
       should "save document into index on save and find it" do
         a = SupermodelArticle.new :title => 'Test'
         a.save
-        # p a
-        # puts a.id
-        # p SupermodelArticle.find(a.id)
 
         Slingshot.index('supermodel_articles').refresh
         results = SupermodelArticle.search 'test'
@@ -56,7 +53,7 @@ module Slingshot
 
         Slingshot.index('supermodel_articles').refresh
         results = SupermodelArticle.search 'foo OR bar^100'
-        p results
+
         assert_equal 2, results.count
 
         assert_equal 'bar', results.first.title
