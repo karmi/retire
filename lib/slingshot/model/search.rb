@@ -7,11 +7,6 @@ module Slingshot
         base.send :extend,  ClassMethods
         base.send :include, InstanceMethods
 
-        if base.respond_to?(:after_save) && base.respond_to?(:after_destroy)
-          base.send :after_save,    :update_index
-          base.send :after_destroy, :update_index
-        end
-
         base.create_index
       end
 

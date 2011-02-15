@@ -15,6 +15,7 @@ class ActiveModelArticleWithCallbacks
   define_model_callbacks :save, :destroy
 
   include Slingshot::Model::Search
+  include Slingshot::Model::Callbacks
 
   attr_reader :attributes
 
