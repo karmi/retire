@@ -11,6 +11,10 @@ module Slingshot
           assert_equal 'persistent_articles', PersistentArticle.index_name
         end
 
+        should "have document_type" do
+          assert_equal 'persistent_article', PersistentArticle.document_type
+        end
+
       end
 
       context "Finders" do
