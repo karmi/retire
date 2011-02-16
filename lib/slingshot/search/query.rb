@@ -23,6 +23,11 @@ module Slingshot
         @value
       end
 
+      def all
+        @value = { :match_all => {} }
+        @value
+      end
+
       def to_json
         @value.to_json
       end

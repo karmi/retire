@@ -33,6 +33,10 @@ module Slingshot::Search
                       Query.new.string('foo', :default_field => 'title') )
       end
 
+      should "search for all documents" do
+        assert_equal( { :match_all => { } }, Query.new.all )
+      end
+
     end
 
   end
