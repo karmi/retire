@@ -27,13 +27,13 @@ Gem::Specification.new do |s|
   s.add_dependency "bundler",     "~> 1.0.0"
   s.add_dependency "rest-client", "~> 1.6.0"
   s.add_dependency "yajl-ruby",   "> 0.7.9"
+  s.add_dependency "activemodel", "> 3.0.0"
 
   s.add_development_dependency "turn"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "mocha"
   s.add_development_dependency "sdoc"
   s.add_development_dependency "rcov"
-  s.add_development_dependency "activemodel"
   s.add_development_dependency "activerecord"
   s.add_development_dependency "supermodel"
 
