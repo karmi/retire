@@ -5,6 +5,14 @@ module Slingshot
 
     class PersistenceTest < Test::Unit::TestCase
 
+      context "Model" do
+
+        should "have index_name" do
+          assert_equal 'persistent_articles', PersistentArticle.index_name
+        end
+
+      end
+
       context "Finders" do
 
         setup do

@@ -29,12 +29,11 @@ module Slingshot
           Slingshot::Configuration.wrapper self
           options = args.pop if args.last.is_a?(Hash)
           if args.size > 1
-            index = model_name.plural
-            Slingshot::Search::Search.new(index).query { terms :_id, args }.perform.results
+            Slingshot::Search::Search.new(index_name).query { terms :_id, args }.perform.results
           else
             case args = args.pop
               when Fixnum, String
-                Index.new(model_name.plural).retrieve model_name.plural, args
+                Index.new(index_name).retrieve model_name.plural, args
               when :all, :first, :last
                 send(args)
               else
@@ -49,8 +48,7 @@ module Slingshot
           # TODO: Options like `sort`; Possibly `filters`
           old_wrapper = Slingshot::Configuration.wrapper
           Slingshot::Configuration.wrapper self
-          index = model_name.plural
-          s = Slingshot::Search::Search.new(index).query { all }
+          s = Slingshot::Search::Search.new(index_name).query { all }
           s.perform.results
         ensure
           Slingshot::Configuration.wrapper old_wrapper
@@ -60,8 +58,7 @@ module Slingshot
           # TODO: Options like `sort`; Possibly `filters`
           old_wrapper = Slingshot::Configuration.wrapper
           Slingshot::Configuration.wrapper self
-          index = model_name.plural
-          s = Slingshot::Search::Search.new(index).query { all }.size(1)
+          s = Slingshot::Search::Search.new(index_name).query { all }.size(1)
           s.perform.results
         ensure
           Slingshot::Configuration.wrapper old_wrapper
@@ -69,6 +66,10 @@ module Slingshot
 
         def mode
           :persistable
+        end
+
+        def index_name
+          model_name.plural
         end
 
       end
