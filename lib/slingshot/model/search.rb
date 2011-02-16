@@ -43,9 +43,9 @@ module Slingshot
 
         def update_index
           if destroyed?
-            Index.new(self.class.model_name.plural).remove self.class.model_name.plural, self
+            Index.new(self.class.model_name.plural).remove self.class.model_name.singular, self
           else
-            Index.new(self.class.model_name.plural).store  self.class.model_name.plural, self
+            Index.new(self.class.model_name.plural).store  self.class.model_name.singular, self
           end
         end
 

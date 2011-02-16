@@ -33,7 +33,7 @@ module Slingshot
           else
             case args = args.pop
               when Fixnum, String
-                Index.new(index_name).retrieve model_name.plural, args
+                Index.new(index_name).retrieve document_type, args
               when :all, :first, :last
                 send(args)
               else
@@ -70,6 +70,10 @@ module Slingshot
 
         def index_name
           model_name.plural
+        end
+
+        def document_type
+          model_name.singular
         end
 
       end
