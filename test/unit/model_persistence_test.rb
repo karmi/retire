@@ -9,10 +9,12 @@ module Slingshot
 
         should "have index_name" do
           assert_equal 'persistent_articles', PersistentArticle.index_name
+          assert_equal 'persistent_articles', PersistentArticle.new(:name => 'Test').index_name
         end
 
         should "have document_type" do
           assert_equal 'persistent_article', PersistentArticle.document_type
+          assert_equal 'persistent_article', PersistentArticle.new(:name => 'Test').document_type
         end
 
       end

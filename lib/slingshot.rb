@@ -17,8 +17,9 @@ require 'slingshot/results/collection'
 require 'slingshot/results/item'
 require 'slingshot/index'
 require 'slingshot/dsl'
-require 'slingshot/model/search'
+require 'slingshot/model/naming'
 require 'slingshot/model/callbacks'
+require 'slingshot/model/search'
 require 'slingshot/model/persistence'
 
 module Slingshot

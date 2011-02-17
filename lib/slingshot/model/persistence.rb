@@ -15,6 +15,9 @@ module Slingshot
           extend  ActiveModel::Callbacks
           define_model_callbacks :save, :destroy
 
+          extend  Slingshot::Model::Naming::ClassMethods
+          include Slingshot::Model::Naming::InstanceMethods
+
           extend  ClassMethods
           include InstanceMethods
         end
@@ -66,14 +69,6 @@ module Slingshot
 
         def mode
           :persistable
-        end
-
-        def index_name
-          model_name.plural
-        end
-
-        def document_type
-          model_name.singular
         end
 
       end

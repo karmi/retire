@@ -4,8 +4,13 @@ module Slingshot
     module Search
 
       def self.included(base)
-        base.send :extend,  ClassMethods
-        base.send :include, InstanceMethods
+        base.class_eval do
+          extend  Slingshot::Model::Naming::ClassMethods
+          include Slingshot::Model::Naming::InstanceMethods
+
+          extend  ClassMethods
+          include InstanceMethods
+        end
       end
 
       module ClassMethods
@@ -43,9 +48,9 @@ module Slingshot
 
         def update_index
           if destroyed?
-            Index.new(self.class.model_name.plural).remove self.class.model_name.singular, self
+            Index.new(index_name).remove document_type, self
           else
-            Index.new(self.class.model_name.plural).store  self.class.model_name.singular, self
+            Index.new(index_name).store  document_type, self
           end
         end
 
@@ -53,9 +58,7 @@ module Slingshot
           self.serializable_hash.to_json
         end
 
-
       end
-
 
       extend ClassMethods
     end
