@@ -59,6 +59,13 @@ module Slingshot
           assert_equal 2, documents.count
         end
 
+        should "find document by array of IDs" do
+          Configuration.client.expects(:post).returns(@find_last_two.to_json)
+          documents = PersistentArticle.find [2, 3]
+
+          assert_equal 2, documents.count
+        end
+
         should "find all documents" do
           Configuration.client.stubs(:post).returns(@find_all.to_json)
           documents = PersistentArticle.all
