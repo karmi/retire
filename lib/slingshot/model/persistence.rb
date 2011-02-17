@@ -31,6 +31,7 @@ module Slingshot
           old_wrapper = Slingshot::Configuration.wrapper
           Slingshot::Configuration.wrapper self
           options = args.pop if args.last.is_a?(Hash)
+          args.flatten!
           if args.size > 1
             Slingshot::Search::Search.new(index_name).query { terms :_id, args }.perform.results
           else
