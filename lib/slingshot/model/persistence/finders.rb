@@ -44,7 +44,7 @@ module Slingshot
             old_wrapper = Slingshot::Configuration.wrapper
             Slingshot::Configuration.wrapper self
             s = Slingshot::Search::Search.new(index_name).query { all }.size(1)
-            s.perform.results
+            s.perform.results.first
           ensure
             Slingshot::Configuration.wrapper old_wrapper
           end

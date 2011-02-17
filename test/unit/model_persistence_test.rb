@@ -77,10 +77,9 @@ module Slingshot
 
         should "find first document" do
           Configuration.client.expects(:post).returns(@find_first.to_json)
-          documents = PersistentArticle.first
+          document = PersistentArticle.first
 
-          assert_equal 1, documents.count
-          assert_equal 'First', documents.first.attributes['title']
+          assert_equal 'First', document.attributes['title']
         end
 
 
