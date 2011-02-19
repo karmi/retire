@@ -88,6 +88,12 @@ module Slingshot
           end
         end
 
+        should_eventually "raise error when document is not found" do
+          assert_raise(DocumentNotFound) do
+             PersistentArticle.find 'xyz001'
+          end
+        end
+
       end
 
       context "Persistent model" do
