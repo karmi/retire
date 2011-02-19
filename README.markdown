@@ -11,7 +11,7 @@ RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucen
 written in Java. It manages to very simple and very powerful at the same time.
 You should seriously consider it to power search in your Ruby applications:
 it will deliver all the features you want — and many more you may have not
-imagined yet (native geo search? histogram facets?)
+imagined yet (native geo search? histogram facets for dates?)
 
 _Slingshot_ currently allows basic operation with the index and searching. More is planned.
 
@@ -40,9 +40,9 @@ Usage
 -----
 
 Currently, you can use _Slingshot_ via the DSL (eg. by extending your class with it).
-Plans for full ActiveModel integration (and other convenience layers) are in progress.
+Plans for full ActiveModel integration (and other convenience layers) are in progress (see the `activemodel` branch).
 
-To kick the tiers, require the gem in an IRB session or a Ruby script
+To kick the tires, require the gem in an IRB session or a Ruby script
 (note that you can run the full example from [`examples/dsl.rb`](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb)):
 
     require 'rubygems'
@@ -112,7 +112,9 @@ We can display the full query JSON:
     puts s.to_json
     # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"sort":[{"title":"desc"}],"query":{"terms":{"tags":["ruby"]}}}
 
-See, a Ruby DSL for this thing is kinda handy? We can query _ElasticSearch_ manually with `curl`, simply:
+See, a Ruby DSL for this thing is kinda handy?
+
+You can display the corresponding `curl` command easily:
 
     puts s.to_curl
     # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"sort":[{"title":"desc"}],"query":{"terms":{"tags":["ruby"]}}}'
@@ -128,7 +130,7 @@ Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [S
 * [Querying](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term` and `terms` types of queries
 * Sorting the results by `fields`
 * Retrieving a _terms_ type of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) -- other types are high priority
-* Returning just specific fields from documents
+* Returning just specific `fields` from documents
 * Paging with `from` and `size` query options
 
 See the [`examples/dsl.rb`](blob/master/examples/dsl.rb).
@@ -147,11 +149,12 @@ In order of importance:
 
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
-* [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) management
+* Basic [mapping](http://www.elasticsearch.org/guide/reference/mapping/) management for indices and models
 * Alow to [specify settings and mapping](http://elasticsearch.karmi.cz//guide/reference/api/admin-indices-create-index.html) when creating index
+* Proper RDoc annotations for the source code
+* Dual interface: allow to simply pass queries/options for _ElasticSearch_ as a Hash in any method
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
-* Proper RDoc annotations for the source code
 * Infrastructure for query filters
 * [Range](http://www.elasticsearch.org/guide/reference/query-dsl/range-filter.html) filters and queries
 * [Geo Filters](http://www.elasticsearch.org/blog/2010/08/16/geo_location_and_search.html) for queries
@@ -161,7 +164,7 @@ In order of importance:
 * [Analyze](http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze.html) API support
 * [Highligting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) support
 * [Bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) API
-* Embedded webserver to display cluster statistics and allow easy searches
+* Embedded webserver to display statistics and to allow easy searches
 
 
 Other Clients
