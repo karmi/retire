@@ -21,6 +21,8 @@ module Slingshot
           extend  Persistence::Finders::ClassMethods
           include Persistence::Attributes::InstanceMethods
 
+          include Persistence::Storage
+
           def self.mode
             :persistable
           end
