@@ -21,9 +21,9 @@ Installation
 
 First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's define easy:
 
-    $ curl -k -L -o elasticsearch-0.14.4.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.14.4.tar.gz
-    $ tar -zxvf elasticsearch-0.14.4.tar.gz
-    $ ./elasticsearch-0.14.4/bin/elasticsearch -f
+    $ curl -k -L -o elasticsearch-0.15.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.0.tar.gz
+    $ tar -zxvf elasticsearch-0.15.0.tar.gz
+    $ ./elasticsearch-0.15.0/bin/elasticsearch -f
 
 OK, easy. Now, install the gem via Rubygems:
 
