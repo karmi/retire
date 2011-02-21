@@ -7,13 +7,9 @@ module Slingshot
       # and leaving everything else alone.
       #
       def initialize(args={})
-        if args.respond_to?(:each_pair)
-          args.each_pair do |key, value|
-            self[key.to_sym] = value.respond_to?(:to_hash) ? self.class.new(value) : value
-          end
-          super.replace self
-        else
-          super
+        raise ArgumentError, "Please pass a Hash-like object" unless args.respond_to?(:each_pair)
+        args.each_pair do |key, value|
+          self[key.to_sym] = value.respond_to?(:to_hash) ? self.class.new(value) : value
         end
       end
 
@@ -30,6 +26,7 @@ module Slingshot
       end
 
       alias_method :to_indexed_json, :to_json
+
     end
 
   end
