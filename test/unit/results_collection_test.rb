@@ -37,10 +37,10 @@ module Slingshot
           assert_equal 'Test', document.title
         end
 
-        should "allow access to raw underlying Hash in Item" do
+        should_eventually "NOT allow access to raw underlying Hash in Item" do
           document = Results::Collection.new(@response).first
-          assert_not_nil document[:_source][:title]
-          assert_equal 'Test', document[:_source][:title]
+          assert_nil document[:_source]
+          assert_nil document['_source']
         end
 
         should "allow wrapping hits in a Hash" do
