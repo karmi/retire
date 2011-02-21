@@ -135,8 +135,8 @@ module Slingshot
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Results::Item, article
-          assert_equal 'Test', article['_source']['title']
           assert_equal 'Test', article.title
+          assert_equal 'Test', article[:title]
         end
 
         should "return document as a hash" do

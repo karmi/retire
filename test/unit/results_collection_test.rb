@@ -37,7 +37,7 @@ module Slingshot
           assert_equal 'Test', document.title
         end
 
-        should_eventually "NOT allow access to raw underlying Hash in Item" do
+        should "NOT allow access to raw underlying Hash in Item" do
           document = Results::Collection.new(@response).first
           assert_nil document[:_source]
           assert_nil document['_source']

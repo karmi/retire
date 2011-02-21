@@ -15,7 +15,7 @@ module Slingshot
         end
 
         assert_equal 5, s.results.count
-        assert_equal 'Five', s.results.first['_source']['title']
+        assert_equal 'Five', s.results.first[:title]
       end
 
       should "sort by title, descending" do
@@ -26,7 +26,7 @@ module Slingshot
         end
 
         assert_equal 5, s.results.count
-        assert_equal 'Two', s.results.first['_source']['title']
+        assert_equal 'Two', s.results.first[:title]
       end
 
     end

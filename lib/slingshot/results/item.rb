@@ -7,14 +7,9 @@ module Slingshot
       # and leaving everything else alone.
       #
       def initialize(args={})
-        # TODO: Need to store underlying Hash in a var and not subclass Hash, since it messes up Hash#default
-        if args.is_a? Hash
-          args.each_pair do |key, value|
-            self[key.to_sym] = value.is_a?(Hash) ? self.class.new(value) : value
-          end
-          super.replace self
-        else
-          super
+        raise ArgumentError, "Please pass a Hash" unless args.is_a?(Hash)
+        args.each_pair do |key, value|
+          self[key.to_sym] = value.is_a?(Hash) ? self.class.new(value) : value
         end
       end
 
@@ -31,6 +26,7 @@ module Slingshot
       end
 
       alias_method :to_indexed_json, :to_json
+
     end
 
   end
