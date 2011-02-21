@@ -102,7 +102,11 @@ module Slingshot
 
         should "allow to set attributes on initialization" do
           assert_not_nil @article.attributes
-          assert_equal 'Test', @article.attributes[:title]
+          assert_equal 'Test', @article.attributes['title']
+        end
+
+        should "allow to leave attributes blank on initialization" do
+          assert_nothing_raised { PersistentArticle.new }
         end
 
         should "have getters for existing attributes" do
@@ -185,19 +189,19 @@ module Slingshot
 
         should "have attribute names" do
           article = PersistentArticle.new :one => 'One', :two => 'Two'
-          assert_equal ['one', 'two'], article.attribute_names
+          assert_equal ['one', 'two'].sort, article.attribute_names.sort
         end
 
         should "allow to update existing attribute" do
           @article.title = 'Updated'
           assert_equal 'Updated', @article.title
-          assert_equal 'Updated', @article.attributes[:title]
+          assert_equal 'Updated', @article.attributes['title']
         end
 
         should "allow to set new attribute" do
           @article.author = 'John Smith'
           assert_equal 'John Smith', @article.author
-          assert_equal 'John Smith', @article.attributes[:author]
+          assert_equal 'John Smith', @article.attributes['author']
         end
 
         should_eventually "allow to set deeply nested attributes" do
@@ -206,7 +210,7 @@ module Slingshot
 
           assert_equal 'John',  @article.author.first_name
           assert_equal 'Smith', @article.author.last_name
-          assert_equal({ :first_name => 'John', :last_name => 'Smith' }, @article.attributes[:author])
+          assert_equal({ :first_name => 'John', :last_name => 'Smith' }, @article.attributes['author'])
         end
 
         context "when creating" do
