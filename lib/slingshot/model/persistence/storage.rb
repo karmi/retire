@@ -33,7 +33,9 @@ module Slingshot
           end
 
           def update_attributes(attributes={})
-            @attributes = attributes
+            attributes.each do |name, value|
+              send("#{name}=", value)
+            end
             save
           end
 
