@@ -40,7 +40,8 @@ Usage
 -----
 
 Currently, you can use _Slingshot_ via the DSL (eg. by extending your class with it).
-Plans for full ActiveModel integration (and other convenience layers) are in progress (see the `activemodel` branch).
+Plans for full ActiveModel integration (and other convenience layers) are in progress
+(see the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch).
 
 To kick the tires, require the gem in an IRB session or a Ruby script
 (note that you can run the full example from [`examples/dsl.rb`](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb)):
@@ -147,7 +148,7 @@ Todo & Plans
 
 In order of importance:
 
-* Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility)
+* Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
 * Basic [mapping](http://www.elasticsearch.org/guide/reference/mapping/) management for indices and models
 * Alow to [specify settings and mapping](http://elasticsearch.karmi.cz//guide/reference/api/admin-indices-create-index.html) when creating index
