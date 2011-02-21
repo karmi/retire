@@ -11,6 +11,7 @@ module Slingshot
           include ActiveModel::Serialization
           include ActiveModel::Serializers::JSON
           include ActiveModel::Naming
+          include ActiveModel::Conversion
 
           extend  ActiveModel::Callbacks
           define_model_callbacks :save, :destroy
