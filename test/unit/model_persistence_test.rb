@@ -241,6 +241,11 @@ module Slingshot
             assert_equal 'r2d2', article.id
           end
 
+          should "perform model validations" do
+            Configuration.client.expects(:post).never
+            assert ! ValidatedModel.create(:name => nil)
+          end
+
         end
 
         context "when saving" do
@@ -258,6 +263,11 @@ module Slingshot
                                                      article.to_indexed_json).
                                                 returns('{"ok":true,"_id":"1"}')
             assert article.save
+          end
+
+          should "perform validations" do
+            article = ValidatedModel.new :name => nil
+            assert ! article.save
           end
 
         end

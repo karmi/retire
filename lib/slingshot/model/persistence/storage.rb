@@ -18,6 +18,7 @@ module Slingshot
 
           def create(args={})
             document    = new(args)
+            return false unless document.valid?
             response    = document.update_index
             document.id = response['_id']
             document
@@ -40,6 +41,7 @@ module Slingshot
           end
 
           def save
+            return false unless valid?
             run_callbacks :save do
             end
             self
