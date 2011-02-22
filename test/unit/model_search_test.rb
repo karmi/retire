@@ -24,6 +24,12 @@ module Slingshot
           ActiveModelArticle.search q
         end
 
+        should "allow to refresh index" do
+          Index.any_instance.expects(:refresh)
+
+          ActiveModelArticle.index.refresh
+        end
+
         should "wrap results in proper class with ID and score and not change the original wrapper" do
           response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 0.8, '_source' => { 'title' => 'Article' }}] } }
           Configuration.client.expects(:post).returns(response.to_json)
@@ -115,8 +121,7 @@ module Slingshot
 
         should "store the record in index on :update_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
-          i = mock('index') { expects(:store) }
-          Slingshot::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)
+          @model.index.expects(:store)
 
           @model.save
         end

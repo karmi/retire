@@ -24,6 +24,7 @@ module Slingshot
 
           include Persistence::Storage
 
+          index.create
         end
 
       end

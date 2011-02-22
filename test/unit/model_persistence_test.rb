@@ -17,6 +17,12 @@ module Slingshot
           assert_equal 'persistent_article', PersistentArticle.new(:name => 'Test').document_type
         end
 
+        should "create index on load" do
+          Index.any_instance.expects(:create)
+
+          load File.expand_path( '../models/persistent_article.rb', File.dirname(__FILE__) )
+        end
+
       end
 
       context "Finders" do

@@ -24,6 +24,10 @@ module Slingshot
             document
           end
 
+          def index
+            @index ||= Index.new(index_name)
+          end
+
         end
 
         module InstanceMethods
