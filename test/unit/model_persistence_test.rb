@@ -23,6 +23,15 @@ module Slingshot
           load File.expand_path( '../models/persistent_article.rb', File.dirname(__FILE__) )
         end
 
+        should "allow to define property" do
+          assert_nothing_raised do
+            a = PersistentArticle.new
+            class << a
+              property :status
+            end
+          end
+        end
+
       end
 
       context "Finders" do
@@ -134,14 +143,11 @@ module Slingshot
           end
         end
 
-        should_eventually "not raise error when getting known attribute" do
+        should "not raise error when getting known attribute" do
           article = PersistentArticle.new :title => 'Test'
-          article.class_eval do
-            property :title, :tags
-          end
 
-          assert_nothing_raised { article.tags }
-          assert_nil article.tags
+          assert_nothing_raised { article.published }
+          assert_nil article.published
         end
 
         should_eventually "return default values for known attribute" do
@@ -165,11 +171,8 @@ module Slingshot
           end
         end
 
-        should_eventually "not raise error when querying for known attribute" do
+        should "not raise error when querying for known attribute" do
           article = PersistentArticle.new :title => 'Test'
-          article.class_eval do
-            property :title, :published
-          end
 
           assert_nothing_raised { article.published? }
           assert ! article.published?
@@ -185,18 +188,15 @@ module Slingshot
           assert ! article.respond_to?(:krapulitz)
         end
 
-        should_eventually "return true for respond_to? calls for known attributes" do
+        should "return true for respond_to? calls for known attributes" do
           article = PersistentArticle.new :title => 'Test'
-          article.class_eval do
-            property :title, :published
-          end
 
           assert article.respond_to?(:published)
         end
 
         should "have attribute names" do
           article = PersistentArticle.new :one => 'One', :two => 'Two'
-          assert_equal ['one', 'two'].sort, article.attribute_names.sort
+          assert_equal ['one', 'published', 'two'].sort, article.attribute_names.sort
         end
 
         should "allow to update existing attribute" do
