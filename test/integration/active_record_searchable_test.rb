@@ -34,7 +34,7 @@ module Slingshot
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!
         sleep(1) # Leave ES some breathing room here...
-        Slingshot.index('active_record_articles').refresh
+        a.index.refresh
         sleep(1) # Leave ES some breathing room here...
         results = ActiveRecordArticle.search 'test'
 
@@ -51,7 +51,7 @@ module Slingshot
         a.save!
         a.destroy
 
-        Slingshot.index('active_record_articles').refresh
+        a.index.refresh
         results = ActiveRecordArticle.search 'test'
         
         assert_equal 0, results.count
@@ -61,7 +61,7 @@ module Slingshot
         ActiveRecordArticle.create! :title => 'foo'
         ActiveRecordArticle.create! :title => 'bar'
 
-        Slingshot.index('active_record_articles').refresh
+        ActiveRecordArticle.index.refresh
         results = ActiveRecordArticle.search 'foo OR bar^100'
         assert_equal 2, results.count
 

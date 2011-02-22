@@ -25,7 +25,7 @@ module Slingshot
         a = SupermodelArticle.new :title => 'Test', :_score => 1
         a.save
 
-        Slingshot.index('supermodel_articles').refresh
+        a.index.refresh
         results = SupermodelArticle.search 'test'
 
         assert_equal 1, results.count
@@ -39,7 +39,7 @@ module Slingshot
         a.save
         a.destroy
 
-        Slingshot.index('supermodel_articles').refresh
+        a.index.refresh
         results = SupermodelArticle.search 'test'
         
         assert_equal 0, results.count
@@ -49,7 +49,7 @@ module Slingshot
         SupermodelArticle.create! :title => 'foo'
         SupermodelArticle.create! :title => 'bar'
 
-        Slingshot.index('supermodel_articles').refresh
+        SupermodelArticle.index.refresh
         results = SupermodelArticle.search 'foo OR bar^100'
 
         assert_equal 2, results.count

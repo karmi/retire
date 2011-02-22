@@ -46,6 +46,10 @@ module Slingshot
           Slingshot::Configuration.wrapper old_wrapper
         end
 
+        def index
+          @index ||= Index.new(index_name)
+        end
+
       end
 
       module InstanceMethods
@@ -58,11 +62,15 @@ module Slingshot
           self.id=value
         end
 
+        def index
+          self.class.index
+        end
+
         def update_index
           if destroyed?
-            Index.new(index_name).remove document_type, self
+            self.class.index.remove document_type, self
           else
-            Index.new(index_name).store  document_type, self
+            self.class.index.store  document_type, self
           end
         end
 
