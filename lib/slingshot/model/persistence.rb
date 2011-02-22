@@ -20,6 +20,7 @@ module Slingshot
           include Slingshot::Model::Naming::InstanceMethods
 
           extend  Persistence::Finders::ClassMethods
+          extend  Persistence::Attributes::ClassMethods
           include Persistence::Attributes::InstanceMethods
 
           include Persistence::Storage

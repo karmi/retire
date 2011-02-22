@@ -5,6 +5,18 @@ module Slingshot
 
       module Attributes
 
+        module ClassMethods
+
+          def property(name, opts = {})
+            known_attributes << name.to_s
+          end
+
+          def known_attributes
+            @known_attributes ||= []
+          end
+
+        end
+
         module InstanceMethods
 
           def initialize(attributes={})
@@ -43,11 +55,11 @@ module Slingshot
           end
 
           def attribute_names
-            attributes.keys.map { |a| a.to_s }
+            attributes.keys.map { |a| a.to_s } | self.class.known_attributes
           end
 
           def has_attribute?(name)
-            attributes.has_key?(name.to_sym) || attributes.has_key?(name.to_s)
+            attribute_names.include?(name.to_s)
           end
 
           protected
