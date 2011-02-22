@@ -54,7 +54,7 @@ module Slingshot
 
           def destroyed?; !!@destroyed; end
 
-          def persisted?; id;           end
+          def persisted?; !!id;           end
 
         end
 
