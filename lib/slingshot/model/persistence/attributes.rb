@@ -19,10 +19,6 @@ module Slingshot
             attributes['_id'] || attributes['id']
           end
 
-          def persisted?
-            !!id
-          end
-
           def method_missing(method_id, *arguments, &block)
             method_id    = method_id.to_sym    # Let's be as defensive as a motherfucking Tony Montana here.
             method_name  = method_id.to_s
