@@ -16,8 +16,6 @@ module Slingshot
       SupermodelArticle.delete_all
     end
 
-    include ActiveModel::Lint::Tests
-
     context "ActiveModel in :searchable mode" do
 
       setup    { Slingshot.index('supermodel_articles').delete }
