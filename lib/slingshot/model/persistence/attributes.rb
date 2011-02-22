@@ -61,6 +61,7 @@ module Slingshot
             attributes['id'] = value
             self
           end
+          alias :_id= :id=
 
         end
 

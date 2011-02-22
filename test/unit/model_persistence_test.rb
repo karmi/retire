@@ -39,8 +39,9 @@ module Slingshot
           document = PersistentArticle.find 1
 
           assert_instance_of PersistentArticle, document
+          assert_equal 1, document.attributes['id']
           assert_equal 'First', document.attributes['title']
-          # assert_equal 'First', document.title
+          assert_equal 'First', document.title
         end
 
         should "find document by string ID" do
@@ -49,7 +50,7 @@ module Slingshot
 
           assert_instance_of PersistentArticle, document
           assert_equal 'First', document.attributes['title']
-          # assert_equal 'First', document.title
+          assert_equal 'First', document.title
         end
 
         should "find document by list of IDs" do
@@ -237,16 +238,17 @@ module Slingshot
         context "when saving" do
 
           should "save the document with updated attribute" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     {:id => 1, :title => 'Test', :tags => ['one', 'two']}.to_json).
-                                                returns('{"ok":true,"_id":"1"}')
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     {:id => 1, :title => 'Updated', :tags => ['one', 'two']}.to_json).
-                                                returns('{"ok":true,"_id":"1"}')
             article = PersistentArticle.new :id => 1, :title => 'Test', :tags => [:one, :two]
+
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
+                                                     article.to_indexed_json).
+                                                returns('{"ok":true,"_id":"1"}')
             assert article.save
 
             article.title = 'Updated'
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
+                                                     article.to_indexed_json).
+                                                returns('{"ok":true,"_id":"1"}')
             assert article.save
           end
 

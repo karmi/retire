@@ -6,7 +6,6 @@ require 'active_model'
 class ActiveModelArticle
 
   include ActiveModel::AttributeMethods
-  include ActiveModel::Validations
   include ActiveModel::Serialization
   include ActiveModel::Serializers::JSON
   include ActiveModel::Naming
@@ -19,8 +18,12 @@ class ActiveModelArticle
     @attributes = attributes
   end
 
-  def method_missing(id, *args, &block)
-    attributes[id.to_sym] || attributes[id.to_s] || super
+  def id
+    attributes['_id'] || attributes['id']
+  end
+
+  def method_missing(name, *args, &block)
+    attributes[name.to_sym] || attributes[name.to_s] || super
   end
 
   def persisted?; true; end

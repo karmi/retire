@@ -24,10 +24,9 @@ module Slingshot
           ActiveModelArticle.search q
         end
 
-        should "wrap results in proper class and do not change the original wrapper" do
-          response = { 'hits' => { 'hits' => [{'_id' => 1, '_source' => { :title => 'Article' }}] } }
+        should "wrap results in proper class with ID and score and not change the original wrapper" do
+          response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 0.8, '_source' => { 'title' => 'Article' }}] } }
           Configuration.client.expects(:post).returns(response.to_json)
-          ActiveModelArticle.expects(:find).with([1]).returns([ActiveModelArticle.new :title => 'Article'])
 
           collection = ActiveModelArticle.search 'foo'
           assert_instance_of Results::Collection, collection
@@ -35,7 +34,10 @@ module Slingshot
           assert_equal Results::Item, Slingshot::Configuration.wrapper
 
           document = collection.first
+
           assert_instance_of ActiveModelArticle, document
+          assert_not_nil document.score
+          assert_equal 1, document.id
           assert_equal 'Article', document.title
         end
 
@@ -132,8 +134,8 @@ module Slingshot
       context "ActiveModel" do
 
         should "serialize itself into JSON without 'root'" do
-          @model = ActiveModelArticle.new :name => 'Test'
-          assert_equal({:name => 'Test'}.to_json, @model.to_indexed_json)
+          @model = ActiveModelArticle.new 'title' => 'Test'
+          assert_equal({'title' => 'Test'}.to_json, @model.to_indexed_json)
         end
         
       end

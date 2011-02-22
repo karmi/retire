@@ -24,10 +24,6 @@ module Slingshot
 
           include Persistence::Storage
 
-          def self.mode
-            :persistable
-          end
-
         end
 
       end

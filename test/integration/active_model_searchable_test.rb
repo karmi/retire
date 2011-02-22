@@ -16,22 +16,22 @@ module Slingshot
       SupermodelArticle.delete_all
     end
 
-    context "ActiveModel in :searchable mode" do
+    context "ActiveModel" do
 
       setup    { Slingshot.index('supermodel_articles').delete }
       teardown { Slingshot.index('supermodel_articles').delete }
 
-      should "save document into index on save and find it" do
-        a = SupermodelArticle.new :title => 'Test'
+      should "save document into index on save and find it with score" do
+        a = SupermodelArticle.new :title => 'Test', :_score => 1
         a.save
 
         Slingshot.index('supermodel_articles').refresh
         results = SupermodelArticle.search 'test'
 
         assert_equal 1, results.count
-
         assert_instance_of SupermodelArticle, results.first
         assert_equal 'Test', results.first.title
+        assert_not_nil results.first.score
       end
 
       should "remove document from index on destroy" do
