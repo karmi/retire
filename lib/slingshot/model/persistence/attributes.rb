@@ -30,7 +30,8 @@ module Slingshot
                 !!attributes[query_method.to_sym] || !!attributes[query_method.to_s]
               when method_name =~ /=$/                                                    # Setter (<tt>name=value</tt>)
                 # NOTE: Beware of `comparison of String with :last_name failed` in `attributes.keys.sort` (ActiveModel)
-                attributes.store method_name.gsub(/=$/, '').to_s, arguments.shift
+                value = arguments.shift
+                attributes.store method_name.gsub(/=$/, '').to_s, value.is_a?(Hash) ? Slingshot::Results::Item.new(value) : value
               else
                 super
             end

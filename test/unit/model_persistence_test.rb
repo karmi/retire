@@ -205,7 +205,15 @@ module Slingshot
           assert_equal 'John Smith', @article.attributes['author']
         end
 
-        should_eventually "allow to set deeply nested attributes" do
+        should "allow to set deeply nested attributes on initialization" do
+          article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
+
+          assert_equal 'John',  article.author.first_name
+          assert_equal 'Smith', article.author.last_name
+          assert_equal({ :first_name => 'John', :last_name => 'Smith' }, article.attributes['author'])
+        end
+
+        should_eventually "allow to set deeply nested attributes on update" do
           @article.author.first_name = 'John'
           @article.author.last_name  = 'Smith'
 
