@@ -25,7 +25,7 @@ module Slingshot
       File.delete fixtures_path.join('articles.db') rescue nil
     end
 
-    context "ActiveRecord in :searchable mode" do
+    context "ActiveRecord integration" do
 
       setup    { Slingshot.index('active_record_articles').delete }
       teardown { Slingshot.index('active_record_articles').delete }
@@ -33,14 +33,16 @@ module Slingshot
       should "save document into index on save and find it" do
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!
-
+        sleep(1) # Leave ES some breathing room here...
         Slingshot.index('active_record_articles').refresh
-        sleep(2) # Leave ES some breathing room here...
+        sleep(1) # Leave ES some breathing room here...
         results = ActiveRecordArticle.search 'test'
-        
+
         assert_equal 1, results.count
 
         assert_instance_of ActiveRecordArticle, results.first
+        assert_not_nil results.first.id
+        assert_not_nil results.first.score
         assert_equal 'Test', results.first.title
       end
 
@@ -55,13 +57,12 @@ module Slingshot
         assert_equal 0, results.count
       end
 
-      should_eventually "retrieve sorted documents by IDs returned from search" do
+      should "return documents with scores" do
         ActiveRecordArticle.create! :title => 'foo'
         ActiveRecordArticle.create! :title => 'bar'
 
         Slingshot.index('active_record_articles').refresh
         results = ActiveRecordArticle.search 'foo OR bar^100'
-        p results
         assert_equal 2, results.count
 
         assert_equal 'bar', results.first.title

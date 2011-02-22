@@ -7,7 +7,9 @@ module Slingshot
     context "Collection" do
       setup do
         Configuration.reset :wrapper
-        @default_response = { 'hits' => { 'hits' => [{:_id => 1}, {:_id => 2}, {:_id => 3}] } }
+        @default_response = { 'hits' => { 'hits' => [{:_id => 1, :_score => 1, :_source => {:title => 'Test'}},
+                                                     {:_id => 2},
+                                                     {:_id => 3}] } }
       end
 
       should "be iterable" do
@@ -28,7 +30,7 @@ module Slingshot
       context "wrapping results" do
 
         setup do
-          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
+          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
         end
 
         should "wrap hits in Item by default" do
@@ -60,15 +62,9 @@ module Slingshot
           assert_equal   'Test',  article.title
         end
 
-        should "delegate results to wrapper find method for :searchable wrappers" do
-          class FakeModel
-            def self.find(*args); end
-            def self.mode; :searchable; end
-          end
-          Configuration.wrapper FakeModel
-          FakeModel.expects(:find).with([1])
-
-          Results::Collection.new(@response)
+        should "return score" do
+          document =  Results::Collection.new(@response).first
+          assert_equal 0.5, document._score
         end
 
       end

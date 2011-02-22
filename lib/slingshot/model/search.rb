@@ -10,6 +10,14 @@ module Slingshot
 
           extend  ClassMethods
           include InstanceMethods
+
+          base.class_eval do
+            ['_score', '_type', '_index'].each do |attr|
+              # TODO: Find a sane way to add attributes like _score for ActiveRecord
+              define_method("#{attr}=") { |value| instance_variable_get(:@attributes)[attr] = value }
+              define_method("#{attr}")  { attributes[attr] }
+            end
+          end
         end
       end
 
@@ -38,13 +46,17 @@ module Slingshot
           Slingshot::Configuration.wrapper old_wrapper
         end
 
-        def mode
-          :searchable
-        end
-
       end
 
       module InstanceMethods
+
+        def score
+          attributes['_score']
+        end
+
+        def _id=(value)
+          self.id=value
+        end
 
         def update_index
           if destroyed?
