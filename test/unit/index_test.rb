@@ -37,6 +37,44 @@ module Slingshot
         assert_nothing_raised { assert @index.refresh }
       end
 
+      context "mapping" do
+
+        should "create index with mapping" do
+          Configuration.client.expects(:post).returns('{"ok":true,"acknowledged":true}')
+
+          assert @index.create :settings => { :number_of_shards => 1 },
+                               :mappings => { :article => {
+                                                :properties => {
+                                                  :title => { :boost => 2.0,
+                                                              :type => 'string',
+                                                              :store => 'yes',
+                                                              :analyzer => 'snowball' }
+                                                }
+                                              }
+                                            }
+        end
+
+        should "return the mapping" do
+          json =<<-JSON
+          {
+            "dummy" : {
+              "article" : {
+                "properties" : {
+                  "title" :    { "type" : "string", "boost" : 2.0 },
+                  "category" : { "type" : "string", "analyzed" : "no" }
+                }
+              }
+            }
+          }
+          JSON
+          Configuration.client.stubs(:get).returns(json)
+
+          assert_equal 'string', @index.mapping['article']['properties']['title']['type']
+          assert_equal 2.0,      @index.mapping['article']['properties']['title']['boost']
+        end
+
+      end
+
       context "when storing" do
 
         should "properly set type from args" do

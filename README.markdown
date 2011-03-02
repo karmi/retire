@@ -150,8 +150,7 @@ In order of importance:
 
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
-* Basic [mapping](http://www.elasticsearch.org/guide/reference/mapping/) management for indices and models
-* Alow to [specify settings and mapping](http://elasticsearch.karmi.cz//guide/reference/api/admin-indices-create-index.html) when creating index
+* [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) definition for models
 * Proper RDoc annotations for the source code
 * Dual interface: allow to simply pass queries/options for _ElasticSearch_ as a Hash in any method
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets

@@ -13,10 +13,15 @@ module Slingshot
       false
     end
 
-    def create
-      Configuration.client.post "#{Configuration.url}/#{@name}", ''
+    def create(options={})
+      # http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html
+      Configuration.client.post "#{Configuration.url}/#{@name}", Yajl::Encoder.encode(options)
     rescue
       false
+    end
+
+    def mapping
+      JSON.parse( Configuration.client.get("#{Configuration.url}/#{@name}/_mapping") )[@name]
     end
 
     def store(*args)
