@@ -8,7 +8,7 @@ _Slingshot_ aims to provide a rich Ruby API and DSL for the
 
 _ElasticSearch_ is a scalable, distributed, highly-available,
 RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucene.apache.org/),
-written in Java. It manages to very simple and very powerful at the same time.
+written in Java. It manages to be very simple and very powerful at the same time.
 You should seriously consider it to power search in your Ruby applications:
 it will deliver all the features you want — and many more you may have not
 imagined yet (native geo search? histogram facets for dates?)
@@ -63,7 +63,24 @@ First, let's create an index named `articles` and store/index some documents:
       refresh
     end
 
-Now, let's query the database:
+You can also create the
+index with specific [mappings](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html), such as:
+
+    Slingshot.index 'articles' do
+      create :mappings => {
+        :article => {
+          :properties => {
+            :title    => { :type => 'string', :boost => 2.0,            :analyzer => 'snowball'  },
+            :content  => { :type => 'string', :analyzer => 'snowball'                            },
+            :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
+            :url      => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
+            :category => { :type => 'string', :analyzer => 'keyword',   :include_in_all => false }
+          }
+        }
+      }
+    end
+
+Now, let's query the database.
 
 We are searching for articles tagged _ruby_, sorted by `title` in `descending` order,
 and also retrieving some [_facets_](http://www.lucidimagination.com/Community/Hear-from-the-Experts/Articles/Faceted-Search-Solr)
