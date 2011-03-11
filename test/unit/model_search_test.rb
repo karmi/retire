@@ -100,33 +100,33 @@ module Slingshot
 
         should "not set callback when hooks are missing" do
           @model = ActiveModelArticle.new
-          @model.expects(:update_index).never
+          @model.expects(:update_elastic_search_index).never
 
           @model.save
         end
 
         should "fire :after_save callbacks" do
           @model = ActiveModelArticleWithCallbacks.new
-          @model.expects(:update_index)
+          @model.expects(:update_elastic_search_index)
 
           @model.save
         end
 
         should "fire :after_destroy callbacks" do
           @model = ActiveModelArticleWithCallbacks.new
-          @model.expects(:update_index)
+          @model.expects(:update_elastic_search_index)
 
           @model.destroy
         end
 
-        should "store the record in index on :update_index when saved" do
+        should "store the record in index on :update_elastic_search_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
           @model.index.expects(:store)
 
           @model.save
         end
 
-        should "remove the record from index on :update_index when destroyed" do
+        should "remove the record from index on :update_elastic_search_index when destroyed" do
           @model = ActiveModelArticleWithCallbacks.new
           i = mock('index') { expects(:remove) }
           Slingshot::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)

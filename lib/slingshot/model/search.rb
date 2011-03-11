@@ -65,7 +65,7 @@ module Slingshot
           self.class.index
         end
 
-        def update_index
+        def update_elastic_search_index
           if destroyed?
             self.class.index.remove document_type, self
           else
