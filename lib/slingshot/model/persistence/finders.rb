@@ -14,7 +14,7 @@ module Slingshot
             options = args.pop if args.last.is_a?(Hash)
             args.flatten!
             if args.size > 1
-              Slingshot::Search::Search.new(index_name).query { terms :_id, args }.perform.results
+              Slingshot::Search::Search.new(index.name).query { terms :_id, args }.perform.results
             else
               case args = args.pop
                 when Fixnum, String

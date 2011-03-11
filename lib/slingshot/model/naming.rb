@@ -4,8 +4,9 @@ module Slingshot
     module Naming
 
       module ClassMethods
-        def index_name
-          model_name.plural
+        def index_name name=nil
+          @index_name = name if name
+          @index_name || model_name.plural
         end
 
         def document_type

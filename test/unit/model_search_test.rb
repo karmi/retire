@@ -16,12 +16,19 @@ module Slingshot
           assert_respond_to ActiveModelArticle, :search
         end
 
-        should "search in specific index" do
+        should "search in index named after class name by default" do
           i = 'active_model_articles'
-          q = 'foo'
           Slingshot::Search::Search.expects(:new).with(i, {}).returns(@stub)
 
-          ActiveModelArticle.search q
+          ActiveModelArticle.search 'foo'
+        end
+
+        should "search in custom name" do
+          i = 'custom-index-name'
+          Slingshot::Search::Search.expects(:new).with(i, {}).returns(@stub)
+
+          ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
+          ActiveModelArticleWithCustomIndexName.search 'foo'
         end
 
         should "allow to refresh index" do
