@@ -9,8 +9,7 @@ module Slingshot
         @time    = response['took']
         @total   = response['hits']['total']
         @results = response['hits']['hits'].map do |h|
-                     if Configuration.wrapper == Hash
-                       h
+                     if Configuration.wrapper == Hash then h
                      else
                        document = h['fields'] ? h.delete('fields') : h.delete('_source')
                        document['highlight'] = h['highlight'] if h['highlight']
