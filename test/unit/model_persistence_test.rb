@@ -7,9 +7,14 @@ module Slingshot
 
       context "Model" do
 
-        should "have index_name" do
+        should "have default index name" do
           assert_equal 'persistent_articles', PersistentArticle.index_name
           assert_equal 'persistent_articles', PersistentArticle.new(:name => 'Test').index_name
+        end
+
+        should "allow to set custom index name" do
+          assert_equal 'custom-index-name',
+                       PersistentArticleWithCustomIndexName.index_name
         end
 
         should "have document_type" do

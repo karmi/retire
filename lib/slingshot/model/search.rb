@@ -25,11 +25,10 @@ module Slingshot
         def search(query=nil, options={}, &block)
           old_wrapper = Slingshot::Configuration.wrapper
           Slingshot::Configuration.wrapper self
-          index = model_name.plural
           sort  = options[:order] || options[:sort]
           sort  = Array(sort)
           unless block_given?
-            s = Slingshot::Search::Search.new(index, options)
+            s = Slingshot::Search::Search.new(index.name, options)
             s.query { string query }
             s.sort do
               sort.each do |t|
@@ -39,7 +38,7 @@ module Slingshot
             end unless sort.empty?
             s.perform.results
           else
-            s = Slingshot::Search::Search.new(index, options, &block).perform.results
+            s = Slingshot::Search::Search.new(index.name, options, &block).perform.results
           end
         ensure
           Slingshot::Configuration.wrapper old_wrapper
