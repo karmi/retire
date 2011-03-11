@@ -10,6 +10,10 @@ module Slingshot
         @index = Slingshot::Index.new 'dummy'
       end
 
+      should "have a name" do
+        assert_equal 'dummy', @index.name
+      end
+
       should "create new index" do
         Configuration.client.expects(:post).returns(mock_response('{"ok":true,"acknowledged":true}'))
         assert @index.create
