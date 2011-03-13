@@ -24,6 +24,13 @@ module Slingshot
         @results.each(&block)
       end
 
+      def empty?
+        @results.empty?
+      end
+
+      def size
+        @results.size
+      end
     end
 
   end

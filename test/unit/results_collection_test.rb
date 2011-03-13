@@ -14,10 +14,15 @@ module Slingshot
 
       should "be iterable" do
         assert_respond_to Results::Collection.new(@default_response), :each
+        assert_respond_to Results::Collection.new(@default_response), :size
         assert_nothing_raised do
           Results::Collection.new(@default_response).each { |item| item[:_id] + 1 }
           Results::Collection.new(@default_response).map  { |item| item[:_id] + 1 }
         end
+      end
+
+      should "have size" do
+        assert_equal 3, Results::Collection.new(@default_response).size
       end
 
       should "be initialized with parsed json" do
