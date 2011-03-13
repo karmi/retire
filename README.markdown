@@ -82,18 +82,18 @@ index with specific [mappings](http://www.elasticsearch.org/guide/reference/api/
 
 Now, let's query the database.
 
-We are searching for articles tagged _ruby_, sorted by `title` in `descending` order,
-and also retrieving some [_facets_](http://www.lucidimagination.com/Community/Hear-from-the-Experts/Articles/Faceted-Search-Solr)
+We are searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
+filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.lucidimagination.com/Community/Hear-from-the-Experts/Articles/Faceted-Search-Solr)
 from the database:
 
     s = Slingshot.search 'articles' do
       query do
-        terms :tags, ['ruby']
+        string 'title:T*'
       end
 
-      sort do
-        title 'desc'
-      end
+      filter :terms, :tags => ['ruby']
+
+      sort { title 'desc' }
 
       facet 'global-tags' do
         terms :tags, :global => true
@@ -107,14 +107,12 @@ from the database:
 Let's display the results:
 
     s.results.each do |document|
-      puts "* #{ document.title }"
+      puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
     end
 
-    # * Two
-    # * One
-    # * Four
+    # * Two [tags: ruby, python]
 
-Let's display the facets (distribution of tags across the whole database):
+Let's display the global facets (distribution of tags across the whole database):
 
     s.results.facets['global-tags']['terms'].each do |f|
       puts "#{f['term'].ljust(10)} #{f['count']}"
@@ -124,18 +122,28 @@ Let's display the facets (distribution of tags across the whole database):
     # python     1
     # php        1
     # java       1
-    
+
+Now, let's display the facets based on current query (notice that count for articles
+tagged with 'java' is included, even though it's not returned by our query;
+count for articles tagged 'php' is excluded, since they don't match the current query):
+
+    s.results.facets['current-tags']['terms'].each do |f|
+      puts "#{f['term'].ljust(10)} #{f['count']}"
+    end
+
+    # ruby       1
+    # python     1
+    # java       1
+
 We can display the full query JSON:
 
     puts s.to_json
-    # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"sort":[{"title":"desc"}],"query":{"terms":{"tags":["ruby"]}}}
+    # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}
 
-See, a Ruby DSL for this thing is kinda handy?
-
-You can display the corresponding `curl` command easily:
+Or we can display the corresponding `curl` command for easy debugging:
 
     puts s.to_curl
-    # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"sort":[{"title":"desc"}],"query":{"terms":{"tags":["ruby"]}}}'
+    # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
 
 
 Features
@@ -147,6 +155,7 @@ Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [S
 * Storing a document in the index
 * [Querying](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term` and `terms` types of queries
 * Sorting the results by `fields`
+* [Filtering](http://elasticsearch.org/guide/reference/query-dsl/) the results
 * Retrieving a _terms_ type of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) -- other types are high priority
 * Returning just specific `fields` from documents
 * Paging with `from` and `size` query options
@@ -172,9 +181,6 @@ In order of importance:
 * Dual interface: allow to simply pass queries/options for _ElasticSearch_ as a Hash in any method
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
-* Infrastructure for query filters
-* [Range](http://www.elasticsearch.org/guide/reference/query-dsl/range-filter.html) filters and queries
-* [Geo Filters](http://www.elasticsearch.org/blog/2010/08/16/geo_location_and_search.html) for queries
 * [Statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html) facets
 * [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
 * [Index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html) management

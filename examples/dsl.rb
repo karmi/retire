@@ -29,8 +29,10 @@ end
 
 s = search 'articles' do
   query do
-    terms :tags, ['ruby']
+    string 'T*'
   end
+
+  filter :terms, :tags => ['ruby']
 
   sort do
     title 'desc'
@@ -56,15 +58,16 @@ puts s.to_curl
 
 puts "", "Results:", "-"*80
 s.results.each_with_index do |document, i|
-  puts "#{i+1}. #{ document.title.ljust(20) } [id] #{document._id}"
+  puts "#{i+1}. #{ document.title.ljust(10) } [id] #{document._id}"
 end
 
 puts "", "Facets: tags distribution across the whole database:", "-"*80
 s.results.facets['global-tags']['terms'].each do |f|
-  puts "#{f['term'].ljust(10)} #{f['count']}"
+  puts "#{f['term'].ljust(13)} #{f['count']}"
 end
 
-puts "", "Facets: tags distribution for the current query", "-"*80
+puts "", "Facets: tags distribution for the current query ",
+         "(Notice that 'java' is included, because of the filter)", "-"*80
 s.results.facets['current-tags']['terms'].each do |f|
-  puts "#{f['term'].ljust(10)} #{f['count']}"
+  puts "#{f['term'].ljust(13)} #{f['count']}"
 end

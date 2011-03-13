@@ -85,6 +85,20 @@ module Slingshot
 
       end
 
+      context "filter" do
+
+        should "allow to specify filter" do
+          s = Search::Search.new('index') do
+            filter :terms, :tags => ['foo']
+          end
+
+          assert_equal 1, s.filters.size
+          assert_not_nil s.filters.first
+          assert_not_nil s.filters.first[:terms]
+        end
+
+      end
+
       context "with from/size" do
 
         should "set the values in request" do

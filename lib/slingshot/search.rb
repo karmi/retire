@@ -3,7 +3,7 @@ module Slingshot
   
     class Search
 
-      attr_reader :indices, :url, :results, :response, :query, :facets
+      attr_reader :indices, :url, :results, :response, :query, :facets, :filters
 
       def initialize(*indices, &block)
         @options = indices.pop if indices.last.is_a?(Hash)
@@ -28,6 +28,12 @@ module Slingshot
       def facet(name, options={}, &block)
         @facets ||= {}
         @facets.update Facet.new(name, options, &block).to_hash
+        self
+      end
+
+      def filter(type, *options)
+        @filters ||= []
+        @filters << Filter.new(type, *options).to_hash
         self
       end
 
@@ -63,12 +69,13 @@ module Slingshot
       def to_json
         request = {}
         request.update( { :query  => @query } )
-        request.update( { :sort   => @sort } )   if @sort
-        request.update( { :facets => @facets } ) if @facets
-        request.update( { :size => @size } )     if @size
-        request.update( { :from => @from } )     if @from
-        request.update( { :fields => @fields } ) if @fields
-        request.to_json
+        request.update( { :sort   => @sort } )     if @sort
+        request.update( { :facets => @facets } )   if @facets
+        @filters.each { |filter| request.update( { :filter => filter } ) } if @filters
+        request.update( { :size => @size } )       if @size
+        request.update( { :from => @from } )       if @from
+        request.update( { :fields => @fields } )   if @fields
+        Yajl::Encoder.encode(request)
       end
 
     end
