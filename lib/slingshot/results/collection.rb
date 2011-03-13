@@ -36,6 +36,8 @@ module Slingshot
         self
       end
 
+      alias :total_entries :total
+
     end
 
   end
