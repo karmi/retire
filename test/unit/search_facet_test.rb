@@ -7,7 +7,7 @@ module Slingshot::Search
     context "Facet" do
 
       should "be serialized to JSON" do
-        assert_respond_to Sort.new, :to_json
+        assert_respond_to Facet.new('foo'), :to_json
       end
 
       context "generally" do
