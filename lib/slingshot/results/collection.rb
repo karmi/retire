@@ -31,6 +31,11 @@ module Slingshot
       def size
         @results.size
       end
+
+      def to_ary
+        self
+      end
+
     end
 
   end
