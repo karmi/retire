@@ -46,6 +46,14 @@ module Slingshot
         assert_not_nil s.response
       end
 
+      should "print debugging information on exception and re-raise it" do
+        Configuration.client.expects(:post).raises(RestClient::InternalServerError)
+        STDERR.expects(:puts)
+
+        s = Search::Search.new('index')
+        assert_raise(RestClient::InternalServerError) { s.perform }
+      end
+
       context "sort" do
 
         should "allow sorting by multiple fields" do

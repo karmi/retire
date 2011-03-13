@@ -51,6 +51,9 @@ module Slingshot
         @response = JSON.parse( Configuration.client.post(@url, self.to_json) )
         @results = Results::Collection.new(@response)
         self
+      rescue Exception
+        STDERR.puts "Request failed: \n#{self.to_curl}"
+        raise
       end
 
       def to_curl
