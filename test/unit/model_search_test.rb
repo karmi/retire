@@ -63,6 +63,19 @@ module Slingshot
             ActiveModelArticle.search { query { string 'foo' } }
           end
 
+          should "allow to pass block with argument to query, allowing to use local variables from outer scope" do
+            Slingshot::Search::Query.any_instance.expects(:instance_eval).never
+            Slingshot::Search::Search.any_instance.expects(:perform).returns(@stub)
+            Slingshot::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
+
+            my_query = 'foo'
+            ActiveModelArticle.search do
+              query do |query|
+                query.string(my_query)
+              end
+            end
+          end
+
         end
 
         context "searching with query string" do
