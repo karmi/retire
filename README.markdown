@@ -3,7 +3,7 @@ Slingshot
 
 ![Slingshot](https://github.com/karmi/slingshot/raw/master/slingshot.png)
 
-_Slingshot_ aims to provide a rich Ruby API and DSL for the
+_Slingshot_ aims to provide rich and comfortable Ruby API and DSL for the
 [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
 
 _ElasticSearch_ is a scalable, distributed, highly-available,
@@ -11,7 +11,7 @@ RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucen
 written in Java. It manages to be very simple and very powerful at the same time.
 You should seriously consider it to power search in your Ruby applications:
 it will deliver all the features you want — and many more you may have not
-imagined yet (native geo search? histogram facets for dates?)
+imagined yet (native geo search? date histogram facets? _percolator_?)
 
 _Slingshot_ currently allows basic operation with the index and searching. More is planned.
 
@@ -44,7 +44,7 @@ Plans for full ActiveModel integration (and other convenience layers) are in pro
 (see the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch).
 
 To kick the tires, require the gem in an IRB session or a Ruby script
-(note that you can run the full example from [`examples/dsl.rb`](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb)):
+(note that you can just run the full example from [`examples/dsl.rb`](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb)):
 
     require 'rubygems'
     require 'slingshot'
@@ -70,11 +70,10 @@ index with specific [mappings](http://www.elasticsearch.org/guide/reference/api/
       create :mappings => {
         :article => {
           :properties => {
-            :title    => { :type => 'string', :boost => 2.0,            :analyzer => 'snowball'  },
-            :content  => { :type => 'string', :analyzer => 'snowball'                            },
             :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
-            :url      => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
-            :category => { :type => 'string', :analyzer => 'keyword',   :include_in_all => false }
+            :title    => { :type => 'string', :boost => 2.0,            :analyzer => 'snowball'  },
+            :tags     => { :type => 'string', :analyzer => 'keyword'                             },
+            :content  => { :type => 'string', :analyzer => 'snowball'                            }
           }
         }
       }
@@ -140,7 +139,7 @@ We can display the full query JSON:
     puts s.to_json
     # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}
 
-Or we can display the corresponding `curl` command for easy debugging:
+Or, we can display the corresponding `curl` command for easy debugging:
 
     puts s.to_curl
     # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
@@ -152,9 +151,10 @@ Features
 Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [Search API](http://www.elasticsearch.org/guide/reference/api/search/request-body.html) and it's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/):
 
 * Creating, deleting and refreshing the index
+* Creating the index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
 * Storing a document in the index
 * [Querying](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term` and `terms` types of queries
-* Sorting the results by `fields`
+* [Sorting](http://elasticsearch.org/guide/reference/api/search/sort.html) the results by `fields`
 * [Filtering](http://elasticsearch.org/guide/reference/query-dsl/) the results
 * Retrieving a _terms_ type of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) -- other types are high priority
 * Returning just specific `fields` from documents
