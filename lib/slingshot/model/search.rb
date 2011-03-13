@@ -38,7 +38,9 @@ module Slingshot
             end unless sort.empty?
             s.perform.results
           else
-            s = Slingshot::Search::Search.new(index.name, options, &block).perform.results
+            s = Slingshot::Search::Search.new(index.name, options)
+            block.arity < 1 ? s.instance_eval(&block) : block.call(s)
+            s.perform.results
           end
         ensure
           Slingshot::Configuration.wrapper old_wrapper

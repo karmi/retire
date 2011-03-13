@@ -16,7 +16,8 @@ module Slingshot
       end
 
       def query(&block)
-        @query = Query.new(&block)
+        @query = Query.new
+        block.arity < 1 ? @query.instance_eval(&block) : block.call(@query)
         self
       end
 

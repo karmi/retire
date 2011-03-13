@@ -15,6 +15,20 @@ module Slingshot
         assert_respond_to Search::Search.new('index'), :query
       end
 
+      should "allow to pass block to query" do
+        Search::Query.any_instance.expects(:instance_eval)
+
+        Search::Search.new('index').query { string 'foo' }
+      end
+
+      should "allow to pass block with argument to query, allowing to use local variables from outer scope" do
+        foo = 'bar'
+        query_block = lambda { |query| query.string foo }
+        Search::Query.any_instance.expects(:instance_eval).never
+
+        Search::Search.new('index').query &query_block
+      end
+
       should "store indices as an array" do
         s = Search::Search.new('index1') do;end
         assert_equal ['index1'], s.indices
