@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "bundler",     "~> 1.0.0"
   s.add_dependency "rest-client", "~> 1.6.0"
-  s.add_dependency "yajl-ruby",   "> 0.7.9"
+  s.add_dependency "yajl-ruby",   "> 0.8.0"
   s.add_dependency "activemodel", "> 3.0.0"
 
   s.add_development_dependency "turn"
