@@ -907,10 +907,12 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-66">&#182;</a>
         </div>
-        <p>We will get all articles</p>
+        <p>We will just get all articles.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;*&#39;</span> <span class="p">}</span> </pre></div>
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;*&#39;</span> <span class="p">}</span> 
+
+  <span class="n">sort</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-67'>
@@ -918,21 +920,29 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-67">&#182;</a>
         </div>
-        <p>And sort the results by their <code>published_on</code> property in ascending (default) order,
-and by their <code>title</code> property, in descending order.</p>
+        <p>And sort the results by their <code>published_on</code> property in ascending (default) order,</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">sort</span> <span class="k">do</span>
-    <span class="n">published_on</span>
-    <span class="n">title</span> <span class="s1">&#39;desc&#39;</span>
-  <span class="k">end</span>
-<span class="k">end</span></pre></div>
+        <div class='highlight'><pre>    <span class="n">published_on</span></pre></div>
       </td>
     </tr>
     <tr id='section-68'>
       <td class=docs>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-68">&#182;</a>
+        </div>
+        <p>and by their <code>title</code> property, in descending order.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="n">title</span> <span class="s1">&#39;desc&#39;</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-69'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-69">&#182;</a>
         </div>
         <p>The results:</p>
 
