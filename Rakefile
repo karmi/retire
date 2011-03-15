@@ -53,14 +53,8 @@ end
 
 namespace :web do
 
-  desc "Generate and update website documentation"
-  task :update do
-    system "rocco examples/slingshot-dsl.rb"
-    html = File.read('examples/slingshot-dsl.html').gsub!(/slingshot\-dsl\.rb/, 'slingshot.rb')
-    File.open('examples/slingshot-dsl.html', 'w') { |f| f.write html }
-    system "open examples/slingshot-dsl.html"
-
-    # Update the Github website
+  desc "Update the Github website"
+  task :update => :generate do
     current_branch = `git branch --no-color`.split("\n").select { |line| line =~ /^\* / }.to_s.gsub(/\* (.*)/, '\1')
     (puts "Unable to determine current branch"; exit(1) ) unless current_branch
     system "git stash save && git checkout web"
@@ -68,5 +62,13 @@ namespace :web do
     system "git add index.html && git co -m 'Updated Slingshot website'"
     system "git push origin web:gh-pages -f"
     system "git checkout #{current_branch} && git stash pop"
+  end
+
+  desc "Generate the Rocco documentation page"
+  task :generate do
+    system "rocco examples/slingshot-dsl.rb"
+    html = File.read('examples/slingshot-dsl.html').gsub!(/slingshot\-dsl\.rb/, 'slingshot.rb')
+    File.open('examples/slingshot-dsl.html', 'w') { |f| f.write html }
+    system "open examples/slingshot-dsl.html"
   end
 end
