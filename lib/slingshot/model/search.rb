@@ -47,7 +47,7 @@ module Slingshot
         end
 
         def index
-          @index ||= Index.new(index_name)
+          @index = Index.new(index_name)
         end
 
       end

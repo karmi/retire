@@ -13,8 +13,11 @@ module Slingshot
         end
 
         should "allow to set custom index name" do
-          assert_equal 'custom-index-name',
-                       PersistentArticleWithCustomIndexName.index_name
+          assert_equal 'custom-index-name', PersistentArticleWithCustomIndexName.index_name
+
+          PersistentArticleWithCustomIndexName.index_name "another-index-name"
+          assert_equal 'another-index-name', PersistentArticleWithCustomIndexName.index_name
+          assert_equal 'another-index-name', PersistentArticleWithCustomIndexName.index.name
         end
 
         should "have document_type" do
