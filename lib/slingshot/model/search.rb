@@ -36,6 +36,8 @@ module Slingshot
                 field_name.include?('.') ? field(field_name, direction) : send(field_name, direction)
               end
             end unless sort.empty?
+            s.size( options[:per_page].to_i ) if options[:per_page]
+            s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
             s.perform.results
           else
             s = Slingshot::Search::Search.new(index.name, options)
