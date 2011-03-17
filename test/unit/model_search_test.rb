@@ -11,6 +11,10 @@ module Slingshot
           @stub = stub('search') { stubs(:query).returns(self); stubs(:perform).returns(self); stubs(:results).returns([]) }
         end
 
+        teardown do
+          ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
+        end
+
         should "have the search method" do
           assert_respond_to Model::Search, :search
           assert_respond_to ActiveModelArticle, :search
@@ -24,9 +28,18 @@ module Slingshot
         end
 
         should "search in custom name" do
-          i = 'custom-index-name'
-          Slingshot::Search::Search.expects(:new).with(i, {}).returns(@stub)
+          first  = 'custom-index-name'
+          second = 'another-custom-index-name'
 
+          Slingshot::Search::Search.expects(:new).with(first, {}).returns(@stub)
+          ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
+          ActiveModelArticleWithCustomIndexName.search 'foo'
+
+          Slingshot::Search::Search.expects(:new).with(second, {}).returns(@stub)
+          ActiveModelArticleWithCustomIndexName.index_name 'another-custom-index-name'
+          ActiveModelArticleWithCustomIndexName.search 'foo'
+
+          Slingshot::Search::Search.expects(:new).with(first, {}).returns(@stub)
           ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
           ActiveModelArticleWithCustomIndexName.search 'foo'
         end
@@ -141,7 +154,7 @@ module Slingshot
 
         should "store the record in index on :update_elastic_search_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
-          @model.index.expects(:store)
+          Slingshot::Index.any_instance.expects(:store)
 
           @model.save
         end
