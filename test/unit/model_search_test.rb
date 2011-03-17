@@ -129,6 +129,26 @@ module Slingshot
             ActiveModelArticle.search @q, :order => ['title DESC', 'author.name']
           end
 
+          should "allow to specify number of results per page" do
+            Slingshot::Search::Search.any_instance.expects(:size).with(20)
+
+            ActiveModelArticle.search @q, :per_page => 20
+          end
+
+          should "allow to specify first page in paginated results" do
+            Slingshot::Search::Search.any_instance.expects(:size).with(10)
+            Slingshot::Search::Search.any_instance.expects(:from).with(0)
+
+            ActiveModelArticle.search @q, :per_page => 10, :page => 1
+          end
+
+          should "allow to specify page further in paginated results" do
+            Slingshot::Search::Search.any_instance.expects(:size).with(10)
+            Slingshot::Search::Search.any_instance.expects(:from).with(20)
+
+            ActiveModelArticle.search @q, :per_page => 10, :page => 3
+          end
+
         end
 
         should "not set callback when hooks are missing" do

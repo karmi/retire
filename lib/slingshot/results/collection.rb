@@ -3,11 +3,14 @@ module Slingshot
 
     class Collection
       include Enumerable
-      attr_reader :time, :total, :results, :facets
+      include Pagination
 
-      def initialize(response)
-        @time    = response['took']
-        @total   = response['hits']['total']
+      attr_reader :time, :total, :options, :results, :facets
+
+      def initialize(response, options={})
+        @options = options
+        @time    = response['took'].to_i
+        @total   = response['hits']['total'].to_i
         @results = response['hits']['hits'].map do |h|
                      if Configuration.wrapper == Hash then h
                      else
@@ -35,8 +38,6 @@ module Slingshot
       def to_ary
         self
       end
-
-      alias :total_entries :total
 
     end
 
