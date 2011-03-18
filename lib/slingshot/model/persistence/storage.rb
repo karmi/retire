@@ -19,8 +19,7 @@ module Slingshot
           def create(args={})
             document    = new(args)
             return false unless document.valid?
-            response    = document.update_elastic_search_index
-            document.id = response['_id']
+            document.save
             document
           end
 

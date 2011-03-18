@@ -70,7 +70,9 @@ module Slingshot
           if destroyed?
             self.class.index.remove document_type, self
           else
-            self.class.index.store  document_type, self
+            response  = self.class.index.store  document_type, self
+            self.id ||= response['_id']
+            self
           end
         end
 

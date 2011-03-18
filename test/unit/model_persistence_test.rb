@@ -262,6 +262,28 @@ module Slingshot
 
         end
 
+        context "when creating" do
+
+          should "set the id property" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
+                                                     {:title => 'Test'}.to_json).
+                                                returns('{"ok":true,"_id":"1"}')
+
+            article = PersistentArticle.create :title => 'Test'
+            assert_equal '1', article.id
+          end
+
+          should "not set the id property if already set" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
+                                                     {:title => 'Test', :id => '123'}.to_json).
+                                                returns('{"ok":true, "_id":"XXX"}')
+
+            article = PersistentArticle.create :id => '123', :title => 'Test'
+            assert_equal '123', article.id
+          end
+
+        end
+
         context "when saving" do
 
           should "save the document with updated attribute" do
@@ -282,6 +304,29 @@ module Slingshot
           should "perform validations" do
             article = ValidatedModel.new :name => nil
             assert ! article.save
+          end
+
+          should "set the id property" do
+            article = PersistentArticle.new
+            article.title = 'Test'
+
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
+                                                     article.to_indexed_json).
+                                                returns('{"ok":true,"_id":"1"}')
+             assert article.save
+             assert_equal '1', article.id
+          end
+
+          should "not set the id property if already set" do
+            article = PersistentArticle.new
+            article.id    = '123'
+            article.title = 'Test'
+
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
+                                                     article.to_indexed_json).
+                                                returns('{"ok":true,"_id":"XXX"}')
+             assert article.save
+             assert_equal '123', article.id
           end
 
         end
