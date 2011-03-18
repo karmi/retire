@@ -22,10 +22,10 @@ module Slingshot
       teardown { Slingshot.index('supermodel_articles').delete }
 
       should "save document into index on save and find it with score" do
-        a = SupermodelArticle.new :title => 'Test', :_score => 1
-        a.save
+        a = SupermodelArticle.new :title => 'Test'
+        a.save and a.index.refresh
+        sleep(1)
 
-        a.index.refresh
         results = SupermodelArticle.search 'test'
 
         assert_equal 1, results.count
