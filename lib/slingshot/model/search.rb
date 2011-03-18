@@ -11,7 +11,7 @@ module Slingshot
           extend  ClassMethods
           include InstanceMethods
 
-          ['_score', '_type', '_index'].each do |attr|
+          ['_score', '_type', '_index', 'sort'].each do |attr|
             # TODO: Find a sane way to add attributes like _score for ActiveRecord -
             #       `define_attribute_methods [attr]` does not work in AR.
             define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
