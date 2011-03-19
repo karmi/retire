@@ -4,6 +4,10 @@ module Slingshot
 
   class ConfigurationTest < Test::Unit::TestCase
 
+    def teardown
+      Slingshot::Configuration.reset
+    end
+
     context "Configuration" do
       setup do
         Configuration.instance_variable_set(:@url,    nil)
