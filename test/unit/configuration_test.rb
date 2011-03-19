@@ -28,6 +28,16 @@ module Slingshot
         assert_equal Client::Base, Configuration.client
       end
 
+      should "return nil as logger by default" do
+        assert_nil Configuration.logger
+      end
+
+      should "return set and return logger" do
+        Configuration.logger STDERR
+        assert_not_nil Configuration.logger
+        assert_instance_of Slingshot::Logger, Configuration.logger
+      end
+
       should "allow to reset the configuration for specific property" do
         Configuration.url 'http://example.com'
         Configuration.client Client::Base

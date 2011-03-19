@@ -5,6 +5,7 @@ module Slingshot
   class SearchTest < Test::Unit::TestCase
 
     context "Search" do
+      setup { Configuration.reset :logger }
 
       should "be initialized with index/indices" do
         assert_raise(ArgumentError) { Search::Search.new }
@@ -52,6 +53,17 @@ module Slingshot
 
         s = Search::Search.new('index')
         assert_raise(RestClient::InternalServerError) { s.perform }
+      end
+
+      should "log request, but not response, when logger is set" do
+        Configuration.logger STDERR
+
+        Configuration.client.expects(:post).returns('{"hits":[]}')
+        Results::Collection.expects(:new).returns([])
+        Configuration.logger.expects(:log_request).returns(true)
+        Configuration.logger.expects(:log_response).never
+
+        Search::Search.new('index').perform
       end
 
       context "sort" do

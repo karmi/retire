@@ -2,6 +2,7 @@ require 'rest_client'
 require 'yajl/json_gem'
 
 require 'slingshot/rubyext/hash'
+require 'slingshot/logger'
 require 'slingshot/configuration'
 require 'slingshot/client'
 require 'slingshot/client'

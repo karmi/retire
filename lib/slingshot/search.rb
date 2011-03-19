@@ -59,8 +59,15 @@ module Slingshot
         @results  = Results::Collection.new(@json)
         self
       rescue Exception
-        STDERR.puts "Request failed: \n#{self.to_curl}"
+        STDERR.puts "[REQUEST FAILED]\n#{self.to_curl}\n"
         raise
+      ensure
+        if Configuration.logger
+          Configuration.logger.log_request  '_search', indices, to_curl
+          if Configuration.logger.level == 'debug'
+            Configuration.logger.log_response @response.code, Yajl::Encoder.encode(@json, :pretty => true)
+          end
+        end
       end
 
       def to_curl
