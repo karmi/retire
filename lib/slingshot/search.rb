@@ -3,7 +3,7 @@ module Slingshot
   
     class Search
 
-      attr_reader :indices, :url, :results, :response, :query, :facets, :filters
+      attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters
 
       def initialize(*indices, &block)
         @options = indices.pop if indices.last.is_a?(Hash)
@@ -53,9 +53,10 @@ module Slingshot
       end
 
       def perform
-        @url     = "#{Configuration.url}/#{indices.join(',')}/_search"
-        @response = JSON.parse( Configuration.client.post(@url, self.to_json) )
-        @results = Results::Collection.new(@response)
+        @url      = "#{Configuration.url}/#{indices.join(',')}/_search"
+        @response = Configuration.client.post(@url, self.to_json)
+        @json     = Yajl::Parser.parse(@response)
+        @results  = Results::Collection.new(@json)
         self
       rescue Exception
         STDERR.puts "Request failed: \n#{self.to_curl}"
