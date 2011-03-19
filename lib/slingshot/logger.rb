@@ -7,6 +7,7 @@ module Slingshot
       else
         File.open(device, 'a')
       end
+      @device.sync = true
       @options = options
       at_exit { @device.close unless @device.closed? }
     end
