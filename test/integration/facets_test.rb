@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'date'
 
 module Slingshot
 
@@ -38,6 +39,23 @@ module Slingshot
 
         assert_equal 2, scoped_facets.count
         assert_equal 5, global_facets.count
+      end
+
+      context "date histogram" do
+
+        should "return aggregated values for all results" do
+          s = Slingshot.search('articles-test') do
+            query { all }
+            facet 'published_on' do
+              date :published_on
+            end
+          end
+
+          facets = s.results.facets['published_on']['entries']
+          assert_equal 4, facets.size, facets.inspect
+          assert_equal 2, facets.entries[1]["count"], facets.inspect
+        end
+
       end
 
     end

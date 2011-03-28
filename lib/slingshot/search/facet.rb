@@ -3,7 +3,7 @@ module Slingshot
 
     #--
     # TODO: Implement all elastic search facets (geo, histogram, range, etc)
-    # https://github.com/elasticsearch/elasticsearch/wiki/Search-API-Facets
+    # http://elasticsearch.org/guide/reference/api/search/facets/
     #++
 
     class Facet
@@ -16,6 +16,11 @@ module Slingshot
 
       def terms(field, options={})
         @value = { :terms => { :field => field } }.update(options)
+        self
+      end
+
+      def date(field, interval='day', options={})
+        @value = { :date_histogram => { :field => field, :interval => interval } }.update(options)
         self
       end
 

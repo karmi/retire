@@ -37,6 +37,15 @@ module Slingshot::Search
 
       end
 
+      context "date histogram" do
+
+        should "encode the JSON" do
+          f = Facet.new('date') { date :published_on, 'day' }
+          assert_equal({ :date => { :date_histogram => { :field => 'published_on', :interval => 'day' } } }.to_json, f.to_json)
+        end
+
+      end
+
     end
 
   end

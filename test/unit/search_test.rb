@@ -83,7 +83,7 @@ module Slingshot
 
       context "facets" do
 
-        should "allow searching for facets" do
+        should "retrieve terms facets" do
           s = Search::Search.new('index') do
             facet('foo1') { terms :bar, :global => true }
             facet('foo2', :global => true) { terms :bar }
@@ -93,6 +93,14 @@ module Slingshot
           assert_not_nil s.facets['foo1']
           assert_not_nil s.facets['foo2']
           assert_not_nil s.facets['foo3']
+        end
+
+        should "retrieve date histogram facets" do
+          s = Search::Search.new('index') do
+            facet('date') { date :published_on }
+          end
+          assert_equal 1, s.facets.keys.size
+          assert_not_nil  s.facets['date']
         end
 
       end
