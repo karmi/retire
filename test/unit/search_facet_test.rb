@@ -13,26 +13,24 @@ module Slingshot::Search
       context "generally" do
 
         should "encode facets with defaults for current query" do
-          assert_equal( { :foo => { :terms => {:field=>'bar'} } }.to_json, Facet.new('foo').terms(:bar).to_json )
+          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10} } }.to_json, Facet.new('foo').terms(:bar).to_json )
         end
 
         should "encode facets as global" do
-          assert_equal( { :foo => { :terms => {:field=>'bar'}, :global => true } }.to_json,
+          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10}, :global => true } }.to_json,
                         Facet.new('foo', :global => true).terms(:bar).to_json )
         end
 
         should "encode facet options" do
-          assert_equal( { :foo => { :terms => {:field=>'bar'}, :size => 5 } }.to_json,
-                        Facet.new('foo', :size => 5).terms(:bar).to_json )
-          assert_equal( { :foo => { :terms => {:field=>'bar'}, :size => 5 } }.to_json,
-                        Facet.new('foo').terms(:bar, :size => 5).to_json )
+          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>5} } }.to_json,
+                        Facet.new('foo').terms(:bar, 5).to_json )
         end
 
         should "encode facets when passed as a block" do
           f = Facet.new('foo') do
             terms :bar
           end
-          assert_equal( { :foo => { :terms => {:field=>'bar'} } }.to_json, f.to_json )
+          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10} } }.to_json, f.to_json )
         end
 
       end

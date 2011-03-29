@@ -14,8 +14,8 @@ module Slingshot
         self.instance_eval(&block) if block_given?
       end
 
-      def terms(field, options={})
-        @value = { :terms => { :field => field } }.update(options)
+      def terms(field, size=10, options={})
+        @value = { :terms => { :field => field, :size => size } }.update(options)
         self
       end
 
