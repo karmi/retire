@@ -71,7 +71,7 @@ module Slingshot
       end
 
       def to_curl
-        %Q|curl -X POST "http://localhost:9200/#{indices}/_search?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X POST "#{Configuration.url}/#{indices}/_search?pretty=true" -d '#{self.to_json}'|
       end
 
       def to_json
