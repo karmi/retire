@@ -943,11 +943,120 @@ such as published date, price, etc? We can do that.</p>
 * Three       (Published on: 2011-01-02)
 * Four        (Published on: 2011-01-03)
 </code></pre>
-
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
   <span class="nb">puts</span> <span class="s2">&quot;* </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="si">}</span><span class="s2">  (Published on: </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">published_on</span> <span class="si">}</span><span class="s2">)&quot;</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-Highlighting'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-Highlighting">&#182;</a>
+        </div>
+        <h4>Highlighting</h4>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-70'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-70">&#182;</a>
+        </div>
+        <p>Often, you want to highlight the matched snippets in your text.
+<em>ElasticSearch</em> provides many features for
+<a href="http://www.elasticsearch.org/guide/reference/api/search/highlighting.html">highlighting</a>,</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-71'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-71">&#182;</a>
+        </div>
+        <p>Let&rsquo;s search for documents containing “Two” in their titles.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span> </pre></div>
+      </td>
+    </tr>
+    <tr id='section-72'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-72">&#182;</a>
+        </div>
+        <p>And use the <code>highlight</code> method.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-73'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-73">&#182;</a>
+        </div>
+        <p>The results:</p>
+
+<pre><code>Title: Two, highlighted title: &lt;em&gt;Two&lt;/em&gt;
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">&quot;Title: </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2">, highlighted title: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">highlight</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-74'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-74">&#182;</a>
+        </div>
+        <p>Slingshot allows you to specify options for the highlighting, such as:</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-75'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-75">&#182;</a>
+        </div>
+        <p>• specifying the fields to highlight</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-76'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-76">&#182;</a>
+        </div>
+        <p>• specifying their options</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:number_of_fragments</span> <span class="o">=&gt;</span> <span class="mi">0</span> <span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-77'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-77">&#182;</a>
+        </div>
+        <p>• or specifying highlighting options, such as the wrapper tag</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span><span class="p">,</span> <span class="ss">:options</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;strong class=&quot;highlight&quot;&gt;&#39;</span> <span class="p">}</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
