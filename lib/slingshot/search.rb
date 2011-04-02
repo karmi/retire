@@ -37,6 +37,15 @@ module Slingshot
         self
       end
 
+      def highlight(*args)
+        unless args.empty?
+          @highlight = Highlight.new(*args)
+          self
+        else
+          @highlight
+        end
+      end
+
       def from(value)
         @from = value
         self
@@ -88,6 +97,7 @@ module Slingshot
         request.update( { :sort   => @sort } )     if @sort
         request.update( { :facets => @facets } )   if @facets
         @filters.each { |filter| request.update( { :filter => filter } ) } if @filters
+        request.update( { :highlight => @highlight } ) if @highlight
         request.update( { :size => @size } )       if @size
         request.update( { :from => @from } )       if @from
         request.update( { :fields => @fields } )   if @fields

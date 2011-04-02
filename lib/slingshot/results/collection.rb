@@ -13,6 +13,7 @@ module Slingshot
                        h
                      else
                        document = h['_source'] ? h['_source'] : h['fields']
+                       document['highlight'] = h['highlight'] if h['highlight']
                        h.update document if document
                        Configuration.wrapper.new(h)
                      end

@@ -119,6 +119,37 @@ module Slingshot
 
       end
 
+      context "highlight" do
+
+        should "allow to specify highlight for single field" do
+          s = Search::Search.new('index') do
+            highlight :body
+          end
+
+          assert_not_nil s.highlight
+          assert_instance_of Slingshot::Search::Highlight, s.highlight
+        end
+
+        should "allow to specify highlight for more fields" do
+          s = Search::Search.new('index') do
+            highlight :body, :title
+          end
+
+          assert_not_nil s.highlight
+          assert_instance_of Slingshot::Search::Highlight, s.highlight
+        end
+
+        should "allow to specify highlight with for more fields with options" do
+          s = Search::Search.new('index') do
+            highlight :body, :title => { :fragment_size => 150, :number_of_fragments => 3 }
+          end
+
+          assert_not_nil s.highlight
+          assert_instance_of Slingshot::Search::Highlight, s.highlight
+        end
+
+      end
+
       context "with from/size" do
 
         should "set the values in request" do

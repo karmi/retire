@@ -340,3 +340,39 @@ end
 s.results.each do |document|
   puts "* #{ document.title.ljust(10) }  (Published on: #{ document.published_on })"
 end
+
+##### Highlighting
+
+# Often, you want to highlight the matched snippets in your text.
+# _ElasticSearch_ provides many features for
+# [highlighting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html),
+# 
+s = Slingshot.search 'articles' do
+  # Let's search for documents containing “Two” in their titles.
+  query { string 'title:Two' } 
+
+   # And use the `highlight` method.
+  highlight :title
+end
+
+# The results:
+#     Title: Two, highlighted title: <em>Two</em>
+s.results.each do |document|
+  puts "Title: #{ document.title }, highlighted title: #{document.highlight.title}"
+end
+
+# Slingshot allows you to specify options for the highlighting, such as:
+#
+s = Slingshot.search 'articles' do
+  query { string 'title:Two' }
+
+  # • specifying the fields to highlight
+  highlight :title, :body
+
+  # • specifying their options
+  highlight :title, :body => { :number_of_fragments => 0 }
+
+  # • or specifying highlighting options, such as the wrapper tag
+  highlight :title, :body, :options => { :tag => '<strong class="highlight">' }
+end
+
