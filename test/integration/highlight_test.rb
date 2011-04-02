@@ -8,9 +8,9 @@ module Slingshot
     context "Highlight" do 
 
       should "add 'highlight' field to the result item" do
-        Slingshot::Configuration.logger STDERR, :level => 'debug'
+        # Slingshot::Configuration.logger STDERR, :level => 'debug'
         s = Slingshot.search('articles-test') do
-          # query { string '-w' }
+          query { string 'Two' }
           highlight :title
         end
 
