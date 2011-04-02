@@ -58,14 +58,22 @@ module Slingshot
         @json     = Yajl::Parser.parse(@response)
         @results  = Results::Collection.new(@json)
         self
-      rescue Exception
+      rescue Exception => e
         STDERR.puts "[REQUEST FAILED]\n#{self.to_curl}\n"
         raise
       ensure
         if Configuration.logger
-          Configuration.logger.log_request  '_search', indices, to_curl
+          Configuration.logger.log_request '_search', indices, to_curl
           if Configuration.logger.level == 'debug'
-            Configuration.logger.log_response @response.code, Yajl::Encoder.encode(@json, :pretty => true)
+            # FIXME: Depends on RestClient implementation
+            if @response
+              code = @response.code
+              body = Yajl::Encoder.encode(@json, :pretty => true)
+            else
+              code = e.message
+              body = e.http_body
+            end
+            Configuration.logger.log_response code, body
           end
         end
       end
