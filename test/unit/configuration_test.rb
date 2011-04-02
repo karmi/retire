@@ -10,6 +10,10 @@ module Slingshot
         Configuration.instance_variable_set(:@client, nil)
       end
 
+      teardown do
+        Configuration.reset
+      end
+
       should "return default URL" do
         assert_equal 'http://localhost:9200', Configuration.url
       end
