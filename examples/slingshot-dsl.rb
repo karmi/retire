@@ -258,7 +258,7 @@ end
 
 ##### Filtered Search
 
-# So, let's make out search a bit complex. Let's search for articles whose titles begin
+# So, let's make our search a bit more complex. Let's search for articles whose titles begin
 # with letter “T”, again, but filter the results, so only the articles tagged “ruby”
 # are returned.
 s = Slingshot.search 'articles' do
@@ -301,9 +301,9 @@ end
 # (available as the `_score` property).
 
 # But, what if we want to sort the results based on some other criteria,
-# such as published date, price, etc? We can do that.
+# such as published date or product price? We can do that.
 s = Slingshot.search 'articles' do
-  # We search for articles tagged “ruby”
+  # We search for articles tagged “ruby”.
   query { string 'tags:ruby' } 
 
    # And sort them by their `title`, in descending order.
@@ -322,7 +322,7 @@ end
 
 s = Slingshot.search 'articles' do
   # We will just get all articles for this case.
-  query { string '*' } 
+  query { all } 
 
   sort do
     # We will sort the results by their `published_on` property in ascending (default) order,
@@ -343,15 +343,19 @@ end
 
 ##### Highlighting
 
-# Often, you want to highlight the matched snippets in your text.
-# _ElasticSearch_ provides many features for
-# [highlighting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html),
-# 
+# Often, you want to highlight the snippets matching your query in the
+# displayed results.
+# _ElasticSearch_ provides rich
+# [highlighting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html)
+# features, and Slingshot makes them trivial to use.
+#
+# Let's suppose that we want to highlight terms of our query.
+#
 s = Slingshot.search 'articles' do
-  # Let's search for documents containing “Two” in their titles.
+  # Let's search for documents containing word “Two” in their titles,
   query { string 'title:Two' } 
 
-   # And use the `highlight` method.
+   # and instruct _ElasticSearch_ to highlight relevant snippets.
   highlight :title
 end
 
@@ -361,7 +365,7 @@ s.results.each do |document|
   puts "Title: #{ document.title }, highlighted title: #{document.highlight.title}"
 end
 
-# Slingshot allows you to specify options for the highlighting, such as:
+# We can configure many options for highlighting, such as:
 #
 s = Slingshot.search 'articles' do
   query { string 'title:Two' }
@@ -372,7 +376,7 @@ s = Slingshot.search 'articles' do
   # • specifying their options
   highlight :title, :body => { :number_of_fragments => 0 }
 
-  # • or specifying highlighting options, such as the wrapper tag
+  # • or specifying global highlighting options, such as the wrapper tag
   highlight :title, :body, :options => { :tag => '<strong class="highlight">' }
 end
 
