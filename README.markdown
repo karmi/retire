@@ -139,16 +139,20 @@ We can display the full query JSON:
     puts s.to_json
     # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}
 
-Or, we can display the corresponding `curl` command for easy debugging:
+Or, better, we can display the corresponding `curl` command for easy debugging:
 
     puts s.to_curl
     # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
+
+Since `curl` is the crucial debugging tool in _ElasticSearch_ land, we can log every search query in `curl` format:
+
+    Slingshot.configure { logger 'elasticsearch.log' }
 
 
 Features
 --------
 
-Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [Search API](http://www.elasticsearch.org/guide/reference/api/search/request-body.html) and it's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/):
+Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [Search API](http://www.elasticsearch.org/guide/reference/api/search/request-body.html) and it's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/). In present, it allows you to:
 
 * Creating, deleting and refreshing the index
 * Creating the index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
@@ -156,26 +160,32 @@ Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [S
 * [Querying](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term` and `terms` types of queries
 * [Sorting](http://elasticsearch.org/guide/reference/api/search/sort.html) the results by `fields`
 * [Filtering](http://elasticsearch.org/guide/reference/query-dsl/) the results
-* Retrieving a _terms_ type of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) -- other types are high priority
+* Retrieving _terms_ and _date histogram_ type of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) (other types are high priority)
+* [Highligting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) matching fields
 * Returning just specific `fields` from documents
 * Paging with `from` and `size` query options
+* Logging the `curl`-equivalent of every search query
 
-See the [`examples/dsl.rb`](blob/master/examples/dsl.rb).
+See the [`examples/slingshot-dsl.rb`](blob/master/examples/slingshot-dsl.rb) file for the full example.
 
 _Slingshot_ wraps the results in a enumerable `Results::Collection` class, and every result in a `Results::Item` class,
-which looks like a child of `Hash` and `Openstruct`.
+which looks like a child of `Hash` and `Openstruct`, for smooth iterating and displaying the results.
 
-You may wrap the result items in your own class by setting the `Configuration.wrapper` property.
-Check out file `test/unit/results_collection_test.rb` to see how to do that.
+You may wrap the result items in your own class just by setting the `Configuration.wrapper` property,
+supposed your class takes a hash of attributes upon initialization, in ActiveModel/ActiveRecord manner.
+Please see the files `test/models/article.rb` and `test/unit/results_collection_test.rb` for details.
 
 
 Todo & Plans
 ------------
 
-In order of importance:
+_Slingshot_ is already used in production by its authors. Nevertheless, it's not finished yet.
+The todos and plans are vast, and the most important are listed below, in order of importance:
 
-* Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
-* Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination
+* Make the [logger](https://github.com/karmi/slingshot/blob/master/lib/slingshot/logger.rb) more usable and log basic info about responses as well by default
+* Make it possible to log also other types of requests (index create, document save, etc)
+* Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the ongoing work in the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
+* Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination. Already [implemented](https://github.com/karmi/slingshot/commit/e1351f6) on the `activemodel` branch
 * [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) definition for models
 * Proper RDoc annotations for the source code
 * Dual interface: allow to simply pass queries/options for _ElasticSearch_ as a Hash in any method
@@ -185,7 +195,6 @@ In order of importance:
 * [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
 * [Index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html) management
 * [Analyze](http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze.html) API support
-* [Highligting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) support
 * [Bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) API
 * Embedded webserver to display statistics and to allow easy searches
 
