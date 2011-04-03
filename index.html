@@ -725,7 +725,7 @@ and all the facets should continue to be calculated based on the original query.
         <div class="pilwrap">
           <a class="pilcrow" href="#section-52">&#182;</a>
         </div>
-        <p>So, let&rsquo;s make out search a bit complex. Let&rsquo;s search for articles whose titles begin
+        <p>So, let&rsquo;s make our search a bit more complex. Let&rsquo;s search for articles whose titles begin
 with letter “T”, again, but filter the results, so only the articles tagged “ruby”
 are returned.</p>
       </td>
@@ -836,7 +836,7 @@ java       1
           <a class="pilcrow" href="#section-60">&#182;</a>
         </div>
         <p>But, what if we want to sort the results based on some other criteria,
-such as published date, price, etc? We can do that.</p>
+such as published date or product price? We can do that.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
@@ -847,7 +847,7 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-61">&#182;</a>
         </div>
-        <p>We search for articles tagged “ruby”</p>
+        <p>We search for articles tagged “ruby”.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span> </pre></div>
@@ -902,7 +902,7 @@ such as published date, price, etc? We can do that.</p>
         <p>We will just get all articles for this case.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;*&#39;</span> <span class="p">}</span> 
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">all</span> <span class="p">}</span> 
 
   <span class="n">sort</span> <span class="k">do</span></pre></div>
       </td>
@@ -966,9 +966,13 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-70">&#182;</a>
         </div>
-        <p>Often, you want to highlight the matched snippets in your text.
-<em>ElasticSearch</em> provides many features for
-<a href="http://www.elasticsearch.org/guide/reference/api/search/highlighting.html">highlighting</a>,</p>
+        <p>Often, you want to highlight the snippets matching your query in the
+displayed results.
+<em>ElasticSearch</em> provides rich
+<a href="http://www.elasticsearch.org/guide/reference/api/search/highlighting.html">highlighting</a>
+features, and Slingshot makes them trivial to use.</p>
+
+<p>Let&rsquo;s suppose that we want to highlight terms of our query.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
@@ -979,7 +983,7 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-71">&#182;</a>
         </div>
-        <p>Let&rsquo;s search for documents containing “Two” in their titles.</p>
+        <p>Let&rsquo;s search for documents containing word “Two” in their titles,</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span> </pre></div>
@@ -990,7 +994,7 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-72">&#182;</a>
         </div>
-        <p>And use the <code>highlight</code> method.</p>
+        <p>and instruct <em>ElasticSearch</em> to highlight relevant snippets.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span>
@@ -1018,7 +1022,7 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-74">&#182;</a>
         </div>
-        <p>Slingshot allows you to specify options for the highlighting, such as:</p>
+        <p>We can configure many options for highlighting, such as:</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
@@ -1052,7 +1056,7 @@ such as published date, price, etc? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-77">&#182;</a>
         </div>
-        <p>• or specifying highlighting options, such as the wrapper tag</p>
+        <p>• or specifying global highlighting options, such as the wrapper tag</p>
 
       </td>
       <td class=code>
