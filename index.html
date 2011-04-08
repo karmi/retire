@@ -82,9 +82,9 @@ on a sane operation system in less then 10 minutes.</p>
       <td class=code>
         <div class='highlight'><pre><span class="p">(</span> <span class="nb">puts</span> <span class="o">&lt;&lt;-</span><span class="sh">&quot;</span><span class="no">INSTALL</span><span class="sh">&quot;</span> <span class="p">;</span> <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> <span class="k">unless</span> <span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://localhost:9200&#39;</span><span class="p">)</span> <span class="k">rescue</span> <span class="kp">false</span>
 <span class="sh"> [!] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands.</span>
-<span class="sh"> curl -k -L -o elasticsearch-0.15.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.0.tar.gz</span>
-<span class="sh"> tar -zxvf elasticsearch-0.15.0.tar.gz</span>
-<span class="sh"> ./elasticsearch-0.15.0/bin/elasticsearch -f</span>
+<span class="sh"> curl -k -L -o elasticsearch-0.15.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.2.tar.gz</span>
+<span class="sh"> tar -zxvf elasticsearch-0.15.2.tar.gz</span>
+<span class="sh"> ./elasticsearch-0.15.2/bin/elasticsearch -f</span>
 <span class="no">INSTALL</span></pre></div>
       </td>
     </tr>
