@@ -22,9 +22,9 @@ require 'slingshot'
 # You'll need a working and running _ElasticSearch_ server. Thankfully, that's easy.
 ( puts <<-"INSTALL" ; exit(1) ) unless RestClient.get('http://localhost:9200') rescue false
  [!] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands.
- curl -k -L -o elasticsearch-0.15.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.0.tar.gz
- tar -zxvf elasticsearch-0.15.0.tar.gz
- ./elasticsearch-0.15.0/bin/elasticsearch -f
+ curl -k -L -o elasticsearch-0.15.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.2.tar.gz
+ tar -zxvf elasticsearch-0.15.2.tar.gz
+ ./elasticsearch-0.15.2/bin/elasticsearch -f
 INSTALL
 
 ### Simple Usage
