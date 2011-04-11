@@ -32,6 +32,13 @@ module Slingshot
                      s.to_curl
       end
 
+      should "return curl snippet with multiple indices for debugging" do
+        s = Search::Search.new('index_1', 'index_2') do
+          query { string 'title:foo' }
+        end
+        assert_match /index_1,index_2/, s.to_curl
+      end
+
       should "allow chaining" do
         assert_nothing_raised do
           Search::Search.new('index').query { }.sort { title 'desc' }.size(5).sort { name 'asc' }.from(1)
