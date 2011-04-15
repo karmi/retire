@@ -1,6 +1,9 @@
 # **Slingshot** is a rich and comfortable Ruby API and DSL for the
 # [_ElasticSearch_](http://www.elasticsearch.org/) search engine/database.
 #
+# <img src="http://github.com/favicon.ico" style="position:relative; top:2px">
+# You can download or clone the source code from <https://github.com/karmi/slingshot>.
+#
 # _ElasticSearch_ is a scalable, distributed, highly-available,
 # RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucene.apache.org/),
 # written in Java. It manages to be very simple and very powerful at the same time.
