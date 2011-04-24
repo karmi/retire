@@ -3,18 +3,12 @@ Slingshot
 
 ![Slingshot](https://github.com/karmi/slingshot/raw/master/slingshot.png)
 
-_Slingshot_ aims to provide rich and comfortable Ruby API and DSL for the
-[ElasticSearch](http://www.elasticsearch.org/) search engine/database.
+_Slingshot_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
+It aims to provide rich and comfortable Ruby API in the form of a simple domain-specific language.
 
-_ElasticSearch_ is a scalable, distributed, highly-available,
+_ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
 RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucene.apache.org/),
-written in Java. It manages to be very simple and very powerful at the same time.
-You should seriously consider it to power search in your Ruby applications:
-it will deliver all the features you want — and many more you may have not
-imagined yet (native geo search? date histogram facets? _percolator_?)
-
-_Slingshot_ currently allows basic operation with the index and searching. More is planned.
-
+written in Java. It manages to be very simple to use and very powerful at the same time.
 
 Installation
 ------------
@@ -63,8 +57,8 @@ First, let's create an index named `articles` and store/index some documents:
       refresh
     end
 
-You can also create the
-index with specific [mappings](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html), such as:
+We can also create the
+index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html):
 
     Slingshot.index 'articles' do
       create :mappings => {
@@ -82,7 +76,7 @@ index with specific [mappings](http://www.elasticsearch.org/guide/reference/api/
 Now, let's query the database.
 
 We are searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
-filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.lucidimagination.com/Community/Hear-from-the-Experts/Articles/Faceted-Search-Solr)
+filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
 from the database:
 
     s = Slingshot.search 'articles' do
@@ -152,21 +146,21 @@ Since `curl` is the crucial debugging tool in _ElasticSearch_ land, we can log e
 Features
 --------
 
-Currently, _Slingshot_ supports only a limited subset of vast _ElasticSearch_ [Search API](http://www.elasticsearch.org/guide/reference/api/search/request-body.html) and it's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/). In present, it allows you to:
+Currently, _Slingshot_ supports main features of the _ElasticSearch_ [Search API](http://www.elasticsearch.org/guide/reference/api/search/request-body.html) and it's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/). In present, it allows you to:
 
-* Creating, deleting and refreshing the index
-* Creating the index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
-* Storing a document in the index
-* [Querying](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term` and `terms` types of queries
-* [Sorting](http://elasticsearch.org/guide/reference/api/search/sort.html) the results by `fields`
-* [Filtering](http://elasticsearch.org/guide/reference/query-dsl/) the results
-* Retrieving _terms_ and _date histogram_ type of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) (other types are high priority)
-* [Highligting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) matching fields
-* Returning just specific `fields` from documents
-* Paging with `from` and `size` query options
-* Logging the `curl`-equivalent of every search query
+* Create, delete and refresh the index
+* Create the index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
+* Store a document in the index
+* [Query](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term`, `terms` and `match_all` types of queries
+* [Sort](http://elasticsearch.org/guide/reference/api/search/sort.html) the results by `fields`
+* [Filter](http://elasticsearch.org/guide/reference/query-dsl/) the results
+* Retrieve the _terms_ and _date histogram_ types of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) (other types are high priority)
+* [Highlight](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) matching fields
+* Return just specific `fields` from documents
+* Page the results with `from` and `size` query options
+* Log the `curl`-equivalent of requests and response JSON
 
-See the [`examples/slingshot-dsl.rb`](blob/master/examples/slingshot-dsl.rb) file for the full example.
+See the [`examples/slingshot-dsl.rb`](blob/master/examples/slingshot-dsl.rb) file for the full, working examples.
 
 _Slingshot_ wraps the results in a enumerable `Results::Collection` class, and every result in a `Results::Item` class,
 which looks like a child of `Hash` and `Openstruct`, for smooth iterating and displaying the results.
@@ -176,11 +170,12 @@ supposed your class takes a hash of attributes upon initialization, in ActiveMod
 Please see the files `test/models/article.rb` and `test/unit/results_collection_test.rb` for details.
 
 
-Todo & Plans
-------------
+Todo, Plans & Ideas
+-------------------
 
 _Slingshot_ is already used in production by its authors. Nevertheless, it's not finished yet.
-The todos and plans are vast, and the most important are listed below, in order of importance:
+
+The todos and plans are vast, and the most important are listed below, in the order of importance:
 
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the ongoing work in the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination. Already [implemented](https://github.com/karmi/slingshot/commit/e1351f6) on the `activemodel` branch
@@ -188,14 +183,15 @@ The todos and plans are vast, and the most important are listed below, in order 
 * Proper RDoc annotations for the source code
 * Dual interface: allow to simply pass queries/options for _ElasticSearch_ as a Hash in any method
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
-* Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
 * [Statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html) facets
 * [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
 * [Index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html) management
 * [Analyze](http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze.html) API support
 * [Bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) API
 * Embedded webserver to display statistics and to allow easy searches
+* Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
 
+The full ActiveModel integration is planned for the 1.0 release.
 
 Other Clients
 -------------
