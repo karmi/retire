@@ -46,8 +46,10 @@ module Slingshot
       end
 
       should "perform the search" do
-        Configuration.client.expects(:post).returns('{"hits":[]}')
+        response = stub(:body => '{"took":1,"hits":[]}', :code => 200)
+        Configuration.client.expects(:post).returns(response)
         Results::Collection.expects(:new).returns([])
+
         s = Search::Search.new('index')
         s.perform
         assert_not_nil s.results
@@ -65,10 +67,12 @@ module Slingshot
       should "log request, but not response, when logger is set" do
         Configuration.logger STDERR
 
-        Configuration.client.expects(:post).returns('{"hits":[]}')
+        response = stub(:body => '{"took":1,"hits":[]}', :code => 200)
+        Configuration.client.expects(:post).returns(response)
+
         Results::Collection.expects(:new).returns([])
         Configuration.logger.expects(:log_request).returns(true)
-        Configuration.logger.expects(:log_response).never
+        Configuration.logger.expects(:log_response).with(200, 1, '')
 
         Search::Search.new('index').perform
       end

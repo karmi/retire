@@ -21,21 +21,21 @@ module Slingshot
     end
 
     def log_request(endpoint, params=nil, curl='')
-      # [_search] (articles,users) 2001-02-12 18:20:42:32
+      # 2001-02-12 18:20:42:32 [_search] (articles,users)
       #
       # curl -X POST ....
       #
-      content  = "# [#{endpoint}] "
-      content += "(#{params.inspect}) " if params
-      content += time
+      content  = "# #{time}"
+      content += " [#{endpoint}]"
+      content += " (#{params.inspect})" if params
       content += "\n#\n"
       content += curl
       content += "\n\n"
       write content
     end
 
-    def log_response(status, json)
-      # [200 OK] (4 msec) Sat Feb 12 19:20:47 2011
+    def log_response(status, took, json)
+      # 2001-02-12 18:20:42:32 [200] (4 msec)
       #
       # {
       #   "took" : 4,
@@ -43,11 +43,10 @@ module Slingshot
       #   ...
       # }
       #
-      took = JSON.parse(json)['took'] rescue nil
-      content  = "# [#{status}] "
-      content += "(#{took} msec) " if took
-      content += time
-      content += "\n#\n"
+      content  = "# #{time}"
+      content += " [#{status}]"
+      content += " (#{took} msec)" if took
+      content += "\n#\n" unless json == ''
       json.each_line { |line| content += "# #{line}" }
       content += "\n\n"
       write content

@@ -64,27 +64,14 @@ module Slingshot
       def perform
         @url      = "#{Configuration.url}/#{indices.join(',')}/_search"
         @response = Configuration.client.post(@url, self.to_json)
-        @json     = Yajl::Parser.parse(@response)
+        @json     = Yajl::Parser.parse(@response.body)
         @results  = Results::Collection.new(@json)
         self
-      rescue Exception => e
-        STDERR.puts "[REQUEST FAILED]\n#{self.to_curl}\n"
+      rescue Exception => error
+        STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
         raise
       ensure
-        if Configuration.logger
-          Configuration.logger.log_request '_search', indices, to_curl
-          if Configuration.logger.level == 'debug'
-            # FIXME: Depends on RestClient implementation
-            if @response
-              code = @response.code
-              body = Yajl::Encoder.encode(@json, :pretty => true)
-            else
-              code = e.message
-              body = e.http_body
-            end
-            Configuration.logger.log_response code, body
-          end
-        end
+        logged(error)
       end
 
       def to_curl
@@ -102,6 +89,25 @@ module Slingshot
         request.update( { :from => @from } )       if @from
         request.update( { :fields => @fields } )   if @fields
         Yajl::Encoder.encode(request)
+      end
+
+      def logged(error=nil)
+        if Configuration.logger
+
+          Configuration.logger.log_request '_search', indices, to_curl
+
+          code = @response ? @response.code : error.message
+          took = @json['took'] rescue nil
+
+          if Configuration.logger.level.to_s == 'debug'
+            # FIXME: Depends on RestClient implementation
+            body = @response ? Yajl::Encoder.encode(@json, :pretty => true) : body = error.http_body
+          else
+            body = ''
+          end
+
+          Configuration.logger.log_response code, took, body
+        end
       end
 
     end

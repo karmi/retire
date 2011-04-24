@@ -46,12 +46,12 @@ module Slingshot
 
     context "levels" do
 
-      should "have default level" do
+      should "have the default level" do
         logger = Logger.new STDERR
         assert_equal 'info', logger.level
       end
 
-      should "have set the level" do
+      should "set the level" do
         logger = Logger.new STDERR, :level => 'debug'
         assert_equal 'debug', logger.level
       end
@@ -66,7 +66,7 @@ module Slingshot
 
       should "log request in correct format" do
         log = (<<-"log;").gsub(/^ +/, '')
-          # [_search] (["articles", "users"]) 2011-03-19 11:00:00:L
+          # 2011-03-19 11:00:00:L [_search] (["articles", "users"])
           #
           curl -X GET http://...
 
@@ -98,14 +98,14 @@ module Slingshot
         }
         json;
         log  = (<<-"log;").gsub(/^\s*/, '')
-          # [200 OK] (4 msec) 2011-03-19 11:00:00:L
+          # 2011-03-19 11:00:00:L [200 OK] (4 msec)
           #
         log;
         # log += json.split.map { |line| "# #{line}" }.join("\n")
         json.each_line { |line| log += "# #{line}" }
         log += "\n\n"
         @logger.expects(:write).with(log)
-        @logger.log_response('200 OK', json)
+        @logger.log_response('200 OK', 4, json)
       end
 
     end
