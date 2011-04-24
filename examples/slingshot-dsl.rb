@@ -127,11 +127,41 @@ puts s.to_json
 puts "", "Try the query in Curl:", "-"*80
 puts s.to_curl
 
+# For debugging more complex situations, you can enable logging, so requests and responses
+# will be logged using the `curl`-based format.
+
+Slingshot.configure do
+
+  # By default, at the _info_ level, only the `curl`-format of request and
+  # basic information about the response will be logged:
+  #
+  #     # 2011-04-24 11:34:01:150 [CREATE] ("articles")
+  #     #
+  #     curl -X POST "http://localhost:9200/articles" -d '{
+  #     
+  #     }'
+  #     
+  #     # 2011-04-24 11:34:01:152 [200]
+  #
+  logger 'elasticsearch.log'
+
+  # For debugging, you can switch to the _debug_ level, which will log the complete JSON responses.
+  #
+  # That's very convenient if you want to post a recreation of some problem or solution to the mailing list, IRC, etc.
+  #
+  logger 'elasticsearch.log', :level => 'debug'
+
+  # Note that you can pass any [`IO`](http://www.ruby-doc.org/core/classes/IO.html)-compatible Ruby object as a logging device.
+  #
+  logger STDERR
+end
 
 ##### Other Types of Queries
 
-# Of course, we may want to define our queries more expressively, for instance
-# when we're searching for articles with specific _tags_.
+# Well, query strings are convenient for simple searches, but
+# we may want to define our queries more expressively.
+#
+# For instance when we're searching for articles with specific _tags_.
 
 # Let's suppose we want to search for articles tagged “ruby” _or_ “python”.
 # That's a great excuse to use a [_terms_](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
