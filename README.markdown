@@ -182,8 +182,6 @@ Todo & Plans
 _Slingshot_ is already used in production by its authors. Nevertheless, it's not finished yet.
 The todos and plans are vast, and the most important are listed below, in order of importance:
 
-* Make the [logger](https://github.com/karmi/slingshot/blob/master/lib/slingshot/logger.rb) more usable and log basic info about responses as well by default
-* Make it possible to log also other types of requests (index create, document save, etc)
 * Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the ongoing work in the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination. Already [implemented](https://github.com/karmi/slingshot/commit/e1351f6) on the `activemodel` branch
 * [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) definition for models
