@@ -1,8 +1,12 @@
-# **Slingshot** is a rich and comfortable Ruby API and DSL for the
+# **Slingshot** is a rich and comfortable Ruby client for the
 # [_ElasticSearch_](http://www.elasticsearch.org/) search engine/database.
 #
+# It provides the API for the main _ElasticSearch_ features, and this document
+# will walk you through them.
+#
 # <img src="http://github.com/favicon.ico" style="position:relative; top:2px">
-# You can download or clone the source code from <https://github.com/karmi/slingshot>.
+# _Slingshot_ is open source, and you can download or clone the source code
+# from <https://github.com/karmi/slingshot>.
 #
 # _ElasticSearch_ is a scalable, distributed, highly-available,
 # RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucene.apache.org/),
@@ -422,3 +426,22 @@ s = Slingshot.search 'articles' do
   # • or specifying global highlighting options, such as the wrapper tag
   highlight :title, :body, :options => { :tag => '<strong class="highlight">' }
 end
+
+
+
+#### What's next?
+
+# As you can see, [_Slingshot_](https://github.com/karmi/slingshot) supports the
+# main features of _ElasticSearch_ in Ruby.
+#
+# It allows you to create and delete indices, add documents, search them, retrieve facets, highlight the results,
+# and comes with usable logging facility.
+#
+# Of course, the holy grail of any search library is easy, painless integration with your Ruby classes, and,
+# most importantly, with ActiveRecord/ActiveModel classes.
+#
+# _Slingshot_ already provides such integration, though in experimental mode.
+# Check out the tests in the
+# [`activemodel`](https://github.com/karmi/slingshot/blob/activemodel/test/integration/active_model_searchable_test.rb) branch.
+#
+# Send any feedback via Github issues, or ask questions in the [#elasticsearch](irc://irc.freenode.net/#elasticsearch) IRC channel.
