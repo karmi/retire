@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Slingshot
 
-  class IndexMappingTest < Test::Unit::TestCase
+  class IndexMappingIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
     context "Default mapping" do

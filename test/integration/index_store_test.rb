@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Slingshot
 
-  class IndexStoreTest < Test::Unit::TestCase
+  class IndexStoreIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
     context "Storing the documents in index" do
