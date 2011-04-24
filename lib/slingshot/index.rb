@@ -9,7 +9,7 @@ module Slingshot
     def delete
       # FIXME: RestClient does not return response for DELETE requests?
       @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
-      return @response =~ /error/ ? false : true
+      return @response.body =~ /error/ ? false : true
     rescue Exception => error
       false
     ensure
@@ -28,7 +28,8 @@ module Slingshot
     end
 
     def mapping
-      JSON.parse( Configuration.client.get("#{Configuration.url}/#{@name}/_mapping") )[@name]
+      @response = Configuration.client.get("#{Configuration.url}/#{@name}/_mapping")
+      JSON.parse(@response.body)[@name]
     end
 
     def store(*args)
@@ -56,7 +57,7 @@ module Slingshot
       url = id ? "#{Configuration.url}/#{@name}/#{type}/#{id}" : "#{Configuration.url}/#{@name}/#{type}/"
 
       @response = Configuration.client.post url, document
-      JSON.parse(@response)
+      JSON.parse(@response.body)
 
     rescue Exception => error
       raise
@@ -67,7 +68,7 @@ module Slingshot
 
     def retrieve(type, id)
       @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
-      h = JSON.parse(@response)
+      h = JSON.parse(@response.body)
       if Configuration.wrapper == Hash then h
       else
         document = h['_source'] ? h['_source'] : h['fields']

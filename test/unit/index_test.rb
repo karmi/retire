@@ -4,6 +4,10 @@ module Slingshot
 
   class IndexTest < Test::Unit::TestCase
 
+    def mock_response(json, code=200)
+      stub(:body => json, :code => code)
+    end
+
     context "Index" do
 
       setup do
@@ -11,7 +15,7 @@ module Slingshot
       end
 
       should "create new index" do
-        Configuration.client.expects(:post).returns('{"ok":true,"acknowledged":true}')
+        Configuration.client.expects(:post).returns(mock_response('{"ok":true,"acknowledged":true}'))
         assert @index.create
       end
 
@@ -21,26 +25,26 @@ module Slingshot
       end
 
       should "delete index" do
-        Configuration.client.expects(:delete).returns('{"ok":true,"acknowledged":true}')
+        Configuration.client.expects(:delete).returns(mock_response('{"ok":true,"acknowledged":true}'))
         assert @index.delete
       end
 
       should "not raise exception and just return false when deleting non-existing index" do
-        Configuration.client.expects(:delete).returns('{"error":"[articles] missing"}')
+        Configuration.client.expects(:delete).returns(mock_response('{"error":"[articles] missing"}'))
         assert_nothing_raised { assert ! @index.delete }
         Configuration.client.expects(:delete).raises(RestClient::BadRequest)
         assert_nothing_raised { assert ! @index.delete }
       end
 
       should "refresh the index" do
-        Configuration.client.expects(:post).returns('{"ok":true,"_shards":{}}')
+        Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_shards":{}}'))
         assert_nothing_raised { assert @index.refresh }
       end
 
       context "mapping" do
 
         should "create index with mapping" do
-          Configuration.client.expects(:post).returns('{"ok":true,"acknowledged":true}')
+          Configuration.client.expects(:post).returns(mock_response('{"ok":true,"acknowledged":true}'))
 
           assert @index.create :settings => { :number_of_shards => 1 },
                                :mappings => { :article => {
@@ -67,7 +71,7 @@ module Slingshot
             }
           }
           JSON
-          Configuration.client.stubs(:get).returns(json)
+          Configuration.client.stubs(:get).returns(mock_response(json))
 
           assert_equal 'string', @index.mapping['article']['properties']['title']['type']
           assert_equal 2.0,      @index.mapping['article']['properties']['title']['boost']
@@ -78,19 +82,19 @@ module Slingshot
       context "when storing" do
 
         should "properly set type from args" do
-          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').returns('{"ok":true,"_id":"test"}').twice
+          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}')).twice
           @index.store 'article', :title => 'Test'
           @index.store :article,  :title => 'Test'
         end
 
         should "set default type" do
-          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/", '{"title":"Test"}').returns('{"ok":true,"_id":"test"}')
+          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :title => 'Test'
         end
 
         should "call #to_indexed_json on non-String documents" do
           document = { :title => 'Test' }
-          Configuration.client.expects(:post).returns('{"ok":true,"_id":"test"}')
+          Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_id":"test"}'))
           document.expects(:to_indexed_json)
           @index.store document
         end
@@ -105,14 +109,14 @@ module Slingshot
           should "store Hash it under its ID property" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
                                                      {:id => 123, :title => 'Test'}.to_json).
-                                                returns('{"ok":true,"_id":"123"}')
+                                                returns(mock_response('{"ok":true,"_id":"123"}'))
             @index.store :id => 123, :title => 'Test'
           end
 
           should "store a custom class under its ID property" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
                                                      {:id => 123, :title => 'Test', :body => 'Lorem'}.to_json).
-                                                returns('{"ok":true,"_id":"123"}')
+                                                returns(mock_response('{"ok":true,"_id":"123"}'))
             @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
           end
 
@@ -126,13 +130,13 @@ module Slingshot
           Configuration.reset :wrapper
 
           Configuration.client.stubs(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').
-                                            returns('{"ok":true,"_id":"id-1"}')
+                                            returns(mock_response('{"ok":true,"_id":"id-1"}'))
           @index.store :article, :title => 'Test'
         end
 
         should "return document in default wrapper" do
           Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
-                                             returns('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}')
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Results::Item, article
           assert_equal 'Test', article['_source']['title']
@@ -143,7 +147,7 @@ module Slingshot
           Configuration.wrapper Hash
 
           Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
-                                             returns('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}')
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Hash, article
         end
@@ -152,7 +156,7 @@ module Slingshot
           Configuration.wrapper Article
 
           Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
-                                             returns('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}')
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Article, article
           assert_equal 'Test', article.title
