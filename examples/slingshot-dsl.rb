@@ -34,9 +34,7 @@ require 'slingshot'
  ./elasticsearch-0.15.2/bin/elasticsearch -f
 INSTALL
 
-### Simple Usage
-
-#### Storing and indexing documents
+### Storing and indexing documents
 
 # Let's initialize an index named “articles”.
 Slingshot.index 'articles' do
@@ -78,14 +76,14 @@ end
 
 
 
-#### Searching
+### Searching
 
 # With the documents indexed and stored in the _ElasticSearch_ database, we want to search for them.
 #
 # Slingshot exposes the search interface via simple domain-specific language.
 
 
-##### Simple Query String Searches
+#### Simple Query String Searches
 
 # We can do simple searches, like searching for articles containing “One” in their title.
 s = Slingshot.search('articles') do
@@ -132,7 +130,7 @@ puts "", "Try the query in Curl:", "-"*80
 puts s.to_curl
 
 
-#### Logging
+### Logging
 
 # For debugging more complex situations, you can enable logging, so requests and responses
 # will be logged using the `curl`-based format.
@@ -163,33 +161,34 @@ Slingshot.configure do
   logger STDERR
 end
 
-#### Configuration
+### Configuration
 
-# Just as with logging, you can configure other parts of _Slingshot_.
+# As you have just seen with logging, you can configure various parts of _Slingshot_.
 
 Slingshot.configure do
 
-  # First of all, you can configure the URL for _ElasticSearch_
+  # First of all, you can configure the URL for _ElasticSearch_.
   url "http://search.example.com"
 
-  # Second, you may want to wrap the results in your own class
+  # Second, you may want to wrap the results in your own class.
   class MySpecialWrapper; end
   wrapper MySpecialWrapper
 
-  # Of course, you can reset one or all configuration setting to their defaults
+  # Of course, you can reset one or all configuration settings to their defaults.
   reset
 
 end
 
 
-##### Other Types of Queries
+### Complex Searching
 
-# Well, query strings are convenient for simple searches, but
-# we may want to define our queries more expressively.
+#### Other Types of Queries
+
+# Query strings are convenient for simple searches, but we may want to define our queries more expressively,
+# using the _ElasticSearch_ Query DSL.
 #
-# For instance when we're searching for articles with specific _tags_.
-
-# Let's suppose we want to search for articles tagged “ruby” _or_ “python”.
+# Let's suppose we want to search for articles with specific _tags_, in our case “ruby” _or_ “python”.
+#
 # That's a great excuse to use a [_terms_](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
 # query.
 s = Slingshot.search('articles') do
@@ -232,7 +231,7 @@ end
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
 # * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
 
-##### Faceted Search
+#### Faceted Search
 
 # _ElasticSearch_ makes it trivial to retrieve complex aggregated data from our index/database,
 # so called [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html).
@@ -325,7 +324,7 @@ end
 # The immediate use case for that is the „faceted navigation“.
 
 
-##### Filtered Search
+#### Filtered Search
 
 # So, let's make our search a bit more complex. Let's search for articles whose titles begin
 # with letter “T”, again, but filter the results, so only the articles tagged “ruby”
@@ -364,7 +363,7 @@ s.results.facets['tags']['terms'].each do |f|
 end
 
 
-##### Sorting
+#### Sorting
 
 # By default, the results are sorted according to their relevancy
 # (available as the `_score` property).
@@ -410,7 +409,7 @@ s.results.each do |document|
   puts "* #{ document.title.ljust(10) }  (Published on: #{ document.published_on })"
 end
 
-##### Highlighting
+#### Highlighting
 
 # Often, you want to highlight the snippets matching your query in the
 # displayed results.
@@ -451,7 +450,7 @@ end
 
 
 
-#### What's next?
+### What's next?
 
 # As you can see, [_Slingshot_](https://github.com/karmi/slingshot) supports the
 # main features of _ElasticSearch_ in Ruby.
