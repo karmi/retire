@@ -6,3 +6,4 @@ rdoc/
 coverage/
 scratch/
 examples/*.html
+*.log

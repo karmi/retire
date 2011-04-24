@@ -131,6 +131,9 @@ puts s.to_json
 puts "", "Try the query in Curl:", "-"*80
 puts s.to_curl
 
+
+#### Logging
+
 # For debugging more complex situations, you can enable logging, so requests and responses
 # will be logged using the `curl`-based format.
 
@@ -159,6 +162,25 @@ Slingshot.configure do
   #
   logger STDERR
 end
+
+#### Configuration
+
+# Just as with logging, you can configure other parts of _Slingshot_.
+
+Slingshot.configure do
+
+  # First of all, you can configure the URL for _ElasticSearch_
+  url "http://search.example.com"
+
+  # Second, you may want to wrap the results in your own class
+  class MySpecialWrapper; end
+  wrapper MySpecialWrapper
+
+  # Of course, you can reset one or all configuration setting to their defaults
+  reset
+
+end
+
 
 ##### Other Types of Queries
 
