@@ -196,17 +196,20 @@ s.results.each do |document|
   puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
 end
 
-# _ElasticSearch_ allows us to do many more types of queries.
+# _ElasticSearch_ supports many types of [queries](http://www.elasticsearch.org/guide/reference/query-dsl/).
+#
 # Eventually, _Slingshot_ will support all of them.
 # So far, only these are supported:
 #
+# * [string](http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html)
 # * [term](http://elasticsearch.org/guide/reference/query-dsl/term-query.html)
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
+# * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
 
 ##### Faceted Search
 
 # _ElasticSearch_ makes it trivial to retrieve complex aggregated data from our index/database,
-# so called [_facets_](http://www.lucidimagination.com/Community/Hear-from-the-Experts/Articles/Faceted-Search-Solr).
+# so called [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html).
 
 # Let's say we want to display article counts for every tag in the database.
 # For that, we'll use a _terms_ facet.
@@ -216,7 +219,7 @@ s = Slingshot.search 'articles' do
   # We will search for articles whose title begins with letter “T”,
   query { string 'title:T*' }
 
-  # and retrieve their counts “bucketed” by their `tags`.
+  # and retrieve their counts, “bucketed” by their `tags`.
   facet 'tags' do
     terms :tags
   end
@@ -249,8 +252,8 @@ s = Slingshot.search 'articles' do
     terms :tags, :global => true
   end
 
-  # As you can see, we can even combine facets scoped
-  # to the current query with global facets.
+  # As you can see, we can even combine facets scoped to the current query
+  # with global facets — we'll just use a different name.
   facet 'current-tags' do
     terms :tags
   end
@@ -280,13 +283,20 @@ s.results.facets['global-tags']['terms'].each do |f|
   puts "#{f['term'].ljust(10)} #{f['count']}"
 end
 
-# The real power of facets lies in their combination with
-# [filters](http://elasticsearch.karmi.cz/guide/reference/api/search/filter.html),
-# though:
+# _ElasticSearch_ supports many types of advanced facets.
+#
+# Eventually, _Slingshot_ will support all of them.
+# So far, only these are supported:
+#
+# * [terms](http://www.elasticsearch.org/guide/reference/api/search/facets/terms-facet.html)
+# * [date](http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html)
 
-# > When doing things like facet navigation,
-# > sometimes only the hits are needed to be filtered by the chosen facet,
-# > and all the facets should continue to be calculated based on the original query.
+# The real power of facets lies in their combination with
+# [filters](http://elasticsearch.org/guide/reference/api/search/filter.html).
+
+# Filters enable us to restrict the returned documents, for example to a specific category,
+# but to calculate the facet counts based on the original query.
+# The immediate use case for that is the „faceted navigation“.
 
 
 ##### Filtered Search
@@ -412,4 +422,3 @@ s = Slingshot.search 'articles' do
   # • or specifying global highlighting options, such as the wrapper tag
   highlight :title, :body, :options => { :tag => '<strong class="highlight">' }
 end
-
