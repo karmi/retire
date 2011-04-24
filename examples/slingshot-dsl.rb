@@ -3,7 +3,10 @@
 #
 # It provides the API for the main _ElasticSearch_ features, and this document
 # will walk you through them.
-#
+
+# Note, that you can execute this file directly if you download or clone the source code.
+% ruby examples/slingshot-dsl.rb
+
 # <img src="http://github.com/favicon.ico" style="position:relative; top:2px">
 # _Slingshot_ is open source, and you can download or clone the source code
 # from <https://github.com/karmi/slingshot>.
