@@ -69,9 +69,9 @@ Slingshot.index 'articles' do
         :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
         # Set the boost or analyzer settings for the field, et cetera. The _ElasticSearch_ guide
         # has [more information](http://elasticsearch.org/guide/reference/mapping/index.html).
-        :title    => { :type => 'string', :boost => 2.0,            :analyzer => 'snowball'  },
+        :title    => { :type => 'string', :analyzer => 'snowball', :boost => 2.0             },
         :tags     => { :type => 'string', :analyzer => 'keyword'                             },
-        :content  => { :type => 'string', :analyzer => 'snowball'                            }
+        :content  => { :type => 'string', :analyzer => 'czech'                               }
       }
     }
   }
@@ -190,12 +190,13 @@ end
 # Query strings are convenient for simple searches, but we may want to define our queries more expressively,
 # using the _ElasticSearch_ Query DSL.
 #
-# Let's suppose we want to search for articles with specific _tags_, in our case “ruby” _or_ “python”.
-#
-# That's a great excuse to use a [_terms_](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
-# query.
 s = Slingshot.search('articles') do
+  # Let's suppose we want to search for articles with specific _tags_, in our case “ruby” _or_ “python”.
+  #
   query do
+    # That's a great excuse to use a [_terms_](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
+    # query.
+    #
     terms :tags, ['ruby', 'python']
   end
 end
@@ -210,9 +211,11 @@ s.results.each do |document|
 end
 
 # What if we wanted to search for articles tagged both “ruby” _and_ “python”.
-# That's a great excuse to specify `minimum_match` for the query.
+#
 s = Slingshot.search('articles') do
   query do
+    # That's a great excuse to specify `minimum_match` for the query.
+    #
     terms :tags, ['ruby', 'python'], :minimum_match => 2
   end
 end
@@ -273,15 +276,17 @@ end
 
 #
 s = Slingshot.search 'articles' do
+  # Let's repeat the search...
+  #
   query { string 'title:T*' }
 
   facet 'global-tags' do
-    # That's where the `global` scope for a facet comes in.
+    # ...but set the `global` scope for the facet in this case.
     terms :tags, :global => true
   end
 
-  # As you can see, we can even combine facets scoped to the current query
-  # with global facets — we'll just use a different name.
+  # We can even _combine_ facets scoped to the current query
+  # with globally scoped facets — we'll just use a different name.
   facet 'current-tags' do
     terms :tags
   end
@@ -311,7 +316,7 @@ s.results.facets['global-tags']['terms'].each do |f|
   puts "#{f['term'].ljust(10)} #{f['count']}"
 end
 
-# _ElasticSearch_ supports many types of advanced facets.
+# _ElasticSearch_ supports many advanced facets types, such as those for computing statistics or geographical distance.
 #
 # Eventually, _Slingshot_ will support all of them.
 # So far, only these are supported:
