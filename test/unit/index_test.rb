@@ -4,10 +4,6 @@ module Slingshot
 
   class IndexTest < Test::Unit::TestCase
 
-    def mock_response(json, code=200)
-      stub(:body => json, :code => code)
-    end
-
     context "Index" do
 
       setup do

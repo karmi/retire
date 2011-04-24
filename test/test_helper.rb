@@ -11,6 +11,10 @@ Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
 
 class Test::Unit::TestCase
 
+  def mock_response(body, code=200)
+    stub(:body => body, :code => code)
+  end
+
   def fixtures_path
     Pathname( File.expand_path( 'fixtures', File.dirname(__FILE__) ) )
   end
