@@ -19,10 +19,10 @@ module Slingshot
               case args = args.pop
                 when Fixnum, String
                   Index.new(index_name).retrieve document_type, args
-                when :all, :first, :last
+                when :all, :first
                   send(args)
                 else
-                  raise ArgumentError, "Please pass either ID as Fixnum or String, or :all, :first, :last as an argument"
+                  raise ArgumentError, "Please pass either ID as Fixnum or String, or :all, :first as an argument"
               end
             end
           ensure
