@@ -7,17 +7,24 @@ module Slingshot
     end
 
     def delete
-      response = Configuration.client.delete "#{Configuration.url}/#{@name}"
-      return response =~ /error/ ? false : true
-    rescue
+      # FIXME: RestClient does not return response for DELETE requests?
+      @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
+      return @response =~ /error/ ? false : true
+    rescue Exception => error
       false
+    ensure
+      curl = %Q|curl -X DELETE "#{Configuration.url}/#{@name}"|
+      logged(error, 'DELETE', curl)
     end
 
     def create(options={})
-      # http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html
-      Configuration.client.post "#{Configuration.url}/#{@name}", Yajl::Encoder.encode(options)
-    rescue
+      @options = options
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}", Yajl::Encoder.encode(options)
+    rescue Exception => error
       false
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{Yajl::Encoder.encode(options, :pretty => true)}'|
+      logged(error, 'CREATE', curl)
     end
 
     def mapping
@@ -46,17 +53,21 @@ module Slingshot
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
       end
 
-      if id
-        result = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/#{id}", document
-      else
-        result = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/", document
-      end
-      JSON.parse(result)
+      url = id ? "#{Configuration.url}/#{@name}/#{type}/#{id}" : "#{Configuration.url}/#{@name}/#{type}/"
+
+      @response = Configuration.client.post url, document
+      JSON.parse(@response)
+
+    rescue Exception => error
+      raise
+    ensure
+      curl = %Q|curl -X POST "#{url}" -d '#{document}'|
+      logged(error, "/#{@name}/#{type}/", curl)
     end
 
     def retrieve(type, id)
-      result = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
-      h = JSON.parse(result)
+      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      h = JSON.parse(@response)
       if Configuration.wrapper == Hash then h
       else
         document = h['_source'] ? h['_source'] : h['fields']
@@ -66,7 +77,30 @@ module Slingshot
     end
 
     def refresh
-      Configuration.client.post "#{Configuration.url}/#{@name}/_refresh", ''
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_refresh", ''
+    rescue Exception => error
+      raise
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_refresh"|
+      logged(error, '_refresh', curl)
+    end
+
+    def logged(error=nil, endpoint='/', curl='')
+      if Configuration.logger
+
+        Configuration.logger.log_request endpoint, @name, curl
+
+        code = @response ? @response.code : error.message rescue 200
+
+        if Configuration.logger.level.to_s == 'debug'
+          # FIXME: Depends on RestClient implementation
+          body = @response ? Yajl::Encoder.encode(@response.body, :pretty => true) : error.http_body rescue ''
+        else
+          body = ''
+        end
+
+        Configuration.logger.log_response code, nil, body
+      end
     end
 
   end

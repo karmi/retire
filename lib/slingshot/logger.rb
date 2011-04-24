@@ -34,7 +34,7 @@ module Slingshot
       write content
     end
 
-    def log_response(status, took, json)
+    def log_response(status, took=nil, json='')
       # 2001-02-12 18:20:42:32 [200] (4 msec)
       #
       # {
@@ -47,7 +47,7 @@ module Slingshot
       content += " [#{status}]"
       content += " (#{took} msec)" if took
       content += "\n#\n" unless json == ''
-      json.each_line { |line| content += "# #{line}" }
+      json.each_line { |line| content += "# #{line}" } unless json == ''
       content += "\n\n"
       write content
     end
