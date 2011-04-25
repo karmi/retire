@@ -25,12 +25,6 @@ module Slingshot
           assert_equal 'persistent_article', PersistentArticle.new(:title => 'Test').document_type
         end
 
-        should "create index on load" do
-          Index.any_instance.expects(:create)
-
-          load File.expand_path( '../models/persistent_article.rb', File.dirname(__FILE__) )
-        end
-
         should "allow to define property" do
           assert_nothing_raised do
             a = PersistentArticle.new

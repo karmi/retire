@@ -24,9 +24,6 @@ module Slingshot
           include Persistence::Attributes::InstanceMethods
 
           include Persistence::Storage
-
-          # FIXME: Create with mapping
-          index.create
         end
 
       end
