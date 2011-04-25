@@ -15,7 +15,7 @@ module Slingshot
           store :article, :title => 'One'
           refresh
         end
-        sleep 1.25
+        sleep 1.5
 
         assert_equal 'string', index.mapping['article']['properties']['title']['type'],  index.mapping.inspect
         assert_nil             index.mapping['article']['properties']['title']['boost'], index.mapping.inspect

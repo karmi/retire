@@ -33,16 +33,20 @@ module Slingshot
       should "save document into index on save and find it" do
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!
+        id = a.id
+
         a.index.refresh
         sleep(1.5) # Leave ES some breathing room here...
+
         results = ActiveRecordArticle.search 'test'
 
         assert_equal 1, results.count
 
         assert_instance_of ActiveRecordArticle, results.first
         assert_not_nil results.first.id
-        assert_not_nil results.first.score
-        assert_equal 'Test', results.first.title
+        assert_equal   id, results.first.id
+        assert_not_nil results.first._score
+        assert_equal   'Test', results.first.title
       end
 
       should "remove document from index on destroy" do

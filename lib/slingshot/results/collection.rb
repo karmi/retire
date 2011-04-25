@@ -14,10 +14,19 @@ module Slingshot
         @results = response['hits']['hits'].map do |h|
                      if Configuration.wrapper == Hash then h
                      else
-                       document = h['fields'] ? h.delete('fields') : h.delete('_source')
-                       document['highlight'] = h['highlight'] if h['highlight']
-                       h.update document if document
-                       Configuration.wrapper.new(h)
+                       document = {}
+
+                       # Update the document with content and ID
+                       document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
+                       document.update( {'id' => h['_id']} )
+
+                       # Update the document with meta information
+                       ['_score', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
+
+                       # TODO: Find a way to actually circumvent mass assignment in ActiveRecord and this wouldn't be neccessary
+                       object = Configuration.wrapper.new(document)
+                       object.id = h['_id'] if object.respond_to?(:id=)
+                       object
                      end
                    end
         @facets  = response['facets']

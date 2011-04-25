@@ -20,6 +20,12 @@ module Slingshot
         self.has_key?(method_name.to_sym) ? self[method_name.to_sym] : nil
       end
 
+      # Get ID
+      #
+      def id
+        self[:id]
+      end
+
       def inspect
         s = []; self.each { |k,v| s << "#{k}: #{v.inspect}" }
         %Q|<Item #{s.join(', ')}>|
