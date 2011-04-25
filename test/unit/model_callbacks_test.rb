@@ -71,7 +71,7 @@ module Slingshot
 
       context "Model with ActiveModel callbacks without destroyed? method implemented" do
 
-        should "defined the destroyed? method" do
+        should "have the destroyed? method added" do
           assert_respond_to ModelThree.new, :destroyed?
         end
 
