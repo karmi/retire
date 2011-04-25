@@ -24,6 +24,8 @@ module Slingshot
       should "save document into index on save and find it with score" do
         a = SupermodelArticle.new :title => 'Test'
         a.save
+        id = a.id
+
         a.index.refresh
         sleep(1.5)
 
@@ -31,8 +33,9 @@ module Slingshot
 
         assert_equal 1, results.count
         assert_instance_of SupermodelArticle, results.first
-        assert_equal 'Test', results.first.title
-        assert_not_nil results.first.score
+        assert_equal       'Test', results.first.title
+        assert_not_nil     results.first.score
+        assert_equal       id, results.first.id
       end
 
       should "remove document from index on destroy" do

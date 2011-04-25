@@ -7,17 +7,17 @@ module Slingshot
     context "Collection" do
       setup do
         Configuration.reset :wrapper
-        @default_response = { 'hits' => { 'hits' => [{:_id => 1, :_score => 1, :_source => {:title => 'Test'}},
-                                                     {:_id => 2},
-                                                     {:_id => 3}] } }
+        @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
+                                                     {'_id' => 2},
+                                                     {'_id' => 3}] } }
       end
 
       should "be iterable" do
         assert_respond_to Results::Collection.new(@default_response), :each
         assert_respond_to Results::Collection.new(@default_response), :size
         assert_nothing_raised do
-          Results::Collection.new(@default_response).each { |item| item[:_id] + 1 }
-          Results::Collection.new(@default_response).map  { |item| item[:_id] + 1 }
+          Results::Collection.new(@default_response).each { |item| item.id + 1 }
+          Results::Collection.new(@default_response).map  { |item| item.id + 1 }
         end
       end
 
@@ -78,14 +78,19 @@ module Slingshot
           assert_equal 0.5, document._score
         end
 
+        should "return id" do
+          document =  Results::Collection.new(@response).first
+          assert_equal 1, document.id
+        end
+
       end
 
       context "while paginating results" do
 
         setup do
-          @default_response = { 'hits' => { 'hits' => [{:_id => 1, :_score => 1, :_source => {:title => 'Test'}},
-                                                       {:_id => 2},
-                                                       {:_id => 3}],
+          @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
+                                                       {'_id' => 2},
+                                                       {'_id' => 3}],
                                             'total' => 3,
                                             'took'  => 1 } }
           @collection = Results::Collection.new( @default_response, :per_page => 1, :page => 2 )
