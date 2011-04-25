@@ -23,8 +23,9 @@ module Slingshot
 
       should "save document into index on save and find it with score" do
         a = SupermodelArticle.new :title => 'Test'
-        a.save and a.index.refresh
-        sleep(1)
+        a.save
+        a.index.refresh
+        sleep(1.5)
 
         results = SupermodelArticle.search 'test'
 
@@ -40,6 +41,8 @@ module Slingshot
         a.destroy
 
         a.index.refresh
+        sleep(1.25)
+
         results = SupermodelArticle.search 'test'
         
         assert_equal 0, results.count

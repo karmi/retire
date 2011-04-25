@@ -46,6 +46,8 @@ module Slingshot
           def save
             return false unless valid?
             run_callbacks :save do
+              # Document#id is set in the +update_elastic_search_index+ method,
+              # where we have access to the JSON response
             end
             self
           end

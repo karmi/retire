@@ -6,6 +6,8 @@ class ValidatedModel
   include Slingshot::Model::Search
   include Slingshot::Model::Callbacks
 
+  property :name
+
   validates_presence_of :name
 
 end
