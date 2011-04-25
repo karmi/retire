@@ -14,6 +14,16 @@ module Slingshot
         assert_equal 'dummy', @index.name
       end
 
+      should "return true when exists" do
+        Configuration.client.expects(:get).returns(mock_response('{"dummy":{"document":{"properties":{}}}}'))
+        assert @index.exists?
+      end
+
+      should "return false when does not exist" do
+        Configuration.client.expects(:get).raises(RestClient::ResourceNotFound)
+        assert ! @index.exists?
+      end
+
       should "create new index" do
         Configuration.client.expects(:post).returns(mock_response('{"ok":true,"acknowledged":true}'))
         assert @index.create

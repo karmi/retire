@@ -8,6 +8,12 @@ module Slingshot
       instance_eval(&block) if block_given?
     end
 
+    def exists?
+      !!Configuration.client.get("#{Configuration.url}/#{@name}/_status")
+    rescue Exception => error
+      false
+    end
+
     def delete
       # FIXME: RestClient does not return response for DELETE requests?
       @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
