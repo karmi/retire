@@ -19,6 +19,8 @@ module Slingshot
           extend  Slingshot::Model::Naming::ClassMethods
           include Slingshot::Model::Naming::InstanceMethods
 
+          extend  Slingshot::Model::Mapping::ClassMethods
+
           extend  Persistence::Finders::ClassMethods
           extend  Persistence::Attributes::ClassMethods
           include Persistence::Attributes::InstanceMethods

@@ -7,12 +7,12 @@ module Slingshot
 
         module ClassMethods
 
-          def property(name, opts = {})
+          def property(name, options = {})
             attr_accessor name.to_sym
             properties << name.to_s unless properties.include?(name.to_s)
             define_query_method      name.to_sym
             define_attribute_methods [name.to_sym]
-            # TODO: Mapping
+            mapping[name] = options
             self
           end
 
