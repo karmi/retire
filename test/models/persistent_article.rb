@@ -6,6 +6,8 @@ class PersistentArticle
   include Slingshot::Model::Search
   include Slingshot::Model::Callbacks
 
-  property :published
+  property :title
+  property :published_on
+  property :tags
 
 end

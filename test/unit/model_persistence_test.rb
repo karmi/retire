@@ -9,7 +9,7 @@ module Slingshot
 
         should "have default index name" do
           assert_equal 'persistent_articles', PersistentArticle.index_name
-          assert_equal 'persistent_articles', PersistentArticle.new(:name => 'Test').index_name
+          assert_equal 'persistent_articles', PersistentArticle.new(:title => 'Test').index_name
         end
 
         should "allow to set custom index name" do
@@ -22,7 +22,7 @@ module Slingshot
 
         should "have document_type" do
           assert_equal 'persistent_article', PersistentArticle.document_type
-          assert_equal 'persistent_article', PersistentArticle.new(:name => 'Test').document_type
+          assert_equal 'persistent_article', PersistentArticle.new(:title => 'Test').document_type
         end
 
         should "create index on load" do
@@ -62,6 +62,7 @@ module Slingshot
           document = PersistentArticle.find 1
 
           assert_instance_of PersistentArticle, document
+          assert_equal 1, document.id
           assert_equal 1, document.attributes['id']
           assert_equal 'First', document.attributes['title']
           assert_equal 'First', document.title
@@ -72,6 +73,8 @@ module Slingshot
           document = PersistentArticle.find '1'
 
           assert_instance_of PersistentArticle, document
+          assert_equal 1, document.id
+          assert_equal 1, document.attributes['id']
           assert_equal 'First', document.attributes['title']
           assert_equal 'First', document.title
         end
@@ -133,13 +136,13 @@ module Slingshot
           assert_nothing_raised { PersistentArticle.new }
         end
 
-        should "have getters for existing attributes" do
+        should "have getter methods for attributes" do
           assert_not_nil @article.title
           assert_equal 'Test', @article.title
           assert_equal [:one, :two], @article.tags
         end
 
-        should "have getters for existing String attributes" do
+        should "have getter methods for attributes passed as a String" do
           article = PersistentArticle.new 'title' => 'Tony Montana'
           assert_not_nil article.title
           assert_equal   'Tony Montana', article.title
@@ -151,14 +154,14 @@ module Slingshot
           end
         end
 
-        should "not raise error when getting known attribute" do
+        should "not raise error when getting unset attribute" do
           article = PersistentArticle.new :title => 'Test'
 
-          assert_nothing_raised { article.published }
-          assert_nil article.published
+          assert_nothing_raised { article.published_on }
+          assert_nil article.published_on
         end
 
-        should_eventually "return default values for known attribute" do
+        should_eventually "return default value for attribute" do
           article = PersistentArticle.new :title => 'Test'
           article.class_eval do
             property :title
@@ -169,7 +172,7 @@ module Slingshot
           assert_equal [], article.tags
         end
 
-        should "have query method for existing attribute" do
+        should "have query method for attribute" do
           assert_equal true, @article.title?
         end
 
@@ -179,47 +182,41 @@ module Slingshot
           end
         end
 
-        should "not raise error when querying for known attribute" do
+        should "not raise error when querying for unset attribute" do
           article = PersistentArticle.new :title => 'Test'
 
-          assert_nothing_raised { article.published? }
-          assert ! article.published?
+          assert_nothing_raised { article.published_on? }
+          assert ! article.published_on?
         end
       
-        should "return true for respond_to? calls for existing attributes" do
+        should "return true for respond_to? calls for set attributes" do
           article = PersistentArticle.new :title => 'Test'
           assert article.respond_to?(:title)
         end
 
-        should "return true for respond_to? calls for unknown attributes" do
+        should "return false for respond_to? calls for unknown attributes" do
           article = PersistentArticle.new :title => 'Test'
           assert ! article.respond_to?(:krapulitz)
         end
 
-        should "return true for respond_to? calls for known attributes" do
+        should "return true for respond_to? calls for defined but unset attributes" do
           article = PersistentArticle.new :title => 'Test'
 
-          assert article.respond_to?(:published)
+          assert article.respond_to?(:published_on)
         end
 
         should "have attribute names" do
-          article = PersistentArticle.new :one => 'One', :two => 'Two'
-          assert_equal ['one', 'published', 'two'].sort, article.attribute_names.sort
+          article = PersistentArticle.new :title => 'Test', :tags => ['one', 'two']
+          assert_equal ['published_on', 'tags', 'title'], article.attribute_names
         end
 
-        should "allow to update existing attribute" do
+        should "have setter method for attribute" do
           @article.title = 'Updated'
           assert_equal 'Updated', @article.title
           assert_equal 'Updated', @article.attributes['title']
         end
 
-        should "allow to set new attribute" do
-          @article.author = 'John Smith'
-          assert_equal 'John Smith', @article.author
-          assert_equal 'John Smith', @article.attributes['author']
-        end
-
-        should "allow to set deeply nested attributes on initialization" do
+        should_eventually "allow to set deeply nested attributes on initialization" do
           article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
 
           assert_equal 'John',  article.author.first_name
@@ -228,35 +225,40 @@ module Slingshot
         end
 
         should_eventually "allow to set deeply nested attributes on update" do
-          @article.author.first_name = 'John'
-          @article.author.last_name  = 'Smith'
+          article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
 
-          assert_equal 'John',  @article.author.first_name
-          assert_equal 'Smith', @article.author.last_name
-          assert_equal({ :first_name => 'John', :last_name => 'Smith' }, @article.attributes['author'])
+          article.author.first_name = 'Robert'
+          article.author.last_name  = 'Carpenter'
+
+          assert_equal 'Robert',    article.author.first_name
+          assert_equal 'Carpenter', article.author.last_name
+          assert_equal({ :first_name => 'Robert', :last_name => 'Carpenter' }, article.attributes['author'])
         end
 
         context "when creating" do
 
           should "save the document with generated ID in the database" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
-                                                     '{"title":"Test","tags":["one","two"]}').
+                                                     '{"title":"Test","tags":["one","two"],"published_on":null}').
                                                 returns(mock_response('{"ok":true,"_id":"abc123"}'))
             article = PersistentArticle.create :title => 'Test', :tags => [:one, :two]
+
             assert article.persisted?, "#{article.inspect} should be `persisted?`"
             assert_equal 'abc123', article.id
           end
 
           should "save the document with custom ID in the database" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/r2d2",
-                                                     {:id => 'r2d2', :title => 'Test'}.to_json).
+                                                     '{"title":"Test","id":"r2d2","tags":null,"published_on":null}').
                                                 returns(mock_response('{"ok":true,"_id":"r2d2"}'))
             article = PersistentArticle.create :id => 'r2d2', :title => 'Test'
+
             assert_equal 'r2d2', article.id
           end
 
           should "perform model validations" do
             Configuration.client.expects(:post).never
+ 
             assert ! ValidatedModel.create(:name => nil)
           end
 
@@ -266,7 +268,7 @@ module Slingshot
 
           should "set the id property" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
-                                                     {:title => 'Test'}.to_json).
+                                                     {:title => 'Test', :tags => nil, :published_on => nil}.to_json).
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
 
             article = PersistentArticle.create :title => 'Test'
@@ -275,7 +277,7 @@ module Slingshot
 
           should "not set the id property if already set" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     {:title => 'Test', :id => '123'}.to_json).
+                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}').
                                                 returns(mock_response('{"ok":true, "_id":"XXX"}'))
 
             article = PersistentArticle.create :id => '123', :title => 'Test'
@@ -287,16 +289,16 @@ module Slingshot
         context "when saving" do
 
           should "save the document with updated attribute" do
-            article = PersistentArticle.new :id => 1, :title => 'Test', :tags => [:one, :two]
+            article = PersistentArticle.new :id => 1, :title => 'Test'
 
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     article.to_indexed_json).
+                                                     '{"title":"Test","id":1,"tags":null,"published_on":null}').
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
             assert article.save
 
             article.title = 'Updated'
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     article.to_indexed_json).
+                                                     '{"title":"Updated","id":1,"tags":null,"published_on":null}').
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
             assert article.save
           end
@@ -323,7 +325,7 @@ module Slingshot
             article.title = 'Test'
 
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     article.to_indexed_json).
+                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}').
                                                 returns(mock_response('{"ok":true,"_id":"XXX"}'))
              assert article.save
              assert_equal '123', article.id
@@ -334,12 +336,12 @@ module Slingshot
         context "when destroying" do
 
           should "delete the document from the database" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     {:id => 1, :title => 'Test'}.to_json).
-                                                returns(mock_response('{"ok":true,"_id":"1"}'))
-            Configuration.client.expects(:delete).with("#{Configuration.url}/persistent_articles/persistent_article/1")
+            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
+                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}').
+                                                returns(mock_response('{"ok":true,"_id":"123"}'))
+            Configuration.client.expects(:delete).with("#{Configuration.url}/persistent_articles/persistent_article/123")
 
-            article = PersistentArticle.new :id => 1, :title => 'Test'
+            article = PersistentArticle.new :id => '123', :title => 'Test'
             article.save
             article.destroy
           end

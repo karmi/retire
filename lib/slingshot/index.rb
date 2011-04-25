@@ -94,9 +94,10 @@ module Slingshot
       h = JSON.parse(@response.body)
       if Configuration.wrapper == Hash then h
       else
-        document = h['_source'] ? h['_source'] : h['fields']
-        h.update document if document
-        Configuration.wrapper.new(h)
+        document = {}
+        document = h['_source'] ? document.update( h['_source'] ) : document.update( h['fields'] )
+        document.update('id' => h['_id'], '_version' => h['_version'])
+        Configuration.wrapper.new(document)
       end
     end
 

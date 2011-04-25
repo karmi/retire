@@ -33,9 +33,8 @@ module Slingshot
       should "save document into index on save and find it" do
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!
-        sleep(1) # Leave ES some breathing room here...
         a.index.refresh
-        sleep(1) # Leave ES some breathing room here...
+        sleep(1.5) # Leave ES some breathing room here...
         results = ActiveRecordArticle.search 'test'
 
         assert_equal 1, results.count
