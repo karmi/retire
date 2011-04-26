@@ -8,7 +8,7 @@ module Slingshot
           extend  Slingshot::Model::Naming::ClassMethods
           include Slingshot::Model::Naming::InstanceMethods
 
-          extend  Slingshot::Model::Mapping::ClassMethods
+          extend  Slingshot::Model::Indexing::ClassMethods
 
           extend  ClassMethods
           include InstanceMethods
