@@ -27,8 +27,18 @@ module Slingshot
 
     context "ActiveRecord integration" do
 
-      setup    { Slingshot.index('active_record_articles').delete }
+      setup    do
+        Slingshot.index('active_record_articles').delete
+        load File.expand_path('../../models/active_record_article.rb', __FILE__)
+      end
       teardown { Slingshot.index('active_record_articles').delete }
+
+      should "configure mapping" do
+        assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]
+        assert_equal 10, ActiveRecordArticle.mapping[:title][:boost]
+
+        assert_equal 'snowball', ActiveRecordArticle.index.mapping['active_record_article']['properties']['title']['analyzer']
+      end
 
       should "save document into index on save and find it" do
         a = ActiveRecordArticle.new :title => 'Test'

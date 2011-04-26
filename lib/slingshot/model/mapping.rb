@@ -14,9 +14,16 @@ module Slingshot
           end
         end
 
+        def property(name, options = {})
+          # p "#{self}, SEARCH PROPERTY, #{name}"
+          mapping[name] = options
+        end
+
         private
 
         def create_index_or_update_mapping
+          # STDERR.puts "Creating index with mapping", mapping_to_hash.inspect
+          # STDERR.puts "Index exists?, #{index.exists?}"
           unless index.exists?
             index.create :mappings => mapping_to_hash
           else

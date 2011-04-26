@@ -3,8 +3,8 @@
 class PersistentArticle
 
   include Slingshot::Model::Persistence
-  include Slingshot::Model::Search
   include Slingshot::Model::Callbacks
+  include Slingshot::Model::Search
 
   property :title
   property :published_on
