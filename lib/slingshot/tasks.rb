@@ -5,6 +5,22 @@ namespace :slingshot do
   desc "Import data from your ActiveModel model: rake environment slingshot:import CLASS='MyModel' PARAMS='{:page => 1}' FORCE=1"
   task :import do
 
+    def elapsed_to_human(elapsed)
+      hour = 60*60
+      day  = hour*24
+
+      case elapsed
+      when 0..59
+        "#{sprintf("%1.5f", elapsed)} seconds"
+      when 60..hour-1
+        "#{elapsed/60} minutes and #{elapsed % 60} seconds"
+      when hour..day
+        "#{elapsed/hour} hours and #{elapsed % hour} minutes"
+      else
+        "#{elapsed/hour} hours"
+      end
+    end
+
     if ENV['CLASS'].to_s == ''
       puts "[ERROR] Please provide a class you wish to import data from in a CLASS environment variable."
       exit(1)
@@ -36,7 +52,7 @@ namespace :slingshot do
       end
     end
 
-    puts "", '-'*80, "Import finished in #{sprintf("%1.5f", elapsed)} seconds"
+    puts "", '-'*80, "Import finished in #{elapsed_to_human(elapsed)}"
 
   end
 end
