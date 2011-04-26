@@ -25,8 +25,6 @@ module Slingshot
           @store_mapping || false
         end
 
-        private
-
         def create_index_or_update_mapping
           # STDERR.puts "Creating index with mapping", mapping_to_hash.inspect
           # STDERR.puts "Index exists?, #{index.exists?}"

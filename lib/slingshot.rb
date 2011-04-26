@@ -28,6 +28,7 @@ require 'slingshot/model/persistence/finders'
 require 'slingshot/model/persistence/attributes'
 require 'slingshot/model/persistence/storage'
 require 'slingshot/model/persistence'
+require 'slingshot/tasks'
 
 module Slingshot
   extend DSL
