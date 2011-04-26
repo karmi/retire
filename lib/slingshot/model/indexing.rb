@@ -1,7 +1,7 @@
 module Slingshot
   module Model
 
-    module Mapping
+    module Indexing
 
       module ClassMethods
 
