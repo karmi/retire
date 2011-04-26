@@ -9,6 +9,9 @@ module Slingshot
       def post(url, data)
         raise NoMethodError, "Implement this method in your client class"
       end
+      def put(url, data)
+        raise NoMethodError, "Implement this method in your client class"
+      end
       def delete(url)
         raise NoMethodError, "Implement this method in your client class"
       end
@@ -20,6 +23,9 @@ module Slingshot
       end
       def self.post(url, data)
         ::RestClient.post url, data
+      end
+      def self.put(url, data)
+        ::RestClient.put url, data
       end
       def self.delete(url)
         ::RestClient.delete url rescue nil
