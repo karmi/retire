@@ -69,7 +69,7 @@ module Slingshot
             self.class.index.remove document_type, self
           else
             response  = self.class.index.store  document_type, self
-            self.id ||= response['_id']
+            self.id ||= response['_id'] if self.respond_to?(:id=)
             self
           end
         end
