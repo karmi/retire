@@ -14,7 +14,7 @@ module Slingshot
           end
         end
 
-        def property(name, options = {})
+        def indexes(name, options = {})
           # p "#{self}, SEARCH PROPERTY, #{name}"
           mapping[name] = options
         end

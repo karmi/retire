@@ -10,7 +10,7 @@ class SupermodelArticle < SuperModel::Base
   include Slingshot::Model::Callbacks
 
   mapping do
-    property :title,      :type => 'string', :boost => 15, :analyzer => 'czech'
+    indexes :title,      :type => 'string', :boost => 15, :analyzer => 'czech'
   end
 
   alias :persisted? :exists?
