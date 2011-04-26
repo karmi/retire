@@ -37,6 +37,11 @@ module Slingshot::Search
         assert_equal( { :match_all => { } }, Query.new.all )
       end
 
+      should "search for documents by IDs" do
+        assert_equal( { :ids => { :values => [1, 2], :type => 'foo' }  },
+                      Query.new.ids([1, 2], 'foo') )
+      end
+
     end
 
   end
