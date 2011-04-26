@@ -14,9 +14,9 @@ module Slingshot
             options = args.pop if args.last.is_a?(Hash)
             args.flatten!
             if args.size > 1
-              # TODO: Use `ids` query
-              # https://github.com/elasticsearch/elasticsearch/issues/865
-              Slingshot::Search::Search.new(index.name).query { terms :_id, args }.perform.results
+              Slingshot::Search::Search.new(index.name).query do |query|
+                query.ids(args, document_type)
+              end.perform.results
             else
               case args = args.pop
                 when Fixnum, String
