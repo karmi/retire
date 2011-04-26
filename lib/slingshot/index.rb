@@ -74,6 +74,52 @@ module Slingshot
       logged(error, "/#{@name}/#{type}/", curl)
     end
 
+    def bulk_store documents
+      create unless exists?
+
+      payload = documents.map do |document|
+        old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
+        id = case
+          when document.is_a?(Hash)                                           then document[:id] || document['id']
+          when document.respond_to?(:id) && document.id != document.object_id then document.id
+        end
+        $VERBOSE = old_verbose
+
+        type = case
+          when document.is_a?(Hash)                 then document[:type] || document['type']
+          when document.respond_to?(:document_type) then document.document_type
+        end || 'document'
+
+        output = []
+        output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        output << document.to_indexed_json
+        output.join("\n")
+      end
+      payload << ""
+
+      tries = 5
+      count = 0
+
+      begin
+        # STDERR.puts "Posting payload..."
+        # STDERR.puts payload.join("\n")
+        Configuration.client.post("#{Configuration.url}/_bulk", payload.join("\n"))
+      rescue Exception => error
+        if count < tries
+          count += 1
+          STDERR.puts "[ERROR] #{error.message}:#{error.http_body rescue nil}, retrying (#{count})..."
+          retry
+        else
+          STDERR.puts "[ERROR] Too many exceptions occured, giving up..."
+          STDERR.puts "Response: #{error.http_body rescue nil}"
+          raise
+        end
+      ensure
+        curl = %Q|curl -X POST "#{Configuration.url}/_bulk" -d '{... data omitted ...}'|
+        logged(error, 'BULK', curl)
+      end
+    end
+
     def remove(*args)
       # TODO: Infer type from the document (hash property, method)
 
