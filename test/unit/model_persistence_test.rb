@@ -121,112 +121,116 @@ module Slingshot
 
         setup { @article = PersistentArticle.new :title => 'Test', :tags => [:one, :two] }
 
-        should "allow to set attributes on initialization" do
-          assert_not_nil @article.attributes
-          assert_equal 'Test', @article.attributes['title']
-        end
+        context "attribute methods" do
 
-        should "allow to leave attributes blank on initialization" do
-          assert_nothing_raised { PersistentArticle.new }
-        end
-
-        should "have getter methods for attributes" do
-          assert_not_nil @article.title
-          assert_equal 'Test', @article.title
-          assert_equal [:one, :two], @article.tags
-        end
-
-        should "have getter methods for attributes passed as a String" do
-          article = PersistentArticle.new 'title' => 'Tony Montana'
-          assert_not_nil article.title
-          assert_equal   'Tony Montana', article.title
-        end
-
-        should "raise error when getting unknown attributes" do
-          assert_raise(NoMethodError) do
-            @article.krapulitz
-          end
-        end
-
-        should "not raise error when getting unset attribute" do
-          article = PersistentArticle.new :title => 'Test'
-
-          assert_nothing_raised { article.published_on }
-          assert_nil article.published_on
-        end
-
-        should_eventually "return default value for attribute" do
-          article = PersistentArticle.new :title => 'Test'
-          article.class_eval do
-            property :title
-            property :tags, :default => []
+          should "allow to set attributes on initialization" do
+            assert_not_nil @article.attributes
+            assert_equal 'Test', @article.attributes['title']
           end
 
-          assert_nothing_raised { article.tags }
-          assert_equal [], article.tags
-        end
-
-        should "have query method for attribute" do
-          assert_equal true, @article.title?
-        end
-
-        should "raise error when querying for unknown attribute" do
-          assert_raise(NoMethodError) do
-            @article.krapulitz?
+          should "allow to leave attributes blank on initialization" do
+            assert_nothing_raised { PersistentArticle.new }
           end
-        end
 
-        should "not raise error when querying for unset attribute" do
-          article = PersistentArticle.new :title => 'Test'
+          should "have getter methods for attributes" do
+            assert_not_nil @article.title
+            assert_equal 'Test', @article.title
+            assert_equal [:one, :two], @article.tags
+          end
 
-          assert_nothing_raised { article.published_on? }
-          assert ! article.published_on?
-        end
+          should "have getter methods for attribute passed as a String" do
+            article = PersistentArticle.new 'title' => 'Tony Montana'
+            assert_not_nil article.title
+            assert_equal   'Tony Montana', article.title
+          end
+
+          should "raise error when getting unknown attribute" do
+            assert_raise(NoMethodError) do
+              @article.krapulitz
+            end
+          end
+
+          should "not raise error when getting unset attribute" do
+            article = PersistentArticle.new :title => 'Test'
+
+            assert_nothing_raised { article.published_on }
+            assert_nil article.published_on
+          end
+
+          should_eventually "return default value for attribute" do
+            article = PersistentArticle.new :title => 'Test'
+            article.class_eval do
+              property :title
+              property :tags, :default => []
+            end
+
+            assert_nothing_raised { article.tags }
+            assert_equal [], article.tags
+          end
+
+          should "have query method for attribute" do
+            assert_equal true, @article.title?
+          end
+
+          should "raise error when querying for unknown attribute" do
+            assert_raise(NoMethodError) do
+              @article.krapulitz?
+            end
+          end
+
+          should "not raise error when querying for unset attribute" do
+            article = PersistentArticle.new :title => 'Test'
+
+            assert_nothing_raised { article.published_on? }
+            assert ! article.published_on?
+          end
       
-        should "return true for respond_to? calls for set attributes" do
-          article = PersistentArticle.new :title => 'Test'
-          assert article.respond_to?(:title)
-        end
+          should "return true for respond_to? calls for set attributes" do
+            article = PersistentArticle.new :title => 'Test'
+            assert article.respond_to?(:title)
+          end
 
-        should "return false for respond_to? calls for unknown attributes" do
-          article = PersistentArticle.new :title => 'Test'
-          assert ! article.respond_to?(:krapulitz)
-        end
+          should "return false for respond_to? calls for unknown attributes" do
+            article = PersistentArticle.new :title => 'Test'
+            assert ! article.respond_to?(:krapulitz)
+          end
 
-        should "return true for respond_to? calls for defined but unset attributes" do
-          article = PersistentArticle.new :title => 'Test'
+          should "return true for respond_to? calls for defined but unset attributes" do
+            article = PersistentArticle.new :title => 'Test'
 
-          assert article.respond_to?(:published_on)
-        end
+            assert article.respond_to?(:published_on)
+          end
 
-        should "have attribute names" do
-          article = PersistentArticle.new :title => 'Test', :tags => ['one', 'two']
-          assert_equal ['published_on', 'tags', 'title'], article.attribute_names
-        end
+          should "have attribute names" do
+            article = PersistentArticle.new :title => 'Test', :tags => ['one', 'two']
+            assert_equal ['published_on', 'tags', 'title'], article.attribute_names
+          end
 
-        should "have setter method for attribute" do
-          @article.title = 'Updated'
-          assert_equal 'Updated', @article.title
-          assert_equal 'Updated', @article.attributes['title']
-        end
+          should "have setter method for attribute" do
+            @article.title = 'Updated'
+            assert_equal 'Updated', @article.title
+            assert_equal 'Updated', @article.attributes['title']
+          end
 
-        should_eventually "allow to set deeply nested attributes on initialization" do
-          article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
+          should_eventually "allow to set deeply nested attributes on initialization" do
+            article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
 
-          assert_equal 'John',  article.author.first_name
-          assert_equal 'Smith', article.author.last_name
-          assert_equal({ :first_name => 'John', :last_name => 'Smith' }, article.attributes['author'])
-        end
+            assert_equal 'John',  article.author.first_name
+            assert_equal 'Smith', article.author.last_name
+            assert_equal({ :first_name => 'John', :last_name => 'Smith' }, article.attributes['author'])
+          end
 
-        should_eventually "allow to set deeply nested attributes on update" do
-          article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
+          should_eventually "allow to set deeply nested attributes on update" do
+            article = PersistentArticle.new :title => 'Test', :author => { :first_name => 'John', :last_name => 'Smith' }
 
-          article.author.first_name = 'Robert'
-          article.author.last_name  = 'Carpenter'
+            article.author.first_name = 'Robert'
+            article.author.last_name  = 'Carpenter'
 
-          assert_equal 'Robert',    article.author.first_name
-          assert_equal 'Carpenter', article.author.last_name
-          assert_equal({ :first_name => 'Robert', :last_name => 'Carpenter' }, article.attributes['author'])
+            assert_equal 'Robert',    article.author.first_name
+            assert_equal 'Carpenter', article.author.last_name
+            assert_equal({ :first_name => 'Robert', :last_name => 'Carpenter' }, article.attributes['author'])
+          end
+
         end
 
         context "when creating" do
