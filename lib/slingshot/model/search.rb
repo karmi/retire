@@ -77,7 +77,14 @@ module Slingshot
         end
 
         def to_indexed_json
-          self.serializable_hash.to_json
+          if self.class.mapping.empty?
+            self.serializable_hash.
+              to_json
+          else
+            self.serializable_hash.
+              reject { |key, value| ! self.class.mapping.keys.map(&:to_s).include?(key.to_s) }.
+              to_json
+          end
         end
 
       end
