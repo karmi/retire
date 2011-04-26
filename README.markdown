@@ -128,7 +128,15 @@ count for articles tagged 'php' is excluded, since they don't match the current 
     # python     1
     # java       1
 
-We can display the full query JSON:
+If configuring the search payload with a block somehow feels weird to you,
+you can simply pass a Ruby Hash (or JSON string) to the `search` method:
+
+    Slingshot.search 'articles', :query => { :query_string => { :query => 'ruby' } }
+
+You are probably able to write your application with `curl`, `sed` and `awk`,
+if this sounds like a great idea to you.
+
+When things go wrong, we can display the full query JSON for close inspection:
 
     puts s.to_json
     # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}
@@ -138,9 +146,16 @@ Or, better, we can display the corresponding `curl` command for easy debugging:
     puts s.to_curl
     # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
 
-Since `curl` is the crucial debugging tool in _ElasticSearch_ land, we can log every search query in `curl` format:
+However, it would be better to log every search query (and other requests) in `curl` format. We can do that quite easily:
 
     Slingshot.configure { logger 'elasticsearch.log' }
+
+When you set the log level to _debug_:
+
+    Slingshot.configure { logger 'elasticsearch.log', :level => 'debug' }
+
+the JSON responses are logged as well. This is not a great idea for production environment,
+but it's priceless when you want to paste a complicated transaction to the mailing list or IRC channel.
 
 
 Features
@@ -181,7 +196,6 @@ The todos and plans are vast, and the most important are listed below, in the or
 * Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination. Already [implemented](https://github.com/karmi/slingshot/commit/e1351f6) on the `activemodel` branch
 * [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) definition for models
 * Proper RDoc annotations for the source code
-* Dual interface: allow to simply pass queries/options for _ElasticSearch_ as a Hash in any method
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * [Statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html) facets
 * [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
