@@ -13,7 +13,7 @@ module Slingshot
             properties << name.to_s unless properties.include?(name.to_s)
             define_query_method      name.to_sym
             define_attribute_methods [name.to_sym]
-            mapping[name] = options
+            mapping[name] = options if store_mapping?
             self
           end
 

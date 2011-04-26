@@ -7,7 +7,9 @@ module Slingshot
 
         def mapping
           if block_given?
+            @store_mapping = true
             yield
+            @store_mapping = false
             create_index_or_update_mapping
           else
             @mapping ||= {}
@@ -17,6 +19,10 @@ module Slingshot
         def indexes(name, options = {})
           # p "#{self}, SEARCH PROPERTY, #{name}"
           mapping[name] = options
+        end
+
+        def store_mapping?
+          @store_mapping || false
         end
 
         private

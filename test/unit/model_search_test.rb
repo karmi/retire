@@ -216,10 +216,67 @@ module Slingshot
         end
 
         context "serialization" do
+          setup { Slingshot::Index.any_instance.stubs(:create).returns(true) }
 
           should "serialize itself into JSON without 'root'" do
             @model = ActiveModelArticle.new 'title' => 'Test'
             assert_equal({'title' => 'Test'}.to_json, @model.to_indexed_json)
+          end
+
+          should "serialize itself with serializable_hash when no mapping is set" do
+
+            class ::ModelWithoutMapping
+              extend  ActiveModel::Naming
+              include ActiveModel::Serialization
+              include Slingshot::Model::Search
+              include Slingshot::Model::Callbacks
+
+              # Do NOT configure any mapping
+
+              attr_reader :attributes
+
+              def initialize(attributes = {}); @attributes = attributes; end
+
+              def method_missing(name, *args, &block)
+                attributes[name.to_sym] || attributes[name.to_s] || super
+              end
+            end
+
+            model = ::ModelWithoutMapping.new :one => 1, :two => 2
+            assert_equal( {:one => 1, :two => 2}, model.serializable_hash )
+
+            # Bot properties are returned
+            assert_equal( {:one => 1, :two => 2}.to_json, model.to_indexed_json )
+          end
+
+          should "serialize only mapped properties when mapping is set" do
+
+            class ::ModelWithMapping
+              extend  ActiveModel::Naming
+              include ActiveModel::Serialization
+              include Slingshot::Model::Search
+              include Slingshot::Model::Callbacks
+
+              mapping do
+                # ONLY index the 'one' attribute
+                indexes :one, :type => 'string', :analyzer => 'keyword'
+              end
+
+              attr_reader :attributes
+
+              def initialize(attributes = {}); @attributes = attributes; end
+
+              def method_missing(name, *args, &block)
+                attributes[name.to_sym] || attributes[name.to_s] || super
+              end
+            end
+
+            model = ::ModelWithMapping.new :one => 1, :two => 2
+            assert_equal( {:one => 1, :two => 2}, model.serializable_hash )
+
+            # Only the mapped property is returned
+            assert_equal( {:one => 1}.to_json, model.to_indexed_json )
+
           end
 
         end
