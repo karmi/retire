@@ -207,7 +207,7 @@ module Slingshot
             include Slingshot::Model::Callbacks
 
             mapping do
-              property :title, :type => 'string', :analyzer => 'snowball', :boost => 10
+              indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
             end
 
           end
