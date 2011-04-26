@@ -28,6 +28,10 @@ module Slingshot
         @value
       end
 
+      def ids(values, type)
+        @value = { :ids => { :values => values, :type => type }  }
+      end
+
       def to_json
         @value.to_json
       end
