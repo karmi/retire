@@ -187,43 +187,43 @@ module Slingshot
           @model.destroy
         end
 
-      end
+        context "with custom mapping" do
 
-      context "with custom mapping" do
+          should "create the index with mapping" do
+            expected_mapping = {
+              :mappings => { :model_with_custom_mapping => {
+                :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
+              }}
+            }
 
-        should "create the index with mapping" do
-          expected_mapping = {
-            :mappings => { :model_with_custom_mapping => {
-              :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
-            }}
-          }
+            Slingshot::Index.any_instance.expects(:create).with(expected_mapping)
 
-          Slingshot::Index.any_instance.expects(:create).with(expected_mapping)
+            class ::ModelWithCustomMapping
+              extend ActiveModel::Naming
 
-          class ::ModelWithCustomMapping
-            extend ActiveModel::Naming
+              include Slingshot::Model::Search
+              include Slingshot::Model::Callbacks
 
-            include Slingshot::Model::Search
-            include Slingshot::Model::Callbacks
+              mapping do
+                indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
+              end
 
-            mapping do
-              indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
             end
 
+            assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
           end
 
-          assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
         end
 
-      end
+        context "serialization" do
 
-      context "ActiveModel" do
+          should "serialize itself into JSON without 'root'" do
+            @model = ActiveModelArticle.new 'title' => 'Test'
+            assert_equal({'title' => 'Test'}.to_json, @model.to_indexed_json)
+          end
 
-        should "serialize itself into JSON without 'root'" do
-          @model = ActiveModelArticle.new 'title' => 'Test'
-          assert_equal({'title' => 'Test'}.to_json, @model.to_indexed_json)
         end
-        
+
       end
 
     end
