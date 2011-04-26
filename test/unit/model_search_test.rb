@@ -189,6 +189,34 @@ module Slingshot
 
       end
 
+      context "with custom mapping" do
+
+        should "create the index with mapping" do
+          expected_mapping = {
+            :mappings => { :model_with_custom_mapping => {
+              :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
+            }}
+          }
+
+          Slingshot::Index.any_instance.expects(:create).with(expected_mapping)
+
+          class ::ModelWithCustomMapping
+            extend ActiveModel::Naming
+
+            include Slingshot::Model::Search
+            include Slingshot::Model::Callbacks
+
+            mapping do
+              property :title, :type => 'string', :analyzer => 'snowball', :boost => 10
+            end
+
+          end
+
+          assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
+        end
+
+      end
+
       context "ActiveModel" do
 
         should "serialize itself into JSON without 'root'" do

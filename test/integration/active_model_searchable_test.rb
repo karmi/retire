@@ -18,8 +18,18 @@ module Slingshot
 
     context "ActiveModel" do
 
-      setup    { Slingshot.index('supermodel_articles').delete }
+      setup    do
+        Slingshot.index('supermodel_articles').delete
+        load File.expand_path('../../models/supermodel_article.rb', __FILE__)
+      end
       teardown { Slingshot.index('supermodel_articles').delete }
+
+      should "configure mapping" do
+        assert_equal 'czech', SupermodelArticle.mapping[:title][:analyzer]
+        assert_equal 15,      SupermodelArticle.mapping[:title][:boost]
+
+        assert_equal 'czech', SupermodelArticle.index.mapping['supermodel_article']['properties']['title']['analyzer']
+      end
 
       should "save document into index on save and find it with score" do
         a = SupermodelArticle.new :title => 'Test'

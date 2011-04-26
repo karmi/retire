@@ -6,7 +6,7 @@ class PersistentArticleWithCustomIndexName
   include Slingshot::Model::Search
   include Slingshot::Model::Callbacks
 
-  property :published
+  property :title
 
   index_name 'custom-index-name'
 end

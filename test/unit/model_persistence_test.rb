@@ -370,11 +370,13 @@ module Slingshot
       context "Persistent model with mapping definition" do
 
         should "create the index with mapping" do
-          Slingshot::Index.any_instance.expects(:create).with({
+          expected_mapping = {
             :mappings => { :persistent_article_with_mapping => {
               :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
             }}
-          })
+          }
+
+          Slingshot::Index.any_instance.expects(:create).with(expected_mapping)
 
           class ::PersistentArticleWithMapping
 
