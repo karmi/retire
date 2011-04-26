@@ -5,10 +5,10 @@ require 'active_model'
 
 class ActiveModelArticle
 
+  extend  ActiveModel::Naming
   include ActiveModel::AttributeMethods
   include ActiveModel::Serialization
   include ActiveModel::Serializers::JSON
-  include ActiveModel::Naming
 
   include Slingshot::Model::Search
 
@@ -18,9 +18,8 @@ class ActiveModelArticle
     @attributes = attributes
   end
 
-  def id
-    attributes['_id'] || attributes['id']
-  end
+  def id;         attributes['id'] || attributes['_id']; end
+  def id=(value); attributes['id'] = value;              end
 
   def method_missing(name, *args, &block)
     attributes[name.to_sym] || attributes[name.to_s] || super
