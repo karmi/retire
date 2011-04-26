@@ -5,9 +5,15 @@ class ImportModel
   include Slingshot::Model::Search
   include Slingshot::Model::Callbacks
 
+  D = (1..10).to_a
+
   def self.paginate(options={})
     options = {:page => 0, :per_page => 1000}.update options
-    (1..10).to_a.slice( options[:page]*options[:per_page]...(options[:page]+1)*options[:per_page] )
+    D.slice( options[:page]*options[:per_page]...(options[:page]+1)*options[:per_page] )
+  end
+
+  def self.count
+    D.size
   end
 end
 
@@ -42,6 +48,23 @@ module Slingshot
             times(3)
 
           ImportModel.import :per_page => 2
+        end
+
+        should "call the passed block on every batch" do
+          Slingshot::Index.any_instance.expects(:bulk_store).returns(true).times(2)
+
+          ImportModel.expects(:paginate).
+            returns([1,2]).
+            then.returns([3,4]).
+            then.returns([]).
+            times(3)
+
+          runs = 0
+          ImportModel.import :per_page => 2 do |total, done|
+            runs += 1
+          end
+
+          assert_equal 2, runs
         end
 
       end

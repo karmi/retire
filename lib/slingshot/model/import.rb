@@ -11,12 +11,15 @@ module Slingshot
                  unless respond_to?(:paginate)
 
           options = {:page => 1, :per_page => 1000}.update options
-          page    = options[:page]
+          total   = self.count rescue nil
+          done    = 0
 
-          while documents = paginate(options.merge :page => page) and not documents.empty?
-            print '.'
+          while documents = paginate(options.merge :page => options[:page]) and not documents.empty?
             index.bulk_store documents
-            page += 1
+            options[:page] += 1
+            done           += documents.size
+
+            yield total, done if total and block_given?
           end
         end
 
