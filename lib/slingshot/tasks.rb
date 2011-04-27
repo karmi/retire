@@ -2,7 +2,19 @@ require 'rake'
 require 'benchmark'
 
 namespace :slingshot do
-  desc "Import data from your ActiveModel model: rake environment slingshot:import CLASS='MyModel' PARAMS='{:page => 1}' FORCE=1"
+
+  usage = <<-DESC
+          Import data from your ActiveModel model: rake environment slingshot:import CLASS='MyModel'
+
+          Pass params for the `paginate` method:
+            $ rake environment slingshot:import CLASS='Article' PARAMS='{:page => 1}'
+
+          Force rebuilding the index (delete and create):
+            $ rake environment slingshot:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
+    
+  DESC
+
+  desc usage.split("\n").first.to_s
   task :import do
 
     def elapsed_to_human(elapsed)
@@ -22,7 +34,7 @@ namespace :slingshot do
     end
 
     if ENV['CLASS'].to_s == ''
-      puts "[ERROR] Please provide a class you wish to import data from in a CLASS environment variable."
+      puts '='*80, 'USAGE', '='*80, usage.gsub(/          /, '')
       exit(1)
     end
 
