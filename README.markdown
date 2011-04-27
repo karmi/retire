@@ -4,11 +4,12 @@ Slingshot
 ![Slingshot](https://github.com/karmi/slingshot/raw/master/slingshot.png)
 
 _Slingshot_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
-It aims to provide rich and comfortable Ruby API in the form of a simple domain-specific language.
+It provides rich and comfortable Ruby API in the form of a simple domain-specific language.
 
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
-RESTful database communicating by JSON over HTTP, based on [Lucene](http://lucene.apache.org/),
-written in Java. It manages to be very simple to use and very powerful at the same time.
+full-text search engine and database, communicating by JSON over RESTful HTTP,
+based on [Lucene](http://lucene.apache.org/), written in Java.
+It manages to be very simple to use and very powerful at the same time.
 
 Installation
 ------------
@@ -19,11 +20,15 @@ First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's d
     $ tar -zxvf elasticsearch-0.16.0.tar.gz
     $ ./elasticsearch-0.16.0/bin/elasticsearch -f
 
-OK, easy. Now, install the gem via Rubygems:
+On a Mac, you can use _Homebrew_:
+
+    $ brew install elasticsearch
+
+OK. Let's install the gem via Rubygems:
 
     $ gem install slingshot-rb
 
-or from source:
+Of course, you can install it from the source as well:
 
     $ git clone git://github.com/karmi/slingshot.git
     $ cd slingshot
@@ -73,9 +78,9 @@ index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/a
       }
     end
 
-Now, let's query the database.
+Now, let's search it!
 
-We are searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
+We will be searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
 filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
 from the database:
 
@@ -133,8 +138,8 @@ you can simply pass a Ruby Hash (or JSON string) to the `search` method:
 
     Slingshot.search 'articles', :query => { :query_string => { :query => 'ruby' } }
 
-You are probably able to write your application with `curl`, `sed` and `awk`,
-if this sounds like a great idea to you.
+If this sounds like a great idea to you, you are probably able to write your application
+using just `curl`, `sed` and `awk`.
 
 When things go wrong, we can display the full query JSON for close inspection:
 
