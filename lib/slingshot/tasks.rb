@@ -39,20 +39,29 @@ namespace :slingshot do
 
     STDOUT.sync = true
     puts "[IMPORT] Starting import for the '#{ENV['CLASS']}' class"
-    cols = 80
+    tty_cols = 80
+    total    = klass.count rescue nil
+    done     = 0
 
-    STDOUT.puts '-'*cols
+    STDOUT.puts '-'*tty_cols
     elapsed = Benchmark.realtime do
-      eval(ENV['CLASS'].to_s).import(params) do |total, done|
+      klass.import(params) do |documents|
 
-        # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
-        percent  = ( (done.to_f / total) * 100 ).to_i
-        STDOUT.print( ("#" * ( percent*((cols-4).to_f/100)).to_i )+" ")
-        STDOUT.print("\r"*cols+"#{percent}% ")
+        if total
+          done += documents.size
+
+          # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
+          percent  = ( (done.to_f / total) * 100 ).to_i
+          STDOUT.print( ("#" * ( percent*((tty_cols-4).to_f/100)).to_i )+" ")
+          STDOUT.print("\r"*tty_cols+"#{percent}% ")
+        end
+
+        # Don't forget to return the documents collection here
+        documents
       end
     end
 
-    puts "", '-'*80, "Import finished in #{elapsed_to_human(elapsed)}"
+    puts "", '='*80, "Import finished in #{elapsed_to_human(elapsed)}"
 
   end
 end
