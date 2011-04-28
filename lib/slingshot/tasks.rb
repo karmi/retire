@@ -4,13 +4,16 @@ require 'benchmark'
 namespace :slingshot do
 
   usage = <<-DESC
-          Import data from your ActiveModel model: rake environment slingshot:import CLASS='MyModel'
+          Import data from your model using paginate: rake environment slingshot:import CLASS='MyModel'
 
           Pass params for the `paginate` method:
             $ rake environment slingshot:import CLASS='Article' PARAMS='{:page => 1}'
 
           Force rebuilding the index (delete and create):
             $ rake environment slingshot:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
+
+          Set target index name:
+            $ rake environment slingshot:import CLASS='Article' INDEX='articles-new'
     
   DESC
 
@@ -41,12 +44,17 @@ namespace :slingshot do
     klass  = eval(ENV['CLASS'].to_s)
     params = eval(ENV['PARAMS'].to_s) || {}
 
+    index = Slingshot::Index.new( ENV['INDEX'] || klass.index.name )
+
     if ENV['FORCE']
-      puts "[IMPORT] Deleting index '#{klass.index.name}'"
-      klass.index.delete
-      puts "[IMPORT] Creating index '#{klass.index.name}' with mapping:",
+      puts "[IMPORT] Deleting index '#{index.name}'"
+      index.delete
+    end
+
+    unless index.exists?
+      puts "[IMPORT] Creating index '#{index.name}' with mapping:",
            Yajl::Encoder.encode(klass.mapping_to_hash, :pretty => true)
-      klass.index.create :mappings => klass.mapping_to_hash
+      index.create :mappings => klass.mapping_to_hash
     end
 
     STDOUT.sync = true
@@ -57,7 +65,7 @@ namespace :slingshot do
 
     STDOUT.puts '-'*tty_cols
     elapsed = Benchmark.realtime do
-      klass.import(params) do |documents|
+      index.import(klass, 'paginate', params) do |documents|
 
         if total
           done += documents.size
