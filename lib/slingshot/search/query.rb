@@ -2,8 +2,8 @@ module Slingshot
   module Search
 
     class Query
-      def initialize(&block)
-        self.instance_eval(&block) if block_given?
+      def initialize
+        instance_eval(&Proc.new) if block_given?
       end
 
       def term(field, value)

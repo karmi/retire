@@ -11,6 +11,9 @@ module Slingshot::Search
       end
 
       should "encode simple filter declarations as JSON" do
+        assert_equal( { :terms => {} }.to_json,
+                      Filter.new('terms').to_json )
+
         assert_equal( { :terms => { :tags => ['foo'] } }.to_json,
                       Filter.new('terms', :tags => ['foo']).to_json )
 
