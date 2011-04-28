@@ -8,7 +8,7 @@ module Slingshot
 
       def initialize(type, *options)
         @type    = type
-        @options = options || []
+        @options = options
       end
 
       def to_json
