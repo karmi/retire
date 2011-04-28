@@ -29,9 +29,8 @@ module Slingshot
       end
 
       def to_hash
-        h = { @name => @value }
-        h[@name].update @options
-        return h
+        @value.update @options
+        { @name => @value }
       end
     end
 
