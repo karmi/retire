@@ -7,8 +7,12 @@ module Slingshot
     class Filter
 
       def initialize(type, *options)
-        @type    = type
-        @options = options || []
+        value = if options.size < 2
+          options.first || {}
+        else
+          options
+        end
+        @hash = { type => value }
       end
 
       def to_json
@@ -16,12 +20,7 @@ module Slingshot
       end
 
       def to_hash
-        initial = @options.size > 1 ? { @type => [] } : { @type => {} }
-        method  = initial[@type].is_a?(Hash) ? :update : :push
-        @options.inject(initial) do |hash, option|
-          hash[@type].send(method, option)
-          hash
-        end
+        @hash
       end
     end
 
