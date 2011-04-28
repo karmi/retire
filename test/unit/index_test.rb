@@ -255,6 +255,118 @@ module Slingshot
 
       end
 
+      context "when importing" do
+        setup do
+          @index = Slingshot::Index.new 'import'
+        end
+
+        class ::ImportData
+          DATA = (1..4).to_a
+
+          def self.paginate(options={})
+            options = {:page => 1, :per_page => 1000}.update options
+            DATA.slice( (options[:page]-1)*options[:per_page]...options[:page]*options[:per_page] )
+          end
+
+          def self.each(&block);   DATA.each &block; end
+          def self.map(&block);    DATA.map &block;  end
+          def self.count;          DATA.size;        end
+        end
+
+        should "be initialized with a collection" do
+          @index.expects(:bulk_store).returns(:true)
+
+          assert_nothing_raised { @index.import [{ :id => 1, :title => 'Article' }] }
+        end
+
+        should "be initialized with a class and params" do
+          @index.expects(:bulk_store).returns(:true)
+
+          assert_nothing_raised { @index.import ImportData }
+        end
+
+        context "plain collection" do
+
+          should "just store it in bulk" do
+            collection = [{ :id => 1, :title => 'Article' }]
+            @index.expects(:bulk_store).with( collection ).returns(true)
+
+            @index.import collection
+          end
+
+        end
+
+        context "class" do
+
+          should "call the passed method and bulk store the results" do
+            @index.expects(:bulk_store).with([1, 2, 3, 4]).returns(true)
+
+            @index.import ImportData, :paginate
+          end
+
+          should "pass the params to the passed method and bulk store the results" do
+            @index.expects(:bulk_store).with([1, 2]).returns(true)
+            @index.expects(:bulk_store).with([3, 4]).returns(true)
+
+            @index.import ImportData, :paginate, :page => 1, :per_page => 2
+          end
+
+          should "pass the class when method not passed" do
+            @index.expects(:bulk_store).with(ImportData).returns(true)
+
+            @index.import ImportData
+          end
+
+        end
+
+        context "with passed block" do
+
+          context "and plain collection" do
+
+            should "allow to manipulate the collection in the block" do
+              Slingshot::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }])
+
+
+              @index.import [{ :id => 1, :title => 'Article' }] do |articles|
+                articles.map { |article| article.update :title => article[:title].upcase }
+              end
+            end
+
+          end
+
+          context "and object" do
+
+            should "call the passed block on every batch" do
+              Slingshot::Index.any_instance.expects(:bulk_store).with([1, 2])
+              Slingshot::Index.any_instance.expects(:bulk_store).with([3, 4])
+
+              runs = 0
+              @index.import ImportData, :paginate, :per_page => 2 do |documents|
+                runs += 1
+                # Don't forget to return the documents at the end of the block
+                documents
+              end
+
+              assert_equal 2, runs
+            end
+
+            should "allow to manipulate the documents in passed block" do
+              Slingshot::Index.any_instance.expects(:bulk_store).with([2, 3])
+              Slingshot::Index.any_instance.expects(:bulk_store).with([4, 5])
+
+
+              @index.import ImportData, :paginate, :per_page => 2 do |documents|
+                # Add 1 to every "document" and return them
+                documents.map { |d| d + 1 }
+              end
+            end
+
+          end
+
+        end
+
+      end
+
     end
 
   end
