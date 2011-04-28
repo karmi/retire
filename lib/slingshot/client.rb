@@ -4,12 +4,15 @@ module Slingshot
 
     class Base
       def get(url)
-        raise NoMethodError, "Implement this method in your client class"
+        raise_no_method_error
       end
       def post(url, data)
-        raise NoMethodError, "Implement this method in your client class"
+        raise_no_method_error
       end
       def delete(url)
+        raise_no_method_error
+      end
+      def raise_no_method_error
         raise NoMethodError, "Implement this method in your client class"
       end
     end
