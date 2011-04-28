@@ -10,6 +10,12 @@ module Slingshot::Search
         assert_respond_to Query.new, :to_json
       end
 
+      should "allow a block to be given" do
+        assert_equal( { :term => { :foo => 'bar' } }.to_json, Query.new do
+          term(:foo, 'bar')
+        end.to_json)
+      end
+
       should "allow search for single term" do
         assert_equal( { :term => { :foo => 'bar' } }, Query.new.term(:foo, 'bar') )
       end

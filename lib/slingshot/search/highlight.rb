@@ -18,9 +18,7 @@ module Slingshot
       end
 
       def to_hash
-        h = { :fields => @fields }
-        h.update @options
-        return h
+        { :fields => @fields }.update @options
       end
 
       private

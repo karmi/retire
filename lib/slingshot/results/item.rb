@@ -7,10 +7,11 @@ module Slingshot
       # and leaving everything else alone.
       #
       def initialize(args={})
-        raise ArgumentError, "Please pass a Hash" unless args.is_a?(Hash)
+        raise ArgumentError, "Please pass a Hash" unless args.respond_to?(:each_pair)
         args.each_pair do |key, value|
-          self[key.to_sym] = value.is_a?(Hash) ? self.class.new(value) : value
+          self[key.to_sym] = value.respond_to?(:to_hash) ? self.class.new(value) : value
         end
+        super.replace self
       end
 
       # Delegate method to a key in underlying hash, if present,
