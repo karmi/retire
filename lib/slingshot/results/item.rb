@@ -9,7 +9,7 @@ module Slingshot
       def initialize(args={})
         if args.respond_to?(:each_pair)
           args.each_pair do |key, value|
-            self[key.to_sym] = value.is_a?(Hash) ? self.class.new(value) : value
+            self[key.to_sym] = value.respond_to?(:to_hash) ? self.class.new(value) : value
           end
           super.replace self
         else
