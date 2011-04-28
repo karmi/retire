@@ -7,7 +7,7 @@ module Slingshot
       # and leaving everything else alone.
       #
       def initialize(args={})
-        if args.is_a? Hash
+        if args.respond_to?(:each_pair)
           args.each_pair do |key, value|
             self[key.to_sym] = value.is_a?(Hash) ? self.class.new(value) : value
           end
