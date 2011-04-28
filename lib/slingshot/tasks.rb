@@ -61,6 +61,7 @@ namespace :slingshot do
     puts "[IMPORT] Starting import for the '#{ENV['CLASS']}' class"
     tty_cols = 80
     total    = klass.count rescue nil
+    offset   = (total.to_s.size*2)+8
     done     = 0
 
     STDOUT.puts '-'*tty_cols
@@ -69,14 +70,14 @@ namespace :slingshot do
 
         if total
           done += documents.size
-
           # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
           percent  = ( (done.to_f / total) * 100 ).to_i
-          STDOUT.print( ("#" * ( percent*((tty_cols-4).to_f/100)).to_i )+" ")
-          STDOUT.print("\r"*tty_cols+"#{percent}% ")
+          glyphs   = ( percent * ( (tty_cols-offset).to_f/100 ) ).to_i
+          STDOUT.print( "#" * glyphs )
+          STDOUT.print( "\r"*tty_cols+"#{done}/#{total} | \e[1m#{percent}%\e[0m " )
         end
 
-        # Don't forget to return the documents collection here
+        # Don't forget to return the documents collection back!
         documents
       end
     end
