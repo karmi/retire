@@ -211,32 +211,44 @@ module Slingshot
       end
 
       context "when storing in bulk" do
+        # The expected JSON looks like this:
+        #
+        # {"index":{"_index":"dummy","_type":"document","_id":"1"}}
+        # {"id":"1","title":"One"}
+        # {"index":{"_index":"dummy","_type":"document","_id":"2"}}
+        # {"id":"2","title":"Two"}
+        #
+        # See http://www.elasticsearch.org/guide/reference/api/bulk.html
 
         should "serialize Hashes" do
-          expected = <<-"JSON".gsub(/ /, '')
-            {"index":{"_index":"dummy","_type":"document","_id":"1"}}
-            {"id":"1","title":"One"}
-            {"index":{"_index":"dummy","_type":"document","_id":"2"}}
-            {"id":"2","title":"Two"}
-          JSON
-
-          Configuration.client.expects(:post).with("#{Configuration.url}/_bulk", expected).
-                                              returns('{}')
+          Configuration.client.expects(:post).with do |url, json|
+            url  == "#{Configuration.url}/_bulk"
+            json =~ /"_index":"dummy"/
+            json =~ /"_type":"document"/
+            json =~ /"_id":"1"/
+            json =~ /"_id":"2"/
+            json =~ /"id":"1"/
+            json =~ /"id":"2"/
+            json =~ /"title":"One"/
+            json =~ /"title":"Two"/
+          end.returns('{}')
 
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
 
         end
 
         should "serialize ActiveModel instances" do
-          expected = <<-"JSON".gsub(/ /, '')
-            {"index":{"_index":"active_model_articles","_type":"active_model_article","_id":"1"}}
-            {"title":"One","id":"1"}
-            {"index":{"_index":"active_model_articles","_type":"active_model_article","_id":"2"}}
-            {"title":"Two","id":"2"}
-          JSON
-
-          Configuration.client.expects(:post).with("#{Configuration.url}/_bulk", expected).
-                                              returns('{}')
+          Configuration.client.expects(:post).with do |url, json|
+            url  == "#{Configuration.url}/_bulk"
+            json =~ /"_index":"active_model_articles"/
+            json =~ /"_type":"article"/
+            json =~ /"_id":"1"/
+            json =~ /"_id":"2"/
+            json =~ /"id":"1"/
+            json =~ /"id":"2"/
+            json =~ /"title":"One"/
+            json =~ /"title":"Two"/
+          end.returns('{}')
 
           one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
           two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
