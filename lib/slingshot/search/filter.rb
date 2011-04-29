@@ -10,7 +10,7 @@ module Slingshot
         value = if options.size < 2
           options.first || {}
         else
-          options
+          options # An +or+ filter encodes multiple filters as an array
         end
         @hash = { type => value }
       end
