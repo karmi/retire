@@ -32,11 +32,13 @@ require 'slingshot'
 #### Prerequisites
 
 # You'll need a working and running _ElasticSearch_ server. Thankfully, that's easy.
-( puts <<-"INSTALL" ; exit(1) ) unless RestClient.get('http://localhost:9200') rescue false
- [!] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands.
- curl -k -L -o elasticsearch-0.15.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.2.tar.gz
- tar -zxvf elasticsearch-0.15.2.tar.gz
- ./elasticsearch-0.15.2/bin/elasticsearch -f
+( puts <<-"INSTALL" ; exit(1) ) unless (RestClient.get('http://localhost:9200') rescue false)
+
+ [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
+
+ curl -k -L -o elasticsearch-0.16.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.16.0.tar.gz
+ tar -zxvf elasticsearch-0.16.0.tar.gz
+ ./elasticsearch-0.16.0/bin/elasticsearch -f
 INSTALL
 
 ### Storing and indexing documents
