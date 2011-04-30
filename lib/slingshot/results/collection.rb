@@ -23,9 +23,11 @@ module Slingshot
                        # Update the document with meta information
                        ['_score', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
 
-                       # TODO: Find a way to actually circumvent mass assignment in ActiveRecord and this wouldn't be neccessary
                        object = Configuration.wrapper.new(document)
+                       # TODO: Figure out how to circumvent mass assignment protection for id in ActiveRecord
                        object.id = h['_id'] if object.respond_to?(:id=)
+                       # TODO: Figure out how mark record as "not new record" in ActiveRecord
+                       object.instance_variable_set(:@new_record, false) if object.respond_to?(:new_record?)
                        object
                      end
                    end

@@ -59,6 +59,8 @@ module Slingshot
             self.freeze
           end
 
+          # TODO: Implement `new_record?` and clean up
+
           def destroyed?; !!@destroyed; end
 
           def persisted?; !!id;           end

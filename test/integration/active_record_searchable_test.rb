@@ -55,6 +55,7 @@ module Slingshot
         assert_instance_of ActiveRecordArticle, results.first
         assert_not_nil results.first.id
         assert_equal   id, results.first.id
+        assert         results.first.persisted?, "Record should be persisted"
         assert_not_nil results.first._score
         assert_equal   'Test', results.first.title
       end
