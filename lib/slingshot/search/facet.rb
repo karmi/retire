@@ -14,12 +14,15 @@ module Slingshot
         self.instance_eval(&block) if block_given?
       end
 
-      def terms(field, size=10, all_terms=false, options={})
+      def terms(field, options={})
+        size      = options.delete(:size) || 10
+        all_terms = options.delete(:all_terms) || false
         @value = { :terms => { :field => field, :size => size, :all_terms => all_terms } }.update(options)
         self
       end
 
-      def date(field, interval='day', options={})
+      def date(field, options={})
+        interval = options.delete(:interval) || 'day'
         @value = { :date_histogram => { :field => field, :interval => interval } }.update(options)
         self
       end

@@ -24,7 +24,7 @@ module Slingshot::Search
 
         should "encode facet options" do
           assert_equal( { :foo => { :terms => {:field=>'bar',:size=>5,:all_terms=>false} } }.to_json,
-                        Facet.new('foo').terms(:bar, 5).to_json )
+                        Facet.new('foo').terms(:bar, :size => 5).to_json )
         end
 
         should "encode facets when passed as a block" do
@@ -43,7 +43,7 @@ module Slingshot::Search
         end
 
         should "encode the all_terms option" do
-          assert_equal true, Facet.new('foo') { terms :foo, 10, true }.to_hash['foo'][:terms][:all_terms]
+          assert_equal true, Facet.new('foo') { terms :foo, :all_terms => true }.to_hash['foo'][:terms][:all_terms]
         end
 
       end
@@ -51,7 +51,7 @@ module Slingshot::Search
       context "date histogram" do
 
         should "encode the JSON" do
-          f = Facet.new('date') { date :published_on, 'day' }
+          f = Facet.new('date') { date :published_on, :interval => 'day' }
           assert_equal({ :date => { :date_histogram => { :field => 'published_on', :interval => 'day' } } }.to_json, f.to_json)
         end
 
