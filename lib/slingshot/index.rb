@@ -82,6 +82,7 @@ module Slingshot
         id = case
           when document.is_a?(Hash)                                           then document[:id] || document['id']
           when document.respond_to?(:id) && document.id != document.object_id then document.id
+          # TODO: Raise error when no id present
         end
         $VERBOSE = old_verbose
 

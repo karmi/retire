@@ -265,6 +265,10 @@ module Slingshot
           end
         end
 
+        should_eventually "raise exception when collection item does not have ID" do
+          # TODO: raise exception when collection item does not have ID
+        end
+
       end
 
       context "when importing" do
