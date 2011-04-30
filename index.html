@@ -21,11 +21,19 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-1">&#182;</a>
         </div>
-        <p><strong>Slingshot</strong> is a rich and comfortable Ruby client for the
+        <p><strong>Slingshot</strong> provides rich and comfortable Ruby API for the
 <a href="http://www.elasticsearch.org/"><em>ElasticSearch</em></a> search engine/database.</p>
 
-<p>It provides the API for the main <em>ElasticSearch</em> features, and this document
-will walk you through them.</p>
+<p><em>ElasticSearch</em> is a scalable, distributed, cloud-ready, highly-available
+full-text search engine and database, communicating by JSON over RESTful HTTP,
+based on <a href="http://lucene.apache.org/">Lucene</a>, written in Java.</p>
+
+<p><img src="http://github.com/favicon.ico" style="position:relative; top:2px">
+<em>Slingshot</em> is open source, and you can download or clone the source code
+from <a href="https://github.com/karmi/slingshot">https://github.com/karmi/slingshot</a>.</p>
+
+<p>By following these instructions you should have the search running
+on a sane operation system in less then 10 minutes.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -36,27 +44,10 @@ will walk you through them.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-2">&#182;</a>
         </div>
-        <p>Note, that you can execute this file directly if you download or clone the source code.</p>
-      </td>
-      <td class=code>
-        <div class='highlight'><pre><span class="sx">% ruby </span><span class="n">examples</span><span class="o">/</span><span class="n">slingshot</span><span class="o">-</span><span class="n">dsl</span><span class="o">.</span><span class="n">rb</span></pre></div>
-      </td>
-    </tr>
-    <tr id='section-3'>
-      <td class=docs>
-        <div class="pilwrap">
-          <a class="pilcrow" href="#section-3">&#182;</a>
-        </div>
-        <p><img src="http://github.com/favicon.ico" style="position:relative; top:2px">
-<em>Slingshot</em> is open source, and you can download or clone the source code
-from <a href="https://github.com/karmi/slingshot">https://github.com/karmi/slingshot</a>.</p>
+        <p>Note, that this file can be executed directly:</p>
 
-<p><em>ElasticSearch</em> is a scalable, distributed, highly-available,
-RESTful database communicating by JSON over HTTP, based on <a href="http://lucene.apache.org/">Lucene</a>,
-written in Java. It manages to be very simple and very powerful at the same time.</p>
-
-<p>By following these instructions you should have the search running
-on a sane operation system in less then 10 minutes.</p>
+<pre><code>ruby examples/slingshot.rb
+</code></pre>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -73,14 +64,23 @@ on a sane operation system in less then 10 minutes.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
+    <tr id='section-4'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-4">&#182;</a>
+        </div>
+        <p>Install Slingshot with Rubygems.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
     <tr id='section-5'>
       <td class=docs>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-5">&#182;</a>
         </div>
-        <p>Install Slingshot with Rubygems.</p>
-
-<pre><code>gem install slingshot-rb
+        <pre><code>gem install slingshot-rb
 </code></pre>
       </td>
       <td class=code>
@@ -107,11 +107,13 @@ on a sane operation system in less then 10 minutes.</p>
         <p>You&rsquo;ll need a working and running <em>ElasticSearch</em> server. Thankfully, that&rsquo;s easy.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="p">(</span> <span class="nb">puts</span> <span class="o">&lt;&lt;-</span><span class="sh">&quot;</span><span class="no">INSTALL</span><span class="sh">&quot;</span> <span class="p">;</span> <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> <span class="k">unless</span> <span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://localhost:9200&#39;</span><span class="p">)</span> <span class="k">rescue</span> <span class="kp">false</span>
-<span class="sh"> [!] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands.</span>
-<span class="sh"> curl -k -L -o elasticsearch-0.15.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.2.tar.gz</span>
-<span class="sh"> tar -zxvf elasticsearch-0.15.2.tar.gz</span>
-<span class="sh"> ./elasticsearch-0.15.2/bin/elasticsearch -f</span>
+        <div class='highlight'><pre><span class="p">(</span> <span class="nb">puts</span> <span class="o">&lt;&lt;-</span><span class="sh">&quot;</span><span class="no">INSTALL</span><span class="sh">&quot;</span> <span class="p">;</span> <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> <span class="k">unless</span> <span class="p">(</span><span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://localhost:9200&#39;</span><span class="p">)</span> <span class="k">rescue</span> <span class="kp">false</span><span class="p">)</span>
+
+<span class="sh"> [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:</span>
+
+<span class="sh"> curl -k -L -o elasticsearch-0.16.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.16.0.tar.gz</span>
+<span class="sh"> tar -zxvf elasticsearch-0.16.0.tar.gz</span>
+<span class="sh"> ./elasticsearch-0.16.0/bin/elasticsearch -f</span>
 <span class="no">INSTALL</span></pre></div>
       </td>
     </tr>
@@ -164,7 +166,8 @@ on a sane operation system in less then 10 minutes.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-12">&#182;</a>
         </div>
-        <p>We want to store and index some articles with title and tags. Simple Hashes are OK.</p>
+        <p>We want to store and index some articles with <code>title</code>, <code>tags</code> and <code>published_on</code> properties.
+Simple Hashes are OK.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">store</span> <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s1">&#39;One&#39;</span><span class="p">,</span>   <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;ruby&#39;</span><span class="o">]</span><span class="p">,</span>           <span class="ss">:published_on</span> <span class="o">=&gt;</span> <span class="s1">&#39;2011-01-01&#39;</span>
@@ -213,7 +216,8 @@ for the index.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-16">&#182;</a>
         </div>
-        <p>Specify for which type of documents this mapping should be used (<code>article</code> in this case).</p>
+        <p>Specify for which type of documents this mapping should be used.
+(The documents must provide a <code>type</code> method or property then.)</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>    <span class="ss">:article</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -236,8 +240,11 @@ for the index.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-18">&#182;</a>
         </div>
-        <p>Set the boost or analyzer settings for the field, et cetera. The <em>ElasticSearch</em> guide
-has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more information</a>.</p>
+        <p>Set the boost or analyzer settings for the field, &hellip; The <em>ElasticSearch</em> guide
+has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more information</a>
+about this. Proper mapping is key to efficient and effective search.
+But don&rsquo;t fret about getting the mapping right the first time, you won&rsquo;t.
+In most cases, the default mapping is just fine for prototyping.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>        <span class="ss">:title</span>    <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="ss">:analyzer</span> <span class="o">=&gt;</span> <span class="s1">&#39;snowball&#39;</span><span class="p">,</span> <span class="ss">:boost</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="o">.</span><span class="mi">0</span>             <span class="p">},</span>
@@ -246,6 +253,109 @@ has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more i
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-Bulk_Storage'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-Bulk_Storage">&#182;</a>
+        </div>
+        <h3>Bulk Storage</h3>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-20'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-20">&#182;</a>
+        </div>
+        <p>Of course, we may have large amounts of data, and adding them to the index one by one really isn&rsquo;t the best idea.
+We can use <em>ElasticSearch&rsquo;s</em> <a href="http://www.elasticsearch.org/guide/reference/api/bulk.html">bulk storage</a>
+for importing the data.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-21'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-21">&#182;</a>
+        </div>
+        <p>So, for demonstration purposes, let&rsquo;s suppose we have a plain collection of hashes to store.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">articles</span> <span class="o">=</span> <span class="o">[</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-22'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-22">&#182;</a>
+        </div>
+        <p>Notice that such objects must have an <code>id</code> property!</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="p">{</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s1">&#39;one&#39;</span><span class="p">,</span>   <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;ruby&#39;</span><span class="o">]</span><span class="p">,</span>           <span class="ss">:published_on</span> <span class="o">=&gt;</span> <span class="s1">&#39;2011-01-01&#39;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s1">&#39;two&#39;</span><span class="p">,</span>   <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;ruby&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="o">]</span><span class="p">,</span> <span class="ss">:published_on</span> <span class="o">=&gt;</span> <span class="s1">&#39;2011-01-02&#39;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;java&#39;</span><span class="o">]</span><span class="p">,</span>           <span class="ss">:published_on</span> <span class="o">=&gt;</span> <span class="s1">&#39;2011-01-02&#39;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s1">&#39;four&#39;</span><span class="p">,</span>  <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;ruby&#39;</span><span class="p">,</span> <span class="s1">&#39;php&#39;</span><span class="o">]</span><span class="p">,</span>    <span class="ss">:published_on</span> <span class="o">=&gt;</span> <span class="s1">&#39;2011-01-03&#39;</span> <span class="p">}</span>
+<span class="o">]</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-23'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-23">&#182;</a>
+        </div>
+        <p>We can just push them into the index in one go.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+  <span class="n">import</span> <span class="n">articles</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-24'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-24">&#182;</a>
+        </div>
+        <p>Of course, we can easily manipulate the documents before storing them</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+  <span class="n">delete</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-25'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-25">&#182;</a>
+        </div>
+        <p>&hellip; by just passing a block to the <code>import</code> method. The collection will
+be available in the block argument.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">import</span> <span class="n">articles</span> <span class="k">do</span> <span class="o">|</span><span class="n">documents</span><span class="o">|</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-26'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-26">&#182;</a>
+        </div>
+        <p>We will capitalize every <em>title</em> and return the manipulated collection
+back to the <code>import</code> method.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>    <span class="n">documents</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span> <span class="n">document</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="ss">:title</span> <span class="o">=&gt;</span> <span class="n">document</span><span class="o">[</span><span class="ss">:title</span><span class="o">].</span><span class="n">capitalize</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="n">refresh</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
@@ -260,12 +370,12 @@ has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more i
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-20'>
+    <tr id='section-28'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-20">&#182;</a>
+          <a class="pilcrow" href="#section-28">&#182;</a>
         </div>
-        <p>With the documents indexed and stored in the <em>ElasticSearch</em> database, we want to search for them.</p>
+        <p>With the documents indexed and stored in the <em>ElasticSearch</em> database, we can search them, finally.</p>
 
 <p>Slingshot exposes the search interface via simple domain-specific language.</p>
       </td>
@@ -284,10 +394,10 @@ has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more i
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-22'>
+    <tr id='section-30'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-22">&#182;</a>
+          <a class="pilcrow" href="#section-30">&#182;</a>
         </div>
         <p>We can do simple searches, like searching for articles containing “One” in their title.</p>
       </td>
@@ -299,10 +409,10 @@ has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more i
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-23'>
+    <tr id='section-31'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-23">&#182;</a>
+          <a class="pilcrow" href="#section-31">&#182;</a>
         </div>
         <p>The results:</p>
 
@@ -315,32 +425,67 @@ has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more i
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-24'>
+    <tr id='section-32'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-24">&#182;</a>
+          <a class="pilcrow" href="#section-32">&#182;</a>
         </div>
-        <p>Of course, we may write the blocks in shorter notation.</p>
+        <p>Or, we can search for articles published between January, 1st and January, 2nd.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">query</span> <span class="k">do</span>
+    <span class="n">string</span> <span class="s2">&quot;published_on:[2011-01-01 TO 2011-01-02]&quot;</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-33'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-33">&#182;</a>
+        </div>
+        <p>The results:</p>
+
+<pre><code>* One [published: 2011-01-01]
+* Two [published: 2011-01-02]
+* Three [published: 2011-01-02]
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">&quot;* </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2"> [published: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">published_on</span><span class="si">}</span><span class="s2">]&quot;</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-34'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-34">&#182;</a>
+        </div>
+        <p>Of course, we may write the blocks in shorter notation.
+Local variables from outer scope are passed down the chain.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-25'>
+    <tr id='section-35'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-25">&#182;</a>
+          <a class="pilcrow" href="#section-35">&#182;</a>
         </div>
         <p>Let&rsquo;s search for articles whose titles begin with letter “T”.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s2">&quot;title:T*&quot;</span> <span class="p">}</span> <span class="p">}</span></pre></div>
+        <div class='highlight'><pre><span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;title:T*&quot;</span>
+<span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="n">q</span> <span class="p">}</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-26'>
+    <tr id='section-36'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-26">&#182;</a>
+          <a class="pilcrow" href="#section-36">&#182;</a>
         </div>
         <p>The results:</p>
 
@@ -354,22 +499,22 @@ has <a href="http://elasticsearch.org/guide/reference/mapping/index.html">more i
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-27'>
+    <tr id='section-37'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-27">&#182;</a>
+          <a class="pilcrow" href="#section-37">&#182;</a>
         </div>
-        <p>We can use any valid <a href="http://lucene.apache.org/java/3_0_3/queryparsersyntax.html">Lucene query syntax</a>
+        <p>In fact, we can use any valid <a href="http://lucene.apache.org/java/3_0_3/queryparsersyntax.html">Lucene query syntax</a>
 for the query string queries.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-28'>
+    <tr id='section-38'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-28">&#182;</a>
+          <a class="pilcrow" href="#section-38">&#182;</a>
         </div>
         <p>For debugging, we can display the JSON which is being sent to <em>ElasticSearch</em>.</p>
 
@@ -381,13 +526,13 @@ for the query string queries.</p>
 <span class="nb">puts</span> <span class="n">s</span><span class="o">.</span><span class="n">to_json</span></pre></div>
       </td>
     </tr>
-    <tr id='section-29'>
+    <tr id='section-39'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-29">&#182;</a>
+          <a class="pilcrow" href="#section-39">&#182;</a>
         </div>
-        <p>Or better, we may display a complete <code>curl</code> command, so we can execute it in terminal
-to see the raw output, tweak params and debug any problems.</p>
+        <p>Or better, we may display a complete <code>curl</code> command to recreate the request in terminal,
+so we can see the naked response, tweak request parameters and meditate on problems.</p>
 
 <pre><code>curl -X POST "http://localhost:9200/articles/_search?pretty=true" \
      -d '{"query":{"query_string":{"query":"title:T*"}}}'
@@ -409,31 +554,29 @@ to see the raw output, tweak params and debug any problems.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-31'>
+    <tr id='section-41'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-31">&#182;</a>
+          <a class="pilcrow" href="#section-41">&#182;</a>
         </div>
-        <p>For debugging more complex situations, you can enable logging, so requests and responses
-will be logged using the <code>curl</code>-based format.</p>
+        <p>For debugging more complex situations, we can enable logging, so requests and responses
+will be logged using this <code>curl</code>-friendly format.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-32'>
+    <tr id='section-42'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-32">&#182;</a>
+          <a class="pilcrow" href="#section-42">&#182;</a>
         </div>
         <p>By default, at the <em>info</em> level, only the <code>curl</code>-format of request and
 basic information about the response will be logged:</p>
 
 <pre><code># 2011-04-24 11:34:01:150 [CREATE] ("articles")
 #
-curl -X POST "http://localhost:9200/articles" -d '{
-
-}'
+curl -X POST "http://localhost:9200/articles"
 
 # 2011-04-24 11:34:01:152 [200]
 </code></pre>
@@ -442,25 +585,26 @@ curl -X POST "http://localhost:9200/articles" -d '{
         <div class='highlight'><pre>  <span class="n">logger</span> <span class="s1">&#39;elasticsearch.log&#39;</span></pre></div>
       </td>
     </tr>
-    <tr id='section-33'>
+    <tr id='section-43'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-33">&#182;</a>
+          <a class="pilcrow" href="#section-43">&#182;</a>
         </div>
-        <p>For debugging, you can switch to the <em>debug</em> level, which will log the complete JSON responses.</p>
+        <p>For debugging, we can switch to the <em>debug</em> level, which will log the complete JSON responses.</p>
 
-<p>That&rsquo;s very convenient if you want to post a recreation of some problem or solution to the mailing list, IRC, etc.</p>
+<p>That&rsquo;s very convenient if we want to post a recreation of some problem or solution
+to the mailing list, IRC channel, etc.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">logger</span> <span class="s1">&#39;elasticsearch.log&#39;</span><span class="p">,</span> <span class="ss">:level</span> <span class="o">=&gt;</span> <span class="s1">&#39;debug&#39;</span></pre></div>
       </td>
     </tr>
-    <tr id='section-34'>
+    <tr id='section-44'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-34">&#182;</a>
+          <a class="pilcrow" href="#section-44">&#182;</a>
         </div>
-        <p>Note that you can pass any <a href="http://www.ruby-doc.org/core/classes/IO.html"><code>IO</code></a>-compatible Ruby object as a logging device.</p>
+        <p>Note that we can pass any <a href="http://www.ruby-doc.org/core/classes/IO.html"><code>IO</code></a>-compatible Ruby object as a logging device.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">logger</span> <span class="no">STDERR</span>
@@ -478,46 +622,46 @@ curl -X POST "http://localhost:9200/articles" -d '{
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-36'>
+    <tr id='section-46'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-36">&#182;</a>
+          <a class="pilcrow" href="#section-46">&#182;</a>
         </div>
-        <p>As you have just seen with logging, you can configure various parts of <em>Slingshot</em>.</p>
+        <p>As we have just seen with logging, we can configure various parts of <em>Slingshot</em>.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-37'>
+    <tr id='section-47'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-37">&#182;</a>
+          <a class="pilcrow" href="#section-47">&#182;</a>
         </div>
-        <p>First of all, you can configure the URL for <em>ElasticSearch</em>.</p>
+        <p>First of all, we can configure the URL for <em>ElasticSearch</em>.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">url</span> <span class="s2">&quot;http://search.example.com&quot;</span></pre></div>
       </td>
     </tr>
-    <tr id='section-38'>
+    <tr id='section-48'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-38">&#182;</a>
+          <a class="pilcrow" href="#section-48">&#182;</a>
         </div>
-        <p>Second, you may want to wrap the results in your own class.</p>
+        <p>Second, we may want to wrap the result items in our own class.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="k">class</span> <span class="nc">MySpecialWrapper</span><span class="p">;</span> <span class="k">end</span>
   <span class="n">wrapper</span> <span class="no">MySpecialWrapper</span></pre></div>
       </td>
     </tr>
-    <tr id='section-39'>
+    <tr id='section-49'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-39">&#182;</a>
+          <a class="pilcrow" href="#section-49">&#182;</a>
         </div>
-        <p>Of course, you can reset one or all configuration settings to their defaults.</p>
+        <p>Finally, we can reset one or all configuration settings to their defaults.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">reset</span>
@@ -547,22 +691,22 @@ curl -X POST "http://localhost:9200/articles" -d '{
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-42'>
+    <tr id='section-52'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-42">&#182;</a>
+          <a class="pilcrow" href="#section-52">&#182;</a>
         </div>
         <p>Query strings are convenient for simple searches, but we may want to define our queries more expressively,
-using the <em>ElasticSearch</em> Query DSL.</p>
+using the <em>ElasticSearch</em> <a href="http://www.elasticsearch.org/guide/reference/query-dsl/index.html">Query DSL</a>.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-43'>
+    <tr id='section-53'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-43">&#182;</a>
+          <a class="pilcrow" href="#section-53">&#182;</a>
         </div>
         <p>Let&rsquo;s suppose we want to search for articles with specific <em>tags</em>, in our case “ruby” <em>or</em> “python”.</p>
       </td>
@@ -570,10 +714,10 @@ using the <em>ElasticSearch</em> Query DSL.</p>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-44'>
+    <tr id='section-54'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-44">&#182;</a>
+          <a class="pilcrow" href="#section-54">&#182;</a>
         </div>
         <p>That&rsquo;s a great excuse to use a <a href="http://elasticsearch.org/guide/reference/query-dsl/terms-query.html"><em>terms</em></a>
 query.</p>
@@ -584,10 +728,10 @@ query.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-45'>
+    <tr id='section-55'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-45">&#182;</a>
+          <a class="pilcrow" href="#section-55">&#182;</a>
         </div>
         <p>The search, as expected, returns three articles, all tagged “ruby” — among other tags:</p>
 
@@ -602,22 +746,22 @@ query.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-46'>
+    <tr id='section-56'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-46">&#182;</a>
+          <a class="pilcrow" href="#section-56">&#182;</a>
         </div>
-        <p>What if we wanted to search for articles tagged both “ruby” <em>and</em> “python”.</p>
+        <p>What if we wanted to search for articles tagged both “ruby” <em>and</em> “python”?</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">query</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-47'>
+    <tr id='section-57'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-47">&#182;</a>
+          <a class="pilcrow" href="#section-57">&#182;</a>
         </div>
         <p>That&rsquo;s a great excuse to specify <code>minimum_match</code> for the query.</p>
       </td>
@@ -627,10 +771,10 @@ query.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-48'>
+    <tr id='section-58'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-48">&#182;</a>
+          <a class="pilcrow" href="#section-58">&#182;</a>
         </div>
         <p>The search, as expected, returns one article, tagged with <em>both</em> “ruby” and “python”:</p>
 
@@ -643,21 +787,21 @@ query.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-49'>
+    <tr id='section-59'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-49">&#182;</a>
+          <a class="pilcrow" href="#section-59">&#182;</a>
         </div>
         <p><em>ElasticSearch</em> supports many types of <a href="http://www.elasticsearch.org/guide/reference/query-dsl/">queries</a>.</p>
 
-<p>Eventually, <em>Slingshot</em> will support all of them.
-So far, only these are supported:</p>
+<p>Eventually, <em>Slingshot</em> will support all of them. So far, only these are supported:</p>
 
 <ul>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html">string</a></li>
 <li><a href="http://elasticsearch.org/guide/reference/query-dsl/term-query.html">term</a></li>
 <li><a href="http://elasticsearch.org/guide/reference/query-dsl/terms-query.html">terms</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html">all</a></li>
+<li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html">ids</a></li>
 </ul>
       </td>
       <td class=code>
@@ -675,10 +819,10 @@ So far, only these are supported:</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-51'>
+    <tr id='section-61'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-51">&#182;</a>
+          <a class="pilcrow" href="#section-61">&#182;</a>
         </div>
         <p><em>ElasticSearch</em> makes it trivial to retrieve complex aggregated data from our index/database,
 so called <a href="http://www.elasticsearch.org/guide/reference/api/search/facets/index.html"><em>facets</em></a>.</p>
@@ -687,10 +831,10 @@ so called <a href="http://www.elasticsearch.org/guide/reference/api/search/facet
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-52'>
+    <tr id='section-62'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-52">&#182;</a>
+          <a class="pilcrow" href="#section-62">&#182;</a>
         </div>
         <p>Let&rsquo;s say we want to display article counts for every tag in the database.
 For that, we&rsquo;ll use a <em>terms</em> facet.</p>
@@ -699,10 +843,10 @@ For that, we&rsquo;ll use a <em>terms</em> facet.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-53'>
+    <tr id='section-63'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-53">&#182;</a>
+          <a class="pilcrow" href="#section-63">&#182;</a>
         </div>
         
       </td>
@@ -710,10 +854,10 @@ For that, we&rsquo;ll use a <em>terms</em> facet.</p>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-54'>
+    <tr id='section-64'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-54">&#182;</a>
+          <a class="pilcrow" href="#section-64">&#182;</a>
         </div>
         <p>We will search for articles whose title begins with letter “T”,</p>
       </td>
@@ -721,12 +865,12 @@ For that, we&rsquo;ll use a <em>terms</em> facet.</p>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:T*&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-55'>
+    <tr id='section-65'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-55">&#182;</a>
+          <a class="pilcrow" href="#section-65">&#182;</a>
         </div>
-        <p>and retrieve their counts, “bucketed” by their <code>tags</code>.</p>
+        <p>and retrieve the counts “bucketed” by <code>tags</code>.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">facet</span> <span class="s1">&#39;tags&#39;</span> <span class="k">do</span>
@@ -735,18 +879,21 @@ For that, we&rsquo;ll use a <em>terms</em> facet.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-56'>
+    <tr id='section-66'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-56">&#182;</a>
+          <a class="pilcrow" href="#section-66">&#182;</a>
         </div>
         <p>As we see, our query has found two articles, and if you recall our articles from above,
-<em>Two</em> is tagged with “ruby” and “python”, <em>Three</em> is tagged with “java”. So the counts
-won&rsquo;t surprise us:</p>
+<em>Two</em> is tagged with “ruby” and “python”, while <em>Three</em> is tagged with “java”.</p>
 
 <pre><code>Found 2 articles: Three, Two
-Counts:
--------
+</code></pre>
+
+<p>The counts shouldn&rsquo;t surprise us:</p>
+
+<pre><code>Counts by tag:
+-------------------------
 ruby       1
 python     1
 java       1
@@ -754,28 +901,28 @@ java       1
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Found </span><span class="si">#{</span><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">count</span><span class="si">}</span><span class="s2"> articles: </span><span class="si">#{</span><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:title</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="nb">puts</span> <span class="s2">&quot;Counts based on tags:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">25</span>
+<span class="nb">puts</span> <span class="s2">&quot;Counts by tag:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">25</span>
 <span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">facets</span><span class="o">[</span><span class="s1">&#39;tags&#39;</span><span class="o">][</span><span class="s1">&#39;terms&#39;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
   <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">f</span><span class="o">[</span><span class="s1">&#39;term&#39;</span><span class="o">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">f</span><span class="o">[</span><span class="s1">&#39;count&#39;</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-57'>
+    <tr id='section-67'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-57">&#182;</a>
+          <a class="pilcrow" href="#section-67">&#182;</a>
         </div>
-        <p>These counts are based on the scope of our current query (called <code>main</code> in <em>ElasticSearch</em>).
+        <p>These counts are based on the scope of our current query.
 What if we wanted to display aggregated counts by <code>tags</code> across the whole database?</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-58'>
+    <tr id='section-68'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-58">&#182;</a>
+          <a class="pilcrow" href="#section-68">&#182;</a>
         </div>
         
       </td>
@@ -783,12 +930,12 @@ What if we wanted to display aggregated counts by <code>tags</code> across the w
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-59'>
+    <tr id='section-69'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-59">&#182;</a>
+          <a class="pilcrow" href="#section-69">&#182;</a>
         </div>
-        <p>Let&rsquo;s repeat the search&hellip;</p>
+        <p>Let&rsquo;s repeat the search for “T”&hellip;</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:T*&#39;</span> <span class="p">}</span>
@@ -796,10 +943,10 @@ What if we wanted to display aggregated counts by <code>tags</code> across the w
   <span class="n">facet</span> <span class="s1">&#39;global-tags&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-60'>
+    <tr id='section-70'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-60">&#182;</a>
+          <a class="pilcrow" href="#section-70">&#182;</a>
         </div>
         <p>&hellip;but set the <code>global</code> scope for the facet in this case.</p>
       </td>
@@ -808,10 +955,10 @@ What if we wanted to display aggregated counts by <code>tags</code> across the w
   <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-61'>
+    <tr id='section-71'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-61">&#182;</a>
+          <a class="pilcrow" href="#section-71">&#182;</a>
         </div>
         <p>We can even <em>combine</em> facets scoped to the current query
 with globally scoped facets — we&rsquo;ll just use a different name.</p>
@@ -823,10 +970,10 @@ with globally scoped facets — we&rsquo;ll just use a different name.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-62'>
+    <tr id='section-72'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-62">&#182;</a>
+          <a class="pilcrow" href="#section-72">&#182;</a>
         </div>
         <p>Aggregated results for the current query are the same as previously:</p>
 
@@ -844,12 +991,12 @@ java       1
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-63'>
+    <tr id='section-73'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-63">&#182;</a>
+          <a class="pilcrow" href="#section-73">&#182;</a>
         </div>
-        <p>As we see, aggregated results for the global scope include also
+        <p>On the other hand, aggregated results for the global scope include also
 tags for articles not matched by the query, such as “java” or “php”:</p>
 
 <pre><code>Global facets:
@@ -867,15 +1014,14 @@ java       1
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-64'>
+    <tr id='section-74'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-64">&#182;</a>
+          <a class="pilcrow" href="#section-74">&#182;</a>
         </div>
-        <p><em>ElasticSearch</em> supports many advanced facets types, such as those for computing statistics or geographical distance.</p>
+        <p><em>ElasticSearch</em> supports many advanced types of facets, such as those for computing statistics or geographical distance.</p>
 
-<p>Eventually, <em>Slingshot</em> will support all of them.
-So far, only these are supported:</p>
+<p>Eventually, <em>Slingshot</em> will support all of them. So far, only these are supported:</p>
 
 <ul>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/terms-facet.html">terms</a></li>
@@ -886,26 +1032,18 @@ So far, only these are supported:</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-65'>
+    <tr id='section-75'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-65">&#182;</a>
+          <a class="pilcrow" href="#section-75">&#182;</a>
         </div>
-        <p>The real power of facets lies in their combination with
-<a href="http://elasticsearch.org/guide/reference/api/search/filter.html">filters</a>.</p>
-      </td>
-      <td class=code>
-        <div class='highlight'><pre></pre></div>
-      </td>
-    </tr>
-    <tr id='section-66'>
-      <td class=docs>
-        <div class="pilwrap">
-          <a class="pilcrow" href="#section-66">&#182;</a>
-        </div>
-        <p>Filters enable us to restrict the returned documents, for example to a specific category,
-but to calculate the facet counts based on the original query.
-The immediate use case for that is the „faceted navigation“.</p>
+        <p>We have seen that <em>ElasticSearch</em> facets enable us to fetch complex aggregations from our data.</p>
+
+<p>They are frequently used for another feature, „faceted navigation“.
+We can be combine query and facets with
+<a href="http://elasticsearch.org/guide/reference/api/search/filter.html">filters</a>,
+so the returned documents are restricted by certain criteria — for example to a specific category —,
+but the aggregation calculations are still based on the original query.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -922,10 +1060,10 @@ The immediate use case for that is the „faceted navigation“.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-68'>
+    <tr id='section-77'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-68">&#182;</a>
+          <a class="pilcrow" href="#section-77">&#182;</a>
         </div>
         <p>So, let&rsquo;s make our search a bit more complex. Let&rsquo;s search for articles whose titles begin
 with letter “T”, again, but filter the results, so only the articles tagged “ruby”
@@ -936,32 +1074,32 @@ are returned.</p>
   </pre></div>
       </td>
     </tr>
-    <tr id='section-69'>
+    <tr id='section-78'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-69">&#182;</a>
+          <a class="pilcrow" href="#section-78">&#182;</a>
         </div>
-        <p>We use the same <strong>query</strong> as before.</p>
+        <p>We will use just the same <strong>query</strong> as before.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:T*&#39;</span> <span class="p">}</span> </pre></div>
       </td>
     </tr>
-    <tr id='section-70'>
+    <tr id='section-79'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-70">&#182;</a>
+          <a class="pilcrow" href="#section-79">&#182;</a>
         </div>
-        <p>And add a <em>terms</em> <strong>filter</strong> based on tags.</p>
+        <p>But we will add a <em>terms</em> <strong>filter</strong> based on tags.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">filter</span> <span class="ss">:terms</span><span class="p">,</span> <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;ruby&#39;</span><span class="o">]</span></pre></div>
       </td>
     </tr>
-    <tr id='section-71'>
+    <tr id='section-80'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-71">&#182;</a>
+          <a class="pilcrow" href="#section-80">&#182;</a>
         </div>
         <p>And, of course, our facet definition.</p>
       </td>
@@ -971,12 +1109,12 @@ are returned.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-72'>
+    <tr id='section-81'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-72">&#182;</a>
+          <a class="pilcrow" href="#section-81">&#182;</a>
         </div>
-        <p>We see that only the article <em>Two</em> (tagged “ruby” and “python”) was returned,
+        <p>We see that only the article <em>Two</em> (tagged “ruby” and “python”) is returned,
 <em>not</em> the article <em>Three</em> (tagged “java”):</p>
 
 <pre><code>* Two [tags: ruby, python]
@@ -988,14 +1126,14 @@ are returned.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-73'>
+    <tr id='section-82'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-73">&#182;</a>
+          <a class="pilcrow" href="#section-82">&#182;</a>
         </div>
-        <p>However, count for article <em>Three</em>&rsquo;s tags, “java”, <em>is</em> in fact included in facets:</p>
+        <p>The <em>count</em> for article <em>Three</em>&rsquo;s tags, “java”, on the other hand, <em>is</em> in fact included:</p>
 
-<pre><code>Counts based on tags:
+<pre><code>Counts by tag:
 -------------------------
 ruby       1
 python     1
@@ -1003,7 +1141,7 @@ java       1
 </code></pre>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Counts based on tags:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">25</span>
+        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Counts by tag:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">25</span>
 <span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">facets</span><span class="o">[</span><span class="s1">&#39;tags&#39;</span><span class="o">][</span><span class="s1">&#39;terms&#39;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
   <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">f</span><span class="o">[</span><span class="s1">&#39;term&#39;</span><span class="o">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">f</span><span class="o">[</span><span class="s1">&#39;count&#39;</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">end</span></pre></div>
@@ -1020,22 +1158,53 @@ java       1
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-75'>
+    <tr id='section-84'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-75">&#182;</a>
+          <a class="pilcrow" href="#section-84">&#182;</a>
         </div>
-        <p>By default, the results are sorted according to their relevancy
-(available as the <code>_score</code> property).</p>
+        <p>By default, the results are sorted according to their relevancy.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">&quot;* </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2"> &quot;</span> <span class="o">+</span>
+       <span class="s2">&quot;[tags: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">; &quot;</span> <span class="o">+</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-85'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-85">&#182;</a>
+        </div>
+        <p>The score is available as the <code>_score</code> property.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>       <span class="s2">&quot;score: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">_score</span><span class="si">}</span><span class="s2">]&quot;</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-86'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-86">&#182;</a>
+        </div>
+        <p>The results:</p>
+
+<pre><code>* One [tags: ruby; score: 0.30685282]
+* Four [tags: ruby, php; score: 0.19178301]
+* Two [tags: ruby, python; score: 0.19178301]
+</code></pre>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-76'>
+    <tr id='section-87'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-76">&#182;</a>
+          <a class="pilcrow" href="#section-87">&#182;</a>
         </div>
         <p>But, what if we want to sort the results based on some other criteria,
 such as published date or product price? We can do that.</p>
@@ -1044,33 +1213,33 @@ such as published date or product price? We can do that.</p>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-77'>
+    <tr id='section-88'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-77">&#182;</a>
+          <a class="pilcrow" href="#section-88">&#182;</a>
         </div>
-        <p>We search for articles tagged “ruby”.</p>
+        <p>We will search for articles tagged “ruby”, again, &hellip;</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span> </pre></div>
       </td>
     </tr>
-    <tr id='section-78'>
+    <tr id='section-89'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-78">&#182;</a>
+          <a class="pilcrow" href="#section-89">&#182;</a>
         </div>
-        <p>And sort them by their <code>title</code>, in descending order.</p>
+        <p>&hellip; but will sort them by their <code>title</code>, in descending order.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">sort</span> <span class="p">{</span> <span class="n">title</span> <span class="s1">&#39;desc&#39;</span> <span class="p">}</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-79'>
+    <tr id='section-90'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-79">&#182;</a>
+          <a class="pilcrow" href="#section-90">&#182;</a>
         </div>
         <p>The results:</p>
 
@@ -1085,10 +1254,10 @@ such as published date or product price? We can do that.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-80'>
+    <tr id='section-91'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-80">&#182;</a>
+          <a class="pilcrow" href="#section-91">&#182;</a>
         </div>
         <p>Of course, it&rsquo;s possible to combine more fields in the sorting definition.</p>
       </td>
@@ -1096,12 +1265,12 @@ such as published date or product price? We can do that.</p>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-81'>
+    <tr id='section-92'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-81">&#182;</a>
+          <a class="pilcrow" href="#section-92">&#182;</a>
         </div>
-        <p>We will just get all articles for this case.</p>
+        <p>We will just get all articles in this case.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">all</span> <span class="p">}</span> 
@@ -1109,23 +1278,23 @@ such as published date or product price? We can do that.</p>
   <span class="n">sort</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-82'>
+    <tr id='section-93'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-82">&#182;</a>
+          <a class="pilcrow" href="#section-93">&#182;</a>
         </div>
-        <p>We will sort the results by their <code>published_on</code> property in ascending (default) order,</p>
+        <p>We will sort the results by their <code>published_on</code> property in <em>ascending</em> order (the default),</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>    <span class="n">published_on</span></pre></div>
       </td>
     </tr>
-    <tr id='section-83'>
+    <tr id='section-94'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-83">&#182;</a>
+          <a class="pilcrow" href="#section-94">&#182;</a>
         </div>
-        <p>and by their <code>title</code> property, in descending order.</p>
+        <p>and by their <code>title</code> property, in <em>descending</em> order.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>    <span class="n">title</span> <span class="s1">&#39;desc&#39;</span>
@@ -1133,10 +1302,10 @@ such as published date or product price? We can do that.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-84'>
+    <tr id='section-95'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-84">&#182;</a>
+          <a class="pilcrow" href="#section-95">&#182;</a>
         </div>
         <p>The results:</p>
 
@@ -1163,27 +1332,24 @@ such as published date or product price? We can do that.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-86'>
+    <tr id='section-97'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-86">&#182;</a>
+          <a class="pilcrow" href="#section-97">&#182;</a>
         </div>
-        <p>Often, you want to highlight the snippets matching your query in the
-displayed results.
+        <p>Often, we want to highlight the snippets matching our query in the displayed results.
 <em>ElasticSearch</em> provides rich
 <a href="http://www.elasticsearch.org/guide/reference/api/search/highlighting.html">highlighting</a>
-features, and Slingshot makes them trivial to use.</p>
-
-<p>Let&rsquo;s suppose that we want to highlight terms of our query.</p>
+features, and <em>Slingshot</em> makes them trivial to use.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-87'>
+    <tr id='section-98'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-87">&#182;</a>
+          <a class="pilcrow" href="#section-98">&#182;</a>
         </div>
         <p>Let&rsquo;s search for documents containing word “Two” in their titles,</p>
       </td>
@@ -1191,10 +1357,10 @@ features, and Slingshot makes them trivial to use.</p>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span> </pre></div>
       </td>
     </tr>
-    <tr id='section-88'>
+    <tr id='section-99'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-88">&#182;</a>
+          <a class="pilcrow" href="#section-99">&#182;</a>
         </div>
         <p>and instruct <em>ElasticSearch</em> to highlight relevant snippets.</p>
       </td>
@@ -1203,26 +1369,26 @@ features, and Slingshot makes them trivial to use.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-89'>
+    <tr id='section-100'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-89">&#182;</a>
+          <a class="pilcrow" href="#section-100">&#182;</a>
         </div>
         <p>The results:</p>
 
-<pre><code>Title: Two, highlighted title: &lt;em&gt;Two&lt;/em&gt;
+<pre><code>Title: Two; Highlighted: &lt;em&gt;Two&lt;/em&gt;
 </code></pre>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
-  <span class="nb">puts</span> <span class="s2">&quot;Title: </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2">, highlighted title: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">highlight</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="nb">puts</span> <span class="s2">&quot;Title: </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2">; Highlighted: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">highlight</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-90'>
+    <tr id='section-101'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-90">&#182;</a>
+          <a class="pilcrow" href="#section-101">&#182;</a>
         </div>
         <p>We can configure many options for highlighting, such as:</p>
       </td>
@@ -1231,34 +1397,34 @@ features, and Slingshot makes them trivial to use.</p>
   <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-91'>
+    <tr id='section-102'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-91">&#182;</a>
+          <a class="pilcrow" href="#section-102">&#182;</a>
         </div>
-        <p>• specifying the fields to highlight</p>
+        <p>• specify the fields to highlight</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span></pre></div>
       </td>
     </tr>
-    <tr id='section-92'>
+    <tr id='section-103'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-92">&#182;</a>
+          <a class="pilcrow" href="#section-103">&#182;</a>
         </div>
-        <p>• specifying their options</p>
+        <p>• specify their individual options</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:number_of_fragments</span> <span class="o">=&gt;</span> <span class="mi">0</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-93'>
+    <tr id='section-104'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-93">&#182;</a>
+          <a class="pilcrow" href="#section-104">&#182;</a>
         </div>
-        <p>• or specifying global highlighting options, such as the wrapper tag</p>
+        <p>• or specify global highlighting options, such as the wrapper tag</p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span><span class="p">,</span> <span class="ss">:options</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;strong class=&quot;highlight&quot;&gt;&#39;</span> <span class="p">}</span>
@@ -1276,16 +1442,16 @@ features, and Slingshot makes them trivial to use.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-95'>
+    <tr id='section-106'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-95">&#182;</a>
+          <a class="pilcrow" href="#section-106">&#182;</a>
         </div>
         <p>As you can see, <a href="https://github.com/karmi/slingshot"><em>Slingshot</em></a> supports the
 main features of <em>ElasticSearch</em> in Ruby.</p>
 
-<p>It allows you to create and delete indices, add documents, search them, retrieve facets, highlight the results,
-and comes with usable logging facility.</p>
+<p>It allows you to create and delete indices, add documents, search them, retrieve the facets, highlight the results,
+and comes with a usable logging facility.</p>
 
 <p>Of course, the holy grail of any search library is easy, painless integration with your Ruby classes, and,
 most importantly, with ActiveRecord/ActiveModel classes.</p>
