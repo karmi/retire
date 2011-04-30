@@ -9,7 +9,6 @@ It provides rich and comfortable Ruby API in the form of a simple domain-specifi
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
 full-text search engine and database, communicating by JSON over RESTful HTTP,
 based on [Lucene](http://lucene.apache.org/), written in Java.
-It manages to be very simple to use and very powerful at the same time.
 
 Installation
 ------------
