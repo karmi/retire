@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class ActiveModelSearchableIntegrationTest < Test::Unit::TestCase
     include Test::Integration
@@ -19,10 +19,10 @@ module Slingshot
     context "ActiveModel" do
 
       setup    do
-        Slingshot.index('supermodel_articles').delete
+        Tire.index('supermodel_articles').delete
         load File.expand_path('../../models/supermodel_article.rb', __FILE__)
       end
-      teardown { Slingshot.index('supermodel_articles').delete }
+      teardown { Tire.index('supermodel_articles').delete }
 
       should "configure mapping" do
         assert_equal 'czech', SupermodelArticle.mapping[:title][:analyzer]

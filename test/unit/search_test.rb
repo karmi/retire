@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class SearchTest < Test::Unit::TestCase
 
@@ -152,7 +152,7 @@ module Slingshot
           end
 
           assert_not_nil s.highlight
-          assert_instance_of Slingshot::Search::Highlight, s.highlight
+          assert_instance_of Tire::Search::Highlight, s.highlight
         end
 
         should "allow to specify highlight for more fields" do
@@ -161,7 +161,7 @@ module Slingshot
           end
 
           assert_not_nil s.highlight
-          assert_instance_of Slingshot::Search::Highlight, s.highlight
+          assert_instance_of Tire::Search::Highlight, s.highlight
         end
 
         should "allow to specify highlight with for more fields with options" do
@@ -170,7 +170,7 @@ module Slingshot
           end
 
           assert_not_nil s.highlight
-          assert_instance_of Slingshot::Search::Highlight, s.highlight
+          assert_instance_of Tire::Search::Highlight, s.highlight
         end
 
       end

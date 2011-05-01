@@ -1,16 +1,16 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class IndexMappingIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
     context "Default mapping" do
-      teardown { Slingshot.index('mapped-index').delete }
+      teardown { Tire.index('mapped-index').delete }
 
       should "create and return the default mapping" do
 
-        index = Slingshot.index 'mapped-index' do
+        index = Tire.index 'mapped-index' do
           create
           store :article, :title => 'One'
           refresh
@@ -23,11 +23,11 @@ module Slingshot
     end
 
     context "Creating index with mapping" do
-      teardown { Slingshot.index('mapped-index').delete; sleep 1 }
+      teardown { Tire.index('mapped-index').delete; sleep 1 }
     
       should "create the specified mapping" do
     
-        index = Slingshot.index 'mapped-index' do
+        index = Tire.index 'mapped-index' do
           create :mappings => { :article => { :properties => { :title => { :type => 'string', :boost => 2.0, :store => 'yes' } } } }
         end
         sleep 1

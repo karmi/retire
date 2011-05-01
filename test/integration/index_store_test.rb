@@ -1,17 +1,17 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class IndexStoreIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
     context "Storing the documents in index" do
 
-      teardown { Slingshot.index('articles-test-ids').delete }
+      teardown { Tire.index('articles-test-ids').delete }
 
       should "store hashes under their IDs" do
 
-        Slingshot.index 'articles-test-ids' do
+        Tire.index 'articles-test-ids' do
           delete
           create
 
@@ -24,11 +24,11 @@ module Slingshot
           refresh
         end
 
-        s = Slingshot.search('articles-test-ids') { query { string '*' } }
+        s = Tire.search('articles-test-ids') { query { string '*' } }
 
         assert_equal 4, s.results.count
 
-        document = Slingshot.index('articles-test-ids').retrieve :document, 4
+        document = Tire.index('articles-test-ids').retrieve :document, 4
         assert_equal 'Four', document.title
         assert_equal 2,      document._version.to_i
 
@@ -38,10 +38,10 @@ module Slingshot
 
     context "Removing documents from the index" do
 
-      teardown { Slingshot.index('articles-test-remove').delete }
+      teardown { Tire.index('articles-test-remove').delete }
 
       setup do
-        Slingshot.index 'articles-test-remove' do
+        Tire.index 'articles-test-remove' do
           delete
           create
           store :id => 1, :title => 'One'
@@ -52,11 +52,11 @@ module Slingshot
 
       should "remove document from the index" do
 
-        assert_equal 2, Slingshot.search('articles-test-remove') { query { string '*' } }.results.count
+        assert_equal 2, Tire.search('articles-test-remove') { query { string '*' } }.results.count
 
         assert_nothing_raised do
-          assert Slingshot.index('articles-test-remove').remove 1
-          assert ! Slingshot.index('articles-test-remove').remove(1)
+          assert Tire.index('articles-test-remove').remove 1
+          assert ! Tire.index('articles-test-remove').remove(1)
         end
 
       end

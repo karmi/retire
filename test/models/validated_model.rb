@@ -2,7 +2,7 @@
 
 class ValidatedModel
 
-  include Slingshot::Model::Persistence
+  include Tire::Model::Persistence
 
   property :name
 

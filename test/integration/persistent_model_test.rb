@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class PersistentModelIntegrationTest < Test::Unit::TestCase
     include Test::Integration

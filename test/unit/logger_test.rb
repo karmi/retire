@@ -1,10 +1,10 @@
 require 'test_helper'
 require 'time'
 
-module Slingshot
+module Tire
 
   class LoggerTest < Test::Unit::TestCase
-    include Slingshot
+    include Tire
 
     context "Logger" do
 

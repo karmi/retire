@@ -2,8 +2,8 @@ require 'test_helper'
 
 class ImportModel
   extend  ActiveModel::Naming
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 
   DATA = (1..4).to_a
 
@@ -21,7 +21,7 @@ class ImportModel
   end
 end
 
-module Slingshot
+module Tire
   module Model
 
     class ImportTest < Test::Unit::TestCase
@@ -33,14 +33,14 @@ module Slingshot
         end
 
         should "paginate the results by default when importing" do
-          Slingshot::Index.any_instance.expects(:bulk_store).returns(true).times(2)
+          Tire::Index.any_instance.expects(:bulk_store).returns(true).times(2)
 
           ImportModel.import :per_page => 2
         end
 
         should "call the passed block on every batch, and NOT manipulate the documents array" do
-          Slingshot::Index.any_instance.expects(:bulk_store).with([1, 2])
-          Slingshot::Index.any_instance.expects(:bulk_store).with([3, 4])
+          Tire::Index.any_instance.expects(:bulk_store).with([1, 2])
+          Tire::Index.any_instance.expects(:bulk_store).with([3, 4])
 
           runs = 0
           ImportModel.import :per_page => 2 do |documents|
@@ -53,8 +53,8 @@ module Slingshot
         end
 
         should "manipulate the documents in passed block" do
-          Slingshot::Index.any_instance.expects(:bulk_store).with([2, 3])
-          Slingshot::Index.any_instance.expects(:bulk_store).with([4, 5])
+          Tire::Index.any_instance.expects(:bulk_store).with([2, 3])
+          Tire::Index.any_instance.expects(:bulk_store).with([4, 5])
 
           ImportModel.import :per_page => 2 do |documents|
             # Add 1 to every "document" and return them

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
   module Model
 
     class PersistenceTest < Test::Unit::TestCase
@@ -376,13 +376,13 @@ module Slingshot
             }}
           }
 
-          Slingshot::Index.any_instance.expects(:create).with(expected_mapping)
+          Tire::Index.any_instance.expects(:create).with(expected_mapping)
 
           class ::PersistentArticleWithMapping
 
-            include Slingshot::Model::Persistence
-            include Slingshot::Model::Search
-            include Slingshot::Model::Callbacks
+            include Tire::Model::Persistence
+            include Tire::Model::Search
+            include Tire::Model::Callbacks
 
             mapping do
               property :title, :type => 'string', :analyzer => 'snowball', :boost => 10

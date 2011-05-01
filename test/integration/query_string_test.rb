@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class QueryStringIntegrationTest < Test::Unit::TestCase
     include Test::Integration
@@ -35,7 +35,7 @@ module Slingshot
     private
 
     def search(q)
-      Slingshot.search('articles-test') { query { string q } }
+      Tire.search('articles-test') { query { string q } }
     end
 
   end

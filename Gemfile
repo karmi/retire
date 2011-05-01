@@ -1,4 +1,4 @@
 source "http://rubygems.org"
 
-# Specify your gem's dependencies in slingshot.gemspec
+# Specify your gem's dependencies in tire.gemspec
 gemspec

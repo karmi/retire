@@ -1,13 +1,13 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class IndexTest < Test::Unit::TestCase
 
     context "Index" do
 
       setup do
-        @index = Slingshot::Index.new 'dummy'
+        @index = Tire::Index.new 'dummy'
       end
 
       should "have a name" do
@@ -273,7 +273,7 @@ module Slingshot
 
       context "when importing" do
         setup do
-          @index = Slingshot::Index.new 'import'
+          @index = Tire::Index.new 'import'
         end
 
         class ::ImportData
@@ -340,7 +340,7 @@ module Slingshot
           context "and plain collection" do
 
             should "allow to manipulate the collection in the block" do
-              Slingshot::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }])
+              Tire::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }])
 
 
               @index.import [{ :id => 1, :title => 'Article' }] do |articles|
@@ -353,8 +353,8 @@ module Slingshot
           context "and object" do
 
             should "call the passed block on every batch" do
-              Slingshot::Index.any_instance.expects(:bulk_store).with([1, 2])
-              Slingshot::Index.any_instance.expects(:bulk_store).with([3, 4])
+              Tire::Index.any_instance.expects(:bulk_store).with([1, 2])
+              Tire::Index.any_instance.expects(:bulk_store).with([3, 4])
 
               runs = 0
               @index.import ImportData, :paginate, :per_page => 2 do |documents|
@@ -367,8 +367,8 @@ module Slingshot
             end
 
             should "allow to manipulate the documents in passed block" do
-              Slingshot::Index.any_instance.expects(:bulk_store).with([2, 3])
-              Slingshot::Index.any_instance.expects(:bulk_store).with([4, 5])
+              Tire::Index.any_instance.expects(:bulk_store).with([2, 3])
+              Tire::Index.any_instance.expects(:bulk_store).with([4, 5])
 
 
               @index.import ImportData, :paginate, :per_page => 2 do |documents|

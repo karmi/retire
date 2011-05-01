@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
   module Model
 
     class SearchTest < Test::Unit::TestCase
@@ -22,7 +22,7 @@ module Slingshot
 
         should "search in index named after class name by default" do
           i = 'active_model_articles'
-          Slingshot::Search::Search.expects(:new).with(i, {}).returns(@stub)
+          Tire::Search::Search.expects(:new).with(i, {}).returns(@stub)
 
           ActiveModelArticle.search 'foo'
         end
@@ -31,15 +31,15 @@ module Slingshot
           first  = 'custom-index-name'
           second = 'another-custom-index-name'
 
-          Slingshot::Search::Search.expects(:new).with(first, {}).returns(@stub)
+          Tire::Search::Search.expects(:new).with(first, {}).returns(@stub)
           ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
           ActiveModelArticleWithCustomIndexName.search 'foo'
 
-          Slingshot::Search::Search.expects(:new).with(second, {}).returns(@stub)
+          Tire::Search::Search.expects(:new).with(second, {}).returns(@stub)
           ActiveModelArticleWithCustomIndexName.index_name 'another-custom-index-name'
           ActiveModelArticleWithCustomIndexName.search 'foo'
 
-          Slingshot::Search::Search.expects(:new).with(first, {}).returns(@stub)
+          Tire::Search::Search.expects(:new).with(first, {}).returns(@stub)
           ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
           ActiveModelArticleWithCustomIndexName.search 'foo'
         end
@@ -57,7 +57,7 @@ module Slingshot
           collection = ActiveModelArticle.search 'foo'
           assert_instance_of Results::Collection, collection
 
-          assert_equal Results::Item, Slingshot::Configuration.wrapper
+          assert_equal Results::Item, Tire::Configuration.wrapper
 
           document = collection.first
 
@@ -70,16 +70,16 @@ module Slingshot
         context "searching with a block" do
 
           should "pass on whatever block it received" do
-            Slingshot::Search::Search.any_instance.expects(:perform).returns(@stub)
-            Slingshot::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
+            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
+            Tire::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
 
             ActiveModelArticle.search { query { string 'foo' } }
           end
 
           should "allow to pass block with argument to query, allowing to use local variables from outer scope" do
-            Slingshot::Search::Query.any_instance.expects(:instance_eval).never
-            Slingshot::Search::Search.any_instance.expects(:perform).returns(@stub)
-            Slingshot::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
+            Tire::Search::Query.any_instance.expects(:instance_eval).never
+            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
+            Tire::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
 
             my_query = 'foo'
             ActiveModelArticle.search do
@@ -96,8 +96,8 @@ module Slingshot
           setup do
             @q = 'foo AND bar'
 
-            Slingshot::Search::Query.any_instance.expects(:string).with( @q ).returns(@stub)
-            Slingshot::Search::Search.any_instance.expects(:perform).returns(@stub)
+            Tire::Search::Query.any_instance.expects(:string).with( @q ).returns(@stub)
+            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
           end
 
           should "search for query string" do
@@ -105,46 +105,46 @@ module Slingshot
           end
 
           should "allow to pass :order option" do
-            Slingshot::Search::Sort.any_instance.expects(:title)
+            Tire::Search::Sort.any_instance.expects(:title)
 
             ActiveModelArticle.search @q, :order => 'title'
           end
 
           should "allow to pass :sort option as :order option" do
-            Slingshot::Search::Sort.any_instance.expects(:title)
+            Tire::Search::Sort.any_instance.expects(:title)
 
             ActiveModelArticle.search @q, :sort => 'title'
           end
 
           should "allow to specify sort direction" do
-            Slingshot::Search::Sort.any_instance.expects(:title).with('DESC')
+            Tire::Search::Sort.any_instance.expects(:title).with('DESC')
 
             ActiveModelArticle.search @q, :order => 'title DESC'
           end
 
           should "allow to specify more fields to sort on" do
-            Slingshot::Search::Sort.any_instance.expects(:title).with('DESC')
-            Slingshot::Search::Sort.any_instance.expects(:field).with('author.name', nil)
+            Tire::Search::Sort.any_instance.expects(:title).with('DESC')
+            Tire::Search::Sort.any_instance.expects(:field).with('author.name', nil)
 
             ActiveModelArticle.search @q, :order => ['title DESC', 'author.name']
           end
 
           should "allow to specify number of results per page" do
-            Slingshot::Search::Search.any_instance.expects(:size).with(20)
+            Tire::Search::Search.any_instance.expects(:size).with(20)
 
             ActiveModelArticle.search @q, :per_page => 20
           end
 
           should "allow to specify first page in paginated results" do
-            Slingshot::Search::Search.any_instance.expects(:size).with(10)
-            Slingshot::Search::Search.any_instance.expects(:from).with(0)
+            Tire::Search::Search.any_instance.expects(:size).with(10)
+            Tire::Search::Search.any_instance.expects(:from).with(0)
 
             ActiveModelArticle.search @q, :per_page => 10, :page => 1
           end
 
           should "allow to specify page further in paginated results" do
-            Slingshot::Search::Search.any_instance.expects(:size).with(10)
-            Slingshot::Search::Search.any_instance.expects(:from).with(20)
+            Tire::Search::Search.any_instance.expects(:size).with(10)
+            Tire::Search::Search.any_instance.expects(:from).with(20)
 
             ActiveModelArticle.search @q, :per_page => 10, :page => 3
           end
@@ -174,7 +174,7 @@ module Slingshot
 
         should "store the record in index on :update_elastic_search_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
-          Slingshot::Index.any_instance.expects(:store)
+          Tire::Index.any_instance.expects(:store)
 
           @model.save
         end
@@ -182,7 +182,7 @@ module Slingshot
         should "remove the record from index on :update_elastic_search_index when destroyed" do
           @model = ActiveModelArticleWithCallbacks.new
           i = mock('index') { expects(:remove) }
-          Slingshot::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)
+          Tire::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)
 
           @model.destroy
         end
@@ -196,13 +196,13 @@ module Slingshot
               }}
             }
 
-            Slingshot::Index.any_instance.expects(:create).with(expected_mapping)
+            Tire::Index.any_instance.expects(:create).with(expected_mapping)
 
             class ::ModelWithCustomMapping
               extend ActiveModel::Naming
 
-              include Slingshot::Model::Search
-              include Slingshot::Model::Callbacks
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
 
               mapping do
                 indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
@@ -216,7 +216,7 @@ module Slingshot
         end
 
         context "serialization" do
-          setup { Slingshot::Index.any_instance.stubs(:create).returns(true) }
+          setup { Tire::Index.any_instance.stubs(:create).returns(true) }
 
           should "serialize itself into JSON without 'root'" do
             @model = ActiveModelArticle.new 'title' => 'Test'
@@ -228,8 +228,8 @@ module Slingshot
             class ::ModelWithoutMapping
               extend  ActiveModel::Naming
               include ActiveModel::Serialization
-              include Slingshot::Model::Search
-              include Slingshot::Model::Callbacks
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
 
               # Do NOT configure any mapping
 
@@ -254,8 +254,8 @@ module Slingshot
             class ::ModelWithMapping
               extend  ActiveModel::Naming
               include ActiveModel::Serialization
-              include Slingshot::Model::Search
-              include Slingshot::Model::Callbacks
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
 
               mapping do
                 # ONLY index the 'one' attribute

@@ -2,7 +2,7 @@
 
 class PersistentArticleWithCustomIndexName
 
-  include Slingshot::Model::Persistence
+  include Tire::Model::Persistence
 
   property :title
 

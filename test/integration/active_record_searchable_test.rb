@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class ActiveRecordSearchableIntegrationTest < Test::Unit::TestCase
     include Test::Integration
@@ -28,10 +28,10 @@ module Slingshot
     context "ActiveRecord integration" do
 
       setup    do
-        Slingshot.index('active_record_articles').delete
+        Tire.index('active_record_articles').delete
         load File.expand_path('../../models/active_record_article.rb', __FILE__)
       end
-      teardown { Slingshot.index('active_record_articles').delete }
+      teardown { Tire.index('active_record_articles').delete }
 
       should "configure mapping" do
         assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]

@@ -1,16 +1,16 @@
-Slingshot
+Tire
 =========
 
-![Slingshot](https://github.com/karmi/slingshot/raw/master/slingshot.png)
+![Tire](https://github.com/karmi/tire/raw/master/tire.png)
 
-_Slingshot_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
+_Tire_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
 
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
 full-text search engine and database, communicating by JSON over RESTful HTTP,
 based on [Lucene](http://lucene.apache.org/), written in Java.
 
-This document provides just a brief overview of _Slingshot's_ features. Be sure to check out also
-the extensive documentation at <http://karmi.github.com/slingshot/> if you're interested.
+This document provides just a brief overview of _Tire's_ features. Be sure to check out also
+the extensive documentation at <http://karmi.github.com/tire/> if you're interested.
 
 Installation
 ------------
@@ -27,19 +27,19 @@ OK. Easy. On a Mac, you can also use _Homebrew_:
 
 OK. Let's install the gem via Rubygems:
 
-    $ gem install slingshot-rb
+    $ gem install tire
 
 Of course, you can install it from the source as well:
 
-    $ git clone git://github.com/karmi/slingshot.git
-    $ cd slingshot
+    $ git clone git://github.com/karmi/tire.git
+    $ cd tire
     $ rake install
 
 
 Usage
 -----
 
-_Slingshot_ exposes easy-to-use domain specific language for fluent communication with _ElasticSearch_.
+_Tire_ exposes easy-to-use domain specific language for fluent communication with _ElasticSearch_.
 
 It also blends with your [ActiveModel](https://github.com/rails/rails/tree/master/activemodel)
 classes for convenient usage in Rails applications.
@@ -47,14 +47,14 @@ classes for convenient usage in Rails applications.
 To test-drive the core _ElasticSearch_ functionality, let's require the gem:
 
     require 'rubygems'
-    require 'slingshot'
+    require 'tire'
 
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
-in [examples/slingshot-dsl.rb](http://karmi.github.com/slingshot/).
+in [examples/tire-dsl.rb](http://karmi.github.com/tire/).
 
 OK. Let's create an index named `articles` and store/index some documents:
 
-    Slingshot.index 'articles' do
+    Tire.index 'articles' do
       delete
       create
 
@@ -70,7 +70,7 @@ We can also create the index with custom
 [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
 for a specific document type:
 
-    Slingshot.index 'articles' do
+    Tire.index 'articles' do
       create :mappings => {
         :article => {
           :properties => {
@@ -92,14 +92,14 @@ one by one. We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch
       { :id => '3', :title => 'three' }
     ]
 
-    Slingshot.index 'bulk' do
+    Tire.index 'bulk' do
       import articles
     end
 
 We can also easily manipulate the documents before storing them in the index, by passing a block to the
 `import` method:
 
-    Slingshot.index 'bulk' do
+    Tire.index 'bulk' do
       import articles do |documents|
 
         documents.each { |document| document[:title].capitalize! }
@@ -112,7 +112,7 @@ We will be searching for articles whose `title` begins with letter “T”, sort
 filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
 from the database:
 
-    s = Slingshot.search 'articles' do
+    s = Tire.search 'articles' do
       query do
         string 'title:T*'
       end
@@ -167,7 +167,7 @@ count for articles tagged 'php' is excluded, since they don't match the current 
 If configuring the search payload with a block somehow feels too weak for you, you can simply pass
 a Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
-    Slingshot.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }
+    Tire.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }
 
 If this sounds like a great idea to you, you are probably able to write your application
 using just `curl`, `sed` and `awk`.
@@ -184,39 +184,39 @@ Or, better, we can display the corresponding `curl` command to recreate and debu
 
 However, we can simply log every search query (and other requests) in this `curl`-friendly format:
 
-    Slingshot.configure { logger 'elasticsearch.log' }
+    Tire.configure { logger 'elasticsearch.log' }
 
 When you set the log level to _debug_:
 
-    Slingshot.configure { logger 'elasticsearch.log', :level => 'debug' }
+    Tire.configure { logger 'elasticsearch.log', :level => 'debug' }
 
 the JSON responses are logged as well. This is not a great idea for production environment,
 but it's priceless when you want to paste a complicated transaction to the mailing list or IRC channel.
 
-The _Slingshot_ DSL tries hard to provide a strong Ruby-like API for the main _ElasticSearch_ features.
+The _Tire_ DSL tries hard to provide a strong Ruby-like API for the main _ElasticSearch_ features.
 
-By default, _Slingshot_ wraps the results collection in a enumerable `Results::Collection` class,
+By default, _Tire_ wraps the results collection in a enumerable `Results::Collection` class,
 and result items in a `Results::Item` class, which looks like a child of `Hash` and `Openstruct`,
 for smooth iterating and displaying the results.
 
-You may wrap the result items in your own class by setting the `Slingshot.configuration.wrapper`
+You may wrap the result items in your own class by setting the `Tire.configuration.wrapper`
 property. Your class must take a `Hash` of attributes on initialization.
 
 If that seems like a great idea to you, there's a big chance you already have such class, and one would bet
 it's an `ActiveRecord` or `ActiveModel` class, containing model of your Rails application.
 
-Fortunately, _Slingshot_ makes blending _ElasticSearch_ features into your models trivially possible.
+Fortunately, _Tire_ makes blending _ElasticSearch_ features into your models trivially possible.
 
 
 ActiveModel Integration
 -----------------------
 
 Let's suppose you have an `Article` class in your Rails application. To make it searchable with
-_Slingshot_, you just `include` it:
+_Tire_, you just `include` it:
 
     class Article < ActiveRecord::Base
-      include Slingshot::Model::Search
-      include Slingshot::Model::Callbacks
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
     end
 
 When you now save a record:
@@ -249,8 +249,8 @@ Dynamic mapping is a godsend when you're prototyping.
 For serious usage, though, you'll definitely want to define a custom mapping for your model:
 
     class Article < ActiveRecord::Base
-      include Slingshot::Model::Search
-      include Slingshot::Model::Callbacks
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
 
       mapping do
         indexes :id,           :type => 'string',  :analyzed => false
@@ -267,8 +267,8 @@ When you want tight grip on how your model attributes are added to the index, ju
 provide the `to_indexed_json` method yourself:
 
     class Article < ActiveRecord::Base
-      include Slingshot::Model::Search
-      include Slingshot::Model::Callbacks
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
 
       def to_indexed_json
         names      = author.split(/\W/)
@@ -287,7 +287,7 @@ provide the `to_indexed_json` method yourself:
 
     end
 
-Note that _Slingshot_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
+Note that _Tire_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
 so you can pass any parameters to the `search` method in the controller, as usual:
 
     @articles = Article.search params[:q], :page => (params[:page] || 1)
@@ -314,24 +314,24 @@ Any other parameters you provide to the `import` method are passed down to the `
 Are we saying you have to fiddle with this thing in a `rails console` or silly Ruby scripts? No.
 Just call the included _Rake_ task on the commandline:
 
-    $ rake environment slingshot:import CLASS='Article'
+    $ rake environment tire:import CLASS='Article'
 
 You can also force-import the data by deleting the index first (and creating it with mapping
 provided by the `mapping` block in your model):
 
-    $ rake environment slingshot:import CLASS='Article' FORCE=true
+    $ rake environment tire:import CLASS='Article' FORCE=true
 
 When you'll spend more time with _ElasticSearch_, you'll notice how
 [index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
 are the best idea since the invention of inverted index.
 You can index your data into a fresh index (and possibly update an alias if everything's fine):
 
-    $ rake environment slingshot:import CLASS='Article' INDEX='articles-2011-05'
+    $ rake environment tire:import CLASS='Article' INDEX='articles-2011-05'
 
 If you're the type who has no time for long introductions, you can generate a fully working
 example Rails application, with an `ActiveRecord` model and a search form, to play with:
 
-    $ rails new searchapp -m https://github.com/karmi/slingshot/raw/master/examples/rails-application-template.rb
+    $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
 
 OK. All this time we have been talking about `ActiveRecord` models, since
 it is a reasonable Rails' default for the storage layer.
@@ -346,8 +346,8 @@ Well, things stay mostly the same:
       field :title, :type => String
       field :content, :type => String
 
-      include Slingshot::Model::Search
-      include Slingshot::Model::Callbacks
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
 
       # Let's use a different index name so stuff doesn't get mixed up
       #
@@ -368,13 +368,13 @@ Well, things stay mostly the same:
 
 That's kinda nice. But there's more.
 
-_Slingshot_ implements not only _searchable_ features, but also _persistence_ features.
+_Tire_ implements not only _searchable_ features, but also _persistence_ features.
 
-This means that you can use a _Slingshot_ model **instead of** your database, not just
+This means that you can use a _Tire_ model **instead of** your database, not just
 for searching your database. Why would you like to do that?
 
 Well, because you're tired of database migrations and lots of hand-holding with your
-database to store stuff like `{ :name => 'Slingshot', :tags => [ 'ruby', 'search' ] }`.
+database to store stuff like `{ :name => 'Tire', :tags => [ 'ruby', 'search' ] }`.
 Because what you need is to just dump a JSON-representation of your data into a database and
 load it back when needed.
 Because you've noticed that _searching_ your data is a much more effective way of retrieval
@@ -382,13 +382,13 @@ then constructing elaborate database query conditions.
 Because you have _lots_ of data and want to use _ElasticSearch's_
 advanced distributed features.
 
-To use the persistence features, you have to include the `Slingshot::Persistence` module
+To use the persistence features, you have to include the `Tire::Persistence` module
 in your class and define the properties (analogous to the way you do with CouchDB- or MongoDB-based models):
 
     class Article
-      include Slingshot::Model::Persistence
-      include Slingshot::Model::Search
-      include Slingshot::Model::Callbacks
+      include Tire::Model::Persistence
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
 
       validates_presence_of :title, :author
 
@@ -406,7 +406,7 @@ and retrieval engine for your data.
 Todo, Plans & Ideas
 -------------------
 
-_Slingshot_ is already used in production by its authors. Nevertheless, it's not considered finished yet.
+_Tire_ is already used in production by its authors. Nevertheless, it's not considered finished yet.
 
 There are todos, plans and ideas, some of which are listed below, in the order of importance:
 
@@ -428,7 +428,7 @@ Check out [other _ElasticSearch_ clients](http://www.elasticsearch.org/guide/app
 Feedback
 --------
 
-You can send feedback via [e-mail](mailto:karmi@karmi.cz) or via [Github Issues](https://github.com/karmi/slingshot/issues).
+You can send feedback via [e-mail](mailto:karmi@karmi.cz) or via [Github Issues](https://github.com/karmi/tire/issues).
 
 -----
 

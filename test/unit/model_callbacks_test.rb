@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class ModelOne
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 
   def save;       false; end
   def destroy;    false; end
@@ -12,8 +12,8 @@ class ModelTwo
   extend  ActiveModel::Callbacks
   define_model_callbacks :save, :destroy
 
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 
   def save
     _run_save_callbacks {}
@@ -30,8 +30,8 @@ class ModelThree
   extend  ActiveModel::Callbacks
   define_model_callbacks :save, :destroy
 
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 
   def save
     _run_save_callbacks {}
@@ -42,7 +42,7 @@ class ModelThree
   end
 end
 
-module Slingshot
+module Tire
   module Model
 
     class ModelCallbacksTest < Test::Unit::TestCase

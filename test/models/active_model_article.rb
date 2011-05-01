@@ -10,7 +10,7 @@ class ActiveModelArticle
   include ActiveModel::Serialization
   include ActiveModel::Serializers::JSON
 
-  include Slingshot::Model::Search
+  include Tire::Model::Search
 
   attr_reader :attributes
 

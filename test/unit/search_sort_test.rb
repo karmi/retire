@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot::Search
+module Tire::Search
 
   class SortTest < Test::Unit::TestCase
 

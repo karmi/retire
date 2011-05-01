@@ -1,11 +1,11 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class ConfigurationTest < Test::Unit::TestCase
 
     def teardown
-      Slingshot::Configuration.reset
+      Tire::Configuration.reset
     end
 
     context "Configuration" do
@@ -43,7 +43,7 @@ module Slingshot
       should "return set and return logger" do
         Configuration.logger STDERR
         assert_not_nil Configuration.logger
-        assert_instance_of Slingshot::Logger, Configuration.logger
+        assert_instance_of Tire::Logger, Configuration.logger
       end
 
       should "allow to reset the configuration for specific property" do

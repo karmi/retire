@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
   module Model
 
     class ActiveModelLintTest < Test::Unit::TestCase

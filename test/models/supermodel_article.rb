@@ -6,8 +6,8 @@ require 'supermodel'
 class SupermodelArticle < SuperModel::Base
   include SuperModel::RandomID
 
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 
   mapping do
     indexes :title,      :type => 'string', :boost => 15, :analyzer => 'czech'

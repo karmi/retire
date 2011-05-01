@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class SortIntegrationTest < Test::Unit::TestCase
     include Test::Integration
@@ -9,7 +9,7 @@ module Slingshot
 
       should "sort by title" do
         q = '*'
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string q }
           sort  { title }
         end
@@ -20,7 +20,7 @@ module Slingshot
 
       should "sort by title, descending" do
         q = '*'
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string q }
           sort  { title :desc }
         end

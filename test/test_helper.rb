@@ -5,7 +5,7 @@ require 'mocha'
 require 'turn' unless ENV["TM_FILEPATH"]
 require 'pathname'
 
-require 'slingshot'
+require 'tire'
 
 Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
 

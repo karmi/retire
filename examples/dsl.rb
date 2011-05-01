@@ -1,9 +1,9 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'rubygems'
-require 'slingshot'
+require 'tire'
 
-extend Slingshot::DSL
+extend Tire::DSL
 
 configure do
   url "http://localhost:9200"

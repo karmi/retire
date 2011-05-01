@@ -14,8 +14,8 @@ class ActiveModelArticleWithCallbacks
   extend  ActiveModel::Callbacks
   define_model_callbacks :save, :destroy
 
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 
   attr_reader :attributes
 

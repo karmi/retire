@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'date'
 
-module Slingshot
+module Tire
 
   class FacetsIntegrationTest < Test::Unit::TestCase
     include Test::Integration
@@ -10,7 +10,7 @@ module Slingshot
 
       should "return results scoped to current query" do
         q = 'tags:ruby'
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string q }
           facet 'tags' do
             terms :tags
@@ -24,7 +24,7 @@ module Slingshot
 
       should "allow to specify global facets and query-scoped facets" do
         q = 'tags:ruby'
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string q }
           facet 'scoped-tags' do
             terms :tags
@@ -44,7 +44,7 @@ module Slingshot
       context "date histogram" do
 
         should "return aggregated values for all results" do
-          s = Slingshot.search('articles-test') do
+          s = Tire.search('articles-test') do
             query { all }
             facet 'published_on' do
               date :published_on

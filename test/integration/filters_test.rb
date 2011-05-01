@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module Slingshot
+module Tire
 
   class FiltersIntegrationTest < Test::Unit::TestCase
     include Test::Integration
@@ -8,7 +8,7 @@ module Slingshot
     context "Filters" do
 
       should "filter the results" do
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string 'title:T*' }
           filter :terms, :tags => ['ruby']
         end
@@ -18,7 +18,7 @@ module Slingshot
       end
 
       should "filter the results with multiple filters" do
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string 'title:F*' }
           filter :or, {:terms => {:tags => ['ruby']}},
                       {:terms => {:tags => ['erlang']}}
@@ -29,7 +29,7 @@ module Slingshot
       end
 
       should "not influence facets" do
-        s = Slingshot.search('articles-test') do
+        s = Tire.search('articles-test') do
           query { string 'title:T*' }
           filter :terms, :tags => ['ruby']
           facet('tags') { terms :tags }

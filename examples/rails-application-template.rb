@@ -1,12 +1,12 @@
 # ===================================================================================================================
-# Template for generating a no-frills Rails application with support for ElasticSearch full-text search via Slingshot
+# Template for generating a no-frills Rails application with support for ElasticSearch full-text search via Tire
 # ===================================================================================================================
 #
-# This file creates a basic Rails application with support for ElasticSearch full-text via the Slingshot gem
+# This file creates a basic Rails application with support for ElasticSearch full-text via the Tire gem
 #
 # Run it like this:
 #
-#     rails new searchapp -m https://github.com/karmi/slingshot/raw/master/examples/rails-application-template.rb
+#     rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
 #
 
 run "rm public/index.html"
@@ -21,7 +21,7 @@ puts
 say_status  "Rubygems", "Adding Rubygems into Gemfile...\n", :yellow
 puts        '-'*80, ''
 
-gem 'slingshot-rb', :git => 'https://github.com/karmi/slingshot.git', :branch => 'activemodel'
+gem 'tire', :git => 'https://github.com/karmi/tire.git', :branch => 'activemodel'
 gem 'will_paginate', '~>3.0.pre'
 git :add => '.'
 git :commit => "-m 'Added gems'"
@@ -50,18 +50,18 @@ git :commit => "-m 'Added the Article resource'"
 run "rm -f app/models/article.rb"
 file 'app/models/article.rb', <<-CODE
 class Article < ActiveRecord::Base
-  include Slingshot::Model::Search
-  include Slingshot::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 end
 CODE
 
-initializer 'slingshot.rb', <<-CODE
-Slingshot.configure do
+initializer 'tire.rb', <<-CODE
+Tire.configure do
   logger STDERR
 end
 CODE
 
-git :commit => "-a -m 'Added Slingshot support into the Article class and an initializer'"
+git :commit => "-a -m 'Added Tire support into the Article class and an initializer'"
 
 puts
 say_status  "Controller", "Adding controller action, route, and neccessary HTML for search...", :yellow
@@ -101,7 +101,7 @@ gsub_file 'config/routes.rb', %r{resources :articles}, <<-CODE
   end
 CODE
 
-git :commit => "-a -m 'Added Slingshot support into the frontend of application'"
+git :commit => "-a -m 'Added Tire support into the frontend of application'"
 
 puts
 say_status  "Database", "Seeding the database with data...", :yellow
@@ -135,7 +135,7 @@ puts
 say_status  "Index", "Indexing database...", :yellow
 puts        '-'*80, ''
 
-rake "environment slingshot:import CLASS='Article' FORCE=true"
+rake "environment tire:import CLASS='Article' FORCE=true"
 
 puts  "", "="*80
 say_status  "DONE", "\e[1mStarting the application. Open http://localhost:3000 and search for something...\e[0m", :yellow
