@@ -20,7 +20,7 @@
 
 #### Installation
 
-# Install Slingshot with Rubygems.
+# Install _Slingshot_ with Rubygems.
 
 #
 #     gem install slingshot-rb
@@ -121,7 +121,7 @@ Slingshot.index 'articles' do
   import articles
 end
 
-# Of course, we can easily manipulate the documents before storing them
+# Of course, we can easily manipulate the documents before storing them in the index.
 #
 Slingshot.index 'articles' do
   delete
