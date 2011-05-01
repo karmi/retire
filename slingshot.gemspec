@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "slingshot-rb"
   s.version     = Slingshot::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.summary       = "Ruby client for ElasticSearch"
-  s.homepage      = "http://github.com/karmi/slingshot"
+  s.summary       = "!NEW NAME! Tire; Ruby client for ElasticSearch"
+  s.homepage      = "http://karmi.github.com/tire/"
   s.authors       = [ 'Karel Minarik' ]
   s.email         = 'karmi@karmi.cz'
 
@@ -39,16 +39,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "supermodel"
 
   s.description = <<-DESC
-   Slingshot is a Ruby client for the ElasticSearch search engine/database.
-
-   It provides Ruby-like API for fluent communication with the ElasticSearch server
-   and blends with ActiveModel class for convenient usage in Rails applications.
-
-   It allows to delete and create indices, define mapping for them, supports
-   the bulk API, and presents an easy-to-use DSL for constructing your queries.
-
-   It has full ActiveRecord/ActiveModel compatibility, allowing you to index
-   your models (incrementally upon saving, or in bulk), searching and
-   paginating the results.
+   This gem has been renamed to "tire", please go to https://rubygems.org/gems/tire
   DESC
 end
