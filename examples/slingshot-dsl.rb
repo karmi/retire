@@ -600,7 +600,7 @@ s = Slingshot.search 'articles' do
 end
 
 
-### What's next?
+### ActiveModel Integration
 
 # As you can see, [_Slingshot_](https://github.com/karmi/slingshot) supports the
 # main features of _ElasticSearch_ in Ruby.
@@ -611,8 +611,7 @@ end
 # Of course, the holy grail of any search library is easy, painless integration with your Ruby classes, and,
 # most importantly, with ActiveRecord/ActiveModel classes.
 #
-# _Slingshot_ already provides such integration, though in experimental mode.
-# Check out the tests in the
-# [`activemodel`](https://github.com/karmi/slingshot/blob/activemodel/test/integration/active_model_searchable_test.rb) branch.
+# Please, check out the [README](https://github.com/karmi/slingshot/tree/master#readme) file for instructions
+# how to include _Slingshot_-based search in your models..
 #
 # Send any feedback via Github issues, or ask questions in the [#elasticsearch](irc://irc.freenode.net/#elasticsearch) IRC channel.
