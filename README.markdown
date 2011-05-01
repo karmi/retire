@@ -4,11 +4,13 @@ Slingshot
 ![Slingshot](https://github.com/karmi/slingshot/raw/master/slingshot.png)
 
 _Slingshot_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
-It provides rich and comfortable Ruby API in the form of a simple domain-specific language.
 
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
 full-text search engine and database, communicating by JSON over RESTful HTTP,
 based on [Lucene](http://lucene.apache.org/), written in Java.
+
+This document provides just a brief overview of _Slingshot's_ features. Be sure to check out also
+the extensive documentation at <http://karmi.github.com/slingshot/> if you're interested.
 
 Installation
 ------------
@@ -19,7 +21,7 @@ First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's d
     $ tar -zxvf elasticsearch-0.16.0.tar.gz
     $ ./elasticsearch-0.16.0/bin/elasticsearch -f
 
-On a Mac, you can use _Homebrew_:
+OK. Easy. On a Mac, you can also use _Homebrew_:
 
     $ brew install elasticsearch
 
@@ -37,17 +39,20 @@ Of course, you can install it from the source as well:
 Usage
 -----
 
-Currently, you can use _Slingshot_ via the DSL (eg. by extending your class with it).
-Plans for full ActiveModel integration (and other convenience layers) are in progress
-(see the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch).
+_Slingshot_ exposes easy-to-use domain specific language for fluent communication with _ElasticSearch_.
 
-To kick the tires, require the gem in an IRB session or a Ruby script
-(note that you can just run the full example from [`examples/dsl.rb`](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb)):
+It also blends with your [ActiveModel](https://github.com/rails/rails/tree/master/activemodel)
+classes for convenient usage in Rails applications.
+
+To test-drive the core _ElasticSearch_ functionality, let's require the gem:
 
     require 'rubygems'
     require 'slingshot'
 
-First, let's create an index named `articles` and store/index some documents:
+Please note that you can copy these snippets from the much more extensive and heavily annotated file
+in [examples/slingshot-dsl.rb](http://karmi.github.com/slingshot/).
+
+OK. Let's create an index named `articles` and store/index some documents:
 
     Slingshot.index 'articles' do
       delete
@@ -61,8 +66,9 @@ First, let's create an index named `articles` and store/index some documents:
       refresh
     end
 
-We can also create the
-index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html):
+We can also create the index with custom
+[mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
+for a specific document type:
 
     Slingshot.index 'articles' do
       create :mappings => {
@@ -77,7 +83,30 @@ index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/a
       }
     end
 
-Now, let's search it!
+Of course, we may have large amounts of data, and it may be impossible or impractical to add them to the index
+one by one. We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch.org/guide/reference/api/bulk.html):
+
+    articles = [
+      { :id => '1', :title => 'one'   },
+      { :id => '2', :title => 'two'   },
+      { :id => '3', :title => 'three' }
+    ]
+
+    Slingshot.index 'bulk' do
+      import articles
+    end
+
+We can also easily manipulate the documents before storing them in the index, by passing a block to the
+`import` method:
+
+    Slingshot.index 'bulk' do
+      import articles do |documents|
+
+        documents.map { |document| document.update(:title => document[:title].capitalize) }
+      end
+    end
+
+OK. Now, let's go search all the data.
 
 We will be searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
 filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
@@ -100,6 +129,9 @@ from the database:
         terms :tags
       end
     end
+
+<small>Of course, we may also page the results with `from` and `size` query options, retrieve only specific fields
+or highlight content matching our query, etc.</small>
 
 Let's display the results:
 
@@ -132,25 +164,25 @@ count for articles tagged 'php' is excluded, since they don't match the current 
     # python     1
     # java       1
 
-If configuring the search payload with a block somehow feels weird to you,
-you can simply pass a Ruby Hash (or JSON string) to the `search` method:
+If configuring the search payload with a block somehow feels too weak for you, you can simply pass
+a Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
-    Slingshot.search 'articles', :query => { :query_string => { :query => 'ruby' } }
+    Slingshot.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }
 
 If this sounds like a great idea to you, you are probably able to write your application
 using just `curl`, `sed` and `awk`.
 
-When things go wrong, we can display the full query JSON for close inspection:
+We can display the full query JSON for close inspection:
 
     puts s.to_json
     # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}
 
-Or, better, we can display the corresponding `curl` command for easy debugging:
+Or, better, we can display the corresponding `curl` command to recreate and debug the request in the terminal:
 
     puts s.to_curl
     # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
 
-However, it would be better to log every search query (and other requests) in `curl` format. We can do that quite easily:
+However, we can simply log every search query (and other requests) in this `curl`-friendly format:
 
     Slingshot.configure { logger 'elasticsearch.log' }
 
@@ -161,32 +193,25 @@ When you set the log level to _debug_:
 the JSON responses are logged as well. This is not a great idea for production environment,
 but it's priceless when you want to paste a complicated transaction to the mailing list or IRC channel.
 
+The _Slingshot_ DSL tries hard to provide a strong Ruby-like API for the main _ElasticSearch_ features.
 
-Features
---------
+By default, _Slingshot_ wraps the results collection in a enumerable `Results::Collection` class,
+and result items in a `Results::Item` class, which looks like a child of `Hash` and `Openstruct`,
+for smooth iterating and displaying the results.
 
-Currently, _Slingshot_ supports main features of the _ElasticSearch_ [Search API](http://www.elasticsearch.org/guide/reference/api/search/request-body.html) and it's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/). In present, it allows you to:
+You may wrap the result items in your own class by setting the `Slingshot.configuration.wrapper`
+property. Your class must take a `Hash` of attributes on initialization.
 
-* Create, delete and refresh the index
-* Create the index with specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
-* Store a document in the index
-* [Query](https://github.com/karmi/slingshot/blob/master/examples/dsl.rb) the index with the `query_string`, `term`, `terms` and `match_all` types of queries
-* [Sort](http://elasticsearch.org/guide/reference/api/search/sort.html) the results by `fields`
-* [Filter](http://elasticsearch.org/guide/reference/query-dsl/) the results
-* Retrieve the _terms_ and _date histogram_ types of [facets](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html) (other types are high priority)
-* [Highlight](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html) matching fields
-* Return just specific `fields` from documents
-* Page the results with `from` and `size` query options
-* Log the `curl`-equivalent of requests and response JSON
+If that seems like a good idea to you, there's great chance you already have such class, and one would bet
+it's an `ActiveRecord` or `ActiveModel` class, containing model of your Rails application.
 
-See the [`examples/slingshot-dsl.rb`](blob/master/examples/slingshot-dsl.rb) file for the full, working examples.
+Fortunately, _Slingshot_ makes blending _ElasticSearch_ into your models trivially possible.
 
-_Slingshot_ wraps the results in a enumerable `Results::Collection` class, and every result in a `Results::Item` class,
-which looks like a child of `Hash` and `Openstruct`, for smooth iterating and displaying the results.
 
-You may wrap the result items in your own class just by setting the `Configuration.wrapper` property,
-supposed your class takes a hash of attributes upon initialization, in ActiveModel/ActiveRecord manner.
-Please see the files `test/models/article.rb` and `test/unit/results_collection_test.rb` for details.
+ActiveModel Integration
+-----------------------
+
+    TODO
 
 
 Todo, Plans & Ideas
@@ -210,6 +235,7 @@ The todos and plans are vast, and the most important are listed below, in the or
 * Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
 
 The full ActiveModel integration is planned for the 1.0 release.
+
 
 Other Clients
 -------------
