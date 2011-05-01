@@ -1,8 +1,6 @@
 Tire
 =========
 
-![Tire](https://github.com/karmi/tire/raw/master/tire.png)
-
 _Tire_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
 
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
