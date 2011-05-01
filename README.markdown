@@ -229,14 +229,14 @@ When you now save a record:
 it is automatically added into the index, because of the included callbacks. The document attributes
 are indexed exactly as when you call the `Article#to_json` method.
 
-You can simply search the records:
+Now you can search the records:
 
     Article.search 'love'
 
 OK. Often, this is where the game stops. Not here.
 
-First of all, you may use the full query DSL explained above, with filters, sorting,
-advanced facet aggregation, highlighting, et cetera:
+First of all, you may use the full query DSL, as explained above, with filters, sorting,
+advanced facet aggregation, highlighting, etc:
 
     q = 'love'
     Article.search do
@@ -246,7 +246,7 @@ advanced facet aggregation, highlighting, et cetera:
     end
 
 Dynamic mapping is a godsend when you're prototyping.
-For serious usage, though, you'll definitely want to declare a custom mapping for your model:
+For serious usage, though, you'll definitely want to define a custom mapping for your model:
 
     class Article < ActiveRecord::Base
       include Slingshot::Model::Search
@@ -255,7 +255,7 @@ For serious usage, though, you'll definitely want to declare a custom mapping fo
       mapping do
         indexes :id,           :type => 'string',  :analyzed => false
         indexes :title,        :type => 'string',  :analyzer => 'snowball', :boost => 100
-        indexes :content,      :type => 'string', :analyzer => 'snowball'
+        indexes :content,      :type => 'string',  :analyzer => 'snowball'
         indexes :author,       :type => 'string',  :analyzer => 'keyword'
         indexes :published_on, :type => 'date',    :include_in_all => false
       end
@@ -263,7 +263,7 @@ For serious usage, though, you'll definitely want to declare a custom mapping fo
 
 In this case, _only_ the defined model attributes are indexed when adding to the index.
 
-When you want tight grip on how your model attributes are added in your index, just
+When you want tight grip on how your model attributes are added to the index, just
 provide the `to_indexed_json` method yourself:
 
     class Article < ActiveRecord::Base
@@ -287,20 +287,19 @@ provide the `to_indexed_json` method yourself:
 
     end
 
-Note, that _Slingshot_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
-so you can pass any parameters to the `search` method in a controller, as usual:
+Note that _Slingshot_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
+so you can pass any parameters to the `search` method in the controller, as usual:
 
     @articles = Article.search params[:q], :page => (params[:page] || 1)
 
-OK. Chances are, you have lots of records stored in the underlying database of your model.
-How will you get to _ElasticSearch_? Easy:
+OK. Chances are, you have lots of records stored in the underlying database. How will you get them to _ElasticSearch_? Easy:
 
     Article.index.import Article.all
 
-However, this way, all of your records are loaded into memory, serialized into JSON,
+However, this way, all your records are loaded into memory, serialized into JSON,
 and sent down the wire to _ElasticSearch_. Not practical, you say? You're right.
 
-Provided your model implements some support _pagination_ — and it probably does for so much data —,
+Provided your model implements some sort of _pagination_ — and it probably does, for so much data —,
 you can just run:
 
     Article.import
@@ -320,17 +319,17 @@ Just call the included _Rake_ task on the commandline:
 You can also force-import the data by deleting the index first (and creating it with mapping
 provided by the `mapping` block in your model):
 
-    $ rake environment slingshot:import CLASS='Article' FORCE=1
+    $ rake environment slingshot:import CLASS='Article' FORCE=true
 
 When you'll spend more time with _ElasticSearch_, you'll notice how
 [index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
 are the best idea since the invention of inverted index.
-You can index your data into a fresh index (and possibly update an alias if everything's OK):
+You can index your data into a fresh index (and possibly update an alias if everything's fine):
 
     $ rake environment slingshot:import CLASS='Article' INDEX='articles-2011-05'
 
 If you're the type who has no time for long introductions, you can generate a fully working
-example Rails application, with an `ActiveRecord` model and search form, to play with:
+example Rails application, with an `ActiveRecord` model and a search form, to play with:
 
     $ rails new searchapp -m https://github.com/karmi/slingshot/raw/master/examples/rails-application-template.rb
 
@@ -371,14 +370,14 @@ That's kinda nice. But there's more.
 
 _Slingshot_ implements not only _searchable_ features, but also _persistence_ features.
 
-This means that you can use a _Slingshot_ model **instead** of your database, not just
+This means that you can use a _Slingshot_ model **instead of** your database, not just
 for searching your database. Why would you like to do that?
 
 Well, because you're tired of database migrations and lots of hand-holding with your
 database to store stuff like `{ :name => 'Slingshot', :tags => [ 'ruby', 'search' ] }`.
 Because what you need is to just dump a JSON-representation of your data into a database and
 load it back when needed.
-Because you've noticed that _searching_ your data is much more effective way of retrieval
+Because you've noticed that _searching_ your data is a much more effective way of retrieval
 then constructing elaborate database query conditions.
 Because you have _lots_ of data and want to use _ElasticSearch's_
 advanced distributed features.
@@ -401,7 +400,7 @@ in your class and define the properties (analogous to the way you do with CouchD
     end
 
 Of course, not all validations or `ActionPack` helpers will be available to your models,
-but if you can live with that, you just got a schema-free, highly-scalable storage
+but if you can live with that, you've just got a schema-free, highly-scalable storage
 and retrieval engine for your data.
 
 Todo, Plans & Ideas
