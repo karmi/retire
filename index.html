@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
-  <title>slingshot.rb</title>
+  <title>tire.rb</title>
   <link rel="stylesheet" href="http://github.com/jashkenas/docco/raw/0.3.0/resources/docco.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <table cellspacing=0 cellpadding=0>
   <thead>
     <tr>
-      <th class=docs><h1>slingshot.rb</h1></th>
+      <th class=docs><h1>tire.rb</h1></th>
       <th class=code></th>
     </tr>
   </thead>
@@ -21,7 +21,7 @@
         <div class="pilwrap">
           <a class="pilcrow" href="#section-1">&#182;</a>
         </div>
-        <p><strong>Slingshot</strong> provides rich and comfortable Ruby API for the
+        <p><strong>Tire</strong> provides rich and comfortable Ruby API for the
 <a href="http://www.elasticsearch.org/"><em>ElasticSearch</em></a> search engine/database.</p>
 
 <p><em>ElasticSearch</em> is a scalable, distributed, cloud-ready, highly-available
@@ -29,8 +29,8 @@ full-text search engine and database, communicating by JSON over RESTful HTTP,
 based on <a href="http://lucene.apache.org/">Lucene</a>, written in Java.</p>
 
 <p><img src="http://github.com/favicon.ico" style="position:relative; top:2px">
-<em>Slingshot</em> is open source, and you can download or clone the source code
-from <a href="https://github.com/karmi/slingshot">https://github.com/karmi/slingshot</a>.</p>
+<em>Tire</em> is open source, and you can download or clone the source code
+from <a href="https://github.com/karmi/tire">https://github.com/karmi/tire</a>.</p>
 
 <p>By following these instructions you should have the search running
 on a sane operation system in less then 10 minutes.</p>
@@ -46,7 +46,7 @@ on a sane operation system in less then 10 minutes.</p>
         </div>
         <p>Note, that this file can be executed directly:</p>
 
-<pre><code>ruby examples/slingshot.rb
+<pre><code>ruby examples/tire.rb
 </code></pre>
       </td>
       <td class=code>
@@ -69,7 +69,7 @@ on a sane operation system in less then 10 minutes.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-4">&#182;</a>
         </div>
-        <p>Install Slingshot with Rubygems.</p>
+        <p>Install <em>Tire</em> with Rubygems.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -80,12 +80,12 @@ on a sane operation system in less then 10 minutes.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-5">&#182;</a>
         </div>
-        <pre><code>gem install slingshot-rb
+        <pre><code>gem install tire
 </code></pre>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;rubygems&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;slingshot&#39;</span></pre></div>
+<span class="nb">require</span> <span class="s1">&#39;tire&#39;</span></pre></div>
       </td>
     </tr>
     <tr id='section-Prerequisites'>
@@ -136,7 +136,7 @@ on a sane operation system in less then 10 minutes.</p>
         <p>Let&rsquo;s initialize an index named “articles”.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-10'>
@@ -197,7 +197,7 @@ Simple Hashes are OK.</p>
 for the index.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-15'>
@@ -314,7 +314,7 @@ for importing the data.</p>
         <p>We can just push them into the index in one go.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
   <span class="n">import</span> <span class="n">articles</span>
 <span class="k">end</span></pre></div>
       </td>
@@ -324,10 +324,10 @@ for importing the data.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-24">&#182;</a>
         </div>
-        <p>Of course, we can easily manipulate the documents before storing them</p>
+        <p>Of course, we can easily manipulate the documents before storing them in the index.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
   <span class="n">delete</span></pre></div>
       </td>
     </tr>
@@ -377,7 +377,7 @@ back to the <code>import</code> method.</p>
         </div>
         <p>With the documents indexed and stored in the <em>ElasticSearch</em> database, we can search them, finally.</p>
 
-<p>Slingshot exposes the search interface via simple domain-specific language.</p>
+<p>Tire exposes the search interface via simple domain-specific language.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -402,7 +402,7 @@ back to the <code>import</code> method.</p>
         <p>We can do simple searches, like searching for articles containing “One” in their title.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">query</span> <span class="k">do</span>
     <span class="n">string</span> <span class="s2">&quot;title:One&quot;</span>
   <span class="k">end</span>
@@ -433,7 +433,7 @@ back to the <code>import</code> method.</p>
         <p>Or, we can search for articles published between January, 1st and January, 2nd.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">query</span> <span class="k">do</span>
     <span class="n">string</span> <span class="s2">&quot;published_on:[2011-01-01 TO 2011-01-02]&quot;</span>
   <span class="k">end</span>
@@ -479,7 +479,7 @@ Local variables from outer scope are passed down the chain.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;title:T*&quot;</span>
-<span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="n">q</span> <span class="p">}</span> <span class="p">}</span></pre></div>
+<span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="n">q</span> <span class="p">}</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
     <tr id='section-36'>
@@ -563,7 +563,7 @@ so we can see the naked response, tweak request parameters and meditate on probl
 will be logged using this <code>curl</code>-friendly format.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-42'>
@@ -627,10 +627,10 @@ to the mailing list, IRC channel, etc.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-46">&#182;</a>
         </div>
-        <p>As we have just seen with logging, we can configure various parts of <em>Slingshot</em>.</p>
+        <p>As we have just seen with logging, we can configure various parts of <em>Tire</em>.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Slingshot</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-47'>
@@ -700,7 +700,7 @@ to the mailing list, IRC channel, etc.</p>
 using the <em>ElasticSearch</em> <a href="http://www.elasticsearch.org/guide/reference/query-dsl/index.html">Query DSL</a>.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-53'>
@@ -754,7 +754,7 @@ query.</p>
         <p>What if we wanted to search for articles tagged both “ruby” <em>and</em> “python”?</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">query</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
@@ -794,7 +794,7 @@ query.</p>
         </div>
         <p><em>ElasticSearch</em> supports many types of <a href="http://www.elasticsearch.org/guide/reference/query-dsl/">queries</a>.</p>
 
-<p>Eventually, <em>Slingshot</em> will support all of them. So far, only these are supported:</p>
+<p>Eventually, <em>Tire</em> will support all of them. So far, only these are supported:</p>
 
 <ul>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html">string</a></li>
@@ -851,7 +851,7 @@ For that, we&rsquo;ll use a <em>terms</em> facet.</p>
         
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-64'>
@@ -927,7 +927,7 @@ What if we wanted to display aggregated counts by <code>tags</code> across the w
         
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-69'>
@@ -1021,7 +1021,7 @@ java       1
         </div>
         <p><em>ElasticSearch</em> supports many advanced types of facets, such as those for computing statistics or geographical distance.</p>
 
-<p>Eventually, <em>Slingshot</em> will support all of them. So far, only these are supported:</p>
+<p>Eventually, <em>Tire</em> will support all of them. So far, only these are supported:</p>
 
 <ul>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/terms-facet.html">terms</a></li>
@@ -1070,7 +1070,7 @@ with letter “T”, again, but filter the results, so only the articles tagged 
 are returned.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
   </pre></div>
       </td>
     </tr>
@@ -1166,7 +1166,7 @@ java       1
         <p>By default, the results are sorted according to their relevancy.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span> <span class="p">}</span>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span> <span class="p">}</span>
 
 <span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
   <span class="nb">puts</span> <span class="s2">&quot;* </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2"> &quot;</span> <span class="o">+</span>
@@ -1210,7 +1210,7 @@ java       1
 such as published date or product price? We can do that.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-88'>
@@ -1262,7 +1262,7 @@ such as published date or product price? We can do that.</p>
         <p>Of course, it&rsquo;s possible to combine more fields in the sorting definition.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-92'>
@@ -1340,10 +1340,10 @@ such as published date or product price? We can do that.</p>
         <p>Often, we want to highlight the snippets matching our query in the displayed results.
 <em>ElasticSearch</em> provides rich
 <a href="http://www.elasticsearch.org/guide/reference/api/search/highlighting.html">highlighting</a>
-features, and <em>Slingshot</em> makes them trivial to use.</p>
+features, and <em>Tire</em> makes them trivial to use.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-98'>
@@ -1393,7 +1393,7 @@ features, and <em>Slingshot</em> makes them trivial to use.</p>
         <p>We can configure many options for highlighting, such as:</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Slingshot</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
   <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
@@ -1431,12 +1431,12 @@ features, and <em>Slingshot</em> makes them trivial to use.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-What&amp;rsquo;s_next?'>
+    <tr id='section-ActiveModel_Integration'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-What&amp;rsquo;s_next?">&#182;</a>
+          <a class="pilcrow" href="#section-ActiveModel_Integration">&#182;</a>
         </div>
-        <h2>What&rsquo;s next?</h2>
+        <h2>ActiveModel Integration</h2>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -1447,7 +1447,7 @@ features, and <em>Slingshot</em> makes them trivial to use.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-106">&#182;</a>
         </div>
-        <p>As you can see, <a href="https://github.com/karmi/slingshot"><em>Slingshot</em></a> supports the
+        <p>As you can see, <a href="https://github.com/karmi/tire"><em>Tire</em></a> supports the
 main features of <em>ElasticSearch</em> in Ruby.</p>
 
 <p>It allows you to create and delete indices, add documents, search them, retrieve the facets, highlight the results,
@@ -1456,9 +1456,8 @@ and comes with a usable logging facility.</p>
 <p>Of course, the holy grail of any search library is easy, painless integration with your Ruby classes, and,
 most importantly, with ActiveRecord/ActiveModel classes.</p>
 
-<p><em>Slingshot</em> already provides such integration, though in experimental mode.
-Check out the tests in the
-<a href="https://github.com/karmi/slingshot/blob/activemodel/test/integration/active_model_searchable_test.rb"><code>activemodel</code></a> branch.</p>
+<p>Please, check out the <a href="https://github.com/karmi/tire/tree/master#readme">README</a> file for instructions
+how to include <em>Tire</em>-based search in your models..</p>
 
 <p>Send any feedback via Github issues, or ask questions in the <a href="irc://irc.freenode.net/#elasticsearch">#elasticsearch</a> IRC channel.</p>
 
