@@ -102,7 +102,7 @@ We can also easily manipulate the documents before storing them in the index, by
     Slingshot.index 'bulk' do
       import articles do |documents|
 
-        documents.map { |document| document.update(:title => document[:title].capitalize) }
+        documents.each { |document| document[:title].capitalize! }
       end
     end
 
@@ -130,8 +130,8 @@ from the database:
       end
     end
 
-<small>Of course, we may also page the results with `from` and `size` query options, retrieve only specific fields
-or highlight content matching our query, etc.</small>
+(Of course, we may also page the results with `from` and `size` query options, retrieve only specific fields
+or highlight content matching our query, etc.)
 
 Let's display the results:
 
@@ -202,39 +202,222 @@ for smooth iterating and displaying the results.
 You may wrap the result items in your own class by setting the `Slingshot.configuration.wrapper`
 property. Your class must take a `Hash` of attributes on initialization.
 
-If that seems like a good idea to you, there's great chance you already have such class, and one would bet
+If that seems like a great idea to you, there's a big chance you already have such class, and one would bet
 it's an `ActiveRecord` or `ActiveModel` class, containing model of your Rails application.
 
-Fortunately, _Slingshot_ makes blending _ElasticSearch_ into your models trivially possible.
+Fortunately, _Slingshot_ makes blending _ElasticSearch_ features into your models trivially possible.
 
 
 ActiveModel Integration
 -----------------------
 
-    TODO
+Let's suppose you have an `Article` class in your Rails application. To make it searchable with
+_Slingshot_, you just `include` it:
 
+    class Article < ActiveRecord::Base
+      include Slingshot::Model::Search
+      include Slingshot::Model::Callbacks
+    end
+
+When you now save a record:
+
+    Article.create :title =>   "I Love ElasticSearch",
+                   :content => "...",
+                   :author =>  "Captain Nemo",
+                   :published_on => Time.now
+
+it is automatically added into the index, because of the included callbacks. The document attributes
+are indexed exactly as when you call the `Article#to_json` method.
+
+You can simply search the records:
+
+    Article.search 'love'
+
+OK. Often, this is where the game stops. Not here.
+
+First of all, you may use the full query DSL explained above, with filters, sorting,
+advanced facet aggregation, highlighting, et cetera:
+
+    q = 'love'
+    Article.search do
+      query { string q }
+      facet('timeline') { date :published_on, :interval => 'month' }
+      sort  { published_on 'desc' }
+    end
+
+Dynamic mapping is a godsend when you're prototyping.
+For serious usage, though, you'll definitely want to declare a custom mapping for your model:
+
+    class Article < ActiveRecord::Base
+      include Slingshot::Model::Search
+      include Slingshot::Model::Callbacks
+
+      mapping do
+        indexes :id,           :type => 'string',  :analyzed => false
+        indexes :title,        :type => 'string',  :analyzer => 'snowball', :boost => 100
+        indexes :content,      :type => 'string', :analyzer => 'snowball'
+        indexes :author,       :type => 'string',  :analyzer => 'keyword'
+        indexes :published_on, :type => 'date',    :include_in_all => false
+      end
+    end
+
+In this case, _only_ the defined model attributes are indexed when adding to the index.
+
+When you want tight grip on how your model attributes are added in your index, just
+provide the `to_indexed_json` method yourself:
+
+    class Article < ActiveRecord::Base
+      include Slingshot::Model::Search
+      include Slingshot::Model::Callbacks
+
+      def to_indexed_json
+        names      = author.split(/\W/)
+        last_name  = names.pop
+        first_name = names.join
+
+        {
+          :title   => title,
+          :content => content,
+          :author  => {
+            :first_name => first_name,
+            :last_name  => last_name
+          }
+        }.to_json
+      end
+
+    end
+
+Note, that _Slingshot_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
+so you can pass any parameters to the `search` method in a controller, as usual:
+
+    @articles = Article.search params[:q], :page => (params[:page] || 1)
+
+OK. Chances are, you have lots of records stored in the underlying database of your model.
+How will you get to _ElasticSearch_? Easy:
+
+    Article.index.import Article.all
+
+However, this way, all of your records are loaded into memory, serialized into JSON,
+and sent down the wire to _ElasticSearch_. Not practical, you say? You're right.
+
+Provided your model implements some support _pagination_ — and it probably does for so much data —,
+you can just run:
+
+    Article.import
+
+In this case, the `Article.paginate` method is called, and your records are sent to the index
+in chunks of 1000. If that number doesn't suit you, just provide a better one:
+
+    Article.import :per_page => 100
+
+Any other parameters you provide to the `import` method are passed down to the `paginate` method.
+
+Are we saying you have to fiddle with this thing in a `rails console` or silly Ruby scripts? No.
+Just call the included _Rake_ task on the commandline:
+
+    $ rake environment slingshot:import CLASS='Article'
+
+You can also force-import the data by deleting the index first (and creating it with mapping
+provided by the `mapping` block in your model):
+
+    $ rake environment slingshot:import CLASS='Article' FORCE=1
+
+When you'll spend more time with _ElasticSearch_, you'll notice how
+[index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
+are the best idea since the invention of inverted index.
+You can index your data into a fresh index (and possibly update an alias if everything's OK):
+
+    $ rake environment slingshot:import CLASS='Article' INDEX='articles-2011-05'
+
+If you're the type who has no time for long introductions, you can generate a fully working
+example Rails application, with an `ActiveRecord` model and search form, to play with:
+
+    $ rails new searchapp -m https://github.com/karmi/slingshot/raw/master/examples/rails-application-template.rb
+
+OK. All this time we have been talking about `ActiveRecord` models, since
+it is a reasonable Rails' default for the storage layer.
+
+But what if you use another database such as [MongoDB](http://www.mongodb.org/),
+another object mapping library, such as [Mongoid](http://mongoid.org/)?
+
+Well, things stay mostly the same:
+
+    class Article
+      include Mongoid::Document
+      field :title, :type => String
+      field :content, :type => String
+
+      include Slingshot::Model::Search
+      include Slingshot::Model::Callbacks
+
+      # Let's use a different index name so stuff doesn't get mixed up
+      #
+      index_name 'mongo-articles'
+
+      # These Mongo guys sure do some funky stuff with their IDs
+      # in +serializable_hash+, let's fix it.
+      #
+      def to_indexed_json
+        self.to_json
+      end
+
+    end
+
+    Article.create :title => 'I Love ElasticSearch'
+
+    Article.search 'love'
+
+That's kinda nice. But there's more.
+
+_Slingshot_ implements not only _searchable_ features, but also _persistence_ features.
+
+This means that you can use a _Slingshot_ model **instead** of your database, not just
+for searching your database. Why would you like to do that?
+
+Well, because you're tired of database migrations and lots of hand-holding with your
+database to store stuff like `{ :name => 'Slingshot', :tags => [ 'ruby', 'search' ] }`.
+Because what you need is to just dump a JSON-representation of your data into a database and
+load it back when needed.
+Because you've noticed that _searching_ your data is much more effective way of retrieval
+then constructing elaborate database query conditions.
+Because you have _lots_ of data and want to use _ElasticSearch's_
+advanced distributed features.
+
+To use the persistence features, you have to include the `Slingshot::Persistence` module
+in your class and define the properties (analogous to the way you do with CouchDB- or MongoDB-based models):
+
+    class Article
+      include Slingshot::Model::Persistence
+      include Slingshot::Model::Search
+      include Slingshot::Model::Callbacks
+
+      validates_presence_of :title, :author
+
+      property :title
+      property :author
+      property :content
+      property :published_on
+
+    end
+
+Of course, not all validations or `ActionPack` helpers will be available to your models,
+but if you can live with that, you just got a schema-free, highly-scalable storage
+and retrieval engine for your data.
 
 Todo, Plans & Ideas
 -------------------
 
-_Slingshot_ is already used in production by its authors. Nevertheless, it's not finished yet.
+_Slingshot_ is already used in production by its authors. Nevertheless, it's not considered finished yet.
 
-The todos and plans are vast, and the most important are listed below, in the order of importance:
+There are todos, plans and ideas, some of which are listed below, in the order of importance:
 
-* Seamless _ActiveModel_ compatibility for easy usage in _Rails_ applications (this also means nearly full _ActiveRecord_ compatibility). See the ongoing work in the [`activemodel`](https://github.com/karmi/slingshot/compare/activemodel) branch
-* Seamless [will_paginate](https://github.com/mislav/will_paginate) compatibility for easy pagination. Already [implemented](https://github.com/karmi/slingshot/commit/e1351f6) on the `activemodel` branch
-* [Mapping](http://www.elasticsearch.org/guide/reference/mapping/) definition for models
 * Proper RDoc annotations for the source code
 * [Histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html) facets
 * [Statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html) facets
 * [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
 * [Index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html) management
 * [Analyze](http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze.html) API support
-* [Bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) API
 * Embedded webserver to display statistics and to allow easy searches
-* Seamless support for [auto-updating _river_ index](http://www.elasticsearch.org/guide/reference/river/couchdb.html) for _CouchDB_ `_changes` feed
-
-The full ActiveModel integration is planned for the 1.0 release.
 
 
 Other Clients
