@@ -209,8 +209,13 @@ Fortunately, _Tire_ makes blending _ElasticSearch_ features into your models tri
 ActiveModel Integration
 -----------------------
 
-Let's suppose you have an `Article` class in your Rails application. To make it searchable with
-_Tire_, you just `include` it:
+If you're the type with no time for lengthy introductions, you can generate a fully working
+example Rails application, with an `ActiveRecord` model and a search form, to play with:
+
+    $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
+
+For the rest, let's suppose you have an `Article` class in your Rails application.
+To make it searchable with _Tire_, you just `include` it:
 
     class Article < ActiveRecord::Base
       include Tire::Model::Search
@@ -224,14 +229,18 @@ When you now save a record:
                    :author =>  "Captain Nemo",
                    :published_on => Time.now
 
-it is automatically added into the index, because of the included callbacks. The document attributes
-are indexed exactly as when you call the `Article#to_json` method.
+it is automatically added into the index, because of the included callbacks.
+(You may want to skip them in special cases, like when your records are indexed via some external
+mechanism, let's say CouchDB or RabbitMQ [river](http://www.elasticsearch.org/blog/2010/09/28/the_river.html)
+for _ElasticSearch_.)
+
+The document attributes are indexed exactly as when you call the `Article#to_json` method.
 
 Now you can search the records:
 
     Article.search 'love'
 
-OK. Often, this is where the game stops. Not here.
+OK. This is where the game stops, often. Not here.
 
 First of all, you may use the full query DSL, as explained above, with filters, sorting,
 advanced facet aggregation, highlighting, etc:
@@ -325,11 +334,6 @@ are the best idea since the invention of inverted index.
 You can index your data into a fresh index (and possibly update an alias if everything's fine):
 
     $ rake environment tire:import CLASS='Article' INDEX='articles-2011-05'
-
-If you're the type who has no time for long introductions, you can generate a fully working
-example Rails application, with an `ActiveRecord` model and a search form, to play with:
-
-    $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
 
 OK. All this time we have been talking about `ActiveRecord` models, since
 it is a reasonable Rails' default for the storage layer.
