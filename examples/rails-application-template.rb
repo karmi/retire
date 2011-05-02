@@ -13,18 +13,28 @@
 # * Git
 # * Ruby >= 1.8.7
 # * Rubygems
-# * Rails 3
+# * Rails >= 3.0.7
+# * Rubygem: 'rest-client'
 #
 #
 # Usage
 # -----
 #
-#     $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
+#     $ rails new tired -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
 #
 # ===================================================================================================================
 
 require 'rubygems'
-require 'restclient'
+
+begin
+  require 'restclient'
+rescue LoadError
+  say_status  "ERROR", "Rubygem 'rest-client' not installed\n", :red
+  say_status  '',      "Please install it with:\n"
+  say_status  '',      "  gem install rest-client\n\n"
+  say_status  '',      "  Exiting...\n\n"
+  exit(1)
+end
 
 at_exit do
   say_status  "Stop", "ElasticSearch", :yellow
