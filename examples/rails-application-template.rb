@@ -14,6 +14,7 @@
 # * Ruby >= 1.8.7
 # * Rubygems
 # * Rails >= 3.0.7
+# * Sun Java 6 (for ElasticSearch)
 # * Rubygem: 'rest-client'
 #
 #
@@ -29,18 +30,24 @@ require 'rubygems'
 begin
   require 'restclient'
 rescue LoadError
+  puts        "\n"
   say_status  "ERROR", "Rubygem 'rest-client' not installed\n", :red
-  say_status  '',      "Please install it with:\n"
-  say_status  '',      "  gem install rest-client\n\n"
-  say_status  '',      "  Exiting...\n\n"
-  exit(1)
+  puts        '-'*80, ''
+
+  if yes?("Should I install it for you?", :bold)
+    say_status "gem", "install rest-client", :yellow
+    system "gem install rest-client"
+  else
+    exit(1)
+  end
 end
 
 at_exit do
-  say_status  "Stop", "ElasticSearch", :yellow
-
   pid = File.read("#{destination_root}/tmp/pids/elasticsearch.pid") rescue nil
-  run "kill #{pid}" if pid
+  if pid
+    say_status  "Stop", "ElasticSearch", :yellow
+    run "kill #{pid}"
+  end
 end
 
 run "rm public/index.html"
