@@ -158,6 +158,14 @@ module Tire
           @model.save
         end
 
+        should_eventually "not define destroyed? if class already implements it" do
+          load File.expand_path('../../models/active_model_article_with_callbacks.rb', __FILE__)
+
+          # TODO: Find a way how to break the old implementation:
+          #       if base.respond_to?(:before_destroy) && !base.respond_to?(:destroyed?)
+          ActiveModelArticleWithCallbacks.expects(:class_eval).never
+        end
+
         should "fire :after_save callbacks" do
           @model = ActiveModelArticleWithCallbacks.new
           @model.expects(:update_elastic_search_index)
