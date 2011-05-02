@@ -2,34 +2,99 @@
 # Template for generating a no-frills Rails application with support for ElasticSearch full-text search via Tire
 # ===================================================================================================================
 #
-# This file creates a basic Rails application with support for ElasticSearch full-text via the Tire gem
+# This file creates a basic, fully working Rails application
+# with support for ElasticSearch full-text search via the Tire gem.
 #
-# Run it like this:
 #
-#     rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
+# Requirements
+# ------------
 #
+# * Ruby >= 1.8.7
+# * Rubygems
+# * Rails 3
+#
+#
+# Usage
+# -----
+#
+#     $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
+#
+# ===================================================================================================================
+
+require 'rubygems'
+require 'restclient'
+
+at_exit do
+  say_status  "Stop", "ElasticSearch", :yellow
+
+  pid = File.read("#{destination_root}/tmp/pids/elasticsearch.pid") rescue nil
+  run "kill #{pid}" if pid
+end
 
 run "rm public/index.html"
 run "rm public/images/rails.png"
 run "touch tmp/.gitignore log/.gitignore vendor/.gitignore"
 
+run "rm -f .gitignore"
+file ".gitignore", <<-END.gsub(/  /, '')
+  .DS_Store
+  log/*.log
+  tmp/**/*
+  config/database.yml
+  db/*.sqlite3
+  vendor/elasticsearch-0.16.0/
+END
+
 git :init
 git :add => '.'
 git :commit => "-m 'Initial commit: Clean application'"
 
+unless (RestClient.get('http://localhost:9200') rescue false)
+  COMMAND = <<-COMMAND.gsub(/^    /, '')
+    curl -k -L -# -o elasticsearch-0.16.0.tar.gz \
+      "http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.16.0.tar.gz"
+    tar -zxf elasticsearch-0.16.0.tar.gz
+    rm  -f    elasticsearch-0.16.0.tar.gz
+    ./elasticsearch-0.16.0/bin/elasticsearch -p #{destination_root}/tmp/pids/elasticsearch.pid
+  COMMAND
+
+  puts        "\n"
+  say_status  "ERROR", "ElasticSearch not running!\n", :red
+  puts        '-'*80
+  say_status  '',      "It appears that ElasticSearch is not running on this machine."
+  say_status  '',      "Is it installed? Do you want me to install it for you with this command?\n\n"
+  COMMAND.each_line { |l| say_status '', "$ #{l}" }
+  puts
+  say_status  '',      "(To uninstall, just remove the generated application directory.)"
+  puts        '-'*80, ''
+
+  if yes?("Install ElasticSearch?", :bold)
+    puts
+    say_status  "Install", "ElasticSearch", :yellow
+
+    commands = COMMAND.split("\n")
+    exec     = commands.pop
+    inside("vendor") do
+      commands.each { |command| run command }
+      run "(#{exec})"  # Launch ElasticSearch in subshell
+    end
+  end
+end
+
 puts
 say_status  "Rubygems", "Adding Rubygems into Gemfile...\n", :yellow
-puts        '-'*80, ''
+puts        '-'*80, ''; sleep 1
 
-gem 'tire', :git => 'https://github.com/karmi/tire.git', :branch => 'activemodel'
+gem 'tire'
 gem 'will_paginate', '~>3.0.pre'
+
 git :add => '.'
 git :commit => "-m 'Added gems'"
 
 puts
 say_status  "Rubygems", "Installing Rubygems...", :yellow
+puts        '-'*80, ''
 
-puts
 puts "********************************************************************************"
 puts "                Running `bundle install`. Let's watch a movie!"
 puts "********************************************************************************", ""
@@ -37,8 +102,8 @@ puts "**************************************************************************
 run "bundle install"
 
 puts
-say_status  "Model", "Adding search support into the Article model...", :yellow
-puts        '-'*80, ''
+say_status  "Model", "Adding the Article resource...", :yellow
+puts        '-'*80, ''; sleep 1
 
 generate :scaffold, "Article title:string content:text published_on:date"
 route "root :to => 'articles#index'"
@@ -46,6 +111,38 @@ rake  "db:migrate"
 
 git :add => '.'
 git :commit => "-m 'Added the Article resource'"
+
+puts
+say_status  "Database", "Seeding the database with data...", :yellow
+puts        '-'*80, ''; sleep 0.25
+
+run "rm -f db/seeds.rb"
+file 'db/seeds.rb', <<-CODE
+contents = [
+'Lorem ipsum dolor sit amet.',
+'Consectetur adipisicing elit, sed do eiusmod tempor incididunt.',
+'Labore et dolore magna aliqua.',
+'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
+'Excepteur sint occaecat cupidatat non proident.'
+]
+
+puts "Deleting all articles..."
+Article.delete_all
+
+puts "Creating articles..."
+%w[ One Two Three Four Five ].each_with_index do |title, i|
+  Article.create :title => title, :content => contents[i], :published_on => i.days.ago.utc
+end
+CODE
+
+rake "db:seed"
+
+git :add    => "db/seeds.rb"
+git :commit => "-m 'Added database seeding script'"
+
+puts
+say_status  "Model", "Adding search support into the Article model...", :yellow
+puts        '-'*80, ''; sleep 1
 
 run "rm -f app/models/article.rb"
 file 'app/models/article.rb', <<-CODE
@@ -64,8 +161,8 @@ CODE
 git :commit => "-a -m 'Added Tire support into the Article class and an initializer'"
 
 puts
-say_status  "Controller", "Adding controller action, route, and neccessary HTML for search...", :yellow
-puts        '-'*80, ''
+say_status  "Controller", "Adding controller action, route, and HTML for search...", :yellow
+puts        '-'*80, ''; sleep 1
 
 gsub_file 'app/controllers/articles_controller.rb', %r{# GET /articles/1$}, <<-CODE
   # GET /articles/search
@@ -104,41 +201,29 @@ CODE
 git :commit => "-a -m 'Added Tire support into the frontend of application'"
 
 puts
-say_status  "Database", "Seeding the database with data...", :yellow
-puts        '-'*80, ''
-
-run "rm -f db/seeds.rb"
-file 'db/seeds.rb', <<-CODE
-contents = [
-'Lorem ipsum dolor sit amet.',
-'Consectetur adipisicing elit, sed do eiusmod tempor incididunt.',
-'Labore et dolore magna aliqua.',
-'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
-'Excepteur sint occaecat cupidatat non proident.'
-]
-
-puts "Deleting all articles..."
-Article.delete_all
-
-puts "Creating articles:"
-%w[ One Two Three Four Five ].each_with_index do |title, i|
-  Article.create :title => title, :content => contents[i], :published_on => i.days.ago.utc
-end
-CODE
-
-rake "db:seed"
-
-git :add    => "db/seeds.rb"
-git :commit => "-m 'Added database seeding script'"
-
-puts
-say_status  "Index", "Indexing database...", :yellow
-puts        '-'*80, ''
+say_status  "Index", "Indexing the database...", :yellow
+puts        '-'*80, ''; sleep 0.5
 
 rake "environment tire:import CLASS='Article' FORCE=true"
 
+puts
+say_status  "Git", "Details about the application:", :yellow
+puts        '-'*80, ''
+
+run "git log --reverse --pretty=format:'%Cblue%h%Creset | %s'"
+
+if (begin; RestClient.get('http://localhost:3000'); rescue Errno::ECONNREFUSED; false; rescue Exception; true; end)
+  puts        "\n"
+  say_status  "ERROR", "Some other application is running on port 3000!\n", :red
+  puts        '-'*80
+
+  port = ask("Please provide free port:", :bold)
+else
+  port = '3000'
+end
+
 puts  "", "="*80
-say_status  "DONE", "\e[1mStarting the application. Open http://localhost:3000 and search for something...\e[0m", :yellow
+say_status  "DONE", "\e[1mStarting the application. Open http://localhost:#{port}\e[0m", :yellow
 puts  "="*80, ""
 
-run  "rails server"
+run  "rails server --port=#{port}"
