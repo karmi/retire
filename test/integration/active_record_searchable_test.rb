@@ -37,7 +37,7 @@ module Tire
         assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]
         assert_equal 10, ActiveRecordArticle.mapping[:title][:boost]
 
-        assert_equal 'snowball', ActiveRecordArticle.index.mapping['active_record_article']['properties']['title']['analyzer']
+        assert_equal 'snowball', ActiveRecordArticle.elasticsearch_index.mapping['active_record_article']['properties']['title']['analyzer']
       end
 
       should "save document into index on save and find it" do
@@ -75,7 +75,7 @@ module Tire
         ActiveRecordArticle.create! :title => 'foo'
         ActiveRecordArticle.create! :title => 'bar'
 
-        ActiveRecordArticle.index.refresh
+        ActiveRecordArticle.elasticsearch_index.refresh
         results = ActiveRecordArticle.search 'foo OR bar^100'
         assert_equal 2, results.count
 
@@ -85,7 +85,7 @@ module Tire
       context "with pagination" do
         setup do
           1.upto(9) { |number| ActiveRecordArticle.create :title => "Test#{number}" }
-          ActiveRecordArticle.index.refresh
+          ActiveRecordArticle.elasticsearch_index.refresh
         end
 
         context "and parameter searches" do

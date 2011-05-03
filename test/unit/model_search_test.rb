@@ -20,11 +20,29 @@ module Tire
           assert_respond_to ActiveModelArticle, :search
         end
 
+        should_eventually "contain all Tire class/instance methods in a proxy object" do
+        end
+
+        should_eventually "include Tire class methods in class top-level namespace when they do not exist" do
+        end
+
+        should_eventually "include Tire instance methods in instance top-level namespace when they do not exist" do
+        end
+
+        should_eventually "NOT overload existing top-level class methods" do
+        end
+
+        should_eventually "NOT overload existing top-level instance methods" do
+        end
+
         should "search in index named after class name by default" do
           i = 'active_model_articles'
           Tire::Search::Search.expects(:new).with(i, {}).returns(@stub)
 
           ActiveModelArticle.search 'foo'
+        end
+
+        should_eventually "search only in document types for this class by default" do
         end
 
         should "search in custom name" do
@@ -47,7 +65,7 @@ module Tire
         should "allow to refresh index" do
           Index.any_instance.expects(:refresh)
 
-          ActiveModelArticle.index.refresh
+          ActiveModelArticle.elasticsearch_index.refresh
         end
 
         should "wrap results in proper class with ID and score and not change the original wrapper" do

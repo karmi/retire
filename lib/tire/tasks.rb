@@ -44,7 +44,7 @@ namespace :tire do
     klass  = eval(ENV['CLASS'].to_s)
     params = eval(ENV['PARAMS'].to_s) || {}
 
-    index = Tire::Index.new( ENV['INDEX'] || klass.index.name )
+    index = Tire::Index.new( ENV['INDEX'] || klass.elasticsearch_index.name )
 
     if ENV['FORCE']
       puts "[IMPORT] Deleting index '#{index.name}'"

@@ -253,7 +253,7 @@ module Tire
           one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
           two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
 
-          ActiveModelArticle.index.bulk_store [ one, two ]
+          ActiveModelArticle.elasticsearch_index.bulk_store [ one, two ]
 
         end
 

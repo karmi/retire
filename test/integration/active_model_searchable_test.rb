@@ -28,7 +28,7 @@ module Tire
         assert_equal 'czech', SupermodelArticle.mapping[:title][:analyzer]
         assert_equal 15,      SupermodelArticle.mapping[:title][:boost]
 
-        assert_equal 'czech', SupermodelArticle.index.mapping['supermodel_article']['properties']['title']['analyzer']
+        assert_equal 'czech', SupermodelArticle.elasticsearch_index.mapping['supermodel_article']['properties']['title']['analyzer']
       end
 
       should "save document into index on save and find it with score" do
@@ -65,7 +65,7 @@ module Tire
         SupermodelArticle.create! :title => 'foo'
         SupermodelArticle.create! :title => 'bar'
 
-        SupermodelArticle.index.refresh
+        SupermodelArticle.elasticsearch_index.refresh
         results = SupermodelArticle.search 'foo OR bar^100'
 
         assert_equal 2, results.count

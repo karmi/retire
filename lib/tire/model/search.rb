@@ -31,7 +31,7 @@ module Tire
           sort  = options[:order] || options[:sort]
           sort  = Array(sort)
           unless block_given?
-            s = Tire::Search::Search.new(index.name, options)
+            s = Tire::Search::Search.new(elasticsearch_index.name, options)
             s.query { string query }
             s.sort do
               sort.each do |t|
@@ -43,7 +43,7 @@ module Tire
             s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
             s.perform.results
           else
-            s = Tire::Search::Search.new(index.name, options)
+            s = Tire::Search::Search.new(elasticsearch_index.name, options)
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
             s.perform.results
           end
@@ -51,7 +51,15 @@ module Tire
           Tire::Configuration.wrapper old_wrapper
         end
 
-        def index
+        # Wrapper for the ES index for this class
+        #
+        # TODO: Implement some "forwardable" object named +tire+ for Tire mixins,
+        #       and proxy everything via this object. If we're not stepping on
+        #       other libs toes, extend/include also to the top level.
+        #
+        #       The original culprit is Mongoid here, see https://github.com/karmi/tire/issues/7
+        #
+        def elasticsearch_index
           @index = Index.new(index_name)
         end
 
@@ -64,14 +72,14 @@ module Tire
         end
 
         def index
-          self.class.index
+          self.class.elasticsearch_index
         end
 
         def update_elastic_search_index
           if destroyed?
-            self.class.index.remove document_type, self
+            index.remove document_type, self
           else
-            response  = self.class.index.store  document_type, self
+            response  = index.store  document_type, self
             self.id ||= response['_id'] if self.respond_to?(:id=)
             self
           end
