@@ -15,7 +15,6 @@
 # * Rubygems
 # * Rails >= 3.0.7
 # * Sun Java 6 (for ElasticSearch)
-# * Rubygem: 'rest-client'
 #
 #
 # Usage
@@ -32,7 +31,9 @@ begin
 rescue LoadError
   puts        "\n"
   say_status  "ERROR", "Rubygem 'rest-client' not installed\n", :red
-  puts        '-'*80, ''
+  puts        '-'*80
+  say_status  "", "gem install rest-client"
+  puts        "\n"
 
   if yes?("Should I install it for you?", :bold)
     say_status "gem", "install rest-client", :yellow
