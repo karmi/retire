@@ -21,7 +21,7 @@ module Tire
                        document.update( {'id' => h['_id']} )
 
                        # Update the document with meta information
-                       ['_score', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
+                       ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
 
                        object = Configuration.wrapper.new(document)
                        # TODO: Figure out how to circumvent mass assignment protection for id in ActiveRecord

@@ -41,7 +41,7 @@ module Tire
       context "wrapping results" do
 
         setup do
-          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
+          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
         end
 
         should "wrap hits in Item by default" do
@@ -81,6 +81,16 @@ module Tire
         should "return id" do
           document =  Results::Collection.new(@response).first
           assert_equal 1, document.id
+        end
+
+        should "return index" do
+          document =  Results::Collection.new(@response).first
+          assert_equal "testing", document._index
+        end
+
+        should "return type" do
+          document =  Results::Collection.new(@response).first
+          assert_equal "article", document._type
         end
 
       end
