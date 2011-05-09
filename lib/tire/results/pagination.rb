@@ -9,7 +9,7 @@ module Tire
 
       def total_pages
         result = @total.to_f / (@options[:per_page] ? @options[:per_page].to_i : 10 )
-        result < 1 ? 1 : result.round
+        result < 1 ? 1 : result.ceil
       end
 
       def current_page

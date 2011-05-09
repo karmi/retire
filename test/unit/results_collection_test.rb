@@ -100,19 +100,24 @@ module Tire
         setup do
           @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
                                                        {'_id' => 2},
-                                                       {'_id' => 3}],
-                                            'total' => 3,
+                                                       {'_id' => 3},
+                                                       {'_id' => 4}],
+                                            'total' => 4,
                                             'took'  => 1 } }
           @collection = Results::Collection.new( @default_response, :per_page => 1, :page => 2 )
         end
 
         should "return total entries" do
-          assert_equal 3, @collection.total
-          assert_equal 3, @collection.total_entries
+          assert_equal 4, @collection.total
+          assert_equal 4, @collection.total_entries
         end
 
         should "return total pages" do
-          assert_equal 3, @collection.total_pages
+          assert_equal 4, @collection.total_pages
+          @collection = Results::Collection.new( @default_response, :per_page => 2, :page => 2 )
+          assert_equal 2, @collection.total_pages
+          @collection = Results::Collection.new( @default_response, :per_page => 3, :page => 2 )
+          assert_equal 2, @collection.total_pages
         end
 
         should "return total pages when per_page option not set" do
