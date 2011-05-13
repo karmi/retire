@@ -132,7 +132,7 @@ module Tire
           setup { @q = 'test*' }
 
           should "find first page with five results" do
-            results = ActiveRecordArticle.search nil, :per_page => 5, :page => 1 do |search|
+            results = ActiveRecordArticle.search do |search|
               search.query { |query| query.string @q }
               search.sort  { title }
               search.from 0
@@ -149,7 +149,7 @@ module Tire
           end
 
           should "find next page with five results" do
-            results = ActiveRecordArticle.search nil, :per_page => 5, :page => 2 do |search|
+            results = ActiveRecordArticle.search do |search|
               search.query { |query| query.string @q }
               search.sort  { title }
               search.from 5
@@ -165,8 +165,8 @@ module Tire
             assert_equal 'Test6', results.first.title
           end
 
-          should "find not find missing page" do
-            results = ActiveRecordArticle.search nil, :per_page => 5, :page => 3 do |search|
+          should "not find a missing page" do
+            results = ActiveRecordArticle.search do |search|
               search.query { |query| query.string @q }
               search.sort  { title }
               search.from 10
