@@ -3,10 +3,10 @@ module Tire
   
     class Search
 
-      attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters
+      attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters, :options
 
       def initialize(*indices, &block)
-        @options = indices.pop if indices.last.is_a?(Hash)
+        @options = indices.last.is_a?(Hash) ? indices.pop  : {}
         @indices = indices
         raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
         if @options
@@ -49,11 +49,13 @@ module Tire
 
       def from(value)
         @from = value
+        @options[:from] = value
         self
       end
 
       def size(value)
         @size = value
+        @options[:size] = value
         self
       end
 

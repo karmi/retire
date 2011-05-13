@@ -187,6 +187,28 @@ module Tire
           assert_equal 3, hash['from']
         end
 
+        should "set the size in options" do
+          Results::Collection.any_instance.stubs(:total).returns(50)
+          s = Search::Search.new('index') do
+            size 5
+          end
+
+          assert_equal 5, s.options[:size]
+        end
+
+        should "set the size in options" do
+          Results::Collection.any_instance.stubs(:total).returns(50)
+          s = Search::Search.new('index') do
+            from 5
+          end
+
+          assert_equal 5, s.options[:from]
+        end
+
+      end
+
+      context "when limiting returned fields" do
+
         should "set the fields limit in request" do
           s = Search::Search.new('index') do
             fields :title
