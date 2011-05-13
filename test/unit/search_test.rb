@@ -187,7 +187,7 @@ module Tire
           assert_equal 3, hash['from']
         end
 
-        should "set the size in options" do
+        should "set the size value in options" do
           Results::Collection.any_instance.stubs(:total).returns(50)
           s = Search::Search.new('index') do
             size 5
@@ -196,7 +196,7 @@ module Tire
           assert_equal 5, s.options[:size]
         end
 
-        should "set the size in options" do
+        should "set the from value in options" do
           Results::Collection.any_instance.stubs(:total).returns(50)
           s = Search::Search.new('index') do
             from 5
