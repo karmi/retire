@@ -44,14 +44,17 @@ classes for convenient usage in Rails applications.
 
 To test-drive the core _ElasticSearch_ functionality, let's require the gem:
 
+```ruby
     require 'rubygems'
     require 'tire'
+```
 
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
 in [examples/tire-dsl.rb](http://karmi.github.com/tire/).
 
 OK. Let's create an index named `articles` and store/index some documents:
 
+```ruby
     Tire.index 'articles' do
       delete
       create
@@ -63,11 +66,13 @@ OK. Let's create an index named `articles` and store/index some documents:
 
       refresh
     end
+```
 
 We can also create the index with custom
 [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
 for a specific document type:
 
+```ruby
     Tire.index 'articles' do
       create :mappings => {
         :article => {
@@ -80,10 +85,12 @@ for a specific document type:
         }
       }
     end
+```
 
 Of course, we may have large amounts of data, and it may be impossible or impractical to add them to the index
 one by one. We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch.org/guide/reference/api/bulk.html):
 
+```ruby
     articles = [
       { :id => '1', :title => 'one'   },
       { :id => '2', :title => 'two'   },
@@ -93,16 +100,19 @@ one by one. We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch
     Tire.index 'bulk' do
       import articles
     end
+```
 
 We can also easily manipulate the documents before storing them in the index, by passing a block to the
 `import` method:
 
+```ruby
     Tire.index 'bulk' do
       import articles do |documents|
 
         documents.each { |document| document[:title].capitalize! }
       end
     end
+```
 
 OK. Now, let's go search all the data.
 
@@ -110,6 +120,7 @@ We will be searching for articles whose `title` begins with letter “T”, sort
 filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
 from the database:
 
+```ruby
     s = Tire.search 'articles' do
       query do
         string 'title:T*'
@@ -127,20 +138,24 @@ from the database:
         terms :tags
       end
     end
+```
 
 (Of course, we may also page the results with `from` and `size` query options, retrieve only specific fields
 or highlight content matching our query, etc.)
 
 Let's display the results:
 
+```ruby
     s.results.each do |document|
       puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
     end
 
     # * Two [tags: ruby, python]
+```
 
 Let's display the global facets (distribution of tags across the whole database):
 
+```ruby
     s.results.facets['global-tags']['terms'].each do |f|
       puts "#{f['term'].ljust(10)} #{f['count']}"
     end
@@ -149,11 +164,13 @@ Let's display the global facets (distribution of tags across the whole database)
     # python     1
     # php        1
     # java       1
+```
 
 Now, let's display the facets based on current query (notice that count for articles
 tagged with 'java' is included, even though it's not returned by our query;
 count for articles tagged 'php' is excluded, since they don't match the current query):
 
+```ruby
     s.results.facets['current-tags']['terms'].each do |f|
       puts "#{f['term'].ljust(10)} #{f['count']}"
     end
@@ -161,32 +178,43 @@ count for articles tagged 'php' is excluded, since they don't match the current 
     # ruby       1
     # python     1
     # java       1
+```
 
 If configuring the search payload with a block somehow feels too weak for you, you can simply pass
 a Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
+```ruby
     Tire.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }
+```
 
 If this sounds like a great idea to you, you are probably able to write your application
 using just `curl`, `sed` and `awk`.
 
 We can display the full query JSON for close inspection:
 
+```ruby
     puts s.to_json
     # {"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}
+```
 
 Or, better, we can display the corresponding `curl` command to recreate and debug the request in the terminal:
 
+```ruby
     puts s.to_curl
     # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
+```
 
 However, we can simply log every search query (and other requests) in this `curl`-friendly format:
 
+```ruby
     Tire.configure { logger 'elasticsearch.log' }
+```
 
 When you set the log level to _debug_:
 
+```ruby
     Tire.configure { logger 'elasticsearch.log', :level => 'debug' }
+```
 
 the JSON responses are logged as well. This is not a great idea for production environment,
 but it's priceless when you want to paste a complicated transaction to the mailing list or IRC channel.
@@ -217,17 +245,21 @@ example Rails application, with an `ActiveRecord` model and a search form, to pl
 For the rest, let's suppose you have an `Article` class in your Rails application.
 To make it searchable with _Tire_, you just `include` it:
 
+```ruby
     class Article < ActiveRecord::Base
       include Tire::Model::Search
       include Tire::Model::Callbacks
     end
+```
 
 When you now save a record:
 
+```ruby
     Article.create :title =>   "I Love ElasticSearch",
                    :content => "...",
                    :author =>  "Captain Nemo",
                    :published_on => Time.now
+```
 
 it is automatically added into the index, because of the included callbacks.
 (You may want to skip them in special cases, like when your records are indexed via some external
@@ -238,23 +270,28 @@ The document attributes are indexed exactly as when you call the `Article#to_jso
 
 Now you can search the records:
 
+```ruby
     Article.search 'love'
+```
 
 OK. This is where the game stops, often. Not here.
 
 First of all, you may use the full query DSL, as explained above, with filters, sorting,
 advanced facet aggregation, highlighting, etc:
 
+```ruby
     q = 'love'
     Article.search do
       query { string q }
       facet('timeline') { date :published_on, :interval => 'month' }
       sort  { published_on 'desc' }
     end
+```
 
 Dynamic mapping is a godsend when you're prototyping.
 For serious usage, though, you'll definitely want to define a custom mapping for your model:
 
+```ruby
     class Article < ActiveRecord::Base
       include Tire::Model::Search
       include Tire::Model::Callbacks
@@ -267,12 +304,14 @@ For serious usage, though, you'll definitely want to define a custom mapping for
         indexes :published_on, :type => 'date',    :include_in_all => false
       end
     end
+```
 
 In this case, _only_ the defined model attributes are indexed when adding to the index.
 
 When you want tight grip on how your model attributes are added to the index, just
 provide the `to_indexed_json` method yourself:
 
+```ruby
     class Article < ActiveRecord::Base
       include Tire::Model::Search
       include Tire::Model::Callbacks
@@ -293,15 +332,20 @@ provide the `to_indexed_json` method yourself:
       end
 
     end
+```
 
 Note that _Tire_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
 so you can pass any parameters to the `search` method in the controller, as usual:
 
+```ruby
     @articles = Article.search params[:q], :page => (params[:page] || 1)
+```
 
 OK. Chances are, you have lots of records stored in the underlying database. How will you get them to _ElasticSearch_? Easy:
 
+```ruby
     Article.elasticsearch_index.import Article.all
+```
 
 However, this way, all your records are loaded into memory, serialized into JSON,
 and sent down the wire to _ElasticSearch_. Not practical, you say? You're right.
@@ -309,12 +353,16 @@ and sent down the wire to _ElasticSearch_. Not practical, you say? You're right.
 Provided your model implements some sort of _pagination_ — and it probably does, for so much data —,
 you can just run:
 
+```ruby
     Article.import
+```
 
 In this case, the `Article.paginate` method is called, and your records are sent to the index
 in chunks of 1000. If that number doesn't suit you, just provide a better one:
 
+```ruby
     Article.import :per_page => 100
+```
 
 Any other parameters you provide to the `import` method are passed down to the `paginate` method.
 
@@ -343,6 +391,7 @@ another object mapping library, such as [Mongoid](http://mongoid.org/)?
 
 Well, things stay mostly the same:
 
+```ruby
     class Article
       include Mongoid::Document
       field :title, :type => String
@@ -367,6 +416,7 @@ Well, things stay mostly the same:
     Article.create :title => 'I Love ElasticSearch'
 
     Article.search 'love'
+```
 
 That's kinda nice. But there's more.
 
@@ -387,6 +437,7 @@ advanced distributed features.
 To use the persistence features, you have to include the `Tire::Persistence` module
 in your class and define the properties (analogous to the way you do with CouchDB- or MongoDB-based models):
 
+```ruby
     class Article
       include Tire::Model::Persistence
       include Tire::Model::Search
@@ -398,8 +449,8 @@ in your class and define the properties (analogous to the way you do with CouchD
       property :author
       property :content
       property :published_on
-
     end
+```
 
 Of course, not all validations or `ActionPack` helpers will be available to your models,
 but if you can live with that, you've just got a schema-free, highly-scalable storage
