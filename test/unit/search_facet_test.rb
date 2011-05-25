@@ -51,7 +51,7 @@ module Tire::Search
       context "date histogram" do
 
         should "encode the JSON with default values" do
-          f = Facet.new('date') { date :published_on, :interval => 'day' }
+          f = Facet.new('date') { date :published_on }
           assert_equal({ :date => { :date_histogram => { :field => 'published_on', :interval => 'day' } } }.to_json, f.to_json)
         end
 
