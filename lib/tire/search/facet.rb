@@ -27,6 +27,10 @@ module Tire
         self
       end
 
+      def range(field, ranges=[], options={})
+        @value = { :range => { :field => field, :ranges => ranges }.update(options) }
+      end
+
       def to_json
         to_hash.to_json
       end

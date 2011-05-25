@@ -58,6 +58,24 @@ module Tire
 
       end
 
+      context "date ranges" do
+
+        should "return aggregated values for all results" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'published_on' do
+              range :published_on, [{:to => '2010-12-31'}, {:from => '2011-01-01', :to => '2011-01-05'}]
+            end
+          end
+
+          facets = s.results.facets['published_on']['ranges']
+          assert_equal 2, facets.size, facets.inspect
+          assert_equal 0, facets.entries[0]["count"], facets.inspect
+          assert_equal 5, facets.entries[1]["count"], facets.inspect
+        end
+
+      end
+
     end
 
   end

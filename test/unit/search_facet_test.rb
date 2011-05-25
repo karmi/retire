@@ -62,6 +62,13 @@ module Tire::Search
 
       end
 
+      context "range facet" do
+        should "encode facet options" do
+          f = Facet.new('range') { range :published_on, [{:to => '2010-12-31'}, {:from => '2011-01-01', :to => '2011-05-27'}, {:from => '2011-05-28'}]}
+          assert_equal({ :range => { :range => { :field => 'published_on', :ranges => [{:to => '2010-12-31'}, {:from => '2011-01-01', :to => '2011-05-27'}, {:from => '2011-05-28'}] } } }.to_json, f.to_json)
+        end
+      end
+
     end
 
   end
