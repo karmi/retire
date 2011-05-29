@@ -66,7 +66,7 @@ module Tire
 
       should "log request in correct format" do
         log = (<<-"log;").gsub(/^ +/, '')
-          # 2011-03-19 11:00:00:L [_search] (["articles", "users"])
+          # 2011-03-19 11:00:00:#{RUBY_VERSION < "1.9" ? "L" : "000"} [_search] (["articles", "users"])
           #
           curl -X GET http://...
 
@@ -98,7 +98,7 @@ module Tire
         }
         json;
         log  = (<<-"log;").gsub(/^\s*/, '')
-          # 2011-03-19 11:00:00:L [200 OK] (4 msec)
+          # 2011-03-19 11:00:00:#{RUBY_VERSION < "1.9" ? "L" : "000"} [200 OK] (4 msec)
           #
         log;
         # log += json.split.map { |line| "# #{line}" }.join("\n")
