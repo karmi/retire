@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rcov"
   s.add_development_dependency "activerecord"
   s.add_development_dependency "supermodel"
+  s.add_development_dependency "sqlite3"
 
   s.description = <<-DESC
    Tire is a Ruby client for the ElasticSearch search engine/database.
