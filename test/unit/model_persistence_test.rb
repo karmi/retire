@@ -196,7 +196,7 @@ module Tire
             assert_nothing_raised { article.published_on? }
             assert ! article.published_on?
           end
-      
+
           should "return true for respond_to? calls for set attributes" do
             article = PersistentArticle.new :title => 'Test'
             assert article.respond_to?(:title)
@@ -247,9 +247,15 @@ module Tire
 
         context "when creating" do
 
+          # TODO: Find a way to mock JSON paylod for Mocha with disregard to Hash entries ordering.
+          #       Ruby 1.9 brings ordered Hashes, so tests were failing.
+
           should "save the document with generated ID in the database" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
-                                                     '{"title":"Test","tags":["one","two"],"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Test","tags":["one","two"],"published_on":null}' :
+                                                     '{"published_on":null,"tags":["one","two"],"title":"Test"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"abc123"}'))
             article = PersistentArticle.create :title => 'Test', :tags => [:one, :two]
 
@@ -259,7 +265,10 @@ module Tire
 
           should "save the document with custom ID in the database" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/r2d2",
-                                                     '{"title":"Test","id":"r2d2","tags":null,"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Test","id":"r2d2","tags":null,"published_on":null}' :
+                                                     '{"id":"r2d2","published_on":null,"tags":null,"title":"Test"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"r2d2"}'))
             article = PersistentArticle.create :id => 'r2d2', :title => 'Test'
 
@@ -268,7 +277,7 @@ module Tire
 
           should "perform model validations" do
             Configuration.client.expects(:post).never
- 
+
             assert ! ValidatedModel.create(:name => nil)
           end
 
@@ -278,7 +287,10 @@ module Tire
 
           should "set the id property" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
-                                                     {:title => 'Test', :tags => nil, :published_on => nil}.to_json).
+                                                     RUBY_VERSION < "1.9" ?
+                                                     {:title => 'Test', :tags => nil, :published_on => nil}.to_json :
+                                                     {:published_on => nil, :tags => nil, :title => 'Test'}.to_json
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
 
             article = PersistentArticle.create :title => 'Test'
@@ -287,7 +299,10 @@ module Tire
 
           should "not set the id property if already set" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}' :
+                                                     '{"id":"123","published_on":null,"tags":null,"title":"Test"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true, "_id":"XXX"}'))
 
             article = PersistentArticle.create :id => '123', :title => 'Test'
@@ -302,13 +317,19 @@ module Tire
             article = PersistentArticle.new :id => 1, :title => 'Test'
 
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     '{"title":"Test","id":1,"tags":null,"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Test","id":1,"tags":null,"published_on":null}' :
+                                                     '{"id":1,"published_on":null,"tags":null,"title":"Test"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
             assert article.save
 
             article.title = 'Updated'
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     '{"title":"Updated","id":1,"tags":null,"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Updated","id":1,"tags":null,"published_on":null}' :
+                                                     '{"id":1,"published_on":null,"tags":null,"title":"Updated"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
             assert article.save
           end
@@ -335,7 +356,10 @@ module Tire
             article.title = 'Test'
 
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}' :
+                                                     '{"id":"123","published_on":null,"tags":null,"title":"Test"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"XXX"}'))
              assert article.save
              assert_equal '123', article.id
@@ -347,7 +371,10 @@ module Tire
 
           should "delete the document from the database" do
             Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}').
+                                                     RUBY_VERSION < "1.9" ?
+                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}' :
+                                                     '{"id":"123","published_on":null,"tags":null,"title":"Test"}'
+                                                     ).
                                                 returns(mock_response('{"ok":true,"_id":"123"}'))
             Configuration.client.expects(:delete).with("#{Configuration.url}/persistent_articles/persistent_article/123")
 
