@@ -173,7 +173,7 @@ module Tire
       else
         document = {}
         document = h['_source'] ? document.update( h['_source'] ) : document.update( h['fields'] )
-        document.update('id' => h['_id'], '_version' => h['_version'])
+        document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
         Configuration.wrapper.new(document)
       end
     end
