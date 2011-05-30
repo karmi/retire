@@ -39,9 +39,9 @@ module Tire
       context "Finders" do
 
         setup do
-          @first  = { '_id' => 1, '_source' => { :title => 'First'  } }
-          @second = { '_id' => 2, '_source' => { :title => 'Second' } }
-          @third  = { '_id' => 3, '_source' => { :title => 'Third'  } }
+          @first  = { '_id' => 1, '_version' => 1, '_index' => 'persistent_articles', '_type' => 'persistent_article', '_source' => { :title => 'First'  } }
+          @second = { '_id' => 2, '_index' => 'persistent_articles', '_type' => 'persistent_article', '_source' => { :title => 'Second' } }
+          @third  = { '_id' => 3, '_index' => 'persistent_articles', '_type' => 'persistent_article', '_source' => { :title => 'Third'  } }
           @find_all = { 'hits' => { 'hits' => [
             @first,
             @second,
@@ -60,6 +60,18 @@ module Tire
           assert_equal 1, document.attributes['id']
           assert_equal 'First', document.attributes['title']
           assert_equal 'First', document.title
+        end
+
+        should "have _type, _index, _id, _version attributes" do
+          Configuration.client.expects(:get).returns(mock_response(@first.to_json))
+          document = PersistentArticle.find 1
+
+          assert_instance_of PersistentArticle, document
+          assert_equal 1, document.id
+          assert_equal 1, document.attributes['id']
+          assert_equal 'persistent_articles', document._index
+          assert_equal 'persistent_article', document._type
+          assert_equal 1, document._version
         end
 
         should "find document by string ID" do
