@@ -39,6 +39,11 @@ module Tire::Search
                       Query.new.string('foo', :default_field => 'title') )
       end
 
+      should "allow set default operator when searching with a query string" do
+        assert_equal( { :query_string => { :query => 'foo', :default_operator => 'and' } },
+                      Query.new.string('foo', :default_operator => 'and') )
+      end
+
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
       end
