@@ -1,8 +1,13 @@
 require 'rubygems'
+
+require 'pathname'
 require 'test/unit'
+require 'sqlite3'
+
 require 'shoulda'
 require 'turn' unless ENV["TM_FILEPATH"]
-require 'pathname'
+require 'mocha'
+
 require 'tire'
 
 Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
@@ -48,5 +53,3 @@ module Test::Integration
     ::RestClient.delete "#{URL}/articles-test"  rescue nil
   end
 end
-
-require 'mocha'

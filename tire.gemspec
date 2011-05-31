@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mocha"
   s.add_development_dependency "sdoc"
   s.add_development_dependency "rcov"
-  s.add_development_dependency "activerecord"
+  s.add_development_dependency "activerecord", "~> 3.0.7"
   s.add_development_dependency "supermodel"
   s.add_development_dependency "sqlite3"
 
