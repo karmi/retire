@@ -7,3 +7,4 @@ coverage/
 scratch/
 examples/*.html
 *.log
+.rvmrc
