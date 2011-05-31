@@ -20,8 +20,9 @@ module Tire
     end
 
     def self.reset(*properties)
-      reset_variables = properties.empty? ? instance_variables : instance_variables & properties.map { |p| "@#{p}" }
-      reset_variables.each { |v| instance_variable_set(v, nil) }
+      reset_variables = properties.empty? ? instance_variables : instance_variables.map { |p| p.to_s} & \
+                                                                 properties.map         { |p| "@#{p}" }
+      reset_variables.each { |v| instance_variable_set(v.to_sym, nil) }
     end
 
   end
