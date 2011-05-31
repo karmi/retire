@@ -39,6 +39,11 @@ module Tire::Search
                       Query.new.string('foo', :default_field => 'title') )
       end
 
+      should "allow set options when searching with a query string" do
+        assert_equal( { :query_string => { :query => 'foo', :fields => ['title.*'], :use_dis_max => true } },
+                      Query.new.string('foo', :fields => ['title.*'], :use_dis_max => true) )
+      end
+
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
       end
