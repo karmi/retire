@@ -39,6 +39,16 @@ module Tire
       @response = Configuration.client.get("#{Configuration.url}/#{@name}/_mapping")
       JSON.parse(@response.body)[@name]
     end
+    
+    def open(options={})
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_open", Yajl::Encoder.encode(options)
+      JSON.parse(@response.body)[@name]
+    end
+
+    def close(options={})
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_close", Yajl::Encoder.encode(options)
+      JSON.parse(@response.body)[@name]
+    end
 
     def store(*args)
       # TODO: Infer type from the document (hash property, method)
