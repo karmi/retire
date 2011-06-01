@@ -187,6 +187,28 @@ module Tire
       logged(error, '_refresh', curl)
     end
 
+    def open(options={})
+      # TODO: Remove the duplication in the execute > rescue > ensure chain
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_open", Yajl::Encoder.encode(options)
+      JSON.parse(@response.body)['ok']
+    rescue Exception => error
+      raise
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/open"|
+      logged(error, '_open', curl)
+    end
+
+    def close(options={})
+      # TODO: Remove the duplication in the execute > rescue > ensure chain
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_close", Yajl::Encoder.encode(options)
+      JSON.parse(@response.body)['ok']
+    rescue Exception => error
+      raise
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_close"|
+      logged(error, '_close', curl)
+    end
+
     def logged(error=nil, endpoint='/', curl='')
       if Configuration.logger
 
