@@ -219,6 +219,42 @@ module Tire
 
       end
 
+      context "boolean queries" do
+
+        should "wrap other queries" do
+          # TODO: Try to get rid of the `boolean` method
+          #
+          # TODO: Try to get rid of multiple `should`, `must`, invocations, and wrap queries like this:
+          #       boolean do
+          #         should do
+          #           string 'foo'
+          #           string 'bar'
+          #         end
+          #       end
+          s = Search::Search.new('index') do
+            query do
+              boolean do
+                should { string 'foo' }
+                should { string 'moo' }
+                must   { string 'title:bar' }
+                must   { terms  :tags, ['baz']  }
+              end
+            end
+          end
+
+          hash  = JSON.load(s.to_json)
+          query = hash['query']['bool']
+          # p hash
+
+          assert_equal 2, query['should'].size
+          assert_equal 2, query['must'].size
+
+          assert_equal( { 'query_string' => { 'query' => 'foo' } }, query['should'].first)
+          assert_equal( { 'terms' => { 'tags' => ['baz'] } }, query['must'].last)
+        end
+
+      end
+
     end
 
   end
