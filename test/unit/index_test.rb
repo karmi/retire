@@ -51,6 +51,16 @@ module Tire
         assert_nothing_raised { assert @index.refresh }
       end
 
+      should "open the index" do
+        Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_shards":{}}'))
+        assert_nothing_raised { assert @index.open }
+      end
+
+      should "close the index" do
+        Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_shards":{}}'))
+        assert_nothing_raised { assert @index.close }
+      end
+
       context "mapping" do
 
         should "create index with mapping" do

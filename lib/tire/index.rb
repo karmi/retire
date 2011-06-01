@@ -39,7 +39,7 @@ module Tire
       @response = Configuration.client.get("#{Configuration.url}/#{@name}/_mapping")
       JSON.parse(@response.body)[@name]
     end
-
+    
     def store(*args)
       # TODO: Infer type from the document (hash property, method)
 
@@ -179,14 +179,17 @@ module Tire
     end
 
     def refresh
-      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_refresh", ''
-    rescue Exception => error
-      raise
-    ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_refresh"|
-      logged(error, '_refresh', curl)
+      perform_post_action 'refresh', ''
+    end
+    
+    def open
+      perform_post_action 'open', ''
     end
 
+    def close
+      perform_post_action 'close', ''
+    end
+    
     def logged(error=nil, endpoint='/', curl='')
       if Configuration.logger
 
@@ -203,6 +206,17 @@ module Tire
 
         Configuration.logger.log_response code, nil, body
       end
+    end
+    
+    private
+    
+    def perform_post_action action_name, options
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_#{action_name}", options
+    rescue Exception => error
+      raise
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_#{action_name}"|
+      logged(error, "_#{action_name}", curl)
     end
 
   end
