@@ -46,6 +46,10 @@ module Tire
         @results.size
       end
 
+      def [](index)
+        @results[index]
+      end
+
       def to_ary
         self
       end
