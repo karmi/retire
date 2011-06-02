@@ -51,7 +51,7 @@ puts "", "Query:", "-"*80
 puts s.to_json
 
 puts "", "Raw JSON result:", "-"*80
-puts JSON.pretty_generate(s.response)
+puts s.response
 
 puts "", "Try the query in Curl:", "-"*80
 puts s.to_curl

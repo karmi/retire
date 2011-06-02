@@ -16,7 +16,7 @@ module Tire
         end
 
         response = Configuration.client.post( "#{Configuration.url}/#{indices}/_search", payload)
-        json     = Yajl::Parser.parse(response.body)
+        json     = JSON.parse(response.body)
         results  = Results::Collection.new(json, options)
       end
     rescue Exception => error

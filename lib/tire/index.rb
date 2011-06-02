@@ -27,11 +27,11 @@ module Tire
 
     def create(options={})
       @options = options
-      @response = Configuration.client.post "#{Configuration.url}/#{@name}", Yajl::Encoder.encode(options)
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}", JSON.encode(options)
     rescue Exception => error
       false
     ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{Yajl::Encoder.encode(options, :pretty => true)}'|
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{JSON.encode(options, :pretty => true)}'|
       logged(error, 'CREATE', curl)
     end
 
@@ -199,7 +199,7 @@ module Tire
 
         if Configuration.logger.level.to_s == 'debug'
           # FIXME: Depends on RestClient implementation
-          body = @response ? Yajl::Encoder.encode(@response.body, :pretty => true) : error.http_body rescue ''
+          body = @response ? JSON.encode(@response.body, :pretty => true) : error.http_body rescue ''
         else
           body = ''
         end

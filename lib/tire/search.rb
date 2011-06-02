@@ -67,7 +67,7 @@ module Tire
       def perform
         @url      = "#{Configuration.url}/#{indices.join(',')}/_search"
         @response = Configuration.client.post(@url, self.to_json)
-        @json     = Yajl::Parser.parse(@response.body)
+        @json     = JSON.parse(@response.body)
         @results  = Results::Collection.new(@json, @options)
         self
       rescue Exception => error
@@ -91,7 +91,7 @@ module Tire
         request.update( { :size => @size } )       if @size
         request.update( { :from => @from } )       if @from
         request.update( { :fields => @fields } )   if @fields
-        Yajl::Encoder.encode(request)
+        JSON.encode(request)
       end
 
       def logged(error=nil)
