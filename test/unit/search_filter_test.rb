@@ -24,10 +24,16 @@ module Tire::Search
                       Filter.new('geo_distance', { :distance => '12km', :location => [40, -70] }).to_json )
       end
 
-      should "encode 'or' filter declarations as JSON" do
+      should "encode 'or' filter with multiple other filters" do
         # See http://www.elasticsearch.org/guide/reference/query-dsl/or-filter.html
         assert_equal( { :or => [ {:terms => {:tags => ['foo']}}, {:terms => {:tags => ['bar']}} ] }.to_json,
                       Filter.new('or', {:terms => {:tags => ['foo']}}, {:terms => {:tags => ['bar']}}).to_json )
+      end
+
+      should "encode 'bool' filter with multiple filters" do
+        # http://www.elasticsearch.org/guide/reference/query-dsl/bool-filter.html
+        assert_equal( { :bool => [ {:must => {:terms => {:tags => ['foo']}}}, {:should => {:terms => {:tags => ['bar']}}} ] }.to_json,
+                      Filter.new('bool', {:must => {:terms => {:tags => ['foo']}}}, { :should => {:terms => {:tags => ['bar']}}}).to_json )
       end
 
     end
