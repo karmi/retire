@@ -52,6 +52,15 @@ To test-drive the core _ElasticSearch_ functionality, let's require the gem:
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
 in [examples/tire-dsl.rb](http://karmi.github.com/tire/).
 
+Also, note that we're doing some heavy JSON lifting here. _Tire_ uses the
+[_multi_json_](https://github.com/intridea/multi_json) gem as a generic JSON wrapper,
+which allows you to use your preferred JSON library. We'll use the
+[_yajl-ruby_](https://github.com/brianmario/yajl-ruby) gem in the full on mode here:
+
+```ruby
+    require 'yajl/json_gem'
+```
+
 OK. Let's create an index named `articles` and store/index some documents:
 
 ```ruby

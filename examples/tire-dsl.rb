@@ -26,6 +26,14 @@
 #     gem install tire
 #
 require 'rubygems'
+
+# _Tire_ uses the [_multi_json_](https://github.com/intridea/multi_json) gem as a generic JSON library.
+# We want to use the [_yajl-ruby_](https://github.com/brianmario/yajl-ruby) gem in its full on mode here.
+#
+require 'yajl/json_gem'
+
+# Now, let's require the _Tire_ gem itself, and we're ready to go.
+#
 require 'tire'
 
 #### Prerequisites
