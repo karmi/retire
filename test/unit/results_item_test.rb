@@ -10,12 +10,17 @@ module Tire
         @document = Results::Item.new :title => 'Test', :author => { :name => 'Kafka' }
       end
 
-      should "be initialized with a Hash" do
+      should "be initialized with a Hash or Hash like object" do
         assert_raise(ArgumentError) { Results::Item.new('FUUUUUUU') }
 
         assert_nothing_raised do
           d = Results::Item.new(:id => 1)
           assert_instance_of Results::Item, d
+        end
+
+        assert_nothing_raised do
+          class AlmostHash < Hash; end
+          d = Results::Item.new(AlmostHash.new(:id => 1))
         end
       end
 
