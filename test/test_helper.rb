@@ -3,7 +3,7 @@ require 'rubygems'
 require 'pathname'
 require 'test/unit'
 
-require 'yajl'
+require 'yajl/json_gem'
 require 'sqlite3'
 
 require 'shoulda'
