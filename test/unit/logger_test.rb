@@ -66,12 +66,16 @@ module Tire
 
       should "log request in correct format" do
         log = (<<-"log;").gsub(/^ +/, '')
-          # 2011-03-19 11:00:00:#{RUBY_VERSION < "1.9" ? "L" : "000"} [_search] (["articles", "users"])
+          # 2011-03-19 11:00:00:000 [_search] (["articles", "users"])
           #
           curl -X GET http://...
 
         log;
-        @logger.expects(:write).with(log)
+        @logger.expects(:write).with do |payload|
+          payload =~ Regexp.new( Regexp.escape('2011-03-19 11:00:00') )
+          payload =~ Regexp.new( Regexp.escape('_search') )
+          payload =~ Regexp.new( Regexp.escape('(["articles", "users"])') )
+        end
         @logger.log_request('_search', ["articles", "users"], 'curl -X GET http://...')
       end
 
@@ -98,13 +102,20 @@ module Tire
         }
         json;
         log  = (<<-"log;").gsub(/^\s*/, '')
-          # 2011-03-19 11:00:00:#{RUBY_VERSION < "1.9" ? "L" : "000"} [200 OK] (4 msec)
+          # 2011-03-19 11:00:00:000 [200 OK] (4 msec)
           #
         log;
         # log += json.split.map { |line| "# #{line}" }.join("\n")
         json.each_line { |line| log += "# #{line}" }
         log += "\n\n"
-        @logger.expects(:write).with(log)
+        @logger.expects(:write).with do |payload|
+          payload =~ Regexp.new( Regexp.escape('2011-03-19 11:00:00') )
+          payload =~ Regexp.new( Regexp.escape('[200 OK]') )
+          payload =~ Regexp.new( Regexp.escape('(4 msec)') )
+          payload =~ Regexp.new( Regexp.escape('took') )
+          payload =~ Regexp.new( Regexp.escape('hits') )
+          payload =~ Regexp.new( Regexp.escape('_score') )
+        end
         @logger.log_response('200 OK', 4, json)
       end
 
