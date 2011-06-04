@@ -27,9 +27,10 @@ Gem::Specification.new do |s|
   s.add_dependency "rake",        "~> 0.8.0"
   s.add_dependency "bundler",     "~> 1.0.0"
   s.add_dependency "rest-client", "~> 1.6.0"
-  s.add_dependency "yajl-ruby",   "~> 0.8.0"
+  s.add_dependency "multi_json",  "~> 1.0"
   s.add_dependency "activemodel", "~> 3.0.7"
 
+  s.add_development_dependency "yajl-ruby",   "~> 0.8.0"
   s.add_development_dependency "turn"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "mocha"

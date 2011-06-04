@@ -2,6 +2,8 @@ require 'rubygems'
 
 require 'pathname'
 require 'test/unit'
+
+require 'yajl'
 require 'sqlite3'
 
 require 'shoulda'

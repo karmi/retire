@@ -100,7 +100,7 @@ module Tire
               _score
             end
           end
-          hash = JSON.load( s.to_json )
+          hash = MultiJson.decode( s.to_json )
           assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
         end
         
@@ -182,7 +182,7 @@ module Tire
             size 5
             from 3
           end
-          hash = JSON.load( s.to_json )
+          hash = MultiJson.decode( s.to_json )
           assert_equal 5, hash['size']
           assert_equal 3, hash['from']
         end
@@ -213,7 +213,7 @@ module Tire
           s = Search::Search.new('index') do
             fields :title
           end
-          hash = JSON.load( s.to_json )
+          hash = MultiJson.decode( s.to_json )
           assert_equal 'title', hash['fields']
         end
 
@@ -242,7 +242,7 @@ module Tire
             end
           end
 
-          hash  = JSON.load(s.to_json)
+          hash  = MultiJson.decode(s.to_json)
           query = hash['query']['bool']
           # p hash
 

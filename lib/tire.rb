@@ -1,5 +1,5 @@
 require 'rest_client'
-require 'yajl/json_gem'
+require 'multi_json'
 require 'active_model'
 
 require 'tire/rubyext/hash'
