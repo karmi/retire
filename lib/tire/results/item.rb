@@ -9,7 +9,7 @@ module Tire
       def initialize(args={})
         raise ArgumentError, "Please pass a Hash-like object" unless args.respond_to?(:each_pair)
         args.each_pair do |key, value|
-          self[key.to_sym] = value.respond_to?(:to_hash) ? self.class.new(value) : value
+          self[key.to_sym] = value.respond_to?(:to_hash) ? self.class.new(value.to_hash) : value
         end
       end
 
