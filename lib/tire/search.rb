@@ -22,7 +22,7 @@ module Tire
       end
 
       def sort(&block)
-        @sort = Sort.new(&block)
+        @sort = Sort.new(&block).to_ary
         self
       end
 

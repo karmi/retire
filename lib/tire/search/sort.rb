@@ -20,6 +20,10 @@ module Tire
         self
       end
 
+      def to_ary
+        @value
+      end
+
       def to_json
         @value.to_json
       end
