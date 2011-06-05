@@ -43,7 +43,7 @@ module Tire
         @value
       end
 
-      def to_json
+      def to_json generator=nil
         to_hash.to_json
       end
 
