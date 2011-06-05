@@ -20,7 +20,7 @@ module Tire
         self
       end
 
-      def to_json
+      def to_json generator=nil
         @value.to_json
       end
     end
