@@ -8,8 +8,19 @@ module Tire
       #
       def initialize(args={})
         raise ArgumentError, "Please pass a Hash-like object" unless args.respond_to?(:each_pair)
+
         args.each_pair do |key, value|
-          self[key.to_sym] = value.is_a?(Hash) ? self.class.new(value.to_hash) : value
+          self[key.to_sym] = case
+            when value.is_a?(Hash)
+              if value['_name'] && value['_content_type']
+                # file = File.new(value['_name'], File::CREAT|File::TRUNC|File::RDWR, 0644)
+                file << value['content'].unpack('m').to_s
+                value['content'] = file
+              end
+              self.class.new(value.to_hash)
+            else
+              value
+          end
         end
       end
 

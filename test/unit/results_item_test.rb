@@ -57,6 +57,10 @@ module Tire
         assert_equal 'Kafka', @document.author.name
       end
 
+      should "base64 decode attachments" do
+        
+      end
+
     end
 
   end
