@@ -253,6 +253,27 @@ module Tire
           assert_equal( { 'terms' => { 'tags' => ['baz'] } }, query['must'].last)
         end
 
+        should "allow passing variables from outer scope" do
+          q1 = 'foo'
+          q2 = 'bar'
+
+          assert_nothing_raised do
+            @search = Search::Search.new('index') do
+              query do
+                boolean do
+                  must   { string q1 }
+                  must   { string q2 }
+                end
+              end
+            end
+          end
+
+          hash  = MultiJson.decode(@search.to_json)
+          query = hash['query']['bool']
+
+          assert_equal 2, query['must'].size
+        end
+
       end
 
     end
