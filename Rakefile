@@ -25,11 +25,8 @@ namespace :test do
 end
 
 # Generate documentation
-begin
-  require 'sdoc'
-rescue LoadError
-end
-require 'rake/rdoctask'
+begin; require 'sdoc'; rescue LoadError; end
+require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "Tire"
