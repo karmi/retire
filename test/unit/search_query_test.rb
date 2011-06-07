@@ -67,8 +67,8 @@ module Tire::Search
 
     context "BooleanQuery" do
 
-      should "raise ArgumentError when no block given" do
-        assert_raise(ArgumentError) { Query.new.boolean }
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.boolean }
       end
 
       should "encode options" do

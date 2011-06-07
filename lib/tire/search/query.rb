@@ -25,9 +25,6 @@ module Tire
       end
 
       def boolean(options={}, &block)
-        # TODO: Try to get rid of the `boolean` method
-        raise ArgumentError, "Please pass a block to boolean query" unless block_given?
-
         @boolean ||= BooleanQuery.new(options)
         block.arity < 1 ? @boolean.instance_eval(&block) : block.call(@boolean) if block_given?
         @value[:bool] = @boolean.to_hash
