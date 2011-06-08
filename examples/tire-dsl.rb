@@ -312,8 +312,6 @@ end
 
 ### Complex Searching
 
-#### Other Types of Queries
-
 # Query strings are convenient for simple searches, but we may want to define our queries more expressively,
 # using the _ElasticSearch_ [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/index.html).
 #
@@ -359,6 +357,71 @@ s.results.each do |document|
   puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
 end
 
+#### Boolean Queries
+
+# Quite often, we need complex queries with boolean logic.
+# Instead of composing long query strings such as `tags:ruby OR tags:java AND NOT tags:python`,
+# we can use the [_bool_](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
+# query.
+
+s = Tire.search('articles') do
+  query do
+
+    # In _Tire_, we can build `bool` queries declaratively, as usual.
+    boolean do
+
+      # Let's define a `should` (`OR`) query for _ruby_,
+      #
+      should   { string 'tags:ruby' }
+
+      # as well as for _java_,
+      should   { string 'tags:java' }
+
+      # while defining a `must_not` (`AND NOT`) query for _python_.
+      must_not { string 'tags:python' }
+    end
+  end
+end
+
+# The search returns these documents:
+#
+#     * One [tags: ruby]
+#     * Three [tags: java]
+#     * Four [tags: ruby, php]
+#
+s.results.each do |document|
+  puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
+end
+
+# The best thing about `boolean` queries is that we can very easily save these partial queries as Ruby blocks,
+# to mix and reuse them later, since we can call the `boolean` method multiple times.
+#
+
+# Let's define the query for the _tags_ property,
+#
+tags_query = lambda do |boolean|
+  boolean.should { string 'tags:ruby' }
+  boolean.should { string 'tags:java' }
+end
+
+# ... and a query for the _published_on_ property.
+published_on_query = lambda do |boolean|
+  boolean.must   { string 'published_on:[2011-01-01 TO 2011-01-02]' }
+end
+
+# Now, we can use the `tags_query` on its own.
+#
+Tire.search('articles') { query { boolean &tags_query } }
+
+# Or, we can combine it with the `published_on` query.
+#
+Tire.search('articles') do
+  query do
+    boolean &tags_query
+    boolean &published_on_query
+  end
+end
+
 # _ElasticSearch_ supports many types of [queries](http://www.elasticsearch.org/guide/reference/query-dsl/).
 #
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
@@ -366,6 +429,7 @@ end
 # * [string](http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html)
 # * [term](http://elasticsearch.org/guide/reference/query-dsl/term-query.html)
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
+# * [bool](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
 # * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
 # * [ids](http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html)
 
