@@ -14,13 +14,13 @@
 
 # Note, that this file can be executed directly:
 #
-#     ruby examples/tire-dsl.rb
+#     ruby -I lib examples/tire-dsl.rb
 #
 
 
 #### Installation
 
-# Install _Tire_ with Rubygems.
+# Install _Tire_ with _Rubygems_:
 
 #
 #     gem install tire
@@ -38,7 +38,7 @@ require 'tire'
 
 #### Prerequisites
 
-# You'll need a working and running _ElasticSearch_ server. Thankfully, that's easy.
+# We'll need a working and running _ElasticSearch_ server, of course. Thankfully, that's easy.
 ( puts <<-"INSTALL" ; exit(1) ) unless (RestClient.get('http://localhost:9200') rescue false)
 
  [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
@@ -82,7 +82,6 @@ Tire.index 'articles' do
   create :mappings => {
 
     # Specify for which type of documents this mapping should be used.
-    # (The documents must provide a `type` method or property then.)
     #
     :article => {
       :properties => {
@@ -95,7 +94,7 @@ Tire.index 'articles' do
         # has [more information](http://elasticsearch.org/guide/reference/mapping/index.html)
         # about this. Proper mapping is key to efficient and effective search.
         # But don't fret about getting the mapping right the first time, you won't.
-        # In most cases, the default mapping is just fine for prototyping.
+        # In most cases, the default, dynamic mapping is just fine for prototyping.
         #
         :title    => { :type => 'string', :analyzer => 'snowball', :boost => 2.0             },
         :tags     => { :type => 'string', :analyzer => 'keyword'                             },
@@ -105,13 +104,13 @@ Tire.index 'articles' do
   }
 end
 
-#### Bulk Storage
+#### Bulk Indexing
 
 # Of course, we may have large amounts of data, and adding them to the index one by one really isn't the best idea.
-# We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch.org/guide/reference/api/bulk.html)
+# We can use _ElasticSearch's_ [bulk API](http://www.elasticsearch.org/guide/reference/api/bulk.html)
 # for importing the data.
 
-# So, for demonstration purposes, let's suppose we have a plain collection of hashes to store.
+# So, for demonstration purposes, let's suppose we have a simple collection of hashes to store.
 #
 articles = [
 
@@ -134,7 +133,7 @@ end
 Tire.index 'articles' do
   delete
 
-  # ... by just passing a block to the `import` method. The collection will
+  # ... by passing a block to the `import` method. The collection will
   # be available in the block argument.
   #
   import articles do |documents|
@@ -152,8 +151,7 @@ end
 
 # With the documents indexed and stored in the _ElasticSearch_ database, we can search them, finally.
 #
-# Tire exposes the search interface via simple domain-specific language.
-
+# _Tire_ exposes the search interface via simple domain-specific language.
 
 #### Simple Query String Searches
 
@@ -161,7 +159,7 @@ end
 #
 s = Tire.search('articles') do
   query do
-    string "title:One"
+    string "title:one"
   end
 end
 
@@ -208,14 +206,14 @@ end
 # In fact, we can use any valid [Lucene query syntax](http://lucene.apache.org/java/3_0_3/queryparsersyntax.html)
 # for the query string queries.
 
-# For debugging, we can display the JSON which is being sent to _ElasticSearch_.
+# For debugging our queries, we can display the JSON which is being sent to _ElasticSearch_.
 #
 #     {"query":{"query_string":{"query":"title:T*"}}}
 #
 puts "", "Query:", "-"*80
 puts s.to_json
 
-# Or better, we may display a complete `curl` command to recreate the request in terminal,
+# Or better yet, we may display a complete `curl` command to recreate the request in terminal,
 # so we can see the naked response, tweak request parameters and meditate on problems.
 #
 #     curl -X POST "http://localhost:9200/articles/_search?pretty=true" \
