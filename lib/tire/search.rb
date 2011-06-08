@@ -9,10 +9,9 @@ module Tire
         @options = indices.last.is_a?(Hash) ? indices.pop  : {}
         @indices = indices
         raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
-        if @options
-          Configuration.wrapper @options[:wrapper] if @options[:wrapper]
-        end
-        instance_eval(&block) if block_given?
+
+        Configuration.wrapper @options[:wrapper] if @options[:wrapper]
+        block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
 
       def query(&block)

@@ -11,22 +11,24 @@ module Tire
         assert_raise(ArgumentError) { Search::Search.new }
       end
 
-      should "have the query method" do
-        assert_respond_to Search::Search.new('index'), :query
-      end
-
       should "allow to pass block to query" do
         Search::Query.any_instance.expects(:instance_eval)
 
-        Search::Search.new('index').query { string 'foo' }
+        Search::Search.new('index') do
+          query { string 'foo' }
+        end
       end
 
-      should "allow to pass block with argument to query, allowing to use local variables from outer scope" do
-        foo = 'bar'
-        query_block = lambda { |query| query.string foo }
+      should "allow to pass block with argument to query (use variables from outer scope)" do
+        def foo; 'bar'; end
+
         Search::Query.any_instance.expects(:instance_eval).never
 
-        Search::Search.new('index').query &query_block
+        Search::Search.new('index') do |search|
+          search.query do |query|
+            query.string foo
+          end
+        end
       end
 
       should "store indices as an array" do
@@ -251,27 +253,6 @@ module Tire
 
           assert_equal( { 'query_string' => { 'query' => 'foo' } }, query['should'].first)
           assert_equal( { 'terms' => { 'tags' => ['baz'] } }, query['must'].last)
-        end
-
-        should "allow passing variables from outer scope" do
-          q1 = 'foo'
-          q2 = 'bar'
-
-          assert_nothing_raised do
-            @search = Search::Search.new('index') do
-              query do
-                boolean do
-                  must   { string q1 }
-                  must   { string q2 }
-                end
-              end
-            end
-          end
-
-          hash  = MultiJson.decode(@search.to_json)
-          query = hash['query']['bool']
-
-          assert_equal 2, query['must'].size
         end
 
       end
