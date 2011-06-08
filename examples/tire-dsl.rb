@@ -187,12 +187,14 @@ s.results.each do |document|
   puts "* #{ document.title } [published: #{document.published_on}]"
 end
 
-# Of course, we may write the blocks in shorter notation.
-# Local variables from outer scope are passed down the chain.
+# Notice, that we can access local variables from the _enclosing scope_.
+# (Of course, we may write the blocks in shorter notation.)
 
-# Let's search for articles whose titles begin with letter “T”.
+# We will define the query in a local variable named `q`...
 #
 q = "title:T*"
+# ... and we can use it inside the `query` block.
+#
 s = Tire.search('articles') { query { string q } }
 
 # The results:
@@ -203,8 +205,41 @@ s.results.each do |document|
   puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
 end
 
-# In fact, we can use any valid [Lucene query syntax](http://lucene.apache.org/java/3_0_3/queryparsersyntax.html)
-# for the query string queries.
+# Often, we need to access variables or methods defined in the _outer scope_.
+# To do that, we have to use a slight variation of the DSL.
+#
+
+# Let's assume we have a plain Article class.
+#
+class Article
+
+  # We will define the query in a class method...
+  #
+  def self.q
+    "title:T*"
+  end
+
+  # ... and wrap the _Tire_ search method.
+  def self.search
+
+    # Notice how we pass the `search` object around as a block argument.
+    #
+    Tire.search('articles') do |search|
+
+      # And we pass the query object in a similar matter.
+      #
+      search.query do |query|
+
+        # Which means we can access the `q` class method.
+        #
+        query.string self.q
+      end
+    end.results
+  end
+end
+
+# We may use any valid [Lucene query syntax](http://lucene.apache.org/java/3_0_3/queryparsersyntax.html)
+# for the `query_string` queries.
 
 # For debugging our queries, we can display the JSON which is being sent to _ElasticSearch_.
 #

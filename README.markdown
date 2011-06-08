@@ -189,6 +189,21 @@ count for articles tagged 'php' is excluded, since they don't match the current 
     # java       1
 ```
 
+Notice, that only variables from the enclosing scope are accesible.
+If we want to access the variables or methods from outer scope,
+we have to use a slight variation of the DSL, by passing the
+`search` and `query` objects around.
+
+```ruby
+    @query = 'title:T*'
+
+    Tire.search 'articles' do |search|
+      search.query do |query|
+        query.string @query
+      end
+    end
+```
+
 If configuring the search payload with a block somehow feels too weak for you, you can simply pass
 a Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
