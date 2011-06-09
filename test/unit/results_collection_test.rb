@@ -78,14 +78,6 @@ module Tire
           assert_equal   'Test',  article.title
         end
         
-        should "allow wrapping hits in custom class" do
-          Configuration.wrapper(Article)
-
-          article =  Results::Collection.new(@response).first
-          assert_kind_of Article, article
-          assert_equal   'Test',  article.title
-        end
-
         should "inner _source objects in hits should be properly wrapped in custom class" do
           @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', 'fields' => {'_source.inner_object.a' => 1, '_source.inner_object.b.c' => 2} } ] } }
           Configuration.wrapper(Article)
