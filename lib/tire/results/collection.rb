@@ -19,6 +19,7 @@ module Tire
                        # Update the document with content and ID
                        document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
                        document.update( {'id' => h['_id']} )
+                       handle_inner_object_fields document
 
                        # Update the document with meta information
                        ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
@@ -53,8 +54,38 @@ module Tire
       def to_ary
         self
       end
+      
+      private
+      
+      def handle_inner_object_fields(document)
+        symbol_table = {}
+        keys_to_delete = []
+        
+        document.each do |k, v|
+          if k.to_s.match /^_source./
+            add_to_symbol_table( symbol_table, k, v )
+            keys_to_delete << k
+          end
+        end
+        
+        keys_to_delete.each {|k| document.delete( k )}
+        
+        document.update symbol_table
+      end
+      
+      def add_to_symbol_table(symbol_table, k, v)
+        exploded_keys = k.sub('_source.', '').split('.')
+        variable_name = exploded_keys.pop
+
+        current_hash = symbol_table
+        exploded_keys.each do |key|
+          new_hash = current_hash[key] && current_hash[key].is_a?(Hash) ? current_hash[key] : {}
+          current_hash[key] = new_hash
+          current_hash = new_hash
+        end
+        current_hash[ variable_name ] = v
+      end
 
     end
-
   end
 end

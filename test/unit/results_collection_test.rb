@@ -46,7 +46,7 @@ module Tire
       context "wrapping results" do
 
         setup do
-          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
+          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem'} } ] } }
         end
 
         should "wrap hits in Item by default" do
@@ -76,6 +76,24 @@ module Tire
           article =  Results::Collection.new(@response).first
           assert_kind_of Article, article
           assert_equal   'Test',  article.title
+        end
+        
+        should "allow wrapping hits in custom class" do
+          Configuration.wrapper(Article)
+
+          article =  Results::Collection.new(@response).first
+          assert_kind_of Article, article
+          assert_equal   'Test',  article.title
+        end
+
+        should "inner _source objects in hits should be properly wrapped in custom class" do
+          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', 'fields' => {'_source.inner_object.a' => 1, '_source.inner_object.b.c' => 2} } ] } }
+          Configuration.wrapper(Article)
+
+          article =  Results::Collection.new(@response).first
+          assert_kind_of Article, article
+          assert_equal   1,  article.inner_object['a']
+          assert_equal   2,  article.inner_object['b']['c']
         end
 
         should "return score" do

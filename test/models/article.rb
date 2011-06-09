@@ -1,7 +1,7 @@
 # Example non-ActiveModel custom wrapper for result item
 
 class Article
-  attr_reader :id, :title, :body
+  attr_reader :id, :title, :body, :inner_object
 
   def initialize(attributes={})
     attributes.each { |k,v| instance_variable_set(:"@#{k}", v) }
