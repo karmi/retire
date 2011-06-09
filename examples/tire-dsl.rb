@@ -14,13 +14,13 @@
 
 # Note, that this file can be executed directly:
 #
-#     ruby examples/tire-dsl.rb
+#     ruby -I lib examples/tire-dsl.rb
 #
 
 
 #### Installation
 
-# Install _Tire_ with Rubygems.
+# Install _Tire_ with _Rubygems_:
 
 #
 #     gem install tire
@@ -38,7 +38,7 @@ require 'tire'
 
 #### Prerequisites
 
-# You'll need a working and running _ElasticSearch_ server. Thankfully, that's easy.
+# We'll need a working and running _ElasticSearch_ server, of course. Thankfully, that's easy.
 ( puts <<-"INSTALL" ; exit(1) ) unless (RestClient.get('http://localhost:9200') rescue false)
 
  [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
@@ -82,7 +82,6 @@ Tire.index 'articles' do
   create :mappings => {
 
     # Specify for which type of documents this mapping should be used.
-    # (The documents must provide a `type` method or property then.)
     #
     :article => {
       :properties => {
@@ -95,7 +94,7 @@ Tire.index 'articles' do
         # has [more information](http://elasticsearch.org/guide/reference/mapping/index.html)
         # about this. Proper mapping is key to efficient and effective search.
         # But don't fret about getting the mapping right the first time, you won't.
-        # In most cases, the default mapping is just fine for prototyping.
+        # In most cases, the default, dynamic mapping is just fine for prototyping.
         #
         :title    => { :type => 'string', :analyzer => 'snowball', :boost => 2.0             },
         :tags     => { :type => 'string', :analyzer => 'keyword'                             },
@@ -105,13 +104,13 @@ Tire.index 'articles' do
   }
 end
 
-#### Bulk Storage
+#### Bulk Indexing
 
 # Of course, we may have large amounts of data, and adding them to the index one by one really isn't the best idea.
-# We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch.org/guide/reference/api/bulk.html)
+# We can use _ElasticSearch's_ [bulk API](http://www.elasticsearch.org/guide/reference/api/bulk.html)
 # for importing the data.
 
-# So, for demonstration purposes, let's suppose we have a plain collection of hashes to store.
+# So, for demonstration purposes, let's suppose we have a simple collection of hashes to store.
 #
 articles = [
 
@@ -134,7 +133,7 @@ end
 Tire.index 'articles' do
   delete
 
-  # ... by just passing a block to the `import` method. The collection will
+  # ... by passing a block to the `import` method. The collection will
   # be available in the block argument.
   #
   import articles do |documents|
@@ -152,8 +151,7 @@ end
 
 # With the documents indexed and stored in the _ElasticSearch_ database, we can search them, finally.
 #
-# Tire exposes the search interface via simple domain-specific language.
-
+# _Tire_ exposes the search interface via simple domain-specific language.
 
 #### Simple Query String Searches
 
@@ -161,7 +159,7 @@ end
 #
 s = Tire.search('articles') do
   query do
-    string "title:One"
+    string "title:one"
   end
 end
 
@@ -189,12 +187,14 @@ s.results.each do |document|
   puts "* #{ document.title } [published: #{document.published_on}]"
 end
 
-# Of course, we may write the blocks in shorter notation.
-# Local variables from outer scope are passed down the chain.
+# Notice, that we can access local variables from the _enclosing scope_.
+# (Of course, we may write the blocks in shorter notation.)
 
-# Let's search for articles whose titles begin with letter “T”.
+# We will define the query in a local variable named `q`...
 #
 q = "title:T*"
+# ... and we can use it inside the `query` block.
+#
 s = Tire.search('articles') { query { string q } }
 
 # The results:
@@ -205,17 +205,50 @@ s.results.each do |document|
   puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
 end
 
-# In fact, we can use any valid [Lucene query syntax](http://lucene.apache.org/java/3_0_3/queryparsersyntax.html)
-# for the query string queries.
+# Often, we need to access variables or methods defined in the _outer scope_.
+# To do that, we have to use a slight variation of the DSL.
+#
 
-# For debugging, we can display the JSON which is being sent to _ElasticSearch_.
+# Let's assume we have a plain Article class.
+#
+class Article
+
+  # We will define the query in a class method...
+  #
+  def self.q
+    "title:T*"
+  end
+
+  # ... and wrap the _Tire_ search method.
+  def self.search
+
+    # Notice how we pass the `search` object around as a block argument.
+    #
+    Tire.search('articles') do |search|
+
+      # And we pass the query object in a similar matter.
+      #
+      search.query do |query|
+
+        # Which means we can access the `q` class method.
+        #
+        query.string self.q
+      end
+    end.results
+  end
+end
+
+# We may use any valid [Lucene query syntax](http://lucene.apache.org/java/3_0_3/queryparsersyntax.html)
+# for the `query_string` queries.
+
+# For debugging our queries, we can display the JSON which is being sent to _ElasticSearch_.
 #
 #     {"query":{"query_string":{"query":"title:T*"}}}
 #
 puts "", "Query:", "-"*80
 puts s.to_json
 
-# Or better, we may display a complete `curl` command to recreate the request in terminal,
+# Or better yet, we may display a complete `curl` command to recreate the request in terminal,
 # so we can see the naked response, tweak request parameters and meditate on problems.
 #
 #     curl -X POST "http://localhost:9200/articles/_search?pretty=true" \
@@ -279,8 +312,6 @@ end
 
 ### Complex Searching
 
-#### Other Types of Queries
-
 # Query strings are convenient for simple searches, but we may want to define our queries more expressively,
 # using the _ElasticSearch_ [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/index.html).
 #
@@ -326,6 +357,71 @@ s.results.each do |document|
   puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
 end
 
+#### Boolean Queries
+
+# Quite often, we need complex queries with boolean logic.
+# Instead of composing long query strings such as `tags:ruby OR tags:java AND NOT tags:python`,
+# we can use the [_bool_](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
+# query.
+
+s = Tire.search('articles') do
+  query do
+
+    # In _Tire_, we can build `bool` queries declaratively, as usual.
+    boolean do
+
+      # Let's define a `should` (`OR`) query for _ruby_,
+      #
+      should   { string 'tags:ruby' }
+
+      # as well as for _java_,
+      should   { string 'tags:java' }
+
+      # while defining a `must_not` (`AND NOT`) query for _python_.
+      must_not { string 'tags:python' }
+    end
+  end
+end
+
+# The search returns these documents:
+#
+#     * One [tags: ruby]
+#     * Three [tags: java]
+#     * Four [tags: ruby, php]
+#
+s.results.each do |document|
+  puts "* #{ document.title } [tags: #{document.tags.join(', ')}]"
+end
+
+# The best thing about `boolean` queries is that we can very easily save these partial queries as Ruby blocks,
+# to mix and reuse them later, since we can call the `boolean` method multiple times.
+#
+
+# Let's define the query for the _tags_ property,
+#
+tags_query = lambda do |boolean|
+  boolean.should { string 'tags:ruby' }
+  boolean.should { string 'tags:java' }
+end
+
+# ... and a query for the _published_on_ property.
+published_on_query = lambda do |boolean|
+  boolean.must   { string 'published_on:[2011-01-01 TO 2011-01-02]' }
+end
+
+# Now, we can use the `tags_query` on its own.
+#
+Tire.search('articles') { query { boolean &tags_query } }
+
+# Or, we can combine it with the `published_on` query.
+#
+Tire.search('articles') do
+  query do
+    boolean &tags_query
+    boolean &published_on_query
+  end
+end
+
 # _ElasticSearch_ supports many types of [queries](http://www.elasticsearch.org/guide/reference/query-dsl/).
 #
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
@@ -333,6 +429,7 @@ end
 # * [string](http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html)
 # * [term](http://elasticsearch.org/guide/reference/query-dsl/term-query.html)
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
+# * [bool](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
 # * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
 # * [ids](http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html)
 

@@ -52,8 +52,9 @@ namespace :tire do
     end
 
     unless index.exists?
-      puts "[IMPORT] Creating index '#{index.name}' with mapping:",
-           MultiJson.encode(klass.mapping_to_hash, :pretty => true)
+      mapping = defined?(Yajl) ? Yajl::Encoder.encode(klass.mapping_to_hash, :pretty => true) :
+                                 MultiJson.encode(klass.mapping_to_hash)
+      puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
       index.create :mappings => klass.mapping_to_hash
     end
 

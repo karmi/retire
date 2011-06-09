@@ -67,8 +67,8 @@ module Tire::Search
 
     context "BooleanQuery" do
 
-      should "raise ArgumentError when no block given" do
-        assert_raise(ArgumentError) { Query.new.boolean }
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.boolean }
       end
 
       should "encode options" do
@@ -111,6 +111,19 @@ module Tire::Search
         assert_equal( { :query_string => {:query => 'bar'} }, query[:bool][:must].first )
         assert_equal( { :query_string => {:query => 'baz'} }, query[:bool][:must].last )
         assert_equal( { :query_string => {:query => 'fuu'} }, query[:bool][:must_not].first )
+      end
+
+      should "allow passing variables from outer scope" do
+        q1 = 'foo'
+        q2 = 'bar'
+        query = Query.new.boolean do |boolean|
+          boolean.must { |query| query.string q1 }
+          boolean.must { |query| query.string q2 }
+        end
+
+        assert_equal( 2, query[:bool][:must].size, query[:bool][:must].inspect )
+        assert_equal( { :query_string => {:query => 'foo'} }, query[:bool][:must].first )
+        assert_equal( { :query_string => {:query => 'bar'} }, query[:bool][:must].last )
       end
 
     end

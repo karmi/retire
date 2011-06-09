@@ -41,6 +41,14 @@ module Tire
 
     end
 
+    context "Array" do
+
+      should "encode itself to JSON" do
+        assert_equal '["one","two"]', ['one','two'].to_json
+      end
+
+    end
+
   end
 
 end

@@ -4,7 +4,7 @@ module Tire
     class Query
       def initialize(&block)
         @value = {}
-        self.instance_eval(&block) if block_given?
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
       def term(field, value)
@@ -25,9 +25,10 @@ module Tire
       end
 
       def boolean(options={}, &block)
-        # TODO: Try to get rid of the `boolean` method
-        raise ArgumentError, "Please pass a block to boolean query" unless block_given?
-        @value = BooleanQuery.new(options, &block).to_hash
+        @boolean ||= BooleanQuery.new(options)
+        block.arity < 1 ? @boolean.instance_eval(&block) : block.call(@boolean) if block_given?
+        @value[:bool] = @boolean.to_hash
+        @value
       end
 
       def all
@@ -66,7 +67,7 @@ module Tire
       def initialize(options={}, &block)
         @options = options
         @value   = {}
-        self.instance_eval(&block)
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
       def must(&block)
@@ -85,7 +86,7 @@ module Tire
       end
 
       def to_hash
-        { :bool => @value.update(@options) }
+        @value.update(@options)
       end
     end
 

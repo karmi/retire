@@ -189,8 +189,69 @@ count for articles tagged 'php' is excluded, since they don't match the current 
     # java       1
 ```
 
-If configuring the search payload with a block somehow feels too weak for you, you can simply pass
-a Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
+Notice, that only variables from the enclosing scope are accesible.
+If we want to access the variables or methods from outer scope,
+we have to use a slight variation of the DSL, by passing the
+`search` and `query` objects around.
+
+```ruby
+    @query = 'title:T*'
+
+    Tire.search 'articles' do |search|
+      search.query do |query|
+        query.string @query
+      end
+    end
+```
+
+Quite often, we need complex queries with boolean logic.
+Instead of composing long query strings such as `tags:ruby OR tags:java AND NOT tags:python`,
+we can use the [_bool_](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
+query. In _Tire_, we build them declaratively.
+
+```ruby
+    Tire.search('articles') do
+      query do
+        boolean do
+          should   { string 'tags:ruby' }
+          should   { string 'tags:java' }
+          must_not { string 'tags:python' }
+        end
+      end
+    end
+```
+
+The best thing about `boolean` queries is that we can easily save these partial queries as Ruby blocks,
+to mix and reuse them later. So, we may define a query for the _tags_ property:
+
+```ruby
+    tags_query = lambda do
+      boolean.should { string 'tags:ruby' }
+      boolean.should { string 'tags:java' }
+    end
+```
+
+And a query for the _published_on_ property:
+
+```ruby
+    published_on_query = lambda do
+      boolean.must   { string 'published_on:[2011-01-01 TO 2011-01-02]' }
+    end
+```
+
+Now, we can combine these queries for different searches:
+
+```ruby
+    Tire.search('articles') do
+      query do
+        boolean &tags_query
+        boolean &published_on_query
+      end
+    end
+```
+
+If configuring the search payload with blocks somehow feels too weak for you, you can pass
+a plain old Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
 ```ruby
     Tire.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }

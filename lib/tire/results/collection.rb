@@ -17,15 +17,16 @@ module Tire
                        document = {}
 
                        # Update the document with content and ID
-                       document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
+                       document = h['_source'] ? add_source_to_document(h['_source'], document) : document.update( h['fields'] || {} )
                        document.update( {'id' => h['_id']} )
-
+                       
                        # Update the document with meta information
                        ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
-
+                       
                        object = Configuration.wrapper.new(document)
                        # TODO: Figure out how to circumvent mass assignment protection for id in ActiveRecord
                        object.id = h['_id'] if object.respond_to?(:id=)
+                       
                        # TODO: Figure out how mark record as "not new record" in ActiveRecord
                        object.instance_variable_set(:@new_record, false) if object.respond_to?(:new_record?)
                        object
@@ -53,7 +54,35 @@ module Tire
       def to_ary
         self
       end
+      
+      private
+      
+      def add_source_to_document(_source, document)
+        symbol_table = {}
+        
+        _source.each do |k, v|
+          if k.to_s.match /^_source./
+            add_to_symbol_table( symbol_table, k, v )
+          else
+            document[k] = v
+          end
+        end
+        
+        document.update symbol_table
+      end
+      
+      def add_to_symbol_table(symbol_table, k, v)
+        exploded_keys = k.sub('_source.', '').split('.')
+        variable_name = exploded_keys.pop
 
+        current_hash = symbol_table
+        exploded_keys.each do |key|
+          new_hash = current_hash[key] && current_hash[key].is_a?(Hash) ? current_hash[key] : {}
+          current_hash[key] = new_hash
+          current_hash = new_hash
+        end
+        current_hash[ variable_name ] = v
+      end
     end
 
   end

@@ -27,8 +27,18 @@ index 'articles' do
   refresh
 end
 
+s = search 'attachments-index' do
+  query do
+    boolean do
+      must { term :hash, '6e961aabb904c6a838603adadfd2ca0a_805888' }
+      must { term :hash, '6e961aabb904c6a838603adadfd2ca0a_805888' }
+    end
+  end
+end
+
 s = search 'articles' do
   query do
+    b
     string 'T*'
   end
 

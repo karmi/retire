@@ -25,11 +25,8 @@ namespace :test do
 end
 
 # Generate documentation
-begin
-  require 'sdoc'
-rescue LoadError
-end
-require 'rake/rdoctask'
+begin; require 'sdoc'; rescue LoadError; end
+require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "Tire"
@@ -58,17 +55,17 @@ namespace :web do
   task :update => :generate do
     current_branch = `git branch --no-color`.split("\n").select { |line| line =~ /^\* / }.to_s.gsub(/\* (.*)/, '\1')
     (puts "Unable to determine current branch"; exit(1) ) unless current_branch
-    system "git stash save && git checkout web"
+    system "git checkout web"
     system "cp examples/tire-dsl.html index.html"
     system "git add index.html && git co -m 'Updated Tire website'"
     system "git push origin web:gh-pages -f"
-    system "git checkout #{current_branch} && git stash pop"
+    system "git checkout #{current_branch}"
   end
 
   desc "Generate the Rocco documentation page"
   task :generate do
     system "rocco examples/tire-dsl.rb"
-    html = File.read('examples/tire-dsl.html').gsub!(/tire\-dsl\.rb/, 'tire.rb')
+    html = File.read('examples/tire-dsl.html').gsub!(/>tire\-dsl\.rb</, '>tire.rb<')
     File.open('examples/tire-dsl.html', 'w') { |f| f.write html }
     system "open examples/tire-dsl.html"
   end

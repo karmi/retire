@@ -9,10 +9,9 @@ module Tire
         @options = indices.last.is_a?(Hash) ? indices.pop  : {}
         @indices = indices
         raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
-        if @options
-          Configuration.wrapper @options[:wrapper] if @options[:wrapper]
-        end
-        instance_eval(&block) if block_given?
+
+        Configuration.wrapper @options[:wrapper] if @options[:wrapper]
+        block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
 
       def query(&block)
@@ -22,7 +21,7 @@ module Tire
       end
 
       def sort(&block)
-        @sort = Sort.new(&block)
+        @sort = Sort.new(&block).to_ary
         self
       end
 
@@ -91,7 +90,7 @@ module Tire
         request.update( { :size => @size } )       if @size
         request.update( { :from => @from } )       if @from
         request.update( { :fields => @fields } )   if @fields
-        MultiJson.encode(request)
+        request.to_json
       end
 
       def logged(error=nil)
