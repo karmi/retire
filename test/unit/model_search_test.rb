@@ -260,7 +260,10 @@ module Tire
 
         context "with index update callbacks" do
           setup do
-            ::ModelWithIndexCallbacks._update_elastic_search_index_callbacks.clear
+            class ::ModelWithIndexCallbacks
+              _update_elastic_search_index_callbacks.clear
+              def notify; end
+            end
           end
 
           should "run the callback defined as block" do
@@ -278,9 +281,7 @@ module Tire
             class ::ModelWithIndexCallbacks
               after_update_elastic_search_index :notify
 
-              def notify
-                self.go!
-              end
+              def notify; self.go!; end
             end
 
             @model = ::ModelWithIndexCallbacks.new
@@ -289,9 +290,9 @@ module Tire
             @model.update_elastic_search_index
           end
 
-          should_eventually "set the 'matches' property from percolated response" do
-            @model = ModelWithIndexCallbacks.new
-            @model.expects(:_matches)
+          should "set the 'matches' property from percolated response" do
+            @model = ::ModelWithIndexCallbacks.new
+            @model.expects(:matches=)
 
             @model.update_elastic_search_index
           end

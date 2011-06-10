@@ -14,7 +14,7 @@ module Tire
           extend  ClassMethods
           include InstanceMethods
 
-          ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each do |attr|
+          ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches'].each do |attr|
             # TODO: Find a sane way to add attributes like _score for ActiveRecord -
             #       `define_attribute_methods [attr]` does not work in AR.
             define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
@@ -83,8 +83,7 @@ module Tire
             else
               response  = index.store  document_type, self
               self.id ||= response['_id'] if self.respond_to?(:id=)
-              # TODO:
-              # self._matches = response['matches']
+              self.matches = response['matches'] if response
               self
             end
           end
