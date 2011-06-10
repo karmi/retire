@@ -75,8 +75,6 @@ module Tire
     end
 
     def bulk_store documents
-      create unless exists?
-
       payload = documents.map do |document|
         old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
         id = case
