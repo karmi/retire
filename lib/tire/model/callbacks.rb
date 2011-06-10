@@ -15,6 +15,10 @@ module Tire
             def destroyed?; !!@destroyed; end
           end
         end
+
+        base.class_eval do
+          define_model_callbacks(:update_elastic_search_index, :only => [:after, :before])
+        end if base.respond_to?(:define_model_callbacks)
       end
 
     end

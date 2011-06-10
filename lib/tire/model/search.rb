@@ -76,12 +76,16 @@ module Tire
         end
 
         def update_elastic_search_index
-          if destroyed?
-            index.remove document_type, self
-          else
-            response  = index.store  document_type, self
-            self.id ||= response['_id'] if self.respond_to?(:id=)
-            self
+          _run_update_elastic_search_index_callbacks do
+            if destroyed?
+              index.remove document_type, self
+            else
+              response  = index.store  document_type, self
+              self.id ||= response['_id'] if self.respond_to?(:id=)
+              # TODO:
+              # self._matches = response['matches']
+              self
+            end
           end
         end
 

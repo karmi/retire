@@ -1,5 +1,16 @@
 require 'test_helper'
 
+class ModelWithIndexCallbacks
+  extend ActiveModel::Naming
+  extend ActiveModel::Callbacks
+
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+
+  def destroyed?;         false;        end
+  def serializable_hash;  {:one => 1};  end
+end
+
 module Tire
   module Model
 
@@ -18,6 +29,11 @@ module Tire
         should "have the search method" do
           assert_respond_to Model::Search, :search
           assert_respond_to ActiveModelArticle, :search
+        end
+
+        should "have the `update_elastic_search_index` callback methods defined" do
+          assert_respond_to ::ModelWithIndexCallbacks, :before_update_elastic_search_index
+          assert_respond_to ::ModelWithIndexCallbacks, :after_update_elastic_search_index
         end
 
         should_eventually "contain all Tire class/instance methods in a proxy object" do
@@ -226,6 +242,7 @@ module Tire
 
             class ::ModelWithCustomMapping
               extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
 
               include Tire::Model::Search
               include Tire::Model::Callbacks
@@ -237,6 +254,46 @@ module Tire
             end
 
             assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
+          end
+
+        end
+
+        context "with index update callbacks" do
+          setup do
+            ::ModelWithIndexCallbacks._update_elastic_search_index_callbacks.clear
+          end
+
+          should "run the callback defined as block" do
+            class ::ModelWithIndexCallbacks
+              after_update_elastic_search_index { self.go! }
+            end
+
+            @model = ::ModelWithIndexCallbacks.new
+            @model.expects(:go!)
+
+            @model.update_elastic_search_index
+          end
+
+          should "run the callback defined as symbol" do
+            class ::ModelWithIndexCallbacks
+              after_update_elastic_search_index :notify
+
+              def notify
+                self.go!
+              end
+            end
+
+            @model = ::ModelWithIndexCallbacks.new
+            @model.expects(:go!)
+
+            @model.update_elastic_search_index
+          end
+
+          should_eventually "set the 'matches' property from percolated response" do
+            @model = ModelWithIndexCallbacks.new
+            @model.expects(:_matches)
+
+            @model.update_elastic_search_index
           end
 
         end
@@ -253,6 +310,7 @@ module Tire
 
             class ::ModelWithoutMapping
               extend  ActiveModel::Naming
+              extend ActiveModel::Callbacks
               include ActiveModel::Serialization
               include Tire::Model::Search
               include Tire::Model::Callbacks
@@ -279,6 +337,7 @@ module Tire
 
             class ::ModelWithMapping
               extend  ActiveModel::Naming
+              extend ActiveModel::Callbacks
               include ActiveModel::Serialization
               include Tire::Model::Search
               include Tire::Model::Callbacks
