@@ -216,7 +216,7 @@ module Tire
 
         should "store the record in index on :update_elastic_search_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
-          Tire::Index.any_instance.expects(:store)
+          Tire::Index.any_instance.expects(:store).returns({})
 
           @model.save
         end
@@ -264,6 +264,11 @@ module Tire
               _update_elastic_search_index_callbacks.clear
               def notify; end
             end
+
+            response = { 'ok'  => true,
+                         '_id' => 1,
+                         'matches' => ['foo'] }
+            Configuration.client.expects(:post).returns(mock_response(response.to_json))
           end
 
           should "run the callback defined as block" do
@@ -292,9 +297,9 @@ module Tire
 
           should "set the 'matches' property from percolated response" do
             @model = ::ModelWithIndexCallbacks.new
-            @model.expects(:matches=)
-
             @model.update_elastic_search_index
+
+            assert_equal ['foo'], @model.matches
           end
 
         end

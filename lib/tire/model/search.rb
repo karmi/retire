@@ -83,7 +83,7 @@ module Tire
             else
               response  = index.store  document_type, self
               self.id ||= response['_id'] if self.respond_to?(:id=)
-              self.matches = response['matches'] if response
+              self.matches = response['matches']
               self
             end
           end
