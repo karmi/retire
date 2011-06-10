@@ -43,7 +43,7 @@ module Tire
         s = Search::Search.new('index') do
           query { string 'title:foo' }
         end
-        assert_equal %q|curl -X POST "http://localhost:9200/index/_search?pretty=true" -d | +
+        assert_equal %q|curl -X GET "http://localhost:9200/index/_search?pretty=true" -d | +
                      %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
                      s.to_curl
       end
@@ -63,7 +63,7 @@ module Tire
 
       should "perform the search" do
         response = stub(:body => '{"took":1,"hits":[]}', :code => 200)
-        Configuration.client.expects(:post).returns(response)
+        Configuration.client.expects(:get).returns(response)
         Results::Collection.expects(:new).returns([])
 
         s = Search::Search.new('index')
@@ -73,7 +73,7 @@ module Tire
       end
 
       should "print debugging information on exception and re-raise it" do
-        Configuration.client.expects(:post).raises(RestClient::InternalServerError)
+        Configuration.client.expects(:get).raises(RestClient::InternalServerError)
         STDERR.expects(:puts)
 
         s = Search::Search.new('index')
@@ -84,7 +84,7 @@ module Tire
         Configuration.logger STDERR
 
         response = stub(:body => '{"took":1,"hits":[]}', :code => 200)
-        Configuration.client.expects(:post).returns(response)
+        Configuration.client.expects(:get).returns(response)
 
         Results::Collection.expects(:new).returns([])
         Configuration.logger.expects(:log_request).returns(true)

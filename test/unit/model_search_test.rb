@@ -70,7 +70,7 @@ module Tire
 
         should "wrap results in proper class with ID and score and not change the original wrapper" do
           response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 0.8, '_source' => { 'title' => 'Article' }}] } }
-          Configuration.client.expects(:post).returns(mock_response(response.to_json))
+          Configuration.client.expects(:get).returns(mock_response(response.to_json))
 
           collection = ActiveModelArticle.search 'foo'
           assert_instance_of Results::Collection, collection

@@ -31,7 +31,7 @@ class Test::Unit::TestCase
 end
 
 module Test::Integration
-  URL = "http://localhost:9200"
+  URL = "http://localhost.aws:9200"
 
   def setup
     begin
