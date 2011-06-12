@@ -80,17 +80,21 @@ module Tire
         %Q|curl -X POST "#{Configuration.url}/#{indices.join(',')}/_search?pretty=true" -d '#{self.to_json}'|
       end
 
-      def to_json
+      def to_hash
         request = {}
-        request.update( { :query  => @query } )
-        request.update( { :sort   => @sort } )     if @sort
-        request.update( { :facets => @facets } )   if @facets
-        @filters.each { |filter| request.update( { :filter => filter } ) } if @filters
-        request.update( { :highlight => @highlight } ) if @highlight
-        request.update( { :size => @size } )       if @size
-        request.update( { :from => @from } )       if @from
-        request.update( { :fields => @fields } )   if @fields
-        request.to_json
+        request.update( { :query  => @query.to_hash } )    if @query
+        request.update( { :sort   => @sort.to_ary   } )    if @sort
+        request.update( { :facets => @facets.to_hash } )   if @facets
+        @filters.each { |filter| request.update( { :filter => filter.to_hash } ) } if @filters
+        request.update( { :highlight => @highlight.to_hash } ) if @highlight
+        request.update( { :size => @size } )               if @size
+        request.update( { :from => @from } )               if @from
+        request.update( { :fields => @fields } )           if @fields
+        request
+      end
+
+      def to_json
+        to_hash.to_json
       end
 
       def logged(error=nil)

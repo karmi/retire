@@ -55,6 +55,16 @@ module Tire
         assert_match /index_1,index_2/, s.to_curl
       end
 
+      should "return itself as a Hash" do
+        s = Search::Search.new('index_1', 'index_2') do
+          query { string 'title:foo' }
+        end
+        assert_nothing_raised do
+          assert_instance_of Hash,  s.to_hash
+          assert_equal "title:foo", s.to_hash[:query][:query_string][:query]
+        end
+      end
+
       should "allow chaining" do
         assert_nothing_raised do
           Search::Search.new('index').query { }.sort { title 'desc' }.size(5).sort { name 'asc' }.from(1)
