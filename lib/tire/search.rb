@@ -65,7 +65,7 @@ module Tire
 
       def perform
         @url      = "#{Configuration.url}/#{indices.join(',')}/_search"
-        @response = Configuration.client.post(@url, self.to_json)
+        @response = Configuration.client.get(@url, self.to_json)
         @json     = MultiJson.decode(@response.body)
         @results  = Results::Collection.new(@json, @options)
         self
@@ -77,7 +77,7 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X POST "#{Configuration.url}/#{indices.join(',')}/_search?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{Configuration.url}/#{indices.join(',')}/_search?pretty=true" -d '#{self.to_json}'|
       end
 
       def to_json

@@ -3,7 +3,7 @@ module Tire
   module Client
 
     class Base
-      def get(url)
+      def get(url, data=nil)
         raise_no_method_error
       end
       def post(url, data)
@@ -21,8 +21,8 @@ module Tire
     end
 
     class RestClient < Base
-      def self.get(url)
-        ::RestClient.get url
+      def self.get(url, data=nil)
+        ::RestClient::Request.new(:method => :get, :url => url, :payload => data).execute
       end
       def self.post(url, data)
         ::RestClient.post url, data

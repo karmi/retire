@@ -86,21 +86,21 @@ module Tire
         end
 
         should "find document by list of IDs" do
-          Configuration.client.expects(:post).returns(mock_response(@find_last_two.to_json))
+          Configuration.client.expects(:get).returns(mock_response(@find_last_two.to_json))
           documents = PersistentArticle.find 2, 3
 
           assert_equal 2, documents.count
         end
 
         should "find document by array of IDs" do
-          Configuration.client.expects(:post).returns(mock_response(@find_last_two.to_json))
+          Configuration.client.expects(:get).returns(mock_response(@find_last_two.to_json))
           documents = PersistentArticle.find [2, 3]
 
           assert_equal 2, documents.count
         end
 
         should "find all documents" do
-          Configuration.client.stubs(:post).returns(mock_response(@find_all.to_json))
+          Configuration.client.stubs(:get).returns(mock_response(@find_all.to_json))
           documents = PersistentArticle.all
 
           assert_equal 3, documents.count
@@ -109,7 +109,7 @@ module Tire
         end
 
         should "find first document" do
-          Configuration.client.expects(:post).returns(mock_response(@find_first.to_json))
+          Configuration.client.expects(:get).returns(mock_response(@find_first.to_json))
           document = PersistentArticle.first
 
           assert_equal 'First', document.attributes['title']
