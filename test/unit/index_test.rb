@@ -393,6 +393,123 @@ module Tire
 
       end
 
+      context "when percolating" do
+
+        should "register percolator query as a Hash" do
+          query = { :query => { :query_string => { :query => 'foo' } } }
+          Configuration.client.expects(:post).with do |url, payload|
+                                               payload = MultiJson.decode(payload)
+                                               url == "#{Configuration.url}/_percolator/dummy/my-query" &&
+                                               payload['query']['query_string']['query'] == 'foo'
+                               end.
+                               returns(mock_response('{
+                                                        "ok" : true,
+                                                        "_index" : "_percolator",
+                                                        "_type" : "dummy",
+                                                        "_id" : "my-query",
+                                                        "_version" : 1
+                                                     }'))
+
+          @index.register_percolator_query 'my-query', query
+        end
+
+        should "register percolator query as a block" do
+          Configuration.client.expects(:post).with do |url, payload|
+                                               payload = MultiJson.decode(payload)
+                                               url == "#{Configuration.url}/_percolator/dummy/my-query" &&
+                                               payload['query']['query_string']['query'] == 'foo'
+                               end.
+                               returns(mock_response('{
+                                                        "ok" : true,
+                                                        "_index" : "_percolator",
+                                                        "_type" : "dummy",
+                                                        "_id" : "my-query",
+                                                        "_version" : 1
+                                                     }'))
+
+          @index.register_percolator_query 'my-query' do
+            string 'foo'
+          end
+        end
+
+        should "register percolator query with a key" do
+          query = { :query => { :query_string => { :query => 'foo' } },
+                    :tags  => ['alert'] }
+
+          Configuration.client.expects(:post).with do |url, payload|
+                                               payload = MultiJson.decode(payload)
+                                               url == "#{Configuration.url}/_percolator/dummy/my-query" &&
+                                               payload['query']['query_string']['query'] == 'foo'
+                                               payload['tags'] == ['alert']
+                                           end.
+                               returns(mock_response('{
+                                                        "ok" : true,
+                                                        "_index" : "_percolator",
+                                                        "_type" : "dummy",
+                                                        "_id" : "my-query",
+                                                        "_version" : 1
+                                                     }'))
+
+          assert @index.register_percolator_query('my-query', query)
+        end
+
+        should "percolate document against all registered queries" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                               payload = MultiJson.decode(payload)
+                                               url == "#{Configuration.url}/dummy/document/_percolate" &&
+                                               payload['doc']['title'] == 'Test'
+                                              end.
+                               returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+          matches = @index.percolate :title => 'Test'
+          assert_equal ["alerts"], matches
+        end
+
+        should "percolate a typed document against all registered queries" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                               payload = MultiJson.decode(payload)
+                                               url == "#{Configuration.url}/dummy/article/_percolate" &&
+                                               payload['doc']['title'] == 'Test'
+                                              end.
+                               returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+          matches = @index.percolate :article, :title => 'Test'
+          assert_equal ["alerts"], matches
+        end
+
+        should "percolate document against specific queries" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                               payload = MultiJson.decode(payload)
+                                               # p [url, payload]
+                                               url == "#{Configuration.url}/dummy/document/_percolate" &&
+                                               payload['doc']['title']                   == 'Test' &&
+                                               payload['query']['query_string']['query'] == 'tag:alerts'
+                                              end.
+                               returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+          matches = @index.percolate(:title => 'Test') { string 'tag:alerts' }
+          assert_equal ["alerts"], matches
+        end
+
+        context "when storing document" do
+
+          should "percolate document against all registered queries" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=*", '{"title":"Test"}').
+                                 returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+            @index.store :article, :title => 'Test', :percolate => true
+          end
+
+          should "percolate document against specific queries" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=tag:alerts", '{"title":"Test"}').
+                                 returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+            response = @index.store :article, :title => 'Test', :percolate => 'tag:alerts'
+            assert_equal response['matches'], ['alerts']
+          end
+
+        end
+
+      end
+
     end
 
   end

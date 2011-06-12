@@ -42,11 +42,17 @@ module Tire
 
     def store(*args)
       # TODO: Infer type from the document (hash property, method)
+      # TODO: Refactor common logic for getting id, JSON, into private methods
 
       if args.size > 1
         (type, document = args)
       else
         (document = args.pop; type = :document)
+      end
+
+      if document.is_a?(Hash)
+        percolate = document.delete(:percolate)
+        percolate = "*" if percolate === true
       end
 
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
@@ -62,7 +68,8 @@ module Tire
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
       end
 
-      url = id ? "#{Configuration.url}/#{@name}/#{type}/#{id}" : "#{Configuration.url}/#{@name}/#{type}/"
+      url  = id ? "#{Configuration.url}/#{@name}/#{type}/#{id}" : "#{Configuration.url}/#{@name}/#{type}/"
+      url += "?percolate=#{percolate}" if percolate
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
@@ -205,6 +212,48 @@ module Tire
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_close"|
       logged(error, '_close', curl)
+    end
+
+    def register_percolator_query(name, options={}, &block)
+      options[:query] = Search::Query.new(&block).to_hash if block_given?
+
+      @response = Configuration.client.put "#{Configuration.url}/_percolator/#{@name}/#{name}", MultiJson.encode(options)
+      MultiJson.decode(@response.body)['ok']
+      rescue Exception => error
+        raise
+      ensure
+        curl = %Q|curl -X POST "#{Configuration.url}/_percolator/#{@name}/"|
+        logged(error, '_percolator', curl)
+    end
+
+    def percolate(*args, &block)
+      # TODO: Infer type from the document (hash property, method)
+
+      if args.size > 1
+        (type, document = args)
+      else
+        (document = args.pop; type = :document)
+      end
+
+      document = case true
+        when document.is_a?(String) then document
+        when document.respond_to?(:to_hash) then document.to_hash
+        else raise ArgumentError, "Please pass a JSON string or object with a 'to_hash' method"
+      end
+
+      query = Search::Query.new(&block).to_hash if block_given?
+
+      payload = { :doc => document }
+      payload.update( :query => query ) if query
+
+      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/_percolate", payload.to_json
+      MultiJson.decode(@response.body)['matches']
+
+      rescue Exception => error
+        # raise
+      ensure
+        curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/#{type}/_percolate"|
+        logged(error, '_percolate', curl)
     end
 
     def logged(error=nil, endpoint='/', curl='')
