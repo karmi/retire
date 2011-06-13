@@ -1693,6 +1693,277 @@ features, and <em>Tire</em> makes them trivial to use.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
+    <tr id='section-Percolation'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-Percolation">&#182;</a>
+        </div>
+        <h3>Percolation</h3>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-127'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-127">&#182;</a>
+        </div>
+        <p><em>ElasticSearch</em> comes with one very interesting, and rather unique feature:
+<a href="http://www.elasticsearch.org/guide/reference/api/percolate.html"><em>percolation</em></a>.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-128'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-128">&#182;</a>
+        </div>
+        <p>It works in a „reverse search“ manner to regular search workflow of adding
+documents to the index and then querying them.
+Percolation allows us to register a query, and ask if a specific document
+matches it, either on demand, or immediately as the document is being indexed.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-129'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-129">&#182;</a>
+        </div>
+        <p>Let&rsquo;s review an example for an index named <em>weather</em>.
+We will register three queries for percolation against this index.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">index</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;weather&#39;</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">delete</span>
+  <span class="n">create</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-130'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-130">&#182;</a>
+        </div>
+        <p>First, a query named <em>warning</em>,</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;warning&#39;</span><span class="p">,</span> <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;warning&#39;</span><span class="o">]</span><span class="p">)</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;warning OR severe OR extreme&#39;</span> <span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-131'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-131">&#182;</a>
+        </div>
+        <p>a query named <em>tsunami</em>,</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;tsunami&#39;</span><span class="p">,</span> <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;tsunami&#39;</span><span class="o">]</span><span class="p">)</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tsunami&#39;</span> <span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-132'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-132">&#182;</a>
+        </div>
+        <p>and a query named <em>floods</em>.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;floods&#39;</span><span class="p">,</span>  <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;floods&#39;</span><span class="o">]</span><span class="p">)</span>  <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;flood*&#39;</span> <span class="p">}</span>
+
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-133'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-133">&#182;</a>
+        </div>
+        <p>Notice, that we have added a <em>tags</em> field to the query document, because it behaves
+just like any other document in <em>ElasticSearch</em>.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-134'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-134">&#182;</a>
+        </div>
+        <p>We will refresh the <code>_percolator</code> index for immediate access.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;_percolator&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">refresh</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-135'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-135">&#182;</a>
+        </div>
+        <p>Now, let&rsquo;s <em>percolate</em> a document containing some trigger words against all registered queries.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">matches</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">percolate</span><span class="p">(</span><span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Extreme flooding expected after tsunami wave.&#39;</span><span class="p">)</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-136'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-136">&#182;</a>
+        </div>
+        <p>The result will contain, unsurprisingly, names of all the three registered queries:</p>
+
+<pre><code>Matching queries: ["floods", "tsunami", "warning"]
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">matches</span><span class="o">.</span><span class="n">inspect</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-137'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-137">&#182;</a>
+        </div>
+        <p>We can filter the executed queries with a regular <em>ElasticSearch</em> query passed as a block to
+the <code>percolate</code> method.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">matches</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">percolate</span><span class="p">(</span><span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Extreme flooding expected after tsunami wave.&#39;</span><span class="p">)</span> <span class="k">do</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-138'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-138">&#182;</a>
+        </div>
+        <p>Let&rsquo;s use a <em>terms</em> query against the <code>tags</code> field.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>            <span class="n">term</span> <span class="ss">:tags</span><span class="p">,</span> <span class="s1">&#39;tsunami&#39;</span>
+          <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-139'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-139">&#182;</a>
+        </div>
+        <p>In this case, the result will contain only the name of the “tsunami” query.</p>
+
+<pre><code>Matching queries: ["tsunami"]
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">matches</span><span class="o">.</span><span class="n">inspect</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-140'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-140">&#182;</a>
+        </div>
+        <p>What if we percolate another document, without the “tsunami” trigger word?</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">matches</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">percolate</span><span class="p">(</span><span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Extreme temperatures expected.&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">term</span> <span class="ss">:tags</span><span class="p">,</span> <span class="s1">&#39;tsunami&#39;</span> <span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-141'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-141">&#182;</a>
+        </div>
+        <p>As expected, we will get an empty array:</p>
+
+<pre><code>Matching queries: []
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">matches</span><span class="o">.</span><span class="n">inspect</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-142'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-142">&#182;</a>
+        </div>
+        <p>Well, that&rsquo;s of course immensely useful for real-time search systems. But, there&rsquo;s more.
+We can <em>percolate</em> a document <em>at the same time</em> it is being stored in the index,
+getting back a list of matching queries.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-143'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-143">&#182;</a>
+        </div>
+        <p>Let&rsquo;s store a document with some trigger words in the index, and mark it for percolation.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span><span class="p">,</span> <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="kp">true</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-144'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-144">&#182;</a>
+        </div>
+        <p>We will get the names of all matching queries in response.</p>
+
+<pre><code>Matching queries: ["floods", "tsunami", "warning"]
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">response</span><span class="o">[</span><span class="s1">&#39;matches&#39;</span><span class="o">].</span><span class="n">inspect</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-145'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-145">&#182;</a>
+        </div>
+        <p>As with the <em>percolate</em> example, we can filter the executed queries.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span><span class="p">,</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-146'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-146">&#182;</a>
+        </div>
+        <p>Let&rsquo;s use a simple string query for the “tsunami” tag.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>                       <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="s1">&#39;tags:tsunami&#39;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-147'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-147">&#182;</a>
+        </div>
+        <p>Unsurprisingly, the response will contain just the name of the “tsunami” query.</p>
+
+<pre><code>Matching queries: ["tsunami"]
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">response</span><span class="o">[</span><span class="s1">&#39;matches&#39;</span><span class="o">].</span><span class="n">inspect</span></pre></div>
+      </td>
+    </tr>
     <tr id='section-ActiveModel_Integration'>
       <td class=docs>
         <div class="pilwrap">
@@ -1704,10 +1975,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-127'>
+    <tr id='section-149'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-127">&#182;</a>
+          <a class="pilcrow" href="#section-149">&#182;</a>
         </div>
         <p>As you can see, <a href="https://github.com/karmi/tire"><em>Tire</em></a> supports the
 main features of <em>ElasticSearch</em> in Ruby.</p>
