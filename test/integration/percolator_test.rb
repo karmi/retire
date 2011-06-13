@@ -34,6 +34,20 @@ module Tire
           assert percolator
         end
 
+        should "unregister a query" do
+          query = { :query => { :query_string => { :query => 'warning' } } }
+          assert @index.register_percolator_query('alert', query)
+          Tire.index('_percolator').refresh; sleep 0.1
+          assert Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
+
+          assert @index.unregister_percolator_query('alert')
+          Tire.index('_percolator').refresh; sleep 0.1
+
+          assert_raise(RestClient::ResourceNotFound) do
+            Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
+          end
+        end
+
       end
 
       context "when percolating a document" do

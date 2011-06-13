@@ -453,6 +453,12 @@ module Tire
           assert @index.register_percolator_query('my-query', query)
         end
 
+        should "unregister percolator query" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/_percolator/dummy/my-query").
+                               returns(mock_response('{"ok":true,"acknowledged":true}'))
+          assert @index.unregister_percolator_query('my-query')
+        end
+
         should "percolate document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)

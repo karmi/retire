@@ -225,6 +225,14 @@ module Tire
         curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
         logged(error, '_percolator', curl)
     end
+
+    def unregister_percolator_query(name)
+      @response = Configuration.client.delete "#{Configuration.url}/_percolator/#{@name}/#{name}"
+      MultiJson.decode(@response.body)['ok']
+      rescue Exception => error
+        raise
+      ensure
+        curl = %Q|curl -X DELETE "#{Configuration.url}/_percolator/#{@name}"|
         logged(error, '_percolator', curl)
     end
 
