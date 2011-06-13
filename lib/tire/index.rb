@@ -222,7 +222,9 @@ module Tire
       rescue Exception => error
         raise
       ensure
-        curl = %Q|curl -X POST "#{Configuration.url}/_percolator/#{@name}/"|
+        curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
+        logged(error, '_percolator', curl)
+    end
         logged(error, '_percolator', curl)
     end
 
@@ -246,13 +248,13 @@ module Tire
       payload = { :doc => document }
       payload.update( :query => query ) if query
 
-      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/_percolate", payload.to_json
+      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/_percolate", MultiJson.encode(payload)
       MultiJson.decode(@response.body)['matches']
 
       rescue Exception => error
         # raise
       ensure
-        curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/#{type}/_percolate"|
+        curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/#{type}/_percolate?pretty=1" -d '#{payload.to_json}'|
         logged(error, '_percolate', curl)
     end
 
