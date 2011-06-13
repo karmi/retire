@@ -7,16 +7,20 @@ module Tire
 
     context "Percolator" do
       setup do
+        delete_registered_queries
         @index = Tire.index('percolator-test')
         @index.create
       end
-      teardown { @index.delete }
+      teardown do
+        delete_registered_queries
+        @index.delete
+      end
 
       context "when registering a query" do
         should "register query as a Hash" do
           query = { :query => { :query_string => { :query => 'warning' } } }
           assert @index.register_percolator_query('alert', query)
-          sleep 0.1
+          Tire.index('_percolator').refresh; sleep 0.1
 
           percolator = Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
           assert percolator
@@ -24,7 +28,7 @@ module Tire
 
         should "register query as block" do
           assert @index.register_percolator_query('alert') { string 'warning' }
-          sleep 0.1
+          Tire.index('_percolator').refresh; sleep 0.1
 
           percolator = Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
           assert percolator
@@ -37,7 +41,7 @@ module Tire
           @index.register_percolator_query('alert') { string 'warning' }
           @index.register_percolator_query('gantz') { string '"y u no match"' }
           @index.register_percolator_query('weather', :tags => ['weather']) { string 'severe' }
-          sleep 0.1
+          Tire.index('_percolator').refresh; sleep 0.1
         end
 
         should "return an empty array when no query matches" do
@@ -61,7 +65,7 @@ module Tire
           @index.register_percolator_query('alert') { string 'warning' }
           @index.register_percolator_query('gantz') { string '"y u no match"' }
           @index.register_percolator_query('weather', :tags => ['weather']) { string 'severe' }
-          sleep 0.1
+          Tire.index('_percolator').refresh; sleep 0.1
         end
 
         should "return an empty array when no query matches" do
@@ -82,5 +86,14 @@ module Tire
 
     end
 
+    private
+
+    def delete_registered_queries
+      Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert") rescue nil
+      Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/gantz") rescue nil
+      Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/weather") rescue nil
+    end
+
   end
+
 end
