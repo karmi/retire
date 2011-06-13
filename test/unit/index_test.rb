@@ -397,7 +397,7 @@ module Tire
 
         should "register percolator query as a Hash" do
           query = { :query => { :query_string => { :query => 'foo' } } }
-          Configuration.client.expects(:post).with do |url, payload|
+          Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
                                                payload['query']['query_string']['query'] == 'foo'
@@ -414,7 +414,7 @@ module Tire
         end
 
         should "register percolator query as a block" do
-          Configuration.client.expects(:post).with do |url, payload|
+          Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
                                                payload['query']['query_string']['query'] == 'foo'
@@ -436,7 +436,7 @@ module Tire
           query = { :query => { :query_string => { :query => 'foo' } },
                     :tags  => ['alert'] }
 
-          Configuration.client.expects(:post).with do |url, payload|
+          Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
                                                payload['query']['query_string']['query'] == 'foo'
@@ -454,7 +454,7 @@ module Tire
         end
 
         should "percolate document against all registered queries" do
-          Configuration.client.expects(:post).with do |url,payload|
+          Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
                                                url == "#{Configuration.url}/dummy/document/_percolate" &&
                                                payload['doc']['title'] == 'Test'
@@ -466,7 +466,7 @@ module Tire
         end
 
         should "percolate a typed document against all registered queries" do
-          Configuration.client.expects(:post).with do |url,payload|
+          Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
                                                url == "#{Configuration.url}/dummy/article/_percolate" &&
                                                payload['doc']['title'] == 'Test'
@@ -478,7 +478,7 @@ module Tire
         end
 
         should "percolate document against specific queries" do
-          Configuration.client.expects(:post).with do |url,payload|
+          Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
                                                # p [url, payload]
                                                url == "#{Configuration.url}/dummy/document/_percolate" &&
