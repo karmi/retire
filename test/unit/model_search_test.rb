@@ -307,6 +307,10 @@ module Tire
         context "serialization" do
           setup { Tire::Index.any_instance.stubs(:create).returns(true) }
 
+          should "have to_hash" do
+            assert_equal( {'title' => 'Test'}, ActiveModelArticle.new( 'title' => 'Test' ).to_hash )
+          end
+
           should "serialize itself into JSON without 'root'" do
             @model = ActiveModelArticle.new 'title' => 'Test'
             assert_equal({'title' => 'Test'}.to_json, @model.to_indexed_json)
