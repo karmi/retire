@@ -1,5 +1,5 @@
 module Tire
-  VERSION          = "0.1.10"
+  VERSION          = "0.1.11"
 
   CHANGELOG =<<-END
     CHANGES FROM 0.1.8:
