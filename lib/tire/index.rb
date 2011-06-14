@@ -44,14 +44,14 @@ module Tire
       # TODO: Infer type from the document (hash property, method)
       # TODO: Refactor common logic for getting id, JSON, into private methods
 
-      if args.size > 1
-        (type, document = args)
-      else
-        (document = args.pop; type = :document)
+      case args.size
+        when 3 then (type, document, options = args)
+        when 2 then (type, document = args)
+        else        (document = args.pop; type = :document)
       end
 
-      if document.is_a?(Hash)
-        percolate = document.delete(:percolate)
+      if options
+        percolate = options[:percolate]
         percolate = "*" if percolate === true
       end
 

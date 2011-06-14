@@ -497,18 +497,18 @@ module Tire
           assert_equal ["alerts"], matches
         end
 
-        context "when storing document" do
+        context "while storing document" do
 
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=*", '{"title":"Test"}').
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
-            @index.store :article, :title => 'Test', :percolate => true
+            @index.store :article, {:title => 'Test'}, {:percolate => true}
           end
 
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=tag:alerts", '{"title":"Test"}').
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
-            response = @index.store :article, :title => 'Test', :percolate => 'tag:alerts'
+            response = @index.store :article, {:title => 'Test'}, {:percolate => 'tag:alerts'}
             assert_equal response['matches'], ['alerts']
           end
 

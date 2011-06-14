@@ -376,6 +376,121 @@ module Tire
 
         end
 
+        context "with percolation" do
+          setup do
+            class ::ActiveModelArticleWithCallbacks; percolate!(false); end
+            @article = ::ActiveModelArticleWithCallbacks.new :title => 'Test'
+          end
+
+          should "return matching queries on percolate" do
+            Tire::Index.any_instance.expects(:percolate).returns(["alert"])
+
+            assert_equal ['alert'], @article.percolate
+          end
+
+          should "pass the arguments to percolate" do
+            filter   = lambda { string 'tag:alerts' }
+
+            Tire::Index.any_instance.expects(:percolate).with do |type,doc,query|
+              # p [type,doc,query]
+              type  == 'active_model_article_with_callbacks' &&
+              doc   == @article &&
+              query == filter
+            end.returns(["alert"])
+
+            assert_equal ['alert'], @article.percolate(&filter)
+          end
+
+          should "mark the instance for percolation on index update" do
+            @article.percolate = true
+
+            Tire::Index.any_instance.expects(:store).with do |type,doc,options|
+              # p [type,doc,options]
+              options[:percolate] == true
+            end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+            @article.update_elastic_search_index
+          end
+
+          should "not percolate document on index update when not set for percolation" do
+            Tire::Index.any_instance.expects(:store).with do |type,doc,options|
+              # p [type,doc,options]
+              options[:percolate] == nil
+            end.returns(MultiJson.decode('{"ok":true,"_id":"test"}'))
+
+            @article.update_elastic_search_index
+          end
+
+          should "set the default percolator pattern" do
+            class ::ActiveModelArticleWithPercolation < ::ActiveModelArticleWithCallbacks
+              percolate!
+            end
+
+            assert_equal true, ::ActiveModelArticleWithCallbacks.percolator
+          end
+
+          should "set the percolator pattern" do
+            class ::ActiveModelArticleWithPercolation < ::ActiveModelArticleWithCallbacks
+              percolate! 'tags:alert'
+            end
+
+            assert_equal 'tags:alert', ::ActiveModelArticleWithCallbacks.percolator
+          end
+
+          should "mark the class for percolation on index update" do
+            class ::ActiveModelArticleWithPercolation < ::ActiveModelArticleWithCallbacks
+              percolate!
+            end
+
+            Tire::Index.any_instance.expects(:store).with do |type,doc,options|
+              # p [type,doc,options]
+              options[:percolate] == true
+            end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+            percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
+            percolated.update_elastic_search_index
+          end
+
+          should "execute the 'on_percolate' callback" do
+            $test__matches = nil
+            class ::ActiveModelArticleWithPercolation < ::ActiveModelArticleWithCallbacks
+              on_percolate { $test__matches = matches }
+            end
+            percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
+
+            Tire::Index.any_instance.expects(:store).
+                                     with do |type,doc,options|
+                                       doc == percolated &&
+                                       options[:percolate] == true
+                                     end.
+                                     returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+            percolated.update_elastic_search_index
+
+            assert_equal ['alerts'], $test__matches
+          end
+
+          should "execute the 'on_percolate' callback for specific pattern" do
+            $test__matches = nil
+            class ::ActiveModelArticleWithPercolation < ::ActiveModelArticleWithCallbacks
+              on_percolate('tags:alert') { $test__matches = self.matches }
+            end
+            percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
+
+            Tire::Index.any_instance.expects(:store).
+                                     with do |type,doc,options|
+                                       doc == percolated &&
+                                       options[:percolate] == 'tags:alert'
+                                     end.
+                                     returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+
+            percolated.update_elastic_search_index
+
+            assert_equal ['alerts'], $test__matches
+          end
+
+        end
+
       end
 
     end

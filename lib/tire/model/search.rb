@@ -11,6 +11,9 @@ module Tire
           extend  Tire::Model::Indexing::ClassMethods
           extend  Tire::Model::Import::ClassMethods
 
+          extend  Tire::Model::Percolate::ClassMethods
+          include Tire::Model::Percolate::InstanceMethods
+
           extend  ClassMethods
           include InstanceMethods
 
@@ -81,7 +84,7 @@ module Tire
             if destroyed?
               index.remove document_type, self
             else
-              response  = index.store  document_type, self
+              response  = index.store( document_type, self, {:percolate => self.percolator} )
               self.id ||= response['_id'] if self.respond_to?(:id=)
               self.matches = response['matches']
               self
