@@ -23,6 +23,10 @@ module Tire
             define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
             define_method("#{attr}")  { @attributes[attr] }
           end
+
+          def to_hash
+            self.serializable_hash
+          end unless instance_methods.map(&:to_sym).include?(:to_hash)
         end
       end
 
@@ -90,10 +94,6 @@ module Tire
               self
             end
           end
-        end
-
-        def to_hash
-          self.serializable_hash
         end
 
         def to_indexed_json

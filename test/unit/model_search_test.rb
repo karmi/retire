@@ -311,6 +311,19 @@ module Tire
             assert_equal( {'title' => 'Test'}, ActiveModelArticle.new( 'title' => 'Test' ).to_hash )
           end
 
+          should "not redefine to_hash if already defined" do
+            class ::ActiveModelArticleWithToHash < ActiveModelArticle
+              def to_hash; { :foo => 'bar' }; end
+            end
+            assert_equal 'bar', ::ActiveModelArticleWithToHash.new(:title => 'Test').to_hash[:foo]
+
+            class ::ActiveModelArticleWithToHashFromSuperclass < Hash
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+            end
+            assert_equal( {}, ::ActiveModelArticleWithToHashFromSuperclass.new(:title => 'Test').to_hash)
+          end
+
           should "serialize itself into JSON without 'root'" do
             @model = ActiveModelArticle.new 'title' => 'Test'
             assert_equal({'title' => 'Test'}.to_json, @model.to_indexed_json)
