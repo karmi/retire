@@ -53,5 +53,20 @@ Gem::Specification.new do |s|
    It has full ActiveRecord/ActiveModel compatibility, allowing you to index
    your models (incrementally upon saving, or in bulk), searching and
    paginating the results.
+
+   Please check the documentation at <http://karmi.github.com/tire/>.
   DESC
+
+  s.post_install_message =<<-CHANGELOG.gsub(/^  /, '')
+  ================================================================================
+
+    Please check the documentation at <http://karmi.github.com/tire/>.
+
+  --------------------------------------------------------------------------------
+
+#{Tire::CHANGELOG}
+    See the full changelog at <http://github.com/karmi/tire/commits/v#{Tire::VERSION}>.
+
+  --------------------------------------------------------------------------------
+  CHANGELOG
 end
