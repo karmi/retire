@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
-  <title>Reversed or “Real Time” Search in ElasticSearch</title>
+  <title>percolated-twitter.rb</title>
   <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
 </head>
 <body>
@@ -11,11 +11,22 @@
   <table cellspacing=0 cellpadding=0>
   <thead>
     <tr>
-      <th class=docs><h1>Reversed or “Real Time” Search in ElasticSearch</h1></th>
+      <th class=docs><h1>percolated-twitter.rb</h1></th>
       <th class=code></th>
     </tr>
   </thead>
   <tbody>
+    <tr id='section-Reversed_or_“Real_Time”_Search_in_ElasticSearch'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-Reversed_or_“Real_Time”_Search_in_ElasticSearch">&#182;</a>
+        </div>
+        <h1>Reversed or “Real Time” Search in ElasticSearch</h1>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
     <tr id='section-2'>
       <td class=docs>
         <div class="pilwrap">
@@ -115,8 +126,9 @@ receiving notifications when any status message matches one of our queries.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-5">&#182;</a>
         </div>
-        <p>Let&rsquo;s define callback for percolation. Whenewer a new document is saved in the index,
-we will have access to matching queries in the <code>Status#matches</code> property.</p>
+        <p>Let&rsquo;s define callback for percolation.
+Whenewer a new document is saved in the index, this block will be executed,
+and we will have access to matching queries in the <code>Status#matches</code> property.</p>
 
 <p>In our case, we will just print the list of matching queries.</p>
       </td>
