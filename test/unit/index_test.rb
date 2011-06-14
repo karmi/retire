@@ -232,14 +232,14 @@ module Tire
 
         should "serialize Hashes" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/_bulk"
-            json =~ /"_index":"dummy"/
-            json =~ /"_type":"document"/
-            json =~ /"_id":"1"/
-            json =~ /"_id":"2"/
-            json =~ /"id":"1"/
-            json =~ /"id":"2"/
-            json =~ /"title":"One"/
+            url  == "#{Configuration.url}/_bulk" &&
+            json =~ /"_index":"dummy"/ &&
+            json =~ /"_type":"document"/ &&
+            json =~ /"_id":"1"/ &&
+            json =~ /"_id":"2"/ &&
+            json =~ /"id":"1"/ &&
+            json =~ /"id":"2"/ &&
+            json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
           end.returns('{}')
 
@@ -249,14 +249,14 @@ module Tire
 
         should "serialize ActiveModel instances" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/_bulk"
-            json =~ /"_index":"active_model_articles"/
-            json =~ /"_type":"article"/
-            json =~ /"_id":"1"/
-            json =~ /"_id":"2"/
-            json =~ /"id":"1"/
-            json =~ /"id":"2"/
-            json =~ /"title":"One"/
+            url  == "#{Configuration.url}/_bulk" &&
+            json =~ /"_index":"active_model_articles"/ &&
+            json =~ /"_type":"active_model_article"/ &&
+            json =~ /"_id":"1"/ &&
+            json =~ /"_id":"2"/ &&
+            json =~ /"id":"1"/ &&
+            json =~ /"id":"2"/ &&
+            json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
           end.returns('{}')
 
