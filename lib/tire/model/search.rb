@@ -90,7 +90,10 @@ module Tire
             else
               response  = index.store( document_type, self, {:percolate => self.percolator} )
               self.id ||= response['_id'] if self.respond_to?(:id=)
-              self.matches = response['matches']
+              self._index   = response['_index']
+              self._type    = response['_type']
+              self._version = response['_version']
+              self.matches  = response['matches']
               self
             end
           end
