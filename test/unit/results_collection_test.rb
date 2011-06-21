@@ -37,6 +37,11 @@ module Tire
         end
       end
 
+      should "be populated lazily" do
+        collection = Results::Collection.new(@default_response)
+        assert_nil collection.instance_variable_get(:@results)
+      end
+
       should "store passed options" do
         collection = Results::Collection.new( @default_response, :per_page => 20, :page => 2 )
         assert_equal 20, collection.options[:per_page]
