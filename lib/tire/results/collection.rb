@@ -25,17 +25,19 @@ module Tire
 
                # Update the document with content and ID
                document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
-               document.update( {'id' => h['_id']} )
 
                # Update the document with meta information
                ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
 
-               object = @wrapper.new(document)
-               # TODO: Figure out how to circumvent mass assignment protection for id in ActiveRecord
-               object.id = h['_id'] if object.respond_to?(:id=)
-               # TODO: Figure out how mark record as "not new record" in ActiveRecord
-               object.instance_variable_set(:@new_record, false) if object.respond_to?(:new_record?)
-               object
+               # for instantiating ActiveRecord with arbitrary attributes and setting @new_record etc.
+               if @wrapper.respond_to?(:instantiate, true)
+                 object = @wrapper.send(:instantiate, document)
+                 object.id = h['_id'] if object.respond_to?(:id=)
+                 object
+               else
+                 document.update( {'id' => h['_id']} )
+                 @wrapper.new(document)
+               end
              end
            end
         end
