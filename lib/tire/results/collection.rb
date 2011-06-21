@@ -25,17 +25,15 @@ module Tire
 
                # Update the document with content and ID
                document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
+               document.update( {'id' => h['_id']} )
 
                # Update the document with meta information
                ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
 
                # for instantiating ActiveRecord with arbitrary attributes and setting @new_record etc.
                if @wrapper.respond_to?(:instantiate, true)
-                 object = @wrapper.send(:instantiate, document)
-                 object.id = h['_id'] if object.respond_to?(:id=)
-                 object
+                 @wrapper.send(:instantiate, document)
                else
-                 document.update( {'id' => h['_id']} )
                  @wrapper.new(document)
                end
              end
