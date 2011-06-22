@@ -5,49 +5,56 @@ module Tire
       include Enumerable
       include Pagination
 
-      attr_reader :time, :total, :options, :results, :facets
+      attr_reader :time, :total, :options, :facets
 
       def initialize(response, options={})
-        @options = options
-        @time    = response['took'].to_i
-        @total   = response['hits']['total'].to_i
-        @results = response['hits']['hits'].map do |h|
-                     if Configuration.wrapper == Hash then h
-                     else
-                       document = {}
+        @response = response
+        @options  = options
+        @time     = response['took'].to_i
+        @total    = response['hits']['total'].to_i
+        @facets   = response['facets']
+        @wrapper  = Configuration.wrapper
+      end
 
-                       # Update the document with content and ID
-                       document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
-                       document.update( {'id' => h['_id']} )
+      def results
+        @results ||= begin
+          @response['hits']['hits'].map do |h|
+             if @wrapper == Hash then h
+             else
+               document = {}
 
-                       # Update the document with meta information
-                       ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
+               # Update the document with content and ID
+               document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( h['fields'] || {} )
+               document.update( {'id' => h['_id']} )
 
-                       object = Configuration.wrapper.new(document)
-                       # TODO: Figure out how to circumvent mass assignment protection for id in ActiveRecord
-                       object.id = h['_id'] if object.respond_to?(:id=)
-                       # TODO: Figure out how mark record as "not new record" in ActiveRecord
-                       object.instance_variable_set(:@new_record, false) if object.respond_to?(:new_record?)
-                       object
-                     end
-                   end
-        @facets  = response['facets']
+               # Update the document with meta information
+               ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
+
+               # for instantiating ActiveRecord with arbitrary attributes and setting @new_record etc.
+               if @wrapper.respond_to?(:instantiate, true)
+                 @wrapper.send(:instantiate, document)
+               else
+                 @wrapper.new(document)
+               end
+             end
+           end
+        end
       end
 
       def each(&block)
-        @results.each(&block)
+        results.each(&block)
       end
 
       def empty?
-        @results.empty?
+        results.empty?
       end
 
       def size
-        @results.size
+        results.size
       end
 
       def [](index)
-        @results[index]
+        results[index]
       end
 
       def to_ary
