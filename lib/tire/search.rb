@@ -107,7 +107,7 @@ module Tire
 
           if Configuration.logger.level.to_s == 'debug'
             # FIXME: Depends on RestClient implementation
-            body = @response ? MultiJson.encode(@json, :pretty => true) : body = error.http_body
+            body = @response ? MultiJson.encode(@json.merge(:pretty => true)) : body = error.http_body
           else
             body = ''
           end

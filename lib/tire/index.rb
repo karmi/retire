@@ -275,7 +275,7 @@ module Tire
 
         if Configuration.logger.level.to_s == 'debug'
           # FIXME: Depends on RestClient implementation
-          body = @response ? MultiJson.encode(@response.body, :pretty => true) : error.http_body rescue ''
+          body = @response ? MultiJson.encode(MultiJson.decode(@response.body).merge(:pretty => true)) : error.http_body rescue ''
         else
           body = ''
         end
