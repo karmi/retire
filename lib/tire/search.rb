@@ -107,7 +107,11 @@ module Tire
 
           if Configuration.logger.level.to_s == 'debug'
             # FIXME: Depends on RestClient implementation
-            body = @response ? MultiJson.encode(@json.merge(:pretty => true)) : body = error.http_body
+            body = if @response
+              defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
+            else
+              error.http_body rescue ''
+            end
           else
             body = ''
           end
