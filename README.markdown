@@ -557,4 +557,4 @@ You can send feedback via [e-mail](mailto:karmi@karmi.cz) or via [Github Issues]
 
 -----
 
-[Karel Minarik](http://karmi.cz)
+[Karel Minarik](http://karmi.cz) and [contributors](http://github.com/karmi/tire/contributors)
