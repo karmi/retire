@@ -14,6 +14,12 @@ module Tire
       false
     end
 
+    def size
+      return MultiJson.decode(Configuration.client.get("#{Configuration.url}/#{@name}/_status"))["indices"][@name.to_s]["docs"]["num_docs"]
+    rescue Exception => error
+      false
+    end
+
     def delete
       # FIXME: RestClient does not return response for DELETE requests?
       @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
