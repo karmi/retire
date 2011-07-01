@@ -29,5 +29,14 @@ module Tire
       Index.new(name, &block)
     end
 
+    def get(name,type,id,raw=false)
+      if raw then
+        return Configuration.client.get("#{Configuration.url}/#{name}/#{type}/#{id}")
+      else
+        return MultiJson.decode(Configuration.client.get("#{Configuration.url}/#{name}/#{type}/#{id}"))
+      end
+    end
+
+
   end
 end
