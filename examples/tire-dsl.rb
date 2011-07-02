@@ -61,14 +61,56 @@ Tire.index 'articles' do
   create
 
   # We want to store and index some articles with `title`, `tags` and `published_on` properties.
-  # Simple Hashes are OK.
+  # Simple Hashes are OK. The default type is „document”.
   #
   store :title => 'One',   :tags => ['ruby'],           :published_on => '2011-01-01'
   store :title => 'Two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02'
-  store :title => 'Three', :tags => ['java'],           :published_on => '2011-01-02'
-  store :title => 'Four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03'
 
-  # We force refreshing the index, so we can query it immediately.
+  # We usually want to set a specific _type_ for the document in _ElasticSearch_.
+  # Simply setting a `type` property is OK.
+  #
+  store :type => 'article',
+        :title => 'Three',
+        :tags => ['java'],
+        :published_on => '2011-01-02'
+
+  # We may want to wrap your data in a Ruby class, and use it when storing data.
+  # The contract required of such a class is very simple.
+  #
+  class Article
+
+    #
+    attr_reader :title, :tags, :published_on
+    def initialize(attributes={})
+      @attributes =  attributes
+      @attributes.each_pair { |name,value| instance_variable_set :"@#{name}", value }
+    end
+
+    # It must provide a `type`, `_type` or `document_type` method for propper mapping.
+    #
+    def type
+      'article'
+    end
+
+    # And it must provide a `to_indexed_json` method for conversion to JSON.
+    #
+    def to_indexed_json
+      @attributes.to_json
+    end
+  end
+
+  # Note: Since our class takes a Hash of attributes on initialization, we may even
+  # wrap the results in instances of this class; we'll see how to do that further below.
+  #
+  article = Article.new :title => 'Four',
+                        :tags => ['ruby', 'php'],
+                        :published_on => '2011-01-03'
+
+  # Let's store the `article`, now.
+  #
+  store article
+
+  # And let's „force refresh“ the index, so we can query it immediately.
   #
   refresh
 end
@@ -77,22 +119,23 @@ end
 # for the index.
 
 Tire.index 'articles' do
-  # To do so, just pass a Hash containing the specified mapping to the `Index#create` method.
+  # To do so, let's just pass a Hash containing the specified mapping to the `Index#create` method.
   #
   create :mappings => {
 
-    # Specify for which type of documents this mapping should be used.
+    # Let's specify for which _type_ of documents this mapping should be used:
+    # „article”, in our case.
     #
     :article => {
       :properties => {
 
-        # Specify the type of the field, whether it should be analyzed, etc.
+        # Let's specify the type of the field, whether it should be analyzed, ...
         #
         :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
 
-        # Set the boost or analyzer settings for the field, ... The _ElasticSearch_ guide
-        # has [more information](http://elasticsearch.org/guide/reference/mapping/index.html)
-        # about this. Proper mapping is key to efficient and effective search.
+        # ... set the boost or analyzer settings for the field, etc. The _ElasticSearch_ guide
+        # has [more information](http://elasticsearch.org/guide/reference/mapping/index.html).
+        # Don't forget, that proper mapping is key to efficient and effective search.
         # But don't fret about getting the mapping right the first time, you won't.
         # In most cases, the default, dynamic mapping is just fine for prototyping.
         #
@@ -116,10 +159,13 @@ articles = [
 
   # Notice that such objects must have an `id` property!
   #
-  { :id => '1', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01' },
-  { :id => '2', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02' },
-  { :id => '3', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02' },
-  { :id => '4', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03' }
+  { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01' },
+
+  # And, of course, they should contain the `type` property for the mapping to work!
+  #
+  { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02' },
+  { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02' },
+  { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03' }
 ]
 
 # We can just push them into the index in one go.
@@ -209,7 +255,7 @@ end
 # To do that, we have to use a slight variation of the DSL.
 #
 
-# Let's assume we have a plain Article class.
+# Let's assume we have a plain Ruby class, named `Article`.
 #
 class Article
 
@@ -219,7 +265,7 @@ class Article
     "title:T*"
   end
 
-  # ... and wrap the _Tire_ search method.
+  # ... and wrap the _Tire_ search method in another one.
   def self.search
 
     # Notice how we pass the `search` object around as a block argument.
@@ -298,13 +344,14 @@ Tire.configure do
   #
   url "http://search.example.com"
 
-  # Second, we may want to wrap the result items in our own class.
+  # Second, we may want to wrap the result items in our own class, for instance
+  # the `Article` class set above.
   #
-  class MySpecialWrapper; end
-  wrapper MySpecialWrapper
+  wrapper Article
 
   # Finally, we can reset one or all configuration settings to their defaults.
   #
+  reset :url
   reset
 
 end
