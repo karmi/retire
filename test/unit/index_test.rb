@@ -101,10 +101,48 @@ module Tire
 
       context "when storing" do
 
-        should "properly set type from args" do
+        should "set type from args" do
           Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}')).twice
           @index.store 'article', :title => 'Test'
           @index.store :article,  :title => 'Test'
+        end
+
+        should "set type from Hash :type property" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{Configuration.url}/dummy/article/"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+          @index.store :type => 'article', :title => 'Test'
+        end
+
+        should "set type from Hash :_type property" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{Configuration.url}/dummy/article/"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+          @index.store :_type => 'article', :title => 'Test'
+        end
+
+        should "set type from Object _type method" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{Configuration.url}/dummy/article/"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          article = Class.new do
+            def _type; 'article'; end
+            def to_indexed_json; "{}"; end
+          end.new
+          @index.store article
+        end
+
+        should "set type from Object type method" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{Configuration.url}/dummy/article/"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          article = Class.new do
+            def type; 'article'; end
+            def to_indexed_json; "{}"; end
+          end.new
+          @index.store article
         end
 
         should "set default type" do

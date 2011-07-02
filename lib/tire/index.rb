@@ -41,13 +41,28 @@ module Tire
     end
 
     def store(*args)
-      # TODO: Infer type from the document (hash property, method)
       # TODO: Refactor common logic for getting id, JSON, into private methods
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id, Object#type deprecation warnings
 
-      case args.size
-        when 3 then (type, document, options = args)
-        when 2 then (type, document = args)
-        else        (document = args.pop; type = :document)
+      case
+        when ( args.size === 3 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
+          type, document, options = args
+        when ( args.size === 2 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
+          type, document = args
+        else
+          # TODO: Move into a `get_type_from_object` method
+          document, options = args
+          type = case
+            when document.respond_to?(:document_type)
+              document.document_type
+            when document.is_a?(Hash)
+              document[:_type] || document[:type]
+            when document.respond_to?(:_type)
+              document._type
+            when document.respond_to?(:type) && document.type != document.class
+              document.type
+            end
+          type ||= :document
       end
 
       if options
@@ -55,7 +70,6 @@ module Tire
         percolate = "*" if percolate === true
       end
 
-      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
       id = case true
         when document.is_a?(Hash)                                           then document[:id] || document['id']
         when document.respond_to?(:id) && document.id != document.object_id then document.id
