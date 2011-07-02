@@ -2,25 +2,7 @@ module Tire
 
   module Client
 
-    class Base
-      def get(url, data=nil)
-        raise_no_method_error
-      end
-      def post(url, data)
-        raise_no_method_error
-      end
-      def put(url, data)
-        raise NoMethodError, "Implement this method in your client class"
-      end
-      def delete(url)
-        raise_no_method_error
-      end
-      def raise_no_method_error
-        raise NoMethodError, "Implement this method in your client class"
-      end
-    end
-
-    class RestClient < Base
+    class RestClient
       def self.get(url, data=nil)
         ::RestClient::Request.new(:method => :get, :url => url, :payload => data).execute
       end

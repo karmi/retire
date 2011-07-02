@@ -31,11 +31,6 @@ module Tire
         assert_equal Client::RestClient, Configuration.client
       end
 
-      should "allow setting and retrieving the client" do
-        assert_nothing_raised { Configuration.client Client::Base }
-        assert_equal Client::Base, Configuration.client
-      end
-
       should "return nil as logger by default" do
         assert_nil Configuration.logger
       end
@@ -48,21 +43,18 @@ module Tire
 
       should "allow to reset the configuration for specific property" do
         Configuration.url 'http://example.com'
-        Configuration.client Client::Base
-        assert_equal 'http://example.com', Configuration.url
+        assert_equal      'http://example.com', Configuration.url
         Configuration.reset :url
-        assert_equal 'http://localhost:9200', Configuration.url
-        assert_equal Client::Base, Configuration.client
+        assert_equal      'http://localhost:9200', Configuration.url
       end
 
       should "allow to reset the configuration for all properties" do
-        Configuration.url 'http://example.com'
-        Configuration.client Client::Base
-        assert_equal 'http://example.com', Configuration.url
-        assert_equal Client::Base, Configuration.client
+        Configuration.url     'http://example.com'
+        Configuration.wrapper Hash
+        assert_equal          'http://example.com', Configuration.url
         Configuration.reset
-        assert_equal 'http://localhost:9200', Configuration.url
-        assert_equal Client::RestClient, Configuration.client
+        assert_equal          'http://localhost:9200', Configuration.url
+        assert_equal          Client::RestClient, Configuration.client
       end
     end
 
