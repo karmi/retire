@@ -417,8 +417,8 @@ module Tire
           should "mark the instance for percolation on index update" do
             @article.percolate = true
 
-            Tire::Index.any_instance.expects(:store).with do |type,doc,options|
-              # p [type,doc,options]
+            Tire::Index.any_instance.expects(:store).with do |doc,options|
+              # p [doc,options]
               options[:percolate] == true
             end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
@@ -426,8 +426,8 @@ module Tire
           end
 
           should "not percolate document on index update when not set for percolation" do
-            Tire::Index.any_instance.expects(:store).with do |type,doc,options|
-              # p [type,doc,options]
+            Tire::Index.any_instance.expects(:store).with do |doc,options|
+              # p [doc,options]
               options[:percolate] == nil
             end.returns(MultiJson.decode('{"ok":true,"_id":"test"}'))
 
@@ -455,8 +455,8 @@ module Tire
               percolate!
             end
 
-            Tire::Index.any_instance.expects(:store).with do |type,doc,options|
-              # p [type,doc,options]
+            Tire::Index.any_instance.expects(:store).with do |doc,options|
+              # p [doc,options]
               options[:percolate] == true
             end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
@@ -472,7 +472,7 @@ module Tire
             percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
 
             Tire::Index.any_instance.expects(:store).
-                                     with do |type,doc,options|
+                                     with do |doc,options|
                                        doc == percolated &&
                                        options[:percolate] == true
                                      end.
@@ -491,7 +491,7 @@ module Tire
             percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
 
             Tire::Index.any_instance.expects(:store).
-                                     with do |type,doc,options|
+                                     with do |doc,options|
                                        doc == percolated &&
                                        options[:percolate] == 'tags:alert'
                                      end.

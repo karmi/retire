@@ -86,9 +86,9 @@ module Tire
         def update_elastic_search_index
           _run_update_elastic_search_index_callbacks do
             if destroyed?
-              index.remove document_type, self
+              index.remove self
             else
-              response  = index.store( document_type, self, {:percolate => self.percolator} )
+              response  = index.store( self, {:percolate => self.percolator} )
               self.id ||= response['_id'] if self.respond_to?(:id=)
               self._index   = response['_index']
               self._type    = response['_type']
