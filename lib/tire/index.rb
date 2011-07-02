@@ -135,18 +135,21 @@ module Tire
     def remove(*args)
       if args.size > 1
         type, document = args
+        id             = get_id_from_document(document) || document
       else
         document = args.pop
         type     = get_type_from_document(document)
+        id       = get_id_from_document(document) || document
       end
-
-      id = get_id_from_document(document) || document
+      raise ArgumentError, "Please pass a document ID" unless id
 
       result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
       MultiJson.decode(result) if result
     end
 
     def retrieve(type, id)
+      raise ArgumentError, "Please pass a document ID" unless id
+
       @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
       h = MultiJson.decode(@response.body)
       if Configuration.wrapper == Hash then h

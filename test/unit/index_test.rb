@@ -220,11 +220,17 @@ module Tire
           assert_equal 'Test', article.title
         end
 
+        should "raise error when no ID passed" do
+          assert_raise ArgumentError do
+            @index.retrieve 'article', nil
+          end
+        end
+
       end
 
       context "when removing" do
 
-        should "properly set type from args" do
+        should "get type from args" do
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
                                                 returns('{"ok":true,"_id":"1"}').twice
           @index.remove 'article', :id => 1, :title => 'Test'
@@ -256,9 +262,9 @@ module Tire
           @index.remove :document, 1
         end
 
-        should_eventually "raise error when document has no ID" do
-          assert_raise Exception do
-            @index.remove :id => nil
+        should "raise error when no ID passed" do
+          assert_raise ArgumentError do
+            @index.remove :document, nil
           end
         end
 
