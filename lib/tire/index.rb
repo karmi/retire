@@ -41,11 +41,16 @@ module Tire
     end
 
     def store(*args)
-      # TODO: Deprecate the old method signature
       case
         when ( args.size === 3 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
+          Tire.warn "Passing the document type as argument in Index#store has been deprecated, " +
+                    "please pass a Hash with _type/type property, or " +
+                    "an object with _type/type/document_type method."
           type, document, options = args
         when ( args.size === 2 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
+          Tire.warn "Passing the document type as argument in Index#store has been deprecated" +
+                    "please pass a Hash with _type/type property, or " +
+                    "an object with _type/type/document_type method."
           type, document = args
         else
           document, options = args

@@ -12,7 +12,7 @@ module Tire
 
         index = Tire.index 'mapped-index' do
           create
-          store :article, :title => 'One'
+          store :type => :article, :title => 'One'
           refresh
         end
         sleep 1.5

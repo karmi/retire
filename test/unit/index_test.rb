@@ -101,12 +101,6 @@ module Tire
 
       context "when storing" do
 
-        should "set type from args" do
-          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}')).twice
-          @index.store 'article', :title => 'Test'
-          @index.store :article,  :title => 'Test'
-        end
-
         should "set type from Hash :type property" do
           Configuration.client.expects(:post).with do |url,document|
             url == "#{Configuration.url}/dummy/article/"
@@ -189,7 +183,7 @@ module Tire
 
           Configuration.client.stubs(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').
                                             returns(mock_response('{"ok":true,"_id":"id-1"}'))
-          @index.store :article, :title => 'Test'
+          @index.store :type => 'article', :title => 'Test'
         end
 
         should "return document in default wrapper" do
@@ -230,11 +224,11 @@ module Tire
 
       context "when removing" do
 
-        should "get type from args" do
+        should "get type from document" do
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
                                                 returns('{"ok":true,"_id":"1"}').twice
-          @index.remove 'article', :id => 1, :title => 'Test'
-          @index.remove :article,  :id => 1, :title => 'Test'
+          @index.remove :id => 1, :type => 'article', :title => 'Test'
+          @index.remove :id => 1, :type => 'article', :title => 'Test'
         end
 
         should "set default type" do
@@ -256,10 +250,10 @@ module Tire
           @index.remove document
         end
 
-        should "get ID from arguments" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+        should "get type and ID from arguments" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
                                                 returns('{"ok":true,"_id":"1"}')
-          @index.remove :document, 1
+          @index.remove :article, 1
         end
 
         should "raise error when no ID passed" do
@@ -556,13 +550,13 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=*", '{"title":"Test"}').
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
-            @index.store :article, {:title => 'Test'}, {:percolate => true}
+            @index.store( {:type => 'article', :title => 'Test'}, {:percolate => true} )
           end
 
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=tag:alerts", '{"title":"Test"}').
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
-            response = @index.store :article, {:title => 'Test'}, {:percolate => 'tag:alerts'}
+            response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => 'tag:alerts'} )
             assert_equal response['matches'], ['alerts']
           end
 
