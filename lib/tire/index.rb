@@ -41,9 +41,7 @@ module Tire
     end
 
     def store(*args)
-      # TODO: Refactor common logic for getting id, JSON, into private methods
-      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id, Object#type deprecation warnings
-
+      # TODO: Refactor common logic for getting JSON into separate methods
       # TODO: Deprecate the old method signature
       case
         when ( args.size === 3 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
@@ -61,7 +59,6 @@ module Tire
       end
 
       id = get_id_from_document(document)
-      $VERBOSE = old_verbose
 
       document = case true
         when document.is_a?(String) then document
@@ -84,10 +81,8 @@ module Tire
 
     def bulk_store documents
       payload = documents.map do |document|
-        old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
         id = get_id_from_document(document)
         # TODO: Raise error or send WARNING when no id present
-        $VERBOSE = old_verbose
 
         type = get_type_from_document(document)
 
@@ -153,9 +148,7 @@ module Tire
         type     = get_type_from_document(document)
       end
 
-      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
       id = get_id_from_document(document) || document
-      $VERBOSE = old_verbose
 
       result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
       MultiJson.decode(result) if result
@@ -278,6 +271,7 @@ module Tire
     end
 
     def get_type_from_document(document)
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       type = case
         when document.respond_to?(:document_type)
           document.document_type
@@ -288,16 +282,20 @@ module Tire
         when document.respond_to?(:type) && document.type != document.class
           document.type
         end
+      $VERBOSE = old_verbose
       type ||= :document
     end
 
     def get_id_from_document(document)
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
       id = case
         when document.is_a?(Hash)
           document[:_id] || document['_id'] || document[:id] || document['id']
         when document.respond_to?(:id) && document.id != document.object_id
           document.id
       end
+      $VERBOSE = old_verbose
+      id
     end
 
   end
