@@ -32,4 +32,10 @@ require 'tire/tasks'
 
 module Tire
   extend DSL
+
+  def warn(message)
+    line = caller.detect { |line| line !~ %r|lib\/tire\/| }.sub(/:in .*/, '')
+    STDERR.puts  "", "\e[31m[DEPRECATION WARNING] #{message}", "(Called from #{line})", "\e[0m"
+  end
+  module_function :warn
 end
