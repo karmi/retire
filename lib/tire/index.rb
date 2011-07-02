@@ -41,7 +41,6 @@ module Tire
     end
 
     def store(*args)
-      # TODO: Refactor common logic for getting JSON into separate methods
       # TODO: Deprecate the old method signature
       case
         when ( args.size === 3 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
@@ -58,13 +57,8 @@ module Tire
         percolate = "*" if percolate === true
       end
 
-      id = get_id_from_document(document)
-
-      document = case true
-        when document.is_a?(String) then document
-        when document.respond_to?(:to_indexed_json) then document.to_indexed_json
-        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
-      end
+      id       = get_id_from_document(document)
+      document = convert_document_to_json(document)
 
       url  = id ? "#{Configuration.url}/#{@name}/#{type}/#{id}" : "#{Configuration.url}/#{@name}/#{type}/"
       url += "?percolate=#{percolate}" if percolate
@@ -88,7 +82,7 @@ module Tire
 
         output = []
         output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
-        output << document.to_indexed_json
+        output << convert_document_to_json(document)
         output.join("\n")
       end
       payload << ""
@@ -97,8 +91,6 @@ module Tire
       count = 0
 
       begin
-        # STDERR.puts "Posting payload..."
-        # STDERR.puts payload.join("\n")
         Configuration.client.post("#{Configuration.url}/_bulk", payload.join("\n"))
       rescue Exception => error
         if count < tries
@@ -227,11 +219,7 @@ module Tire
         type     = get_type_from_document(document)
       end
 
-      document = case
-        when document.is_a?(String) then document
-        when document.respond_to?(:to_hash) then document.to_hash
-        else raise ArgumentError, "Please pass a JSON string or object with a 'to_hash' method"
-      end
+      document = MultiJson.decode convert_document_to_json(document)
 
       query = Search::Query.new(&block).to_hash if block_given?
 
@@ -296,6 +284,14 @@ module Tire
       end
       $VERBOSE = old_verbose
       id
+    end
+
+    def convert_document_to_json(document)
+      document = case
+        when document.is_a?(String) then document
+        when document.respond_to?(:to_indexed_json) then document.to_indexed_json
+        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
+      end
     end
 
   end
