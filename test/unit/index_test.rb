@@ -325,8 +325,12 @@ module Tire
           end
         end
 
-        should_eventually "raise exception when collection item does not have ID" do
-          # TODO: raise exception when collection item does not have ID
+        should "raise exception when collection item does not have ID" do
+          Configuration.client.expects(:post).with { |url, json| url  == "#{Configuration.url}/_bulk" }
+          STDERR.expects(:puts).once
+
+          documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
+          ActiveModelArticle.elasticsearch_index.bulk_store documents
         end
 
       end

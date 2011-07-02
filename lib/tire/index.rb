@@ -75,10 +75,10 @@ module Tire
 
     def bulk_store documents
       payload = documents.map do |document|
-        id = get_id_from_document(document)
-        # TODO: Raise error or send WARNING when no id present
-
+        id   = get_id_from_document(document)
         type = get_type_from_document(document)
+
+        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
         output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
@@ -109,10 +109,7 @@ module Tire
     end
 
     def import(klass_or_collection, method=nil, options={})
-      # p [klass_or_collection, method, options]
-
       case
-
         when method
           options = {:page => 1, :per_page => 1000}.merge options
           while documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page])) \
@@ -126,8 +123,9 @@ module Tire
         when klass_or_collection.respond_to?(:map)
           documents = block_given? ? yield(klass_or_collection) : klass_or_collection
           bulk_store documents
+
         else
-          raise ArgumentError, "Please pass either a collection of objects, "+
+          raise ArgumentError, "Please pass either a collection of objects, " +
                                "or method for fetching records, or Enumerable compatible class"
       end
     end
