@@ -50,19 +50,8 @@ module Tire
         when ( args.size === 2 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
           type, document = args
         else
-          # TODO: Move into a `get_type_from_object` method
           document, options = args
-          type = case
-            when document.respond_to?(:document_type)
-              document.document_type
-            when document.is_a?(Hash)
-              document[:_type] || document[:type]
-            when document.respond_to?(:_type)
-              document._type
-            when document.respond_to?(:type) && document.type != document.class
-              document.type
-            end
-          type ||= :document
+          type = get_type_from_document(document)
       end
 
       if options
@@ -300,6 +289,20 @@ module Tire
 
         Configuration.logger.log_response code, nil, body
       end
+    end
+
+    def get_type_from_document(document)
+      type = case
+        when document.respond_to?(:document_type)
+          document.document_type
+        when document.is_a?(Hash)
+          document.delete(:_type) || document.delete('_type') || document.delete(:type) || document.delete('type')
+        when document.respond_to?(:_type)
+          document._type
+        when document.respond_to?(:type) && document.type != document.class
+          document.type
+        end
+      type ||= :document
     end
 
   end
