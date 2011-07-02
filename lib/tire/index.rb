@@ -44,6 +44,7 @@ module Tire
       # TODO: Refactor common logic for getting id, JSON, into private methods
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id, Object#type deprecation warnings
 
+      # TODO: Deprecate the old method signature
       case
         when ( args.size === 3 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
           type, document, options = args
@@ -94,10 +95,7 @@ module Tire
         end
         $VERBOSE = old_verbose
 
-        type = case
-          when document.is_a?(Hash)                 then document[:type] || document['type']
-          when document.respond_to?(:document_type) then document.document_type
-        end || 'document'
+        type = get_type_from_document(document)
 
         output = []
         output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
@@ -154,12 +152,11 @@ module Tire
     end
 
     def remove(*args)
-      # TODO: Infer type from the document (hash property, method)
-
       if args.size > 1
-        (type, document = args)
+        type, document = args
       else
-        (document = args.pop; type = :document)
+        document = args.pop
+        type     = get_type_from_document(document)
       end
 
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
@@ -240,15 +237,14 @@ module Tire
     end
 
     def percolate(*args, &block)
-      # TODO: Infer type from the document (hash property, method)
-
       if args.size > 1
-        (type, document = args)
+        type, document = args
       else
-        (document = args.pop; type = :document)
+        document = args.pop
+        type     = get_type_from_document(document)
       end
 
-      document = case true
+      document = case
         when document.is_a?(String) then document
         when document.respond_to?(:to_hash) then document.to_hash
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_hash' method"
