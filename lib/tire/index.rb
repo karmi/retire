@@ -60,10 +60,7 @@ module Tire
         percolate = "*" if percolate === true
       end
 
-      id = case true
-        when document.is_a?(Hash)                                           then document[:id] || document['id']
-        when document.respond_to?(:id) && document.id != document.object_id then document.id
-      end
+      id = get_id_from_document(document)
       $VERBOSE = old_verbose
 
       document = case true
@@ -88,11 +85,8 @@ module Tire
     def bulk_store documents
       payload = documents.map do |document|
         old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
-        id = case
-          when document.is_a?(Hash)                                           then document[:id] || document['id']
-          when document.respond_to?(:id) && document.id != document.object_id then document.id
-          # TODO: Raise error when no id present
-        end
+        id = get_id_from_document(document)
+        # TODO: Raise error or send WARNING when no id present
         $VERBOSE = old_verbose
 
         type = get_type_from_document(document)
@@ -160,11 +154,7 @@ module Tire
       end
 
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
-      id = case true
-        when document.is_a?(Hash)                                           then document[:id] || document['id']
-        when document.respond_to?(:id) && document.id != document.object_id then document.id
-        else document
-      end
+      id = get_id_from_document(document) || document
       $VERBOSE = old_verbose
 
       result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
@@ -299,6 +289,15 @@ module Tire
           document.type
         end
       type ||= :document
+    end
+
+    def get_id_from_document(document)
+      id = case
+        when document.is_a?(Hash)
+          document[:_id] || document['_id'] || document[:id] || document['id']
+        when document.respond_to?(:id) && document.id != document.object_id
+          document.id
+      end
     end
 
   end

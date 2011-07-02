@@ -225,16 +225,16 @@ module Tire
       context "when removing" do
 
         should "properly set type from args" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/").
-                                                returns('{"ok":true,"_id":"test"}').twice
-          @index.remove 'article', :title => 'Test'
-          @index.remove :article,  :title => 'Test'
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
+                                                returns('{"ok":true,"_id":"1"}').twice
+          @index.remove 'article', :id => 1, :title => 'Test'
+          @index.remove :article,  :id => 1, :title => 'Test'
         end
 
         should "set default type" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/").
-                                                returns('{"ok":true,"_id":"test"}')
-          @index.remove :title => 'Test'
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+                                                returns('{"ok":true,"_id":"1"}')
+          @index.remove :id => 1, :title => 'Test'
         end
 
         should "get ID from hash" do
@@ -254,6 +254,12 @@ module Tire
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
                                                 returns('{"ok":true,"_id":"1"}')
           @index.remove :document, 1
+        end
+
+        should_eventually "raise error when document has no ID" do
+          assert_raise Exception do
+            @index.remove :id => nil
+          end
         end
 
       end
