@@ -83,17 +83,17 @@ module Tire
         end
 
         should "return an empty array when no query matches" do
-          response = @index.store :document, {:message => 'Situation normal'}, {:percolate => true}
+          response = @index.store( {:message => 'Situation normal'}, {:percolate => true} )
           assert_equal [], response['matches']
         end
 
         should "return an array of matching query names" do
-          response = @index.store :document, {:message => 'Severe weather warning'}, {:percolate => true}
+          response = @index.store( {:message => 'Severe weather warning'}, {:percolate => true} )
           assert_equal ['alert','weather'], response['matches'].sort
         end
 
         should "return an array of matching query names for specific percolated queries" do
-          response = @index.store :document, {:message => 'Severe weather warning'}, {:percolate => 'tags:weather'}
+          response = @index.store( {:message => 'Severe weather warning'}, {:percolate => 'tags:weather'} )
           assert_equal ['weather'], response['matches']
         end
       end

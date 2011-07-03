@@ -219,6 +219,9 @@ module Tire
 
     def percolate(*args, &block)
       if args.size > 1
+        Tire.warn "Passing the document type as argument in Index#percolate has been deprecated, " +
+                  "please pass a Hash with _type/type property, or " +
+                  "an object with _type/type/document_type method."
         type, document = args
       else
         document = args.pop

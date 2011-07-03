@@ -527,7 +527,7 @@ module Tire
                                               end.
                                returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
-          matches = @index.percolate :article, :title => 'Test'
+          matches = @index.percolate :type => 'article', :title => 'Test'
           assert_equal ["alerts"], matches
         end
 
