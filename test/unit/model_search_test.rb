@@ -96,7 +96,7 @@ module Tire
           document = collection.first
 
           assert_instance_of ActiveModelArticle, document
-          assert_not_nil document.score
+          assert_not_nil document._score
           assert_equal 1, document.id
           assert_equal 'Article', document.title
         end

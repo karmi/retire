@@ -75,7 +75,7 @@ module Tire
       module InstanceMethods
 
         def score
-          STDERR.puts "DEPRECATED! Please use #{self.class}#_score instead."
+          Tire.warn "#{self.class}#score has been deprecated, please use #{self.class}#_score instead."
           attributes['_score']
         end
 
