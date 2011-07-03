@@ -98,6 +98,7 @@ module Tire
             end
           end
         end
+        alias :update_elasticsearch_index :update_elastic_search_index
 
         def to_indexed_json
           if self.class.mapping.empty?
