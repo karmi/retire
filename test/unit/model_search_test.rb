@@ -139,26 +139,26 @@ module Tire
           end
 
           should "allow to pass :order option" do
-            Tire::Search::Sort.any_instance.expects(:title)
+            Tire::Search::Sort.any_instance.expects(:by).with('title', nil)
 
             ActiveModelArticle.search @q, :order => 'title'
           end
 
           should "allow to pass :sort option as :order option" do
-            Tire::Search::Sort.any_instance.expects(:title)
+            Tire::Search::Sort.any_instance.expects(:by).with('title', nil)
 
             ActiveModelArticle.search @q, :sort => 'title'
           end
 
           should "allow to specify sort direction" do
-            Tire::Search::Sort.any_instance.expects(:title).with('DESC')
+            Tire::Search::Sort.any_instance.expects(:by).with('title', 'DESC')
 
             ActiveModelArticle.search @q, :order => 'title DESC'
           end
 
           should "allow to specify more fields to sort on" do
-            Tire::Search::Sort.any_instance.expects(:title).with('DESC')
-            Tire::Search::Sort.any_instance.expects(:field).with('author.name', nil)
+            Tire::Search::Sort.any_instance.expects(:by).with('title', 'DESC')
+            Tire::Search::Sort.any_instance.expects(:by).with('author.name', nil)
 
             ActiveModelArticle.search @q, :order => ['title DESC', 'author.name']
           end

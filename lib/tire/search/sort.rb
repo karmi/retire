@@ -4,20 +4,19 @@ module Tire
     class Sort
       def initialize(&block)
         @value = []
-        self.instance_eval(&block) if block_given?
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
-      def field(name, direction=nil)
+      def by(name, direction=nil)
         @value << ( direction ? { name => direction } : name )
         self
       end
 
       def method_missing(id, *args, &block)
-        case arg = args.shift
-          when String, Symbol, Hash then @value << { id => arg }
-          else @value << id
-        end
-        self
+        Tire.warn "Using methods when sorting has been deprecated, please use the `by` method: " +
+                  "sort { by :#{id}#{ args.empty? ? '' : ', ' + args.first.inspect } }"
+
+        by id, args.shift
       end
 
       def to_ary

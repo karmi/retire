@@ -67,7 +67,11 @@ module Tire
 
       should "allow chaining" do
         assert_nothing_raised do
-          Search::Search.new('index').query { }.sort { title 'desc' }.size(5).sort { name 'asc' }.from(1)
+          Search::Search.new('index').query { }.
+                                      sort { by :title, 'desc' }.
+                                      size(5).
+                                      sort { by :name, 'asc' }.
+                                      from(1)
         end
       end
 
@@ -108,8 +112,8 @@ module Tire
         should "allow sorting by multiple fields" do
           s = Search::Search.new('index') do
             sort do
-              title 'desc'
-              _score
+              by :title, 'desc'
+              by :_score
             end
           end
           hash = MultiJson.decode( s.to_json )

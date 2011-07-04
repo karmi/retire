@@ -11,7 +11,7 @@ module Tire
         q = '*'
         s = Tire.search('articles-test') do
           query { string q }
-          sort  { title }
+          sort  { by :title }
         end
 
         assert_equal 5, s.results.count
@@ -22,7 +22,7 @@ module Tire
         q = '*'
         s = Tire.search('articles-test') do
           query { string q }
-          sort  { title :desc }
+          sort  { by :title, :desc }
         end
 
         assert_equal 5, s.results.count

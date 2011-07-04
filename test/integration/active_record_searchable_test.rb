@@ -132,7 +132,7 @@ module Tire
           should "find first page with five results" do
             results = ActiveRecordArticle.search do |search|
               search.query { |query| query.string @q }
-              search.sort  { title }
+              search.sort  { by :title }
               search.from 0
               search.size 5
             end
@@ -149,7 +149,7 @@ module Tire
           should "find next page with five results" do
             results = ActiveRecordArticle.search do |search|
               search.query { |query| query.string @q }
-              search.sort  { title }
+              search.sort  { by :title }
               search.from 5
               search.size 5
             end
@@ -166,7 +166,7 @@ module Tire
           should "not find a missing page" do
             results = ActiveRecordArticle.search do |search|
               search.query { |query| query.string @q }
-              search.sort  { title }
+              search.sort  { by :title }
               search.from 10
               search.size 5
             end
