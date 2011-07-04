@@ -1,12 +1,12 @@
 module Tire
-  VERSION          = "0.1.14"
+  VERSION          = "0.1.15"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    # Added `<after/before>_update_elastic_search_index` callbacks for models
-    # Added percolator support for DSL and ActiveModel
-    # Lazy loading of ResultsCollection into memory
-    # Fixes for debug logging
+    # Cleanup of code for getting document type, id, JSON serialization
+    # Bunch of deprecations: sorting, passing document type to store/remove
+    # Displaying a warning when no ID is passed when storing in bulk
+    # Correct handling of import for Mongoid/Kaminari combos
   END
 end
