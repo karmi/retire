@@ -27,6 +27,11 @@ module Tire
         assert_equal 'http://example.com', Configuration.url
       end
 
+      should "strip trailing slash from the URL" do
+        assert_nothing_raised { Configuration.url 'http://slash.com:9200/' }
+        assert_equal 'http://slash.com:9200', Configuration.url
+      end
+
       should "return default client" do
         assert_equal Client::RestClient, Configuration.client
       end
