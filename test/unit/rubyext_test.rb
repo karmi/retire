@@ -36,7 +36,7 @@ module Tire
 
       should "properly serialize Time into JSON" do
         json = { :time => Time.mktime(2011, 01, 01, 11, 00).to_json  }.to_json
-        assert_equal '"2011-01-01T11:00:00+01:00"', MultiJson.decode(json)['time']
+        assert_match /"2011-01-01T11:00:00.*"/, MultiJson.decode(json)['time']
       end
 
     end
