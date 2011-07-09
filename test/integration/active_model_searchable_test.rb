@@ -63,14 +63,15 @@ module Tire
 
       should "retrieve sorted documents by IDs returned from search" do
         SupermodelArticle.create! :title => 'foo'
-        SupermodelArticle.create! :title => 'bar'
+        SupermodelArticle.create! :id => 'abc123', :title => 'bar'
 
         SupermodelArticle.elasticsearch_index.refresh
         results = SupermodelArticle.search 'foo OR bar^100'
 
         assert_equal 2, results.count
 
-        assert_equal 'bar', results.first.title
+        assert_equal 'bar',    results.first.title
+        assert_equal 'abc123', results.first.id
       end
 
     end
