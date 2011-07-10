@@ -17,7 +17,12 @@ module Tire
         end
 
         def indexes(name, options = {})
-          # p "#{self}, SEARCH PROPERTY, #{name}"
+          # TODO: if block given, create hash ans store the mapping
+          # defined in the block:
+          #     indexes :author do
+          #       indexes :last_name, :type => ...
+          #    end
+          # 
           mapping[name] = options
         end
 
