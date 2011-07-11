@@ -16,14 +16,21 @@ module Tire
           end
         end
 
-        def indexes(name, options = {})
-          # TODO: if block given, create hash ans store the mapping
-          # defined in the block:
-          #     indexes :author do
-          #       indexes :last_name, :type => ...
-          #    end
-          # 
-          mapping[name] = options
+        def indexes(name, options = {}, &block)
+          if block_given?
+            mapping[name] ||= { :type => 'object', :properties => {} }
+            @_nested_mapping = name
+            nested = yield
+            @_nested_mapping = nil
+            self
+          else
+            if @_nested_mapping
+              mapping[@_nested_mapping][:properties][name] = options
+            else
+              mapping[name] = options
+            end
+            self
+          end
         end
 
         def store_mapping?

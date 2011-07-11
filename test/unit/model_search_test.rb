@@ -256,6 +256,45 @@ module Tire
             assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
           end
 
+          should "define mapping for nested properties with a block" do
+            expected_mapping = {
+              :mappings => { :model_with_nested_mapping => {
+                :properties => {
+                  :title =>  { :type => 'string' },
+                  :author => {
+                    :type => 'object',
+                    :properties => {
+                      :first_name => { :type => 'string' },
+                      :last_name  => { :type => 'string', :boost => 100 }
+                    }
+                  }
+                }
+              }
+            }}
+
+            Tire::Index.any_instance.expects(:create).with(expected_mapping)
+
+            class ::ModelWithNestedMapping
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              mapping do
+                indexes :title, :type => 'string'
+                indexes :author do
+                  indexes :first_name, :type => 'string'
+                  indexes :last_name,  :type => 'string', :boost => 100
+                end
+              end
+
+            end
+
+            assert_not_nil ModelWithNestedMapping.mapping[:author][:properties][:last_name]
+            assert_equal   100, ModelWithNestedMapping.mapping[:author][:properties][:last_name][:boost]
+          end
+
         end
 
         context "with index update callbacks" do
