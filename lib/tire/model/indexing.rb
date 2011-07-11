@@ -17,6 +17,8 @@ module Tire
         end
 
         def indexes(name, options = {}, &block)
+          options[:type] ||= 'string'
+
           if block_given?
             mapping[name] ||= { :type => 'object', :properties => {} }
             @_nested_mapping = name
