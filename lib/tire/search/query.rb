@@ -7,6 +7,10 @@ module Tire
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
+      def prefix(field, value)
+        @value = { :prefix => { field => value } }
+      end
+
       def term(field, value)
         @value = { :term => { field => value } }
       end
