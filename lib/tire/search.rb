@@ -9,6 +9,8 @@ module Tire
         @options = indices.last.is_a?(Hash) ? indices.pop  : {}
         @indices = indices
         raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
+        @type = @options[:type].is_a?(String) ? @options[:type] : nil
+        @url = [Configuration.url, @indices.join(','), @type, '_search'].compact.join('/')
 
         Configuration.wrapper @options[:wrapper] if @options[:wrapper]
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
@@ -64,7 +66,6 @@ module Tire
       end
 
       def perform
-        @url      = "#{Configuration.url}/#{indices.join(',')}/_search"
         @response = Configuration.client.get(@url, self.to_json)
         @json     = MultiJson.decode(@response.body)
         @results  = Results::Collection.new(@json, @options)
@@ -77,7 +78,7 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{Configuration.url}/#{indices.join(',')}/_search?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{@url}?pretty=true" -d '#{self.to_json}'|
       end
 
       def to_hash

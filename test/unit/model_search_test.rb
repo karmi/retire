@@ -52,30 +52,32 @@ module Tire
         should_eventually "NOT overload existing top-level instance methods" do
         end
 
-        should "search in index named after class name by default" do
-          i = 'active_model_articles'
-          Tire::Search::Search.expects(:new).with(i, {}).returns(@stub)
+        should "search only in index named after class name and document types for this class by default" do
+          Tire::Search::Search.expects(:new).
+            with(ActiveModelArticle.index_name,
+                 { :type => ActiveModelArticle.document_type }).
+            returns(@stub)
 
           ActiveModelArticle.search 'foo'
-        end
-
-        should_eventually "search only in document types for this class by default" do
         end
 
         should "search in custom name" do
           first  = 'custom-index-name'
           second = 'another-custom-index-name'
+          expected_options = {
+            :type => ActiveModelArticleWithCustomIndexName.document_type
+          }
 
-          Tire::Search::Search.expects(:new).with(first, {}).returns(@stub)
-          ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
+          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub)
+          ActiveModelArticleWithCustomIndexName.index_name first
           ActiveModelArticleWithCustomIndexName.search 'foo'
 
-          Tire::Search::Search.expects(:new).with(second, {}).returns(@stub)
-          ActiveModelArticleWithCustomIndexName.index_name 'another-custom-index-name'
+          Tire::Search::Search.expects(:new).with(second, expected_options).returns(@stub)
+          ActiveModelArticleWithCustomIndexName.index_name second
           ActiveModelArticleWithCustomIndexName.search 'foo'
 
-          Tire::Search::Search.expects(:new).with(first, {}).returns(@stub)
-          ActiveModelArticleWithCustomIndexName.index_name 'custom-index-name'
+          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub)
+          ActiveModelArticleWithCustomIndexName.index_name first
           ActiveModelArticleWithCustomIndexName.search 'foo'
         end
 
