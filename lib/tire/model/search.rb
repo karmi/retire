@@ -35,9 +35,12 @@ module Tire
         def search(query=nil, options={}, &block)
           old_wrapper = Tire::Configuration.wrapper
           Tire::Configuration.wrapper self
-          sort  = Array( options[:order] || options[:sort] )
+
+          sort    = Array( options[:order] || options[:sort] )
+          options = {:type => document_type}.update(options)
+
           unless block_given?
-            s = Tire::Search::Search.new(elasticsearch_index.name, options.merge(:type => document_type))
+            s = Tire::Search::Search.new(elasticsearch_index.name, options)
             s.query { string query }
             s.sort do
               sort.each do |t|

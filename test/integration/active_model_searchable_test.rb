@@ -36,12 +36,22 @@ module Tire
         a.save
         id = a.id
 
+        # Store document of another type in the index
+        Index.new 'supermodel_articles' do
+          store :type => 'other-thing', :title => 'Title for other thing'
+        end
+
         a.index.refresh
         sleep(1.5)
 
+        # The index should contain 2 documents
+        assert_equal 2, Tire.search('supermodel_articles') { query { all } }.results.size
+
         results = SupermodelArticle.search 'test'
 
+        # The model should find only 1 document
         assert_equal 1, results.count
+
         assert_instance_of SupermodelArticle, results.first
         assert_equal       'Test', results.first.title
         assert_not_nil     results.first._score

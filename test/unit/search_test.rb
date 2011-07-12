@@ -9,6 +9,19 @@ module Tire
 
       should "be initialized with index/indices" do
         assert_raise(ArgumentError) { Search::Search.new }
+
+        s = Search::Search.new('index') do
+          query { string 'foo' }
+        end
+        assert_match %r|index/_search|, s.url
+      end
+
+      should "allow to limit results with document type" do
+        s = Search::Search.new('index', :type => 'bar') do
+          query { string 'foo' }
+        end
+
+        assert_match %r|index/bar/_search|, s.url
       end
 
       should "allow to pass block to query" do

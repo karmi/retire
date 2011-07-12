@@ -52,33 +52,36 @@ module Tire
         should_eventually "NOT overload existing top-level instance methods" do
         end
 
-        should "search only in index named after class name and document types for this class by default" do
-          Tire::Search::Search.expects(:new).
-            with(ActiveModelArticle.index_name,
-                 { :type => ActiveModelArticle.document_type }).
-            returns(@stub)
+        should "limit searching in index for documents matching the model 'document_type'" do
+          Tire::Search::Search.
+            expects(:new).
+            with(ActiveModelArticle.index_name, { :type => ActiveModelArticle.document_type }).
+            returns(@stub).
+            twice
 
           ActiveModelArticle.search 'foo'
+          ActiveModelArticle.search { query { string 'foo' } }
         end
 
         should "search in custom name" do
           first  = 'custom-index-name'
           second = 'another-custom-index-name'
-          expected_options = {
-            :type => ActiveModelArticleWithCustomIndexName.document_type
-          }
+          expected_options = { :type => ActiveModelArticleWithCustomIndexName.document_type }
 
-          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub)
+          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub).twice
           ActiveModelArticleWithCustomIndexName.index_name first
           ActiveModelArticleWithCustomIndexName.search 'foo'
+          ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
 
-          Tire::Search::Search.expects(:new).with(second, expected_options).returns(@stub)
+          Tire::Search::Search.expects(:new).with(second, expected_options).returns(@stub).twice
           ActiveModelArticleWithCustomIndexName.index_name second
           ActiveModelArticleWithCustomIndexName.search 'foo'
+          ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
 
-          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub)
+          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub).twice
           ActiveModelArticleWithCustomIndexName.index_name first
           ActiveModelArticleWithCustomIndexName.search 'foo'
+          ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
         end
 
         should "allow to refresh index" do

@@ -6,12 +6,16 @@ module Tire
       attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters, :options
 
       def initialize(*indices, &block)
+        @indices = Array(indices)
         @options = indices.last.is_a?(Hash) ? indices.pop  : {}
-        @indices = indices
-        raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
-        @type = @options[:type].is_a?(String) ? @options[:type] : nil
-        @url = [Configuration.url, @indices.join(','), @type, '_search'].compact.join('/')
+        @type    = @options[:type]
 
+        # TODO: Remove, unneccessary, let's allow searching whole ES
+        raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
+
+        @url     = [Configuration.url, @indices.join(','), @type, '_search'].compact.join('/')
+
+        # TODO: Do not allow changing the wrapper here or set it back after yield
         Configuration.wrapper @options[:wrapper] if @options[:wrapper]
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
