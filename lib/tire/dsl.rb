@@ -5,7 +5,7 @@ module Tire
       Configuration.class_eval(&block)
     end
 
-    def search(indices, options={}, &block)
+    def search(indices=nil, options={}, &block)
       if block_given?
         Search::Search.new(indices, options, &block).perform
       else

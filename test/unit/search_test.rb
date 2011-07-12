@@ -7,13 +7,24 @@ module Tire
     context "Search" do
       setup { Configuration.reset :logger }
 
-      should "be initialized with index/indices" do
-        assert_raise(ArgumentError) { Search::Search.new }
+      should "be initialized with single index" do
+        s = Search::Search.new('index') { query { string 'foo' } }
+        assert_match %r|/index/_search|, s.url
+      end
 
-        s = Search::Search.new('index') do
-          query { string 'foo' }
-        end
-        assert_match %r|index/_search|, s.url
+      should "be initialized with multiple indices" do
+        s = Search::Search.new(['index1','index2']) { query { string 'foo' } }
+        assert_match %r|/index1,index2/_search|, s.url
+      end
+
+      should "be initialized with multiple indices as string" do
+        s = Search::Search.new(['index1,index2,index3']) { query { string 'foo' } }
+        assert_match %r|/index1,index2,index3/_search|, s.url
+      end
+
+      should "allow to search all indices by leaving index empty" do
+        s = Search::Search.new { query { string 'foo' } }
+        assert_match %r|localhost:9200/_search|, s.url
       end
 
       should "allow to limit results with document type" do
@@ -48,7 +59,7 @@ module Tire
         s = Search::Search.new('index1') do;end
         assert_equal ['index1'], s.indices
 
-        s = Search::Search.new('index1', 'index2') do;end
+        s = Search::Search.new(['index1', 'index2']) do;end
         assert_equal ['index1', 'index2'], s.indices
       end
 
@@ -62,14 +73,14 @@ module Tire
       end
 
       should "return curl snippet with multiple indices for debugging" do
-        s = Search::Search.new('index_1', 'index_2') do
+        s = Search::Search.new(['index_1', 'index_2']) do
           query { string 'title:foo' }
         end
         assert_match /index_1,index_2/, s.to_curl
       end
 
       should "return itself as a Hash" do
-        s = Search::Search.new('index_1', 'index_2') do
+        s = Search::Search.new('index') do
           query { string 'title:foo' }
         end
         assert_nothing_raised do

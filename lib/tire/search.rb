@@ -5,15 +5,15 @@ module Tire
 
       attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters, :options
 
-      def initialize(*indices, &block)
+      def initialize(indices=nil, options = {}, &block)
+        Tire.warn "Passing indices as multiple arguments to the `Search.new` method " +
+                  "has been deprecated, please pass them as an Array: " +
+                  "Search.new([#{indices}, #{options}])" if options.is_a?(String)
         @indices = Array(indices)
-        @options = indices.last.is_a?(Hash) ? indices.pop  : {}
+        @options = options
         @type    = @options[:type]
 
-        # TODO: Remove, unneccessary, let's allow searching whole ES
-        raise ArgumentError, 'Please pass index or indices to search' if @indices.empty?
-
-        @url     = [Configuration.url, @indices.join(','), @type, '_search'].compact.join('/')
+        @url     = Configuration.url+['/', @indices.join(','), @type, '_search'].compact.join('/').squeeze('/')
 
         # TODO: Do not allow changing the wrapper here or set it back after yield
         Configuration.wrapper @options[:wrapper] if @options[:wrapper]
