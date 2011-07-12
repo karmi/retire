@@ -3,6 +3,8 @@
 Gemfile.lock
 pkg/*
 rdoc/
+doc/
+.yardoc/
 coverage/
 scratch/
 examples/*.html
