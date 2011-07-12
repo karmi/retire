@@ -30,7 +30,7 @@ require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "Tire"
-  rdoc.rdoc_files.include('README.rdoc')
+  rdoc.rdoc_files.include('README.markdown')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
