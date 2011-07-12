@@ -105,6 +105,44 @@ module Tire
 
       end
 
+      context "wrapping results with selected fields" do
+        # When limiting fields from _source to return ES returns them prefixed, not as "real" Hashes.
+        # Underlying issue: https://github.com/karmi/tire/pull/31#issuecomment-1340967
+        #
+        setup do
+          Configuration.reset :wrapper
+          @default_response = { 'hits' => { 'hits' =>
+            [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article',
+                'fields' => {
+                  'title'       => 'Knee Deep in JSON',
+                  'crazy.field' => 'CRAAAAZY!',
+                  '_source.artist' => {
+                    'name' => 'Elastiq',
+                    'meta' => {
+                      'favorited' => 1000,
+                      'url'       => 'http://first.fm/abc123/xyz567'
+                    }
+                  },
+                  '_source.track.info.duration' => {
+                    'minutes' => 3
+                  }
+                } } ] } }
+          collection = Results::Collection.new(@default_response)
+          @item      = collection.first
+        end
+
+        should "return fields from the first level" do
+          assert_equal 'Knee Deep in JSON', @item.title
+        end
+
+        should "return fields from the _source prefixed and nested fields" do
+          assert_equal 'Elastiq', @item.artist.name
+          assert_equal 1000,      @item.artist.meta.favorited
+          assert_equal 3,         @item.track.info.duration.minutes
+        end
+
+      end
+
       context "while paginating results" do
 
         setup do
