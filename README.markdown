@@ -439,19 +439,25 @@ Any other parameters you provide to the `import` method are passed down to the `
 Are we saying you have to fiddle with this thing in a `rails console` or silly Ruby scripts? No.
 Just call the included _Rake_ task on the commandline:
 
+```bash
     $ rake environment tire:import CLASS='Article'
+```
 
 You can also force-import the data by deleting the index first (and creating it with mapping
 provided by the `mapping` block in your model):
 
+```bash
     $ rake environment tire:import CLASS='Article' FORCE=true
+```
 
 When you'll spend more time with _ElasticSearch_, you'll notice how
 [index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
 are the best idea since the invention of inverted index.
 You can index your data into a fresh index (and possibly update an alias if everything's fine):
 
+```bash
     $ rake environment tire:import CLASS='Article' INDEX='articles-2011-05'
+```
 
 OK. All this time we have been talking about `ActiveRecord` models, since
 it is a reasonable Rails' default for the storage layer.
