@@ -20,6 +20,7 @@ module Tire
 
         setup do
           @stub = stub('search') { stubs(:query).returns(self); stubs(:perform).returns(self); stubs(:results).returns([]) }
+          Tire::Index.any_instance.stubs(:exists?).returns(false)
         end
 
         teardown do
