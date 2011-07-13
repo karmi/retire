@@ -52,7 +52,7 @@ module Tire
         # The model should find only 1 document
         assert_equal 1, results.count
 
-        assert_instance_of SupermodelArticle, results.first
+        assert_instance_of Results::Item, results.first
         assert_equal       'Test', results.first.title
         assert_not_nil     results.first._score
         assert_equal       id, results.first.id

@@ -50,9 +50,9 @@ module Tire
 
         assert_equal 1, results.count
 
-        assert_instance_of ActiveRecordArticle, results.first
+        assert_instance_of Results::Item, results.first
         assert_not_nil results.first.id
-        assert_equal   id, results.first.id
+        assert_equal   id.to_s, results.first.id.to_s
         assert         results.first.persisted?, "Record should be persisted"
         assert_not_nil results.first._score
         assert_equal   'Test', results.first.title

@@ -30,12 +30,8 @@ module Tire
                # Update the document with meta information
                ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
 
-               # for instantiating ActiveRecord with arbitrary attributes and setting @new_record etc.
-               if @wrapper.respond_to?(:instantiate, true)
-                 @wrapper.send(:instantiate, document)
-               else
-                 @wrapper.new(document)
-               end
+               # Return an instance of the "wrapper" class
+               @wrapper.new(document)
              end
            end
         end

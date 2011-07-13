@@ -33,9 +33,6 @@ module Tire
       module ClassMethods
 
         def search(query=nil, options={}, &block)
-          old_wrapper = Tire::Configuration.wrapper
-          Tire::Configuration.wrapper self
-
           sort    = Array( options[:order] || options[:sort] )
           options = {:type => document_type}.update(options)
 
@@ -56,8 +53,6 @@ module Tire
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
             s.perform.results
           end
-        ensure
-          Tire::Configuration.wrapper old_wrapper
         end
 
         # Wrapper for the ES index for this class

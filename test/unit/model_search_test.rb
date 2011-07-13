@@ -90,20 +90,18 @@ module Tire
           ActiveModelArticle.elasticsearch_index.refresh
         end
 
-        should "wrap results in proper class with ID and score and not change the original wrapper" do
+        should "wrap results in instances of the wrapper class" do
           response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 0.8, '_source' => { 'title' => 'Article' }}] } }
           Configuration.client.expects(:get).returns(mock_response(response.to_json))
 
           collection = ActiveModelArticle.search 'foo'
           assert_instance_of Results::Collection, collection
 
-          assert_equal Results::Item, Tire::Configuration.wrapper
-
           document = collection.first
 
-          assert_instance_of ActiveModelArticle, document
-          assert_not_nil document._score
-          assert_equal 1, document.id
+          assert_instance_of Results::Item, document
+          assert_not_nil     document._score
+          assert_equal 1,    document.id
           assert_equal 'Article', document.title
         end
 
