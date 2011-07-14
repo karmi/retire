@@ -1,7 +1,8 @@
 Tire
 =========
 
-_Tire_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
+_Tire_ is a Ruby (1.8 or 1.9) client for the [ElasticSearch](http://www.elasticsearch.org/)
+search engine/database.
 
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
 full-text search engine and database with
