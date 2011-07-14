@@ -213,7 +213,7 @@ gsub_file 'app/views/articles/index.html.erb', %r{<%= link_to 'New Article', new
 CODE
 
 gsub_file 'config/routes.rb', %r{resources :articles}, <<-CODE
-  resources :articles do
+resources :articles do
     collection { get :search }
   end
 CODE
