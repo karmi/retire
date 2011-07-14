@@ -1599,7 +1599,7 @@ such as published date or product price? We can do that.</p>
         <p>&hellip; but will sort them by their <code>title</code>, in descending order.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">sort</span> <span class="p">{</span> <span class="n">title</span> <span class="s1">&#39;desc&#39;</span> <span class="p">}</span>
+        <div class='highlight'><pre>  <span class="n">sort</span> <span class="p">{</span> <span class="n">by</span> <span class="ss">:title</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span> <span class="p">}</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
@@ -1653,7 +1653,7 @@ such as published date or product price? We can do that.</p>
         <p>We will sort the results by their <code>published_on</code> property in <em>ascending</em> order (the default),</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="n">published_on</span></pre></div>
+        <div class='highlight'><pre>    <span class="n">by</span> <span class="ss">:published_on</span></pre></div>
       </td>
     </tr>
     <tr id='section-123'>
@@ -1664,7 +1664,7 @@ such as published date or product price? We can do that.</p>
         <p>and by their <code>title</code> property, in <em>descending</em> order.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="n">title</span> <span class="s1">&#39;desc&#39;</span>
+        <div class='highlight'><pre>    <span class="n">by</span> <span class="ss">:title</span> <span class="s1">&#39;desc&#39;</span>
   <span class="k">end</span>
 <span class="k">end</span></pre></div>
       </td>
