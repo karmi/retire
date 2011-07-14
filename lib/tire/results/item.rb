@@ -2,6 +2,8 @@ module Tire
   module Results
 
     class Item
+      extend  ActiveModel::Naming
+      include ActiveModel::Conversion
 
       # Create new instance, recursively converting all Hashes to Item
       # and leaving everything else alone.
@@ -33,12 +35,34 @@ module Tire
         !!id
       end
 
-      def inspect
-        s = []; @attributes.each { |k,v| s << "#{k}: #{v.inspect}" }
-        %Q|<Item #{s.join(', ')}>|
+      def errors
+        ActiveModel::Errors.new(self)
       end
 
-      def to_json(options={})
+      def valid?
+        true
+      end
+
+      def to_key
+        persisted? ? [id] : nil
+      end
+
+      def to_hash
+        @attributes
+      end
+
+      # Let's pretend we're someone else in Rails
+      #
+      def class
+        defined?(::Rails) && @attributes[:_type] ? @attributes[:_type].camelize.constantize : super
+      end
+
+      def inspect
+        s = []; @attributes.each { |k,v| s << "#{k}: #{v.inspect}" }
+        %Q|<Item#{self.class.to_s == 'Tire::Results::Item' ? '' : " (#{self.class})"} #{s.join(', ')}>|
+      end
+
+      def to_json(options=nil)
         @attributes.to_json(options)
       end
       alias_method :to_indexed_json, :to_json

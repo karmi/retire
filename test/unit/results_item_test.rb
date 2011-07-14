@@ -1,8 +1,16 @@
 require 'test_helper'
 
 module Tire
-
   class ResultsItemTest < Test::Unit::TestCase
+
+    # ActiveModel compatibility tests
+    #
+    def setup
+      super
+      begin; Object.send(:remove_const, :Rails); rescue; end
+      @model = Results::Item.new :title => 'Test'
+    end
+    include ActiveModel::Lint::Tests
 
     context "Item" do
 
@@ -55,6 +63,45 @@ module Tire
       should "allow to retrieve values from nested hashes" do
         assert_not_nil   @document.author.name
         assert_equal 'Kafka', @document.author.name
+      end
+
+      should "be an Item instance" do
+        assert_instance_of Tire::Results::Item, @document
+      end
+
+      should "be convertible to hash" do
+        assert_instance_of Hash, @document.to_hash
+      end
+
+      should "be inspectable" do
+        assert_match /<Item title|Item author/, @document.inspect
+      end
+
+      context "within Rails" do
+        setup do
+          module ::Rails
+          end
+
+          class ::FakeRailsModel
+            extend  ActiveModel::Naming
+            include ActiveModel::Conversion
+          end
+
+          @document = Results::Item.new :id => 1, :_type => 'fake_rails_model', :title => 'Test'
+        end
+
+        should "be an instance of model, based on _type" do
+          assert_equal FakeRailsModel, @document.class
+        end
+
+        should "be inspectable with masquerade" do
+          assert_match /<Item \(FakeRailsModel\)/, @document.inspect
+        end
+
+        should "return proper singular and plural forms" do
+          assert_equal 'fake_rails_model',  ActiveModel::Naming.singular(@document)
+          assert_equal 'fake_rails_models', ActiveModel::Naming.plural(@document)
+        end
       end
 
     end
