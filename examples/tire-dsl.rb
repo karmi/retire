@@ -667,7 +667,7 @@ s = Tire.search 'articles' do
 
    # ... but will sort them by their `title`, in descending order.
    #
-  sort { title 'desc' }
+  sort { by :title, 'desc' }
 end
 
 # The results:
@@ -692,11 +692,11 @@ s = Tire.search 'articles' do
 
     # We will sort the results by their `published_on` property in _ascending_ order (the default),
     #
-    published_on
+    by :published_on
 
     # and by their `title` property, in _descending_ order.
     #
-    title 'desc'
+    by :title 'desc'
   end
 end
 

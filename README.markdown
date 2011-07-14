@@ -314,13 +314,14 @@ The _Tire_ DSL tries hard to provide a strong Ruby-like API for the main _Elasti
 
 By default, _Tire_ wraps the results collection in a enumerable `Results::Collection` class,
 and result items in a `Results::Item` class, which looks like a child of `Hash` and `Openstruct`,
-for smooth iterating and displaying the results.
+for smooth iterating over and displaying the results.
 
 You may wrap the result items in your own class by setting the `Tire.configuration.wrapper`
 property. Your class must take a `Hash` of attributes on initialization.
 
-If that seems like a great idea to you, there's a big chance you already have such class, and one would bet
-it's an `ActiveRecord` or `ActiveModel` class, containing model of your Rails application.
+If that seems like a great idea to you, there's a big chance you already have such class.
+
+One would bet it's an `ActiveRecord` or `ActiveModel` class, containing model of your Rails application.
 
 Fortunately, _Tire_ makes blending _ElasticSearch_ features into your models trivially possible.
 
@@ -331,12 +332,14 @@ ActiveModel Integration
 **NOTE:** Please note that the ActiveModel/ActiveRecord integration will **change considerably in the next release** (for the better). You can read it up in the Readme on the [activerecord](https://github.com/karmi/tire/blob/activerecord/README.markdown) branch. The reasoning for this change can be found at the [tire#12](https://github.com/karmi/tire/issues/12) issue.
 
 If you're the type with no time for lengthy introductions, you can generate a fully working
-example Rails application, with an `ActiveRecord` model and a search form, to play with:
+example Rails application, with an `ActiveRecord` model and a search form, to play with
+(it even downloads _ElasticSearch_ itself, generates the application skeleton and leaves you with
+a _Git_ repository to explore the steps and the code):
 
     $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
 
 For the rest, let's suppose you have an `Article` class in your Rails application.
-To make it searchable with _Tire_, you just `include` it:
+To make it searchable with _Tire_, just `include` it:
 
 ```ruby
     class Article < ActiveRecord::Base
@@ -367,17 +370,16 @@ Now you can search the records:
     Article.search 'love'
 ```
 
-OK. This is where the game stops, often. Not here.
+OK. This is where the search game stops, often. Not here.
 
 First of all, you may use the full query DSL, as explained above, with filters, sorting,
 advanced facet aggregation, highlighting, etc:
 
 ```ruby
-    q = 'love'
     Article.search do
-      query { string q }
-      facet('timeline') { date :published_on, :interval => 'month' }
-      sort  { published_on 'desc' }
+      query             { string 'love' }
+      facet('timeline') { date   :published_on, :interval => 'month' }
+      sort              { by     :published_on, 'desc' }
     end
 ```
 
@@ -399,10 +401,13 @@ For serious usage, though, you'll definitely want to define a custom mapping for
     end
 ```
 
-In this case, _only_ the defined model attributes are indexed when adding to the index.
+In this case, _only_ the defined model attributes are indexed. The `mapping` declaration creates the
+index when the class is loaded or when the importing features are used, and _only_ when it does not exist, yet.
+(It may well be reasonable to wrap the index creation logic in a class method of your model, so you
+have better control on index creation when bootstrapping your application or when setting up tests.)
 
-When you want tight grip on how your model attributes are added to the index, just
-provide the `to_indexed_json` method yourself:
+When you want a tight grip on how the attributes are added to the index, just
+provide the `to_indexed_json` method in your model:
 
 ```ruby
     class Article < ActiveRecord::Base
@@ -443,8 +448,7 @@ OK. Chances are, you have lots of records stored in the underlying database. How
 However, this way, all your records are loaded into memory, serialized into JSON,
 and sent down the wire to _ElasticSearch_. Not practical, you say? You're right.
 
-Provided your model implements some sort of _pagination_ — and it probably does, for so much data —,
-you can just run:
+Provided your model implements some sort of _pagination_ — and it probably does —, you can just run:
 
 ```ruby
     Article.import
@@ -483,7 +487,7 @@ You can index your data into a fresh index (and possibly update an alias if ever
 ```
 
 OK. All this time we have been talking about `ActiveRecord` models, since
-it is a reasonable Rails' default for the storage layer.
+it is a reasonable _Rails_' default for the storage layer.
 
 But what if you use another database such as [MongoDB](http://www.mongodb.org/),
 another object mapping library, such as [Mongoid](http://mongoid.org/)?
@@ -519,10 +523,7 @@ Well, things stay mostly the same:
 
 That's kinda nice. But there's more.
 
-_Tire_ implements not only _searchable_ features, but also _persistence_ features.
-
-This means that you can use a _Tire_ model **instead of** your database, not just
-for searching your database. Why would you like to do that?
+_Tire_ implements not only _searchable_ features, but also _persistence_ features. This means you can use a _Tire_ model **instead of your database**, not just for _searching_ your database. Why would you like to do that?
 
 Well, because you're tired of database migrations and lots of hand-holding with your
 database to store stuff like `{ :name => 'Tire', :tags => [ 'ruby', 'search' ] }`.
@@ -533,8 +534,7 @@ then constructing elaborate database query conditions.
 Because you have _lots_ of data and want to use _ElasticSearch's_
 advanced distributed features.
 
-To use the persistence features, you have to include the `Tire::Persistence` module
-in your class and define the properties (analogous to the way you do with CouchDB- or MongoDB-based models):
+To use the persistence features, just include the `Tire::Persistence` module in your class and define the properties (like with CouchDB- or MongoDB-based models):
 
 ```ruby
     class Article
