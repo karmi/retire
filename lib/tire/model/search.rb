@@ -28,6 +28,8 @@ module Tire
             self.serializable_hash
           end unless instance_methods.map(&:to_sym).include?(:to_hash)
         end
+
+        Results::Item.send :include, Loader
       end
 
       module ClassMethods
@@ -105,6 +107,16 @@ module Tire
             reject { |key, value| ! self.class.mapping.keys.map(&:to_s).include?(key.to_s) }.
             to_json
           end
+        end
+
+      end
+
+      module Loader
+
+        # Load the "real" model from the database via the corresponding model's `find` method
+        #
+        def load(options=nil)
+          options ? self.class.find(self.id, options) : self.class.find(self.id)
         end
 
       end

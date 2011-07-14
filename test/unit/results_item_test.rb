@@ -91,6 +91,7 @@ module Tire
       end
 
       context "within Rails" do
+
         setup do
           module ::Rails
           end
@@ -98,6 +99,7 @@ module Tire
           class ::FakeRailsModel
             extend  ActiveModel::Naming
             include ActiveModel::Conversion
+            def self.find(id, options); new; end
           end
 
           @document = Results::Item.new :id => 1, :_type => 'fake_rails_model', :title => 'Test'
@@ -115,6 +117,7 @@ module Tire
           assert_equal 'fake_rails_model',  ActiveModel::Naming.singular(@document)
           assert_equal 'fake_rails_models', ActiveModel::Naming.plural(@document)
         end
+
       end
 
     end

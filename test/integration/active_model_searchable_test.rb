@@ -16,7 +16,7 @@ module Tire
       SupermodelArticle.delete_all
     end
 
-    context "ActiveModel" do
+    context "ActiveModel integration" do
 
       setup    do
         Tire.index('supermodel_articles').delete
@@ -85,6 +85,29 @@ module Tire
 
         assert_equal 'bar',    results.first.title
         assert_equal 'abc123', results.first.id
+      end
+
+      context "within Rails" do
+
+        setup do
+          module ::Rails; end
+        end
+
+        should "load the underlying model" do
+          a = SupermodelArticle.new :title => 'Test'
+          a.save
+
+          a.index.refresh
+          sleep(1.5)
+
+          results = SupermodelArticle.search 'test'
+
+          assert_instance_of Results::Item, results.first
+          assert_instance_of SupermodelArticle, results.first.load
+
+          assert_equal 'Test', results.first.load.title
+        end
+
       end
 
     end

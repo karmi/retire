@@ -549,6 +549,38 @@ module Tire
 
       end
 
+      context "Results::Item" do
+
+        setup do
+          module ::Rails
+          end
+
+          class ::FakeRailsModel
+            extend  ActiveModel::Naming
+            include ActiveModel::Conversion
+            def self.find(*args); new; end
+          end
+
+          @document = Results::Item.new :id => 1, :_type => 'fake_rails_model', :title => 'Test'
+        end
+
+        should "load the 'real' instance from the corresponding model" do
+          assert_respond_to  @document, :load
+          assert_instance_of FakeRailsModel, @document.load
+        end
+
+        should "pass the ID to the corresponding model's find method" do
+          FakeRailsModel.expects(:find).with(1).returns(FakeRailsModel.new)
+          @document.load
+        end
+
+        should "pass the options to the corresponding model's find method" do
+          FakeRailsModel.expects(:find).with(1, {:include => 'everything'}).returns(FakeRailsModel.new)
+          @document.load :include => 'everything'
+        end
+
+      end
+
     end
 
   end

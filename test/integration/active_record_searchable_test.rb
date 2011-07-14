@@ -15,19 +15,25 @@ module Tire
           t.string   :title
           t.datetime :created_at, :default => 'NOW()'
         end
+        create_table :active_record_comments do |t|
+          t.string     :author
+          t.text       :body
+          t.references :article
+          t.timestamps
+        end
+        create_table :active_record_stats do |t|
+          t.integer    :pageviews
+          t.string     :period
+          t.references :article
+        end
       end
-    end
-
-    def teardown
-      super
-      File.delete fixtures_path.join('articles.db') rescue nil
     end
 
     context "ActiveRecord integration" do
 
       setup    do
         Tire.index('active_record_articles').delete
-        load File.expand_path('../../models/active_record_article.rb', __FILE__)
+        load File.expand_path('../../models/active_record_models.rb', __FILE__)
       end
       teardown { Tire.index('active_record_articles').delete }
 
@@ -183,6 +189,45 @@ module Tire
             assert_nil results.first
           end
 
+        end
+
+      end
+
+      context "within Rails" do
+
+        setup do
+          module ::Rails; end
+
+          a = ActiveRecordArticle.new :title => 'Test'
+          a.comments.build :author => 'fool', :body => 'Works!'
+          a.stats.build    :pageviews  => 12, :period => '2011-08'
+          a.save!
+          @id = a.id.to_s
+
+          a.index.refresh
+          sleep(1)
+          @item = ActiveRecordArticle.search('test').first
+        end
+
+        should "have access to indexed properties" do
+          assert_equal 'Test', @item.title
+          assert_equal 'fool', @item.comments.first.author
+          assert_equal 12,     @item.stats.first.pageviews
+        end
+
+        should "load the underlying models" do
+          assert_instance_of Results::Item, @item
+          assert_instance_of ActiveRecordArticle, @item.load
+          assert_equal      'Test', @item.load.title
+
+          assert_instance_of Results::Item, @item.comments.first
+          assert_instance_of ActiveRecordComment, @item.comments.first.load
+          assert_equal      'fool', @item.comments.first.load.author
+        end
+
+        should "load the underlying model with options" do
+          ActiveRecordArticle.expects(:find).with(@id, :include => 'comments')
+          @item.load(:include => 'comments')
         end
 
       end

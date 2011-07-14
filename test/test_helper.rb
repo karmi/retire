@@ -34,6 +34,8 @@ module Test::Integration
   URL = "http://localhost:9200"
 
   def setup
+    begin; Object.send(:remove_const, :Rails); rescue; end
+
     begin
       ::RestClient.get URL
     rescue Errno::ECONNREFUSED
