@@ -433,20 +433,43 @@ provide the `to_indexed_json` method in your model:
     end
 ```
 
-Note that _Tire_-enhanced models are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
-so you can pass any parameters to the `search` method in the controller, as usual:
+The results returned by `Article.search` are wrapped in the aforementioned `Item` class, by default.
+This way, we have a fast and flexible access to the properties returned from _ElasticSearch_ (via the
+`_source` or `fields` JSON properties). This way, we can index whatever JSON we like in _ElasticSearch_,
+and retrieve it, simply, via the dot notation:
+
+```ruby
+    articles = Article.search 'love'
+    articles.each do |article|
+      puts article.title
+      puts article.author.last_name
+    end
+```
+
+The `Item` instances masquerade themselves as instances of your model in _Rails_
+(based on the `_type` property retrieved from ElasticSearch), so you can use them carefree;
+all the `url_for` or `dom_id` helpers work as expected.
+
+If you need to access the “real” model (ie. to access its assocations or methods not
+stored in _ElasticSearch_), just load it from the database:
+
+```ruby
+    puts article.load(:include => 'comments').comments.size
+```
+Note that _Tire_ search results are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
+so you can pass all the usual parameters to the `search` method in the controller:
 
 ```ruby
     @articles = Article.search params[:q], :page => (params[:page] || 1)
 ```
 
-OK. Chances are, you have lots of records stored in the underlying database. How will you get them to _ElasticSearch_? Easy:
+OK. Chances are, you have lots of records stored in your database. How will you get them to _ElasticSearch_? Easy:
 
 ```ruby
     Article.elasticsearch_index.import Article.all
 ```
 
-However, this way, all your records are loaded into memory, serialized into JSON,
+This way, however, all your records are loaded into memory, serialized into JSON,
 and sent down the wire to _ElasticSearch_. Not practical, you say? You're right.
 
 Provided your model implements some sort of _pagination_ — and it probably does —, you can just run:
@@ -555,6 +578,9 @@ To use the persistence features, just include the `Tire::Persistence` module in 
 Of course, not all validations or `ActionPack` helpers will be available to your models,
 but if you can live with that, you've just got a schema-free, highly-scalable storage
 and retrieval engine for your data.
+
+Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
+for examples of the API and _ActiveModel_ integration usage.
 
 Todo, Plans & Ideas
 -------------------
