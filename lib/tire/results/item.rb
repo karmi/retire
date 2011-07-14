@@ -12,7 +12,11 @@ module Tire
         raise ArgumentError, "Please pass a Hash-like object" unless args.respond_to?(:each_pair)
         @attributes = {}
         args.each_pair do |key, value|
-          @attributes[key.to_sym] = value.is_a?(Hash) ? self.class.new(value.to_hash) : value
+          if value.is_a?(Array)
+            @attributes[key.to_sym] = value.map { |item| @attributes[key.to_sym] = item.is_a?(Hash) ? self.class.new(item.to_hash) : item }
+          else
+            @attributes[key.to_sym] = value.is_a?(Hash) ? self.class.new(value.to_hash) : value
+          end
         end
       end
 

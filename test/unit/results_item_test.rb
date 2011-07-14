@@ -65,6 +65,19 @@ module Tire
         assert_equal 'Kafka', @document.author.name
       end
 
+      should "wrap arrays" do
+        @document = Results::Item.new :stats => [1, 2, 3]
+        assert_equal [1, 2, 3], @document.stats
+      end
+
+      should "wrap hashes in arrays" do
+        @document = Results::Item.new :comments => [{:title => 'one'}, {:title => 'two'}]
+        assert_equal 2,    @document.comments.size
+        assert_instance_of Results::Item, @document.comments.first
+        assert_equal       'one', @document.comments.first.title
+        assert_equal       'two', @document.comments.last.title
+      end
+
       should "be an Item instance" do
         assert_instance_of Tire::Results::Item, @document
       end
