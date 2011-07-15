@@ -20,7 +20,7 @@ module Tire
         should "register query as a Hash" do
           query = { :query => { :query_string => { :query => 'warning' } } }
           assert @index.register_percolator_query('alert', query)
-          Tire.index('_percolator').refresh; sleep 0.1
+          Tire.index('_percolator').refresh
 
           percolator = Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
           assert percolator
@@ -28,7 +28,7 @@ module Tire
 
         should "register query as block" do
           assert @index.register_percolator_query('alert') { string 'warning' }
-          Tire.index('_percolator').refresh; sleep 0.1
+          Tire.index('_percolator').refresh
 
           percolator = Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
           assert percolator
@@ -37,11 +37,11 @@ module Tire
         should "unregister a query" do
           query = { :query => { :query_string => { :query => 'warning' } } }
           assert @index.register_percolator_query('alert', query)
-          Tire.index('_percolator').refresh; sleep 0.1
+          Tire.index('_percolator').refresh
           assert Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
 
           assert @index.unregister_percolator_query('alert')
-          Tire.index('_percolator').refresh; sleep 0.1
+          Tire.index('_percolator').refresh
 
           assert_raise(RestClient::ResourceNotFound) do
             Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
@@ -55,7 +55,7 @@ module Tire
           @index.register_percolator_query('alert') { string 'warning' }
           @index.register_percolator_query('gantz') { string '"y u no match"' }
           @index.register_percolator_query('weather', :tags => ['weather']) { string 'severe' }
-          Tire.index('_percolator').refresh; sleep 0.1
+          Tire.index('_percolator').refresh
         end
 
         should "return an empty array when no query matches" do
@@ -79,7 +79,7 @@ module Tire
           @index.register_percolator_query('alert') { string 'warning' }
           @index.register_percolator_query('gantz') { string '"y u no match"' }
           @index.register_percolator_query('weather', :tags => ['weather']) { string 'severe' }
-          Tire.index('_percolator').refresh; sleep 0.1
+          Tire.index('_percolator').refresh
         end
 
         should "return an empty array when no query matches" do

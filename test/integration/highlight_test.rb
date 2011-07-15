@@ -32,7 +32,6 @@ module Tire
           store   :id => 1, :content => content
           refresh
         end
-        sleep(0.5)
 
         s = Tire.search('highlight-test') do
           query { string 'fox' }

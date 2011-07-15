@@ -22,7 +22,6 @@ module Tire
         two = PersistentArticle.create :id => 2, :title => 'Two'
 
         PersistentArticle.index.refresh
-        sleep(1.5)
 
         results = PersistentArticle.find [1, 2]
 

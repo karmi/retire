@@ -50,7 +50,6 @@ module Tire
         id = a.id
 
         a.index.refresh
-        sleep(1.5) # Leave ES some breathing room here...
 
         results = ActiveRecordArticle.search 'test'
 
@@ -205,7 +204,6 @@ module Tire
           @id = a.id.to_s
 
           a.index.refresh
-          sleep(1)
           @item = ActiveRecordArticle.search('test').first
         end
 
