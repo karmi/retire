@@ -34,11 +34,14 @@ module Tire
 
       module ClassMethods
 
-        def search(query=nil, options={}, &block)
-          sort    = Array( options[:order] || options[:sort] )
-          options = {:type => document_type}.update(options)
+        def search(*args, &block)
+          default_options = {:type => document_type}
 
           unless block_given?
+            query, options = args
+            options ||= {}
+            sort      = Array( options[:order] || options[:sort] )
+            options   = default_options.update(options)
             s = Tire::Search::Search.new(elasticsearch_index.name, options)
             s.query { string query }
             s.sort do
@@ -51,6 +54,8 @@ module Tire
             s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
             s.perform.results
           else
+            options = args.shift || {}
+            options = default_options.update(options)
             s = Tire::Search::Search.new(elasticsearch_index.name, options)
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
             s.perform.results

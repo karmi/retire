@@ -77,7 +77,7 @@ module Tire
         end
 
         should "load records on block search" do
-          results = ActiveRecordArticle.search nil, :load => true do
+          results = ActiveRecordArticle.search :load => true do
             query { string '"Test 1"' }
           end
 
