@@ -63,6 +63,33 @@ module Tire
         assert_equal   'Test', results.first.title
       end
 
+      context "with eager loading" do
+        setup do
+          ActiveRecordArticle.destroy_all
+          5.times { |n| ActiveRecordArticle.create! :title => "Test #{n+1}" }
+          ActiveRecordArticle.elasticsearch_index.refresh
+        end
+
+        should "load records on query search" do
+          results = ActiveRecordArticle.search '"Test 1"', :load => true
+
+          assert_equal ActiveRecordArticle.find(1), results.first
+        end
+
+        should "load records on block search" do
+          results = ActiveRecordArticle.search nil, :load => true do
+            query { string '"Test 1"' }
+          end
+
+          assert_equal ActiveRecordArticle.find(1), results.first
+        end
+
+        should "load records with options on query search" do
+          assert_equal ActiveRecordArticle.find(['1', '2'], :include => 'comments'),
+                       ActiveRecordArticle.search('"Test 1" OR "Test 2"', :load => { :include => 'comments' }).results
+        end
+      end
+
       should "remove document from index on destroy" do
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!

@@ -187,6 +187,54 @@ module Tire
 
       end
 
+      context "with eager loading" do
+        setup do
+          @response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'active_record_article'},
+                                                {'_id' => 2, '_type' => 'active_record_article'},
+                                                {'_id' => 3, '_type' => 'active_record_article'}] } }
+          ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
+        end
+
+        should "load the records via model find method from database" do
+          ActiveRecordArticle.expects(:find).with([1,2,3]).
+                              returns([ Results::Item.new(:id => 3),
+                                        Results::Item.new(:id => 1),
+                                        Results::Item.new(:id => 2)  ])
+          Results::Collection.new(@response, :load => true).results
+        end
+
+        should "pass the :load option Hash to model find metod" do
+          ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
+                              returns([ Results::Item.new(:id => 3),
+                                        Results::Item.new(:id => 1),
+                                        Results::Item.new(:id => 2)  ])
+          Results::Collection.new(@response, :load => { :include => 'comments' }).results
+        end
+
+        should "preserve the order of records returned from search" do
+          ActiveRecordArticle.expects(:find).with([1,2,3]).
+                              returns([ Results::Item.new(:id => 3),
+                                        Results::Item.new(:id => 1),
+                                        Results::Item.new(:id => 2)  ])
+          assert_equal [1,2,3], Results::Collection.new(@response, :load => true).results.map(&:id)
+        end
+
+        should "raise error when model class cannot be inferred from _type" do
+          assert_raise(NameError) do
+            response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'hic_sunt_leones'}] } }
+            Results::Collection.new(response, :load => true).results
+          end
+        end
+
+        should "raise error when _type is missing" do
+          assert_raise(NoMethodError) do
+            response = { 'hits' => { 'hits' => [ {'_id' => 1}] } }
+            Results::Collection.new(response, :load => true).results
+          end
+        end
+
+      end
+
     end
 
   end
