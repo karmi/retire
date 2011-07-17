@@ -447,15 +447,33 @@ and retrieve it, simply, via the dot notation:
 ```
 
 The `Item` instances masquerade themselves as instances of your model in _Rails_
-(based on the `_type` property retrieved from ElasticSearch), so you can use them carefree;
+(based on the `_type` property retrieved from _ElasticSearch_), so you can use them carefree;
 all the `url_for` or `dom_id` helpers work as expected.
 
-If you need to access the “real” model (ie. to access its assocations or methods not
+If you need to access the “real” model (eg. to access its assocations or methods not
 stored in _ElasticSearch_), just load it from the database:
 
 ```ruby
     puts article.load(:include => 'comments').comments.size
 ```
+You can see that _Tire_ stays as far from the database as possible. That's because it believes
+you have most of the data you want to display stored in _ElasticSearch_. When you need
+to load the records from the database itself, for whatever reason, you can do it with the `:load` option:
+
+```ruby
+    # Will call `Article.search [1, 2, 3]`
+    Article.search 'love', :load => true
+```
+
+Instead of simple `true`, you can pass any options for the model's find method:
+
+```ruby
+    # Will call `Article.search [1, 2, 3], :include => 'comments'`
+    Article.search :load => { :include => 'comments' } do
+      query { string 'love' }
+    end
+```
+
 Note that _Tire_ search results are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
 so you can pass all the usual parameters to the `search` method in the controller:
 
