@@ -21,6 +21,17 @@ module Tire
         assert_nil s.results.first.tags
       end
 
+      should "allow to retrieve multiple fields" do
+        q = 'title:one'
+        s = Tire.search('articles-test') do
+          query { string q }
+          fields 'title', 'tags'
+        end
+        assert_equal 'One',  s.results.first.title
+        assert_equal 'ruby', s.results.first.tags[0]
+        assert_nil s.results.first.published_on
+      end
+
     end
 
   end

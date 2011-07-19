@@ -254,7 +254,23 @@ module Tire
             fields :title
           end
           hash = MultiJson.decode( s.to_json )
-          assert_equal 'title', hash['fields']
+          assert_equal ['title'], hash['fields']
+        end
+
+        should "take multiple fields as an Array" do
+          s = Search::Search.new('index') do
+            fields [:title, :tags]
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal ['title', 'tags'], hash['fields']
+        end
+
+        should "take multiple fields as splat argument" do
+          s = Search::Search.new('index') do
+            fields :title, :tags
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal ['title', 'tags'], hash['fields']
         end
 
       end

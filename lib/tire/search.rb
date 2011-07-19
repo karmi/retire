@@ -64,8 +64,8 @@ module Tire
         self
       end
 
-      def fields(fields=[])
-        @fields = fields
+      def fields(*fields)
+        @fields = Array(fields.flatten)
         self
       end
 
