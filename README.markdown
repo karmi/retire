@@ -367,7 +367,7 @@ For serious usage, though, you'll definitely want to define a custom mapping for
       include Tire::Model::Callbacks
 
       mapping do
-        indexes :id,           :type => 'string',  :analyzed => false
+        indexes :id,           :type => 'string',  :index    => :not_analyzed
         indexes :title,        :type => 'string',  :analyzer => 'snowball', :boost => 100
         indexes :content,      :type => 'string',  :analyzer => 'snowball'
         indexes :author,       :type => 'string',  :analyzer => 'keyword'
