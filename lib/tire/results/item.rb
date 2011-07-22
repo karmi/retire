@@ -13,11 +13,10 @@ module Tire
           self[key.to_sym] = case
             when value.is_a?(Hash)
               if value['_name'] && value['_content_type']
-                # file = File.new(value['_name'], File::CREAT|File::TRUNC|File::RDWR, 0644)
-                file << value['content'].unpack('m').to_s
-                value['content'] = file
+                Attachment.new(value.to_hash)
+              else
+                self.class.new(value.to_hash)
               end
-              self.class.new(value.to_hash)
             else
               value
           end

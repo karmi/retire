@@ -57,8 +57,15 @@ module Tire
         assert_equal 'Kafka', @document.author.name
       end
 
-      should "base64 decode attachments" do
-        
+      should "wrap attachments in an Attachment instance" do
+        @document = Results::Item.new :attachment => { '_name'         => 'test.txt',
+                                                       '_content_type' => 'text/plain',
+                                                       'content'       => 'QQ==' }
+
+        assert_instance_of         Tire::Attachment, @document.attachment
+        assert_equal 'test.txt',   @document.attachment.filename
+        assert_equal 'text/plain', @document.attachment.content_type
+        assert_equal 'A',          @document.attachment.content
       end
 
     end

@@ -6,12 +6,16 @@ class Hash
 
   def to_indexed_json
     # Wrap instances of File in the Attachment class
-    # TODO: Do not modify Hash here, wrap Hashes in a Document instance, similarly
+    # TODO: Do not modify Hash here, wrap Hashes in a Document instance
     # TODO: Add support for Array of attachments
-    self.each_pair do |key,value| 
-      self.store key, Tire::Attachment.new(value) if value.is_a?(File)
+    self.each_pair do |key,value|
+# p [key, value]
+
+      self.store key, Tire::Attachment.new(value).to_hash if value.is_a?(File)
       value.each_pair do |k, v|
-        value.store k, Tire::Attachment.new(v) if v.is_a?(File)
+# p [k, v]
+
+        value.store k, Tire::Attachment.new(v).to_hash if v.is_a?(File)
       end if value.respond_to?(:each_pair)
     end
     self.to_json
