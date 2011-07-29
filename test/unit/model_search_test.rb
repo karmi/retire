@@ -127,6 +127,15 @@ module Tire
             end
           end
 
+          should "allow to pass :page and :per_page options" do
+            Tire::Search::Search.any_instance.expects(:size).with(10)
+            Tire::Search::Search.any_instance.expects(:from).with(20)
+
+            ActiveModelArticle.search :per_page => 10, :page => 3 do
+              query { string 'foo' }
+            end
+          end
+
         end
 
         context "searching with query string" do

@@ -38,7 +38,7 @@ module Tire
 
         should "find first page with five results" do
           results = PersistentArticle.search( :per_page => 5, :page => 1 ) { query { all } }
-          assert_equal 9, results.size
+          assert_equal 5, results.size
 
           assert_equal 2, results.total_pages
           assert_equal 1, results.current_page

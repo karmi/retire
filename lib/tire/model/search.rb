@@ -34,32 +34,61 @@ module Tire
 
       module ClassMethods
 
+        # Returns search results for a given query.
+        #
+        # Query can be passed simply as a String:
+        #
+        #   Article.search 'love'
+        #
+        # Any options, such as pagination or sorting, can be passed as a second argument:
+        #
+        #   Article.search 'love', :per_page => 25, :page => 2
+        #   Article.search 'love', :sort => 'title'
+        #
+        # For more powerful query definition, use the query DSL passed as a block:
+        #
+        #   Article.search do
+        #     query { terms :tags, ['ruby', 'python'] }
+        #     facet 'tags' { terms :tags }
+        #   end
+        #
+        # You can pass options as the first argument, in this case:
+        #
+        #   Article.search :per_page => 25, :page => 2 do
+        #     query { string 'love' }
+        #   end
+        #
+        #
         def search(*args, &block)
           default_options = {:type => document_type}
 
-          unless block_given?
+          if block_given?
+            options = args.shift || {}
+          else
             query, options = args
             options ||= {}
-            sort      = Array( options[:order] || options[:sort] )
-            options   = default_options.update(options)
-            s = Tire::Search::Search.new(elasticsearch_index.name, options)
-            s.query { string query }
-            s.sort do
-              sort.each do |t|
-                field_name, direction = t.split(' ')
-                by field_name, direction
-              end
-            end unless sort.empty?
-            s.size( options[:per_page].to_i ) if options[:per_page]
-            s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
-            s.perform.results
-          else
-            options = args.shift || {}
-            options = default_options.update(options)
-            s = Tire::Search::Search.new(elasticsearch_index.name, options)
-            block.arity < 1 ? s.instance_eval(&block) : block.call(s)
-            s.perform.results
           end
+
+          sort      = Array( options[:order] || options[:sort] )
+          options   = default_options.update(options)
+
+          s = Tire::Search::Search.new(elasticsearch_index.name, options)
+          s.size( options[:per_page].to_i ) if options[:per_page]
+          s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
+          s.sort do
+            sort.each do |t|
+              field_name, direction = t.split(' ')
+              by field_name, direction
+            end
+          end unless sort.empty?
+
+          if block_given?
+            block.arity < 1 ? s.instance_eval(&block) : block.call(s)
+          else
+            s.query { string query }
+          end
+
+          s.perform.results
         end
 
         # Wrapper for the ES index for this class
