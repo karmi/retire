@@ -32,7 +32,14 @@ module Tire
 
       module ClassMethods
 
-        def search(query=nil, options={}, &block)
+        # Usage:
+        #
+        # search('query', [options])
+        # search([options]) do <block> end
+        def search(*args, &block)
+          query = args.size >= 1 ? args[0] : nil
+          options = args.size > 0 ? (args.last.respond_to?(:keys) ? args.last : {}) : {}
+
           old_wrapper = Tire::Configuration.wrapper
           Tire::Configuration.wrapper self
 
