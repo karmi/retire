@@ -307,6 +307,8 @@ Fortunately, _Tire_ makes blending _ElasticSearch_ features into your models tri
 ActiveModel Integration
 -----------------------
 
+**NOTE:** Please note that the ActiveModel/ActiveRecord integration will **change considerably in the next release** (for the better). You can read it up in the Readme on the [activerecord](https://github.com/karmi/tire/blob/activerecord/README.markdown) branch. The reasoning for this change can be found at the [tire#12](https://github.com/karmi/tire/issues/12) issue.
+
 If you're the type with no time for lengthy introductions, you can generate a fully working
 example Rails application, with an `ActiveRecord` model and a search form, to play with:
 
