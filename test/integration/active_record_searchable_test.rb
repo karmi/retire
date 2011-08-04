@@ -53,6 +53,7 @@ module Tire
 
         results = ActiveRecordArticle.search 'test'
 
+        assert       results.any?
         assert_equal 1, results.count
 
         assert_instance_of Results::Item, results.first
@@ -73,6 +74,7 @@ module Tire
         should "load records on query search" do
           results = ActiveRecordArticle.search '"Test 1"', :load => true
 
+          assert       results.any?
           assert_equal ActiveRecordArticle.find(1), results.first
         end
 
@@ -87,6 +89,16 @@ module Tire
         should "load records with options on query search" do
           assert_equal ActiveRecordArticle.find(['1', '2'], :include => 'comments'),
                        ActiveRecordArticle.search('"Test 1" OR "Test 2"', :load => { :include => 'comments' }).results
+        end
+
+        should "return empty collection for nonmatching query" do
+          assert_nothing_raised do
+            results = ActiveRecordArticle.search :load => true do
+              query { string '"Hic Sunt Leones"' }
+            end
+            assert_equal 0, results.size
+            assert ! results.any?
+          end
         end
       end
 
