@@ -8,22 +8,24 @@ full-text search engine and database, communicating by JSON over RESTful HTTP,
 based on [Lucene](http://lucene.apache.org/), written in Java.
 
 This document provides just a brief overview of _Tire's_ features. Be sure to check out also
-the extensive documentation at <http://karmi.github.com/tire/> if you're interested.
+the extensive documentation at <http://karmi.github.com/tire/>.
+
+**NOTE:** Both of these documents contain a lot of information about _Tire_. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please refer to the integration test suite and [issues](https://github.com/karmi/tire/issues).
 
 Installation
 ------------
 
-First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's define easy:
+OK. First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's define easy:
 
     $ curl -k -L -o elasticsearch-0.17.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.2.tar.gz
     $ tar -zxvf elasticsearch-0.17.2.tar.gz
     $ ./elasticsearch-0.17.2/bin/elasticsearch -f
 
-OK. Easy. On a Mac, you can also use _Homebrew_:
+See, easy. On a Mac, you can also use _Homebrew_:
 
     $ brew install elasticsearch
 
-OK. Let's install the gem via Rubygems:
+Now, let's install the gem via Rubygems:
 
     $ gem install tire
 
