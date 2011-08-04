@@ -210,7 +210,7 @@ we can use the [_bool_](http://www.elasticsearch.org/guide/reference/query-dsl/b
 query. In _Tire_, we build them declaratively.
 
 ```ruby
-    Tire.search('articles') do
+    Tire.search 'articles' do
       query do
         boolean do
           should   { string 'tags:ruby' }
@@ -242,7 +242,7 @@ And a query for the _published_on_ property:
 Now, we can combine these queries for different searches:
 
 ```ruby
-    Tire.search('articles') do
+    Tire.search 'articles' do
       query do
         boolean &tags_query
         boolean &published_on_query
@@ -250,7 +250,17 @@ Now, we can combine these queries for different searches:
     end
 ```
 
-If configuring the search payload with blocks somehow feels too weak for you, you can pass
+Note, that you can pass options for configuring queries, facets, etc. by passing a Hash as the last argument to the method call:
+
+```ruby
+    Tire.search 'articles' do
+      query do
+        string 'ruby python', :default_operator => 'AND', :use_dis_max => true
+      end
+    end
+```
+
+If configuring the search payload with blocks feels somehow too weak for you, you can pass
 a plain old Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
 ```ruby
@@ -260,7 +270,7 @@ a plain old Ruby `Hash` (or JSON string) with the query declaration to the `sear
 If this sounds like a great idea to you, you are probably able to write your application
 using just `curl`, `sed` and `awk`.
 
-We can display the full query JSON for close inspection:
+For debugging purposes, we can display the full query JSON for close inspection:
 
 ```ruby
     puts s.to_json

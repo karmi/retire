@@ -30,6 +30,15 @@ module Tire
         assert_equal 4, search(q).results.count
       end
 
+      should "pass options to query definition" do
+        s = Tire.search 'articles-test' do
+          query do
+            string 'ruby python', :default_operator => 'AND'
+          end
+        end
+        assert_equal 1, s.results.count
+      end
+
     end
 
     private
