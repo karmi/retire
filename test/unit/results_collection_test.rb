@@ -6,7 +6,8 @@ module Tire
 
     context "Collection" do
       setup do
-        Configuration.reset :wrapper
+        begin; Object.send(:remove_const, :Rails); rescue; end
+        Configuration.reset
         @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
                                                      {'_id' => 2},
                                                      {'_id' => 3}] } }
@@ -110,7 +111,7 @@ module Tire
         # Underlying issue: https://github.com/karmi/tire/pull/31#issuecomment-1340967
         #
         setup do
-          Configuration.reset :wrapper
+          Configuration.reset
           @default_response = { 'hits' => { 'hits' =>
             [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article',
                 'fields' => {
