@@ -4,13 +4,14 @@ Tire
 _Tire_ is a Ruby client for the [ElasticSearch](http://www.elasticsearch.org/) search engine/database.
 
 _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available,
-full-text search engine and database, communicating by JSON over RESTful HTTP,
-based on [Lucene](http://lucene.apache.org/), written in Java.
+full-text search engine and database with
+[powerfull aggregation features](http://www.elasticsearch.org/guide/reference/api/search/facets/),
+communicating by JSON over RESTful HTTP, based on [Lucene](http://lucene.apache.org/), written in Java.
 
-This document provides just a brief overview of _Tire's_ features. Be sure to check out also
-the extensive documentation at <http://karmi.github.com/tire/>.
+This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/tire/>.
 
-**NOTE:** Both of these documents contain a lot of information about _Tire_. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please refer to the integration test suite and [issues](https://github.com/karmi/tire/issues).
+Both of these documents contain a lot of information. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please refer to the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
+and [issues](https://github.com/karmi/tire/issues).
 
 Installation
 ------------
@@ -63,7 +64,7 @@ which allows you to use your preferred JSON library. We'll use the
     require 'yajl/json_gem'
 ```
 
-OK. Let's create an index named `articles` and store/index some documents:
+Let's create an index named `articles` and store/index some documents:
 
 ```ruby
     Tire.index 'articles' do
@@ -191,7 +192,7 @@ count for articles tagged 'php' is excluded, since they don't match the current 
     # java       1
 ```
 
-Notice, that only variables from the enclosing scope are accesible.
+Notice, that only variables from the enclosing scope are accessible.
 If we want to access the variables or methods from outer scope,
 we have to use a slight variation of the DSL, by passing the
 `search` and `query` objects around.
