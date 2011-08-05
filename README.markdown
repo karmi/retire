@@ -139,7 +139,7 @@ from the database:
 
       filter :terms, :tags => ['ruby']
 
-      sort { title 'desc' }
+      sort { by :title, 'desc' }
 
       facet 'global-tags' do
         terms :tags, :global => true
