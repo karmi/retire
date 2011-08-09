@@ -280,7 +280,8 @@ module Tire
           document.type
         end
       $VERBOSE = old_verbose
-      type ||= :document
+      raise "Please specify a type" unless type
+      type
     end
 
     def get_id_from_document(document)
