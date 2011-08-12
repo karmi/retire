@@ -104,12 +104,12 @@ one by one. We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch
 
 ```ruby
     articles = [
-      { :id => '1', :title => 'one'   },
-      { :id => '2', :title => 'two'   },
-      { :id => '3', :title => 'three' }
+      { :id => '1', :title => 'one', :type=>"article"   },
+      { :id => '2', :title => 'two', :type=>"article"   },
+      { :id => '3', :title => 'three', :type=>"article" }
     ]
 
-    Tire.index 'bulk' do
+    Tire.index 'articles' do
       import articles
     end
 ```
@@ -118,7 +118,7 @@ We can also easily manipulate the documents before storing them in the index, by
 `import` method:
 
 ```ruby
-    Tire.index 'bulk' do
+    Tire.index 'articles' do
       import articles do |documents|
 
         documents.each { |document| document[:title].capitalize! }
