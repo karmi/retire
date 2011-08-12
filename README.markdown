@@ -86,6 +86,8 @@ for a specific document type:
 
 ```ruby
     Tire.index 'articles' do
+      delete
+
       create :mappings => {
         :article => {
           :properties => {
@@ -100,29 +102,35 @@ for a specific document type:
 ```
 
 Of course, we may have large amounts of data, and it may be impossible or impractical to add them to the index
-one by one. We can use _ElasticSearch's_ [bulk storage](http://www.elasticsearch.org/guide/reference/api/bulk.html):
+one by one. We can use _ElasticSearch's_
+[bulk storage](http://www.elasticsearch.org/guide/reference/api/bulk.html).
+Notice, that collection items must have an `id` property or method,
+and should have a `type` property, if you've set any specific mapping for the index.
 
 ```ruby
     articles = [
-      { :id => '1', :title => 'one'   },
-      { :id => '2', :title => 'two'   },
-      { :id => '3', :title => 'three' }
+      { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby']           },
+      { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'] },
+      { :id => '3', :type => 'article', :title => 'three', :tags => ['java']           },
+      { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php']    }
     ]
 
-    Tire.index 'bulk' do
+    Tire.index 'articles' do
       import articles
     end
 ```
 
-We can also easily manipulate the documents before storing them in the index, by passing a block to the
-`import` method:
+We can easily manipulate the documents before storing them in the index, by passing a block to the
+`import` method, like this:
 
 ```ruby
-    Tire.index 'bulk' do
+    Tire.index 'articles' do
       import articles do |documents|
 
         documents.each { |document| document[:title].capitalize! }
       end
+
+      refresh
     end
 ```
 
