@@ -319,12 +319,21 @@ module Tire
           end
         end
 
-        should "raise exception when collection item does not have ID" do
+        should "display error message when collection item does not have ID" do
           Configuration.client.expects(:post).with { |url, json| url  == "#{Configuration.url}/_bulk" }
           STDERR.expects(:puts).once
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
           ActiveModelArticle.elasticsearch_index.bulk_store documents
+        end
+
+        should "work on the clone of original document since we mess with it in get_type_from_document etc" do
+          Configuration.client.expects(:post)
+          one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
+
+          one.expects(:clone).returns( one )
+
+          ActiveModelArticle.elasticsearch_index.bulk_store [ one ]
         end
 
       end
