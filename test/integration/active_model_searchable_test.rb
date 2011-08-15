@@ -61,7 +61,10 @@ module Tire
       should "remove document from index on destroy" do
         a = SupermodelArticle.new :title => 'Test'
         a.save
+        assert_equal 1, SupermodelArticle.all.size
+
         a.destroy
+        assert_equal 0, SupermodelArticle.all.size
 
         a.index.refresh
         sleep(1.25)
