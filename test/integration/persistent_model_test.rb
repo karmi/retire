@@ -28,6 +28,27 @@ module Tire
         assert_equal 2, results.size
         
       end
+
+      context "with pagination" do
+
+        setup do
+          1.upto(9) { |number| PersistentArticle.create :title => "Test#{number}" }
+          PersistentArticle.elasticsearch_index.refresh
+        end
+
+        should "find first page with five results" do
+          results = PersistentArticle.search( :per_page => 5, :page => 1 ) { query { all } }
+          assert_equal 9, results.size
+
+          assert_equal 2, results.total_pages
+          assert_equal 1, results.current_page
+          assert_equal nil, results.previous_page
+          assert_equal 2, results.next_page
+
+          assert_equal 'Test1', results.first.title
+        end
+      end
+
     end
 
   end
