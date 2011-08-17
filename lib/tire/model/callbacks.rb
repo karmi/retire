@@ -9,7 +9,7 @@ module Tire
           base.send :after_destroy, :update_elastic_search_index
         end
 
-        if base.respond_to?(:before_destroy) && !base.instance_methods.include?('destroyed?')
+        if base.respond_to?(:before_destroy) && !base.instance_methods.include?(:destroyed?)
           base.class_eval do
             before_destroy  { @destroyed = true }
             def destroyed?; !!@destroyed; end
