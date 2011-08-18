@@ -15,9 +15,17 @@ module Tire
       end
 
       def terms(field, options={})
-        size      = options.delete(:size) || 10
-        all_terms = options.delete(:all_terms) || false
-        @value = { :terms => { :field => field, :size => size, :all_terms => all_terms } }.update(options)
+        size         = options.delete(:size) || 10
+        all_terms    = options.delete(:all_terms) || false
+        script_field = options.delete(:script_field) || false
+
+        terms = if script_field
+            { :terms => { :script_field => "_source.#{field}", :size => size } }
+          else
+            { :terms => { :field => field, :size => size, :all_terms => all_terms } }
+          end
+
+        @value = terms.update(options)
         self
       end
 

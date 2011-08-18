@@ -46,6 +46,13 @@ module Tire::Search
           assert_equal true, Facet.new('foo') { terms :foo, :all_terms => true }.to_hash['foo'][:terms][:all_terms]
         end
 
+        should "be able to do script_field terms facet" do
+          f = Facet.new('foo') do
+            terms :bar, :script_field => true
+          end
+          assert_equal( { :foo => { :terms => {:script_field=>'_source.bar',:size=>10} } }.to_json, f.to_json )
+        end
+
       end
 
       context "date histogram" do
