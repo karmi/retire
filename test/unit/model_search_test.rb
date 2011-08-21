@@ -189,6 +189,17 @@ module Tire
             ActiveModelArticle.search @q, :per_page => 10, :page => 3
           end
 
+          should "allow to specify page even if using a block" do
+            Tire::Search::Search.any_instance.expects(:size).with(10)
+            Tire::Search::Search.any_instance.expects(:from).with(20)
+
+            ActiveModelArticle.search :per_page => 10, :page => 3 do
+              query do
+                string 'foo AND bar' #@q is not visible here
+              end
+            end
+          end
+
         end
 
         should "not set callback when hooks are missing" do

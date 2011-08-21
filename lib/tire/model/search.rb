@@ -32,15 +32,24 @@ module Tire
 
       module ClassMethods
 
-        def search(query=nil, options={}, &block)
+        # Usage:
+        #
+        # search('query', [options])
+        # search([options]) do <block> end
+        def search(*args, &block)
+          query = args.size >= 1 ? args[0] : nil
+          options = args.size > 0 ? (args.last.respond_to?(:keys) ? args.last : {}) : {}
+
           old_wrapper = Tire::Configuration.wrapper
           Tire::Configuration.wrapper self
 
           sort    = Array( options[:order] || options[:sort] )
           options = {:type => document_type}.update(options)
 
+          s = Tire::Search::Search.new(elasticsearch_index.name, options)
+          s.size( options[:per_page].to_i ) if options[:per_page]
+          s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
           unless block_given?
-            s = Tire::Search::Search.new(elasticsearch_index.name, options)
             s.query { string query }
             s.sort do
               sort.each do |t|
@@ -48,14 +57,10 @@ module Tire
                 by field_name, direction
               end
             end unless sort.empty?
-            s.size( options[:per_page].to_i ) if options[:per_page]
-            s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
-            s.perform.results
           else
-            s = Tire::Search::Search.new(elasticsearch_index.name, options)
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
-            s.perform.results
           end
+          s.perform.results
         ensure
           Tire::Configuration.wrapper old_wrapper
         end
