@@ -1,13 +1,13 @@
 module Tire
-  VERSION   = "0.1.16"
+  VERSION   = "0.2.0"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    # Defined mapping for nested fields [#56]
-    # Mapping type is optional and defaults to "string"
-    # Fixed handling of fields returned prefixed by _source from ES [#31]
-    # Allow passing the type to search and added that model passes `document_type` to search [@jonkarna, #38]
-    # Allow leaving index name empty for searching the whole server
+    # By default, results are wrapped in Item class (05a1331)
+    # Completely rewritten ActiveModel/ActiveRecord support
+    # Added method to items for loading the "real" model from database (f9273bc)
+    # Added the ':load' option to eagerly load results from database (1e34cde)
+    # Deprecated the dynamic sort methods, use the 'sort { by :field_name }' syntax
   END
 end
