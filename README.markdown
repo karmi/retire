@@ -43,8 +43,7 @@ Usage
 
 _Tire_ exposes easy-to-use domain specific language for fluent communication with _ElasticSearch_.
 
-It also blends with your [ActiveModel](https://github.com/rails/rails/tree/master/activemodel)
-classes for convenient usage in Rails applications.
+It easily blends with your _ActiveModel_/_ActiveRecord_ classes for convenient usage in _Rails_ applications.
 
 To test-drive the core _ElasticSearch_ functionality, let's require the gem:
 
@@ -330,8 +329,6 @@ Fortunately, _Tire_ makes blending _ElasticSearch_ features into your models tri
 ActiveModel Integration
 -----------------------
 
-**NOTE:** Please note that the ActiveModel/ActiveRecord integration will **change considerably in the next release** (for the better). You can read it up in the Readme on the [activerecord](https://github.com/karmi/tire/blob/activerecord/README.markdown) branch. The reasoning for this change can be found at the [tire#12](https://github.com/karmi/tire/issues/12) issue.
-
 If you're the type with no time for lengthy introductions, you can generate a fully working
 example Rails application, with an `ActiveRecord` model and a search form, to play with
 (it even downloads _ElasticSearch_ itself, generates the application skeleton and leaves you with
@@ -339,7 +336,8 @@ a _Git_ repository to explore the steps and the code):
 
     $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
 
-For the rest, let's suppose you have an `Article` class in your Rails application.
+For the rest of us, let's suppose you have an `Article` class in your _Rails_ application.
+
 To make it searchable with _Tire_, just `include` it:
 
 ```ruby
@@ -360,8 +358,8 @@ When you now save a record:
 
 it is automatically added into the index, because of the included callbacks.
 (You may want to skip them in special cases, like when your records are indexed via some external
-mechanism, let's say CouchDB or RabbitMQ [river](http://www.elasticsearch.org/blog/2010/09/28/the_river.html)
-for _ElasticSearch_.)
+mechanism, let's say a _CouchDB_ or _RabbitMQ_
+[river](http://www.elasticsearch.org/blog/2010/09/28/the_river.html).
 
 The document attributes are indexed exactly as when you call the `Article#to_json` method.
 
@@ -384,8 +382,8 @@ advanced facet aggregation, highlighting, etc:
     end
 ```
 
-Dynamic mapping is a godsend when you're prototyping.
-For serious usage, though, you'll definitely want to define a custom mapping for your model:
+Second, dynamic mapping is a godsend when you're prototyping.
+For serious usage, though, you'll definitely want to define a custom mapping for your models:
 
 ```ruby
     class Article < ActiveRecord::Base
@@ -403,12 +401,12 @@ For serious usage, though, you'll definitely want to define a custom mapping for
 ```
 
 In this case, _only_ the defined model attributes are indexed. The `mapping` declaration creates the
-index when the class is loaded or when the importing features are used, and _only_ when it does not exist, yet.
+index when the class is loaded or when the importing features are used, and _only_ when it does not yet exist.
 (It may well be reasonable to wrap the index creation logic in a class method of your model, so you
-have better control on index creation when bootstrapping your application or when setting up tests.)
+have better control on index creation when bootstrapping your application or when setting up the test suite.)
 
 When you want a tight grip on how the attributes are added to the index, just
-provide the `to_indexed_json` method in your model:
+implement the `to_indexed_json` method in your model:
 
 ```ruby
     class Article < ActiveRecord::Base
@@ -446,7 +444,7 @@ and retrieve it, simply, via the dot notation:
     end
 ```
 
-The `Item` instances masquerade themselves as instances of your model in _Rails_
+The `Item` instances masquerade themselves as instances of your model within a _Rails_ application
 (based on the `_type` property retrieved from _ElasticSearch_), so you can use them carefree;
 all the `url_for` or `dom_id` helpers work as expected.
 
@@ -456,9 +454,11 @@ stored in _ElasticSearch_), just load it from the database:
 ```ruby
     puts article.load(:include => 'comments').comments.size
 ```
+
 You can see that _Tire_ stays as far from the database as possible. That's because it believes
 you have most of the data you want to display stored in _ElasticSearch_. When you need
-to load the records from the database itself, for whatever reason, you can do it with the `:load` option:
+to eagerly load the records from the database itself, for whatever reason,
+you can do it with the `:load` option when searching:
 
 ```ruby
     # Will call `Article.search [1, 2, 3]`
@@ -522,7 +522,7 @@ provided by the `mapping` block in your model):
 When you'll spend more time with _ElasticSearch_, you'll notice how
 [index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
 are the best idea since the invention of inverted index.
-You can index your data into a fresh index (and possibly update an alias if everything's fine):
+You can index your data into a fresh index (and possibly update an alias once everything's fine):
 
 ```bash
     $ rake environment tire:import CLASS='Article' INDEX='articles-2011-05'
@@ -563,7 +563,8 @@ Well, things stay mostly the same:
     Article.search 'love'
 ```
 
-That's kinda nice. But there's more.
+_Tire_ does not care what's your primary data storage solution, if it has an _ActiveModel_-compatible
+adapter. But there's more.
 
 _Tire_ implements not only _searchable_ features, but also _persistence_ features. This means you can use a _Tire_ model **instead of your database**, not just for _searching_ your database. Why would you like to do that?
 
@@ -576,7 +577,7 @@ then constructing elaborate database query conditions.
 Because you have _lots_ of data and want to use _ElasticSearch's_
 advanced distributed features.
 
-To use the persistence features, just include the `Tire::Persistence` module in your class and define the properties (like with CouchDB- or MongoDB-based models):
+To use the persistence features, just include the `Tire::Persistence` module in your class and define the properties (like with _CouchDB_- or _MongoDB_-based models):
 
 ```ruby
     class Article
