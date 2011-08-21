@@ -6,9 +6,6 @@ module Tire
       attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters, :options
 
       def initialize(indices=nil, options = {}, &block)
-        Tire.warn "Passing indices as multiple arguments to the `Search.new` method " +
-                  "has been deprecated, please pass them as an Array: " +
-                  "Search.new([#{indices}, #{options}])" if options.is_a?(String)
         @indices = Array(indices)
         @options = options
         @type    = @options[:type]

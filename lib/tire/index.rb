@@ -41,21 +41,8 @@ module Tire
     end
 
     def store(*args)
-      case
-        when ( args.size === 3 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
-          Tire.warn "Passing the document type as argument in Index#store has been deprecated, " +
-                    "please pass a Hash with _type/type property, or " +
-                    "an object with _type/type/document_type method."
-          type, document, options = args
-        when ( args.size === 2 && (args.first.is_a?(String) || args.first.is_a?(Symbol)) )
-          Tire.warn "Passing the document type as argument in Index#store has been deprecated" +
-                    "please pass a Hash with _type/type property, or " +
-                    "an object with _type/type/document_type method."
-          type, document = args
-        else
-          document, options = args
-          type = get_type_from_document(document)
-      end
+      document, options = args
+      type = get_type_from_document(document)
 
       if options
         percolate = options[:percolate]
@@ -218,15 +205,8 @@ module Tire
     end
 
     def percolate(*args, &block)
-      if args.size > 1
-        Tire.warn "Passing the document type as argument in Index#percolate has been deprecated, " +
-                  "please pass a Hash with _type/type property, or " +
-                  "an object with _type/type/document_type method."
-        type, document = args
-      else
-        document = args.pop
-        type     = get_type_from_document(document)
-      end
+      document = args.pop
+      type     = get_type_from_document(document)
 
       document = MultiJson.decode convert_document_to_json(document)
 

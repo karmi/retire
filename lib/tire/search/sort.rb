@@ -12,13 +12,6 @@ module Tire
         self
       end
 
-      def method_missing(id, *args, &block)
-        Tire.warn "Using methods when sorting has been deprecated, please use the `by` method: " +
-                  "sort { by :#{id}#{ args.empty? ? '' : ', ' + args.first.inspect } }"
-
-        by id, args.shift
-      end
-
       def to_ary
         @value
       end

@@ -107,11 +107,6 @@ module Tire
 
       module InstanceMethods
 
-        def score
-          Tire.warn "#{self.class}#score has been deprecated, please use #{self.class}#_score instead."
-          attributes['_score']
-        end
-
         def index
           self.class.elasticsearch_index
         end
