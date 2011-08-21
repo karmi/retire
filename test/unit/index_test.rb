@@ -181,7 +181,10 @@ module Tire
         setup do
           Configuration.reset :wrapper
 
-          Configuration.client.stubs(:post).with("#{Configuration.url}/dummy/article/", '{"title":"Test"}').
+          Configuration.client.stubs(:post).with do |url, payload|
+                                              url     == "#{Configuration.url}/dummy/article/" &&
+                                              payload =~ /"title":"Test"/
+                                            end.
                                             returns(mock_response('{"ok":true,"_id":"id-1"}'))
           @index.store :type => 'article', :title => 'Test'
         end
@@ -325,15 +328,6 @@ module Tire
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
           ActiveModelArticle.elasticsearch_index.bulk_store documents
-        end
-
-        should "work on the clone of original document since we mess with it in get_type_from_document etc" do
-          Configuration.client.expects(:post)
-          one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
-
-          one.expects(:clone).returns( one )
-
-          ActiveModelArticle.elasticsearch_index.bulk_store [ one ]
         end
 
       end
@@ -496,7 +490,7 @@ module Tire
           Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
-                                               payload['query']['query_string']['query'] == 'foo'
+                                               payload['query']['query_string']['query'] == 'foo' &&
                                                payload['tags'] == ['alert']
                                            end.
                                returns(mock_response('{
@@ -557,13 +551,21 @@ module Tire
         context "while storing document" do
 
           should "percolate document against all registered queries" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=*", '{"title":"Test"}').
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   url     == "#{Configuration.url}/dummy/article/?percolate=*" &&
+                                   payload =~ /"title":"Test"/
+                                 end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             @index.store( {:type => 'article', :title => 'Test'}, {:percolate => true} )
           end
 
           should "percolate document against specific queries" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/article/?percolate=tag:alerts", '{"title":"Test"}').
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   url     == "#{Configuration.url}/dummy/article/?percolate=tag:alerts" &&
+                                   payload =~ /"title":"Test"/
+                                 end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => 'tag:alerts'} )
             assert_equal response['matches'], ['alerts']

@@ -80,15 +80,14 @@ module Tire
 
     def bulk_store documents
       payload = documents.map do |document|
-        doc  = document.clone
-        id   = get_id_from_document(doc)
-        type = get_type_from_document(doc)
+        id   = get_id_from_document(document)
+        type = get_type_from_document(document)
 
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
         output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
-        output << convert_document_to_json(doc)
+        output << convert_document_to_json(document)
         output.join("\n")
       end
       payload << ""
@@ -274,14 +273,14 @@ module Tire
         when document.respond_to?(:document_type)
           document.document_type
         when document.is_a?(Hash)
-          document.delete(:_type) || document.delete('_type') || document.delete(:type) || document.delete('type')
+          document[:_type] || document['_type'] || document[:type] || document['type']
         when document.respond_to?(:_type)
           document._type
         when document.respond_to?(:type) && document.type != document.class
           document.type
         end
       $VERBOSE = old_verbose
-      type ||= :document
+      type || :document
     end
 
     def get_id_from_document(document)
