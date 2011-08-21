@@ -44,8 +44,6 @@ module Tire
           assert_equal 1, results.current_page
           assert_equal nil, results.previous_page
           assert_equal 2, results.next_page
-
-          assert_equal 'Test1', results.first.title
         end
       end
 
