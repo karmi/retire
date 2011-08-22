@@ -79,7 +79,7 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{@url}?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{@url}" -d '#{self.to_json}'|
       end
 
       def to_hash
@@ -110,7 +110,7 @@ module Tire
           if Configuration.logger.level.to_s == 'debug'
             # FIXME: Depends on RestClient implementation
             body = if @response
-              defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
+              defined?(Yajl) ? Yajl::Encoder.encode(@json) : MultiJson.encode(@json)
             else
               error.http_body rescue ''
             end

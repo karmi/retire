@@ -67,7 +67,7 @@ module Tire
         s = Search::Search.new('index') do
           query { string 'title:foo' }
         end
-        assert_equal %q|curl -X GET "http://localhost:9200/index/_search?pretty=true" -d | +
+        assert_equal %q|curl -X GET "http://localhost:9200/index/_search" -d | +
                      %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
                      s.to_curl
       end
