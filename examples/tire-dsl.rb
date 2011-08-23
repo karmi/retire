@@ -297,7 +297,7 @@ puts s.to_json
 # Or better yet, we may display a complete `curl` command to recreate the request in terminal,
 # so we can see the naked response, tweak request parameters and meditate on problems.
 #
-#     curl -X POST "http://localhost:9200/articles/_search?pretty=true" \
+#     curl -X POST "http://localhost:9200/articles/_search" \
 #          -d '{"query":{"query_string":{"query":"title:T*"}}}'
 #
 puts "", "Try the query in Curl:", "-"*80

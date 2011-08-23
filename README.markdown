@@ -292,7 +292,7 @@ Or, better, we can display the corresponding `curl` command to recreate and debu
 
 ```ruby
     puts s.to_curl
-    # curl -X POST "http://localhost:9200/articles/_search?pretty=true" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
+    # curl -X POST "http://localhost:9200/articles/_search" -d '{"facets":{"current-tags":{"terms":{"field":"tags"}},"global-tags":{"global":true,"terms":{"field":"tags"}}},"query":{"query_string":{"query":"title:T*"}},"filter":{"terms":{"tags":["ruby"]}},"sort":[{"title":"desc"}]}'
 ```
 
 However, we can simply log every search query (and other requests) in this `curl`-friendly format:

@@ -190,7 +190,7 @@ module Tire
       rescue Exception => error
         raise
       ensure
-        curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
+        curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}" -d '#{MultiJson.encode(options)}'|
         logged(error, '_percolator', curl)
     end
 
@@ -221,7 +221,7 @@ module Tire
       rescue Exception => error
         # raise
       ensure
-        curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/#{type}/_percolate?pretty=1" -d '#{payload.to_json}'|
+        curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/#{type}/_percolate" -d '#{payload.to_json}'|
         logged(error, '_percolate', curl)
     end
 
@@ -235,7 +235,7 @@ module Tire
         if Configuration.logger.level.to_s == 'debug'
           # FIXME: Depends on RestClient implementation
           body = if @response
-            defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
+            defined?(Yajl) ? Yajl::Encoder.encode(@json) : MultiJson.encode(@json)
           else
             error.http_body rescue ''
           end
