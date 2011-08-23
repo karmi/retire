@@ -71,8 +71,13 @@ module Tire
 
           sort      = Array( options[:order] || options[:sort] )
           options   = default_options.update(options)
-
-          s = Tire::Search::Search.new(elasticsearch_index.name, options)
+          
+          if options.fetch(:index_name, nil)
+            s = Tire::Search::Search.new(options.delete(:index_name), options)
+          else
+            s = Tire::Search::Search.new(elasticsearch_index.name, options)
+          end
+          
           s.size( options[:per_page].to_i ) if options[:per_page]
           s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
           s.sort do
