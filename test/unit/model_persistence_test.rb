@@ -409,13 +409,14 @@ module Tire
       context "Persistent model with mapping definition" do
 
         should "create the index with mapping" do
-          expected_mapping = {
+          expected = {
+            :settings => {},
             :mappings => { :persistent_article_with_mapping => {
               :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
             }}
           }
 
-          Tire::Index.any_instance.expects(:create).with(expected_mapping)
+          Tire::Index.any_instance.expects(:create).with(expected)
 
           class ::PersistentArticleWithMapping
 

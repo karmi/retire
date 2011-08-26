@@ -383,7 +383,7 @@ advanced facet aggregation, highlighting, etc:
 ```
 
 Second, dynamic mapping is a godsend when you're prototyping.
-For serious usage, though, you'll definitely want to define a custom mapping for your models:
+For serious usage, though, you'll definitely want to define a custom _mapping_ for your models:
 
 ```ruby
     class Article < ActiveRecord::Base
@@ -402,8 +402,40 @@ For serious usage, though, you'll definitely want to define a custom mapping for
 
 In this case, _only_ the defined model attributes are indexed. The `mapping` declaration creates the
 index when the class is loaded or when the importing features are used, and _only_ when it does not yet exist.
-(It may well be reasonable to wrap the index creation logic in a class method of your model, so you
-have better control on index creation when bootstrapping your application or when setting up the test suite.)
+
+Chances are, you want to declare also a custom _mapping_ for the index, such as set the number of shards,
+replicas, or create elaborate analyzer chains, such as the hipster's choice: [_ngrams_](https://gist.github.com/1160430).
+In this case, just wrap the `mapping` method in a `settings` one, passing it the settings as a Hash:
+
+```ruby
+    class URL < ActiveRecord::Base
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
+
+      settings :number_of_shards => 1,
+               :number_of_replicas => 1,
+               :analysis => {
+                 :filter => {
+                   :url_ngram  => {
+                     "type"     => "nGram",
+                     "max_gram" => 5,
+                     "min_gram" => 3 }
+                 },
+                 :analyzer => {
+                   :url_analyzer => {
+                      "tokenizer"    => "lowercase",
+                      "filter"       => ["stop", "url_ngram"],
+                      "type"         => "custom" }
+                 }
+               } do
+        mapping { indexes :url, :type => 'string', :analyzer => "url_analyzer" }
+      end
+    end
+```
+
+It may well be reasonable to wrap the index creation logic declared with `Tire.index('urls').create`
+in a class method of your model, in a module method, etc, so have better control on index creation when bootstrapping your application with Rake tasks or when setting up the test suite.
+_Tire_ will not hold that against you.
 
 When you want a tight grip on how the attributes are added to the index, just
 implement the `to_indexed_json` method in your model:

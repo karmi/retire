@@ -5,14 +5,19 @@ module Tire
 
       module ClassMethods
 
+        def settings(*args)
+          @settings ||= {}
+          args.empty?  ? (return @settings) : @settings = args.pop
+          yield if block_given?
+        end
+
         def mapping
+          @mapping ||= {}
           if block_given?
-            @store_mapping = true
-            yield
-            @store_mapping = false
-            create_index_or_update_mapping
+            @store_mapping = true and yield and @store_mapping = false
+            create_elasticsearch_index
           else
-            @mapping ||= {}
+            @mapping
           end
         end
 
@@ -39,17 +44,10 @@ module Tire
           @store_mapping || false
         end
 
-        def create_index_or_update_mapping
-          # STDERR.puts "Creating index with mapping", mapping_to_hash.inspect
-          # STDERR.puts "Index exists?, #{index.exists?}"
+        def create_elasticsearch_index
           unless elasticsearch_index.exists?
-            elasticsearch_index.create :mappings => mapping_to_hash
-          else
-            # TODO: Update mapping
+            elasticsearch_index.create :mappings => mapping_to_hash, :settings => settings
           end
-        rescue Exception => e
-          # TODO: STDERR + logger
-          raise
         end
 
         def mapping_to_hash

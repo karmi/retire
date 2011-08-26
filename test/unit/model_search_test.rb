@@ -246,13 +246,14 @@ module Tire
         context "with custom mapping" do
 
           should "create the index with mapping" do
-            expected_mapping = {
+            expected = {
+              :settings => {},
               :mappings => { :model_with_custom_mapping => {
                 :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
               }}
             }
 
-            Tire::Index.any_instance.expects(:create).with(expected_mapping)
+            Tire::Index.any_instance.expects(:create).with(expected)
 
             class ::ModelWithCustomMapping
               extend ActiveModel::Naming
@@ -271,7 +272,8 @@ module Tire
           end
 
           should "define mapping for nested properties with a block" do
-            expected_mapping = {
+            expected = {
+              :settings => {},
               :mappings => { :model_with_nested_mapping => {
                 :properties => {
                   :title =>  { :type => 'string' },
@@ -286,7 +288,7 @@ module Tire
               }
             }}
 
-            Tire::Index.any_instance.expects(:create).with(expected_mapping)
+            Tire::Index.any_instance.expects(:create).with(expected)
 
             class ::ModelWithNestedMapping
               extend ActiveModel::Naming
@@ -307,6 +309,39 @@ module Tire
 
             assert_not_nil ModelWithNestedMapping.mapping[:author][:properties][:last_name]
             assert_equal   100, ModelWithNestedMapping.mapping[:author][:properties][:last_name][:boost]
+          end
+
+        end
+
+        context "with settings" do
+
+          should "create the index with settings and mappings" do
+            expected_settings = {
+              :settings => { :number_of_shards => 1, :number_of_replicas => 1 }
+            }
+
+            Tire::Index.any_instance.expects(:create).with do |expected|
+              expected[:settings][:number_of_shards] == 1 &&
+              expected[:mappings].size > 0
+            end
+
+            class ::ModelWithCustomSettings
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              settings :number_of_shards => 1, :number_of_replicas => 1 do
+                mapping do
+                  indexes :title, :type => 'string'
+                end
+              end
+
+            end
+
+            assert_instance_of Hash, ModelWithCustomSettings.settings
+            assert_equal 1, ModelWithCustomSettings.settings[:number_of_shards]
           end
 
         end
