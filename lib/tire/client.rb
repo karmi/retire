@@ -15,6 +15,9 @@ module Tire
       def self.delete(url)
         ::RestClient.delete url rescue nil
       end
+      def self.head(url)
+        ::RestClient.head url
+      end
     end
 
   end
