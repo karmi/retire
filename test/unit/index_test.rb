@@ -15,12 +15,12 @@ module Tire
       end
 
       should "return true when exists" do
-        Configuration.client.expects(:get).returns(mock_response('{"dummy":{"document":{"properties":{}}}}'))
+        Configuration.client.expects(:head).returns(mock_response(''))
         assert @index.exists?
       end
 
       should "return false when does not exist" do
-        Configuration.client.expects(:get).raises(RestClient::ResourceNotFound)
+        Configuration.client.expects(:head).raises(RestClient::ResourceNotFound)
         assert ! @index.exists?
       end
 

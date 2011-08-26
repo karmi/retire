@@ -9,7 +9,7 @@ module Tire
     end
 
     def exists?
-      !!Configuration.client.get("#{Configuration.url}/#{@name}/_status")
+      !!Configuration.client.head("#{Configuration.url}/#{@name}")
     rescue Exception => error
       false
     end
