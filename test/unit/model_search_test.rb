@@ -106,9 +106,11 @@ module Tire
         end
 
         context "searching with a block" do
+          setup do
+            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
+          end
 
           should "pass on whatever block it received" do
-            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
             Tire::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
 
             ActiveModelArticle.search { query { string 'foo' } }
@@ -116,7 +118,6 @@ module Tire
 
           should "allow to pass block with argument to query, allowing to use local variables from outer scope" do
             Tire::Search::Query.any_instance.expects(:instance_eval).never
-            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
             Tire::Search::Query.any_instance.expects(:string).with('foo').returns(@stub)
 
             my_query = 'foo'
