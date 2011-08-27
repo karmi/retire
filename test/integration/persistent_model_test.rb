@@ -33,7 +33,7 @@ module Tire
 
         setup do
           1.upto(9) { |number| PersistentArticle.create :title => "Test#{number}" }
-          PersistentArticle.elasticsearch_index.refresh
+          PersistentArticle.index.refresh
         end
 
         should "find first page with five results" do

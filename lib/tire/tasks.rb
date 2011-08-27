@@ -44,7 +44,7 @@ namespace :tire do
     klass  = eval(ENV['CLASS'].to_s)
     params = eval(ENV['PARAMS'].to_s) || {}
 
-    index = Tire::Index.new( ENV['INDEX'] || klass.elasticsearch_index.name )
+    index = Tire::Index.new( ENV['INDEX'] || klass.tire.index.name )
 
     if ENV['FORCE']
       puts "[IMPORT] Deleting index '#{index.name}'"
@@ -52,10 +52,10 @@ namespace :tire do
     end
 
     unless index.exists?
-      mapping = defined?(Yajl) ? Yajl::Encoder.encode(klass.mapping_to_hash, :pretty => true) :
-                                 MultiJson.encode(klass.mapping_to_hash)
+      mapping = defined?(Yajl) ? Yajl::Encoder.encode(klass.tire.mapping_to_hash, :pretty => true) :
+                                 MultiJson.encode(klass.tire.mapping_to_hash)
       puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
-      index.create :mappings => klass.mapping_to_hash
+      index.create :mappings => klass.tire.mapping_to_hash
     end
 
     STDOUT.sync = true

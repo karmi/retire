@@ -45,8 +45,8 @@ module Tire
         end
 
         def create_elasticsearch_index
-          unless elasticsearch_index.exists?
-            elasticsearch_index.create :mappings => mapping_to_hash, :settings => settings
+          unless index.exists?
+            index.create :mappings => mapping_to_hash, :settings => settings
           end
         end
 

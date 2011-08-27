@@ -340,7 +340,6 @@ module Tire
             Configuration.client.expects(:post).
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
-                                   p doc
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
                                    doc['id'] == '1' &&
                                    doc['title'] == 'Updated'

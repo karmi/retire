@@ -41,7 +41,7 @@ module Tire
         assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]
         assert_equal 10, ActiveRecordArticle.mapping[:title][:boost]
 
-        assert_equal 'snowball', ActiveRecordArticle.elasticsearch_index.mapping['active_record_article']['properties']['title']['analyzer']
+        assert_equal 'snowball', ActiveRecordArticle.index.mapping['active_record_article']['properties']['title']['analyzer']
       end
 
       should "save document into index on save and find it" do
@@ -68,7 +68,7 @@ module Tire
         setup do
           ActiveRecordArticle.destroy_all
           5.times { |n| ActiveRecordArticle.create! :title => "Test #{n+1}" }
-          ActiveRecordArticle.elasticsearch_index.refresh
+          ActiveRecordArticle.index.refresh
         end
 
         should "load records on query search" do
@@ -103,16 +103,15 @@ module Tire
       end
 
       should "remove document from index on destroy" do
-        a = ActiveRecordArticle.new :title => 'Test'
+        a = ActiveRecordArticle.new :title => 'Test remove...'
         a.save!
         assert_equal 1, ActiveRecordArticle.count
 
         a.destroy
-        assert_equal 0, SupermodelArticle.all.size
+        assert_equal 0, ActiveRecordArticle.all.size
 
         a.index.refresh
         results = ActiveRecordArticle.search 'test'
-      
         assert_equal 0, results.count
       end
 
@@ -120,7 +119,7 @@ module Tire
         ActiveRecordArticle.create! :title => 'foo'
         ActiveRecordArticle.create! :title => 'bar'
 
-        ActiveRecordArticle.elasticsearch_index.refresh
+        ActiveRecordArticle.index.refresh
         results = ActiveRecordArticle.search 'foo OR bar^100'
         assert_equal 2, results.count
 
@@ -130,7 +129,7 @@ module Tire
       context "with pagination" do
         setup do
           1.upto(9) { |number| ActiveRecordArticle.create :title => "Test#{number}" }
-          ActiveRecordArticle.elasticsearch_index.refresh
+          ActiveRecordArticle.index.refresh
         end
 
         context "and parameter searches" do
