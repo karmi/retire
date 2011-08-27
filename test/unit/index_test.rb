@@ -310,7 +310,7 @@ module Tire
           one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
           two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
 
-          ActiveModelArticle.elasticsearch_index.bulk_store [ one, two ]
+          ActiveModelArticle.index.bulk_store [ one, two ]
 
         end
 
@@ -327,7 +327,7 @@ module Tire
           STDERR.expects(:puts).once
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
-          ActiveModelArticle.elasticsearch_index.bulk_store documents
+          ActiveModelArticle.index.bulk_store documents
         end
 
       end

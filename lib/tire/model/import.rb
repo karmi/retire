@@ -7,7 +7,7 @@ module Tire
 
         def import options={}, &block
           method = options.delete(:method) || 'paginate'
-          self.elasticsearch_index.import self, method, options, &block
+          index.import klass, method, options, &block
         end
 
       end

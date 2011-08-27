@@ -434,8 +434,52 @@ In this case, just wrap the `mapping` method in a `settings` one, passing it the
 ```
 
 It may well be reasonable to wrap the index creation logic declared with `Tire.index('urls').create`
-in a class method of your model, in a module method, etc, so have better control on index creation when bootstrapping your application with Rake tasks or when setting up the test suite.
+in a class method of your model, in a module method, etc, so have better control on index creation when
+bootstrapping your application with Rake tasks or when setting up the test suite.
 _Tire_ will not hold that against you.
+
+You may have just stopped wondering: what if I have my own `settings` class method defined?
+Or what if some other gem defines `settings`, or some other _Tire_ method, such as `update_index`?
+Things will break, right? No, they won't.
+
+In fact, all this time you've been using only _proxies_ to the real _Tire_ methods, which live in the `tire`
+class and instance methods of your model. Only when not trampling on someone's foot — which is the majority
+of cases —, will _Tire_ bring its methods to the namespace of your class.
+
+So, instead of writing `Article.search`, you could write `Article.tire.search`, and instead of
+`@article.update_index` you could write `@article.tire.update_index`, to be on the safe side.
+Let's have a look on an example with the `mapping` method:
+
+```ruby
+    class Article < ActiveRecord::Base
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
+
+      tire.mapping do
+        indexes :id, :type => 'string', :index => :not_analyzed
+        # ...
+      end
+    end
+```
+
+Of course, you could also use the block form:
+
+```ruby
+    class Article < ActiveRecord::Base
+      include Tire::Model::Search
+      include Tire::Model::Callbacks
+
+      tire do
+        mapping do
+          indexes :id, :type => 'string', :index => :not_analyzed
+          # ...
+        end
+      end
+    end
+```
+
+Internally, _Tire_ uses these proxy methods exclusively. When you run into issues,
+use the proxied method, eg. `Article.tire.mapping`, directly.
 
 When you want a tight grip on how the attributes are added to the index, just
 implement the `to_indexed_json` method in your model.
@@ -529,7 +573,7 @@ so you can pass all the usual parameters to the `search` method in the controlle
 OK. Chances are, you have lots of records stored in your database. How will you get them to _ElasticSearch_? Easy:
 
 ```ruby
-    Article.elasticsearch_index.import Article.all
+    Article.index.import Article.all
 ```
 
 This way, however, all your records are loaded into memory, serialized into JSON,

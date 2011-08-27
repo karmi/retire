@@ -3,35 +3,6 @@ module Tire
 
     module Search
 
-      def self.included(base)
-        base.class_eval do
-          extend  Tire::Model::Naming::ClassMethods
-          include Tire::Model::Naming::InstanceMethods
-
-          extend  Tire::Model::Indexing::ClassMethods
-          extend  Tire::Model::Import::ClassMethods
-
-          extend  Tire::Model::Percolate::ClassMethods
-          include Tire::Model::Percolate::InstanceMethods
-
-          extend  ClassMethods
-          include InstanceMethods
-
-          ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches'].each do |attr|
-            # TODO: Find a sane way to add attributes like _score for ActiveRecord -
-            #       `define_attribute_methods [attr]` does not work in AR.
-            define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
-            define_method("#{attr}")  { @attributes[attr] }
-          end
-
-          def to_hash
-            self.serializable_hash
-          end unless instance_methods.map(&:to_sym).include?(:to_hash)
-        end
-
-        Results::Item.send :include, Loader
-      end
-
       module ClassMethods
 
         # Returns search results for a given query.
@@ -60,7 +31,7 @@ module Tire
         #
         #
         def search(*args, &block)
-          default_options = {:type => document_type, :index => elasticsearch_index.name}
+          default_options = {:type => document_type, :index => index.name}
 
           if block_given?
             options = args.shift || {}
@@ -91,15 +62,9 @@ module Tire
           s.perform.results
         end
 
-        # Wrapper for the ES index for this class
+        # Wraps an Index instance for this class
         #
-        # TODO: Implement some "forwardable" object named +tire+ for Tire mixins,
-        #       and proxy everything via this object. If we're not stepping on
-        #       other libs toes, extend/include also to the top level.
-        #
-        #       The original culprit is Mongoid here, see https://github.com/karmi/tire/issues/7
-        #
-        def elasticsearch_index
+        def index
           @index = Index.new(index_name)
         end
 
@@ -108,32 +73,33 @@ module Tire
       module InstanceMethods
 
         def index
-          self.class.elasticsearch_index
+          instance.class.tire.index
         end
 
-        def update_elastic_search_index
-          _run_update_elastic_search_index_callbacks do
-            if destroyed?
-              index.remove self
+        def update_index
+          instance.send :_run_update_elasticsearch_index_callbacks do
+            if instance.destroyed?
+              index.remove instance
             else
-              response  = index.store( self, {:percolate => self.percolator} )
-              self.id ||= response['_id'] if self.respond_to?(:id=)
-              self._index   = response['_index']
-              self._type    = response['_type']
-              self._version = response['_version']
-              self.matches  = response['matches']
+              response  = index.store( instance, {:percolate => percolator} )
+              instance.id     ||= response['_id']      if instance.respond_to?(:id=)
+              instance._index   = response['_index']   if instance.respond_to?(:_index=)
+              instance._type    = response['_type']    if instance.respond_to?(:_type=)
+              instance._version = response['_version'] if instance.respond_to?(:_version=)
+              instance.matches  = response['matches']  if instance.respond_to?(:matches=)
               self
             end
           end
         end
-        alias :update_elasticsearch_index :update_elastic_search_index
+        alias :update_elasticsearch_index  :update_index
+        alias :update_elastic_search_index :update_index
 
         def to_indexed_json
-          if self.class.mapping.empty?
-            to_hash.to_json
+          if instance.class.tire.mapping.empty?
+            instance.to_hash.to_json
           else
-            to_hash.
-            reject { |key, value| ! self.class.mapping.keys.map(&:to_s).include?(key.to_s) }.
+            instance.to_hash.
+            reject { |key, value| ! instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
             to_json
           end
         end
@@ -150,7 +116,83 @@ module Tire
 
       end
 
-      extend ClassMethods
+      class ClassMethodsProxy
+        include Tire::Model::Naming::ClassMethods
+        include Tire::Model::Import::ClassMethods
+        include Tire::Model::Indexing::ClassMethods
+        include Tire::Model::Percolate::ClassMethods
+        include ClassMethods
+
+        INTERFACE = public_instance_methods.map(&:to_sym) - Object.public_instance_methods.map(&:to_sym)
+
+        attr_reader :klass
+        def initialize(klass)
+          @klass = klass
+        end
+
+      end
+
+      class InstanceMethodsProxy
+        include Tire::Model::Naming::InstanceMethods
+        include Tire::Model::Percolate::InstanceMethods
+        include InstanceMethods
+
+        ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches'].each do |attr|
+          # TODO: Find a sane way to add attributes like _score for ActiveRecord -
+          #       `define_attribute_methods [attr]` does not work in AR.
+          define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
+          define_method("#{attr}")  { @attributes[attr] }
+        end
+
+        INTERFACE = public_instance_methods.map(&:to_sym) - Object.public_instance_methods.map(&:to_sym)
+
+        attr_reader :instance
+        def initialize(instance)
+          @instance = instance
+        end
+      end
+
+      def self.included(base)
+        base.class_eval do
+          def self.tire &block
+            @__tire__ ||= ClassMethodsProxy.new(self)
+
+            @__tire__.instance_eval(&block) if block_given?
+            @__tire__
+          end
+
+          def tire &block
+            @__tire__ ||= InstanceMethodsProxy.new(self)
+
+            @__tire__.instance_eval(&block) if block_given?
+            @__tire__
+          end
+
+          def to_hash
+            self.serializable_hash
+          end unless instance_methods.map(&:to_sym).include?(:to_hash)
+
+        end
+
+        ClassMethodsProxy::INTERFACE.each do |method|
+          base.class_eval <<-"end;", __FILE__, __LINE__ unless base.public_methods.map(&:to_sym).include?(method.to_sym)
+            def self.#{method}(*args, &block)
+              tire.__send__(#{method.inspect}, *args, &block)
+            end
+          end;
+        end
+
+        InstanceMethodsProxy::INTERFACE.each do |method|
+          base.class_eval <<-"end;", __FILE__, __LINE__ unless base.instance_methods.map(&:to_sym).include?(method.to_sym)
+            def #{method}(*args, &block)
+              tire.__send__(#{method.inspect}, *args, &block)
+            end
+          end;
+        end
+
+        Results::Item.send :include, Loader
+      end
+
     end
 
   end

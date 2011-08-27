@@ -28,28 +28,12 @@ module Tire
         end
 
         should "have the search method" do
-          assert_respond_to Model::Search, :search
           assert_respond_to ActiveModelArticle, :search
         end
 
-        should "have the `update_elastic_search_index` callback methods defined" do
-          assert_respond_to ::ModelWithIndexCallbacks, :before_update_elastic_search_index
-          assert_respond_to ::ModelWithIndexCallbacks, :after_update_elastic_search_index
-        end
-
-        should_eventually "contain all Tire class/instance methods in a proxy object" do
-        end
-
-        should_eventually "include Tire class methods in class top-level namespace when they do not exist" do
-        end
-
-        should_eventually "include Tire instance methods in instance top-level namespace when they do not exist" do
-        end
-
-        should_eventually "NOT overload existing top-level class methods" do
-        end
-
-        should_eventually "NOT overload existing top-level instance methods" do
+        should "have the callback methods for update index defined" do
+          assert_respond_to ::ModelWithIndexCallbacks, :before_update_elasticsearch_index
+          assert_respond_to ::ModelWithIndexCallbacks, :after_update_elasticsearch_index
         end
 
         should "limit searching in index for documents matching the model 'document_type'" do
@@ -111,7 +95,7 @@ module Tire
         should "allow to refresh index" do
           Index.any_instance.expects(:refresh)
 
-          ActiveModelArticle.elasticsearch_index.refresh
+          ActiveModelArticle.index.refresh
         end
 
         should "wrap results in instances of the wrapper class" do
@@ -225,7 +209,7 @@ module Tire
 
         should "not set callback when hooks are missing" do
           @model = ActiveModelArticle.new
-          @model.expects(:update_elastic_search_index).never
+          @model.expects(:update_elasticsearch_index).never
 
           @model.save
         end
@@ -240,26 +224,26 @@ module Tire
 
         should "fire :after_save callbacks" do
           @model = ActiveModelArticleWithCallbacks.new
-          @model.expects(:update_elastic_search_index)
+          @model.tire.expects(:update_index)
 
           @model.save
         end
 
         should "fire :after_destroy callbacks" do
           @model = ActiveModelArticleWithCallbacks.new
-          @model.expects(:update_elastic_search_index)
+          @model.tire.expects(:update_index)
 
           @model.destroy
         end
 
-        should "store the record in index on :update_elastic_search_index when saved" do
+        should "store the record in index on :update_elasticsearch_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
           Tire::Index.any_instance.expects(:store).returns({})
 
           @model.save
         end
 
-        should "remove the record from index on :update_elastic_search_index when destroyed" do
+        should "remove the record from index on :update_elasticsearch_index when destroyed" do
           @model = ActiveModelArticleWithCallbacks.new
           i = mock('index') { expects(:remove) }
           Tire::Index.expects(:new).with('active_model_article_with_callbacks').returns(i)
@@ -373,7 +357,7 @@ module Tire
         context "with index update callbacks" do
           setup do
             class ::ModelWithIndexCallbacks
-              _update_elastic_search_index_callbacks.clear
+              _update_elasticsearch_index_callbacks.clear
               def notify; end
             end
 
@@ -385,18 +369,18 @@ module Tire
 
           should "run the callback defined as block" do
             class ::ModelWithIndexCallbacks
-              after_update_elastic_search_index { self.go! }
+              after_update_elasticsearch_index { self.go! }
             end
 
             @model = ::ModelWithIndexCallbacks.new
             @model.expects(:go!)
 
-            @model.update_elastic_search_index
+            @model.update_elasticsearch_index
           end
 
           should "run the callback defined as symbol" do
             class ::ModelWithIndexCallbacks
-              after_update_elastic_search_index :notify
+              after_update_elasticsearch_index :notify
 
               def notify; self.go!; end
             end
@@ -404,12 +388,12 @@ module Tire
             @model = ::ModelWithIndexCallbacks.new
             @model.expects(:go!)
 
-            @model.update_elastic_search_index
+            @model.update_elasticsearch_index
           end
 
           should "set the 'matches' property from percolated response" do
             @model = ::ModelWithIndexCallbacks.new
-            @model.update_elastic_search_index
+            @model.update_elasticsearch_index
 
             assert_equal ['foo'], @model.matches
           end
@@ -533,7 +517,7 @@ module Tire
               options[:percolate] == true
             end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
-            @article.update_elastic_search_index
+            @article.update_elasticsearch_index
           end
 
           should "not percolate document on index update when not set for percolation" do
@@ -542,7 +526,7 @@ module Tire
               options[:percolate] == nil
             end.returns(MultiJson.decode('{"ok":true,"_id":"test"}'))
 
-            @article.update_elastic_search_index
+            @article.update_elasticsearch_index
           end
 
           should "set the default percolator pattern" do
@@ -572,7 +556,7 @@ module Tire
             end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
             percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
-            percolated.update_elastic_search_index
+            percolated.update_elasticsearch_index
           end
 
           should "execute the 'on_percolate' callback" do
@@ -589,7 +573,7 @@ module Tire
                                      end.
                                      returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
-            percolated.update_elastic_search_index
+            percolated.update_elasticsearch_index
 
             assert_equal ['alerts'], $test__matches
           end
@@ -608,9 +592,35 @@ module Tire
                                      end.
                                      returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
-            percolated.update_elastic_search_index
+            percolated.update_elasticsearch_index
 
             assert_equal ['alerts'], $test__matches
+          end
+
+        end
+
+        context "proxy" do
+
+          should "have the proxy to class methods" do
+            assert_respond_to ActiveModelArticle, :tire
+            assert_instance_of Tire::Model::Search::ClassMethodsProxy, ActiveModelArticle.tire
+          end
+
+          should "have the proxy to instance methods" do
+            assert_respond_to ActiveModelArticle.new, :tire
+            assert_instance_of Tire::Model::Search::InstanceMethodsProxy, ActiveModelArticle.new.tire
+          end
+
+          should "NOT overload existing top-level class methods" do
+            assert_equal "THIS IS MY MAPPING!", ActiveRecordClassWithTireMethods.mapping
+            assert_equal 'snowball', ActiveRecordClassWithTireMethods.tire.mapping[:title][:analyzer]
+          end
+
+          should "NOT overload existing top-level instance methods" do
+            ActiveRecordClassWithTireMethods.stubs(:columns).returns([])
+            assert_equal "THIS IS MY INDEX!", ActiveRecordClassWithTireMethods.new.index
+            assert_equal 'active_record_class_with_tire_methods',
+                         ActiveRecordClassWithTireMethods.new.tire.index.name
           end
 
         end

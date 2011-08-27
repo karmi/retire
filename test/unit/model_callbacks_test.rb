@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class ModelOne
+  extend ActiveModel::Naming
   include Tire::Model::Search
   include Tire::Model::Callbacks
 
@@ -9,6 +10,7 @@ class ModelOne
 end
 
 class ModelTwo
+  extend ActiveModel::Naming
   extend  ActiveModel::Callbacks
   define_model_callbacks :save, :destroy
 
@@ -27,6 +29,7 @@ class ModelTwo
 end
 
 class ModelThree
+  extend ActiveModel::Naming
   extend  ActiveModel::Callbacks
   define_model_callbacks :save, :destroy
 
@@ -50,10 +53,11 @@ module Tire
       context "Model without ActiveModel callbacks" do
 
         should "not execute any callbacks" do
-          ModelOne.any_instance.expects(:update_elastic_search_index).never
+          m = ModelOne.new
+          m.tire.expects(:update_index).never
 
-          ModelOne.new.save
-          ModelOne.new.destroy
+          m.save
+          m.destroy
         end
 
       end
@@ -61,10 +65,11 @@ module Tire
       context "Model with ActiveModel callbacks and implemented destroyed? method" do
 
         should "execute the callbacks" do
-          ModelTwo.any_instance.expects(:update_elastic_search_index).twice
+          m = ModelTwo.new
+          m.tire.expects(:update_index).twice
 
-          ModelTwo.new.save
-          ModelTwo.new.destroy
+          m.save
+          m.destroy
         end
 
       end
@@ -76,10 +81,11 @@ module Tire
         end
 
         should "execute the callbacks" do
-          ModelThree.any_instance.expects(:update_elastic_search_index).twice
+          m = ModelThree.new
+          m.tire.expects(:update_index).twice
 
-          ModelThree.new.save
-          ModelThree.new.destroy
+          m.save
+          m.destroy
         end
 
       end

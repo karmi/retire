@@ -26,6 +26,9 @@ module Tire
           t.string     :period
           t.references :article
         end
+        create_table :active_record_class_with_tire_methods do |t|
+          t.string     :title
+        end
       end
     end
 
@@ -41,7 +44,7 @@ module Tire
         assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]
         assert_equal 10, ActiveRecordArticle.mapping[:title][:boost]
 
-        assert_equal 'snowball', ActiveRecordArticle.elasticsearch_index.mapping['active_record_article']['properties']['title']['analyzer']
+        assert_equal 'snowball', ActiveRecordArticle.index.mapping['active_record_article']['properties']['title']['analyzer']
       end
 
       should "save document into index on save and find it" do
@@ -68,7 +71,7 @@ module Tire
         setup do
           ActiveRecordArticle.destroy_all
           5.times { |n| ActiveRecordArticle.create! :title => "Test #{n+1}" }
-          ActiveRecordArticle.elasticsearch_index.refresh
+          ActiveRecordArticle.index.refresh
         end
 
         should "load records on query search" do
@@ -103,16 +106,15 @@ module Tire
       end
 
       should "remove document from index on destroy" do
-        a = ActiveRecordArticle.new :title => 'Test'
+        a = ActiveRecordArticle.new :title => 'Test remove...'
         a.save!
         assert_equal 1, ActiveRecordArticle.count
 
         a.destroy
-        assert_equal 0, SupermodelArticle.all.size
+        assert_equal 0, ActiveRecordArticle.all.size
 
         a.index.refresh
         results = ActiveRecordArticle.search 'test'
-      
         assert_equal 0, results.count
       end
 
@@ -120,7 +122,7 @@ module Tire
         ActiveRecordArticle.create! :title => 'foo'
         ActiveRecordArticle.create! :title => 'bar'
 
-        ActiveRecordArticle.elasticsearch_index.refresh
+        ActiveRecordArticle.index.refresh
         results = ActiveRecordArticle.search 'foo OR bar^100'
         assert_equal 2, results.count
 
@@ -130,7 +132,7 @@ module Tire
       context "with pagination" do
         setup do
           1.upto(9) { |number| ActiveRecordArticle.create :title => "Test#{number}" }
-          ActiveRecordArticle.elasticsearch_index.refresh
+          ActiveRecordArticle.index.refresh
         end
 
         context "and parameter searches" do
@@ -227,6 +229,34 @@ module Tire
             assert_nil results.first
           end
 
+        end
+
+      end
+
+      context "with proxy" do
+
+        should "allow access to Tire instance methods" do
+          a = ActiveRecordClassWithTireMethods.create :title => 'One'
+          assert_equal "THIS IS MY INDEX!", a.index
+          assert_instance_of Tire::Index, a.tire.index
+          assert a.tire.index.exists?, "Index should exist"
+        end
+
+        should "allow access to Tire class methods" do
+          class ::ActiveRecordClassWithTireMethods < ActiveRecord::Base
+            def self.search(*)
+              "THIS IS MY SEARCH!"
+            end
+          end
+
+          ActiveRecordClassWithTireMethods.create :title => 'One'
+          ActiveRecordClassWithTireMethods.tire.index.refresh
+
+          assert_equal "THIS IS MY SEARCH!", ActiveRecordClassWithTireMethods.search
+
+          results = ActiveRecordClassWithTireMethods.tire.search 'one'
+
+          assert_equal 'One', results.first.title
         end
 
       end

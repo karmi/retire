@@ -51,6 +51,8 @@ module Test::Integration
                        fixtures_path.join('articles').join(f).read
     end
     ::RestClient.post "#{URL}/articles-test/_refresh", ''
+
+    Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| load m }
   end
 
   def teardown

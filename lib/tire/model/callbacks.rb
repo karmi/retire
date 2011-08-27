@@ -5,8 +5,8 @@ module Tire
 
       def self.included(base)
         if base.respond_to?(:after_save) && base.respond_to?(:after_destroy)
-          base.send :after_save,    :update_elastic_search_index
-          base.send :after_destroy, :update_elastic_search_index
+          base.send :after_save,    lambda { tire.update_index }
+          base.send :after_destroy, lambda { tire.update_index }
         end
 
         if base.respond_to?(:before_destroy) && !base.instance_methods.map(&:to_sym).include?(:destroyed?)
@@ -17,7 +17,7 @@ module Tire
         end
 
         base.class_eval do
-          define_model_callbacks(:update_elastic_search_index, :only => [:after, :before])
+          define_model_callbacks(:update_elasticsearch_index, :only => [:after, :before])
         end if base.respond_to?(:define_model_callbacks)
       end
 

@@ -11,7 +11,7 @@ module Tire
 
         def on_percolate(pattern=true,&block)
           percolate!(pattern)
-          after_update_elastic_search_index(block)
+          klass.after_update_elasticsearch_index(block)
         end
 
         def percolator
@@ -22,7 +22,7 @@ module Tire
       module InstanceMethods
 
         def percolate(&block)
-          index.percolate self, block
+          index.percolate instance, block
         end
 
         def percolate=(pattern)
@@ -30,7 +30,7 @@ module Tire
         end
 
         def percolator
-          @_percolator || self.class.percolator || nil
+          @_percolator || instance.class.tire.percolator || nil
         end
       end
 
