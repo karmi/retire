@@ -7,7 +7,7 @@ require 'yajl/json_gem'
 require 'sqlite3'
 
 require 'shoulda'
-require 'turn' unless ENV["TM_FILEPATH"]
+require 'turn' unless ENV["TM_FILEPATH"] || ENV["CI"]
 require 'mocha'
 
 require 'tire'
