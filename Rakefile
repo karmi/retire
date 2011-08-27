@@ -14,24 +14,30 @@ end
 namespace :test do
   Rake::TestTask.new(:unit) do |test|
     test.libs << 'lib' << 'test'
-    test.pattern = 'test/unit/*_test.rb'
+    test.test_files = FileList["test/unit/*_test.rb"]
     test.verbose = true
   end
   Rake::TestTask.new(:integration) do |test|
     test.libs << 'lib' << 'test'
-    test.pattern = 'test/integration/*_test.rb'
+    test.test_files = FileList["test/integration/*_test.rb"]
     test.verbose = true
   end
 end
 
 # Generate documentation
-begin; require 'sdoc'; rescue LoadError; end
-require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "Tire"
-  rdoc.rdoc_files.include('README.markdown')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+begin
+  begin; require 'sdoc'; rescue LoadError; end
+  require 'rdoc/task'
+  Rake::RDocTask.new do |rdoc|
+    rdoc.rdoc_dir = 'rdoc'
+    rdoc.title = "Tire"
+    rdoc.rdoc_files.include('README.markdown')
+    rdoc.rdoc_files.include('lib/**/*.rb')
+  end
+rescue LoadError
+  task :rdoc do
+    abort "[!] RDoc gem is not available."
+  end
 end
 
 # Generate coverage reports
@@ -45,7 +51,7 @@ begin
   end
 rescue LoadError
   task :rcov do
-    abort "RCov is not available. In order to run rcov, you must: sudo gem install rcov"
+    abort "[!] RCov gem is not available."
   end
 end
 
