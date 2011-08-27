@@ -22,8 +22,7 @@ module Tire
 
       end
 
-      should "have a to_json method from Yajl" do
-        assert defined?(Yajl)
+      should "have a to_json method from a JSON serialization library" do
         assert_respond_to( {}, :to_json )
         assert_equal '{"one":1}', { :one => 1}.to_json
       end
