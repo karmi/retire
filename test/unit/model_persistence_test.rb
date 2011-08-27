@@ -247,16 +247,16 @@ module Tire
 
         context "when creating" do
 
-          # TODO: Find a way to mock JSON paylod for Mocha with disregard to Hash entries ordering.
-          #       Ruby 1.9 brings ordered Hashes, so tests were failing.
-
           should "save the document with generated ID in the database" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Test","tags":["one","two"],"published_on":null}' :
-                                                     '{"published_on":null,"tags":["one","two"],"title":"Test"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"abc123"}'))
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                  doc = MultiJson.decode(payload)
+                                  url == "#{Configuration.url}/persistent_articles/persistent_article/" &&
+                                  doc['title'] == 'Test' &&
+                                  doc['tags']  == ['one', 'two']
+                                  doc['published_on'] == nil
+                                end.
+                                returns(mock_response('{"ok":true,"_id":"abc123"}'))
             article = PersistentArticle.create :title => 'Test', :tags => [:one, :two]
 
             assert article.persisted?, "#{article.inspect} should be `persisted?`"
@@ -264,12 +264,15 @@ module Tire
           end
 
           should "save the document with custom ID in the database" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/r2d2",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Test","id":"r2d2","tags":null,"published_on":null}' :
-                                                     '{"id":"r2d2","published_on":null,"tags":null,"title":"Test"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"r2d2"}'))
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   doc = MultiJson.decode(payload)
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/r2d2" &&
+                                   doc['id'] == 'r2d2' &&
+                                   doc['title'] == 'Test' &&
+                                   doc['published_on'] == nil
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"r2d2"}'))
             article = PersistentArticle.create :id => 'r2d2', :title => 'Test'
 
             assert_equal 'r2d2', article.id
@@ -286,24 +289,29 @@ module Tire
         context "when creating" do
 
           should "set the id property" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     {:title => 'Test', :tags => nil, :published_on => nil}.to_json :
-                                                     {:published_on => nil, :tags => nil, :title => 'Test'}.to_json
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"1"}'))
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   doc = MultiJson.decode(payload)
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/" &&
+                                   doc['id'] == nil &&
+                                   doc['title'] == 'Test'
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"1"}'))
 
             article = PersistentArticle.create :title => 'Test'
             assert_equal '1', article.id
           end
 
           should "not set the id property if already set" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}' :
-                                                     '{"id":"123","published_on":null,"tags":null,"title":"Test"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true, "_id":"XXX"}'))
+            Configuration.client.expects(:post).
+                                  with do |url, payload|
+                                    doc = MultiJson.decode(payload)
+                                    url == "#{Configuration.url}/persistent_articles/persistent_article/123" &&
+                                    doc['id'] == '123' &&
+                                    doc['title'] == 'Test' &&
+                                    doc['published_on'] == nil
+                                  end.
+                                  returns(mock_response('{"ok":true, "_id":"XXX"}'))
 
             article = PersistentArticle.create :id => '123', :title => 'Test'
             assert_equal '123', article.id
@@ -314,23 +322,30 @@ module Tire
         context "when saving" do
 
           should "save the document with updated attribute" do
-            article = PersistentArticle.new :id => 1, :title => 'Test'
+            article = PersistentArticle.new :id => '1', :title => 'Test'
 
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Test","id":1,"tags":null,"published_on":null}' :
-                                                     '{"id":1,"published_on":null,"tags":null,"title":"Test"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"1"}'))
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   doc = MultiJson.decode(payload)
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
+                                   doc['id'] == '1' &&
+                                   doc['title'] == 'Test' &&
+                                   doc['published_on'] == nil
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"1"}'))
             assert article.save
 
             article.title = 'Updated'
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/1",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Updated","id":1,"tags":null,"published_on":null}' :
-                                                     '{"id":1,"published_on":null,"tags":null,"title":"Updated"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"1"}'))
+
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   doc = MultiJson.decode(payload)
+                                   p doc
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
+                                   doc['id'] == '1' &&
+                                   doc['title'] == 'Updated'
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"1"}'))
             assert article.save
           end
 
@@ -352,17 +367,19 @@ module Tire
 
           should "not set the id property if already set" do
             article = PersistentArticle.new
-            article.id    = '123'
+            article.id    = '456'
             article.title = 'Test'
 
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}' :
-                                                     '{"id":"123","published_on":null,"tags":null,"title":"Test"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"XXX"}'))
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   doc = MultiJson.decode(payload)
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/456" &&
+                                   doc['id'] == '456' &&
+                                   doc['title'] == 'Test'
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"XXX"}'))
              assert article.save
-             assert_equal '123', article.id
+             assert_equal '456', article.id
           end
 
         end
@@ -370,13 +387,16 @@ module Tire
         context "when destroying" do
 
           should "delete the document from the database" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/persistent_articles/persistent_article/123",
-                                                     RUBY_VERSION < "1.9" ?
-                                                     '{"title":"Test","id":"123","tags":null,"published_on":null}' :
-                                                     '{"id":"123","published_on":null,"tags":null,"title":"Test"}'
-                                                     ).
-                                                returns(mock_response('{"ok":true,"_id":"123"}'))
-            Configuration.client.expects(:delete).with("#{Configuration.url}/persistent_articles/persistent_article/123")
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   doc = MultiJson.decode(payload)
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/123" &&
+                                   doc['id'] == '123' &&
+                                   doc['title'] == 'Test'
+                                 end.returns(mock_response('{"ok":true,"_id":"123"}'))
+
+            Configuration.client.expects(:delete).
+                                 with("#{Configuration.url}/persistent_articles/persistent_article/123")
 
             article = PersistentArticle.new :id => '123', :title => 'Test'
             article.save
