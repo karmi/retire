@@ -84,6 +84,30 @@ module Tire
           ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
         end
 
+        should "allow to pass custom document type" do
+          Tire::Search::Search.
+            expects(:new).
+            with(ActiveModelArticle.index_name, { :type => 'custom_type' }).
+            returns(@stub).
+            twice
+
+          ActiveModelArticle.search 'foo', :type => 'custom_type'
+          ActiveModelArticle.search( :type => 'custom_type' ) { query { string 'foo' } }
+        end
+
+        should "allow to pass custom index name" do
+          Tire::Search::Search.
+            expects(:new).
+            with('custom_index', { :type => ActiveModelArticle.document_type }).
+            returns(@stub).
+            twice
+
+          ActiveModelArticle.search 'foo', :index => 'custom_index'
+          ActiveModelArticle.search( :index => 'custom_index' ) do
+            query { string 'foo' }
+          end
+        end
+
         should "allow to refresh index" do
           Index.any_instance.expects(:refresh)
 
