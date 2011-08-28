@@ -40,6 +40,9 @@ class ActiveRecordArticle < ActiveRecord::Base
   end
 end
 
+class CustomActiveRecordArticle < ActiveRecordArticle
+end
+
 class ActiveRecordComment < ActiveRecord::Base
   belongs_to :article, :class_name => "ActiveRecordArticle", :foreign_key => "article_id"
 end

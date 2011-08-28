@@ -15,6 +15,10 @@ module Tire
           t.string   :title
           t.datetime :created_at, :default => 'NOW()'
         end
+        create_table :custom_active_record_articles do |t|
+          t.string   :title
+          t.datetime :created_at, :default => 'NOW()'
+        end
         create_table :active_record_comments do |t|
           t.string     :author
           t.text       :body
@@ -33,9 +37,11 @@ module Tire
 
       setup    do
         Tire.index('active_record_articles').delete
+        Tire.index('custom_active_record_articles').delete
         load File.expand_path('../../models/active_record_models.rb', __FILE__)
       end
       teardown { Tire.index('active_record_articles').delete }
+      teardown { Tire.index('custom_active_record_articles').delete }
 
       should "configure mapping" do
         assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]
@@ -52,6 +58,39 @@ module Tire
         a.index.refresh
 
         results = ActiveRecordArticle.search 'test'
+
+        assert       results.any?
+        assert_equal 1, results.count
+
+        assert_instance_of Results::Item, results.first
+        assert_not_nil results.first.id
+        assert_equal   id.to_s, results.first.id.to_s
+        assert         results.first.persisted?, "Record should be persisted"
+        assert_not_nil results.first._score
+        assert_equal   'Test', results.first.title
+      end
+      
+      should "allow the index being searched to be overridden with a different index name" do
+        a = CustomActiveRecordArticle.new :title => 'Test'
+        a.save!
+        id = a.id
+
+        a.index.refresh
+        
+        results = ActiveRecordArticle.search 'test'
+        assert_equal 0, results.count
+        
+        results = ActiveRecordArticle.search 'test', {
+          :index_name => 'custom_active_record_articles',
+          :type => 'custom_active_record_article'
+        }
+        assert_equal 1, results.count
+        
+        results = ActiveRecordArticle.search :index_name => 'custom_active_record_articles', :type => 'custom_active_record_article' do
+          query do
+            string 'test'
+          end
+        end
 
         assert       results.any?
         assert_equal 1, results.count
