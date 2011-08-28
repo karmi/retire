@@ -70,6 +70,7 @@ module Tire
       def size
         results.size
       end
+      alias :length :size
 
       def [](index)
         results[index]

@@ -22,8 +22,9 @@ module Tire
         end
       end
 
-      should "have size" do
+      should "have size/length" do
         assert_equal 3, Results::Collection.new(@default_response).size
+        assert_equal 3, Results::Collection.new(@default_response).length
       end
 
       should "allow access to items" do
