@@ -403,7 +403,7 @@ For serious usage, though, you'll definitely want to define a custom _mapping_ f
 In this case, _only_ the defined model attributes are indexed. The `mapping` declaration creates the
 index when the class is loaded or when the importing features are used, and _only_ when it does not yet exist.
 
-Chances are, you want to declare also a custom _mapping_ for the index, such as set the number of shards,
+Chances are, you want to declare also a custom _settings_ for the index, such as set the number of shards,
 replicas, or create elaborate analyzer chains, such as the hipster's choice: [_ngrams_](https://gist.github.com/1160430).
 In this case, just wrap the `mapping` method in a `settings` one, passing it the settings as a Hash:
 
