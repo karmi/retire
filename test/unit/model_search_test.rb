@@ -516,9 +516,8 @@ module Tire
           should "pass the arguments to percolate" do
             filter   = lambda { string 'tag:alerts' }
 
-            Tire::Index.any_instance.expects(:percolate).with do |type,doc,query|
-              # p [type,doc,query]
-              type  == 'active_model_article_with_callbacks' &&
+            Tire::Index.any_instance.expects(:percolate).with do |doc,query|
+              # p [doc,query]
               doc   == @article &&
               query == filter
             end.returns(["alert"])

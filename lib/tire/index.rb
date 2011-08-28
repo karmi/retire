@@ -205,7 +205,7 @@ module Tire
     end
 
     def percolate(*args, &block)
-      document = args.pop
+      document = args.shift
       type     = get_type_from_document(document)
 
       document = MultiJson.decode convert_document_to_json(document)

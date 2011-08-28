@@ -10,7 +10,7 @@ module Tire
         end
 
         def on_percolate(pattern=true,&block)
-          self.percolate!(pattern)
+          percolate!(pattern)
           after_update_elastic_search_index(block)
         end
 
@@ -22,7 +22,7 @@ module Tire
       module InstanceMethods
 
         def percolate(&block)
-          index.percolate document_type, self, block
+          index.percolate self, block
         end
 
         def percolate=(pattern)
