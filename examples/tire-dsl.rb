@@ -43,9 +43,9 @@ require 'tire'
 
  [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
 
- curl -k -L -o elasticsearch-0.17.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.2.tar.gz
- tar -zxvf elasticsearch-0.17.2.tar.gz
- ./elasticsearch-0.17.2/bin/elasticsearch -f
+ curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz
+ tar -zxvf elasticsearch-0.17.6.tar.gz
+ ./elasticsearch-0.17.6/bin/elasticsearch -f
 INSTALL
 
 ### Storing and indexing documents
