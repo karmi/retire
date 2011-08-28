@@ -69,6 +69,18 @@ module Tire::Search
         end
       end
 
+      context "histogram facet" do
+        should "encode facet options with default key" do
+          f = Facet.new('histogram') { histogram :age, {:interval => 5} }
+          assert_equal({ :histogram => { :histogram => { :field => 'age', :interval => 5 } } }.to_json, f.to_json)
+        end
+
+        should "encode the JSON if define an histogram" do
+          f = Facet.new('histogram') { histogram :age, {:histogram => {:key_field => "age", :value_field => "age", :interval => 100}} }
+          assert_equal({ :histogram => { :histogram => {:key_field => "age", :value_field => "age", :interval => 100} } }.to_json, f.to_json)
+        end
+      end
+
     end
 
   end

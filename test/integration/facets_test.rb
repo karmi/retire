@@ -76,6 +76,23 @@ module Tire
 
       end
 
+      context "histogram" do
+        should "return aggregated values for all results" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'words' do
+              histogram :words, :interval => 100
+            end
+          end
+
+          facets = s.results.facets['words']['entries']
+          assert_equal 3, facets.size, facets.inspect
+          assert_equal({"key" => 100, "count" => 2}, facets.entries[0], facets.inspect)
+          assert_equal({"key" => 200, "count" => 2}, facets.entries[1], facets.inspect)
+          assert_equal({"key" => 300, "count" => 1}, facets.entries[2], facets.inspect)
+        end
+      end
+
     end
 
   end
