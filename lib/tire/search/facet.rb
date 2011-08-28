@@ -29,6 +29,12 @@ module Tire
 
       def range(field, ranges=[], options={})
         @value = { :range => { :field => field, :ranges => ranges }.update(options) }
+        self
+      end
+
+      def histogram(field, options={})
+        @value = { :histogram => (options.delete(:histogram) || {:field => field}.update(options)) }
+        self
       end
 
       def to_json
