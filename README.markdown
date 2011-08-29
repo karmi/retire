@@ -438,12 +438,26 @@ in a class method of your model, in a module method, etc, so have better control
 _Tire_ will not hold that against you.
 
 When you want a tight grip on how the attributes are added to the index, just
-implement the `to_indexed_json` method in your model:
+implement the `to_indexed_json` method in your model.
+
+The easiest way is to customize the `to_json` serialization support of your model:
 
 ```ruby
     class Article < ActiveRecord::Base
-      include Tire::Model::Search
-      include Tire::Model::Callbacks
+      # ...
+
+      include_root_in_json = false
+      def to_indexed_json
+        to_json :except => ['updated_at'], :methods => ['length']
+      end
+    end
+```
+
+Of course, it may well be reasonable to define the indexed JSON from the ground up:
+
+```ruby
+    class Article < ActiveRecord::Base
+      # ...
 
       def to_indexed_json
         names      = author.split(/\W/)
@@ -459,7 +473,6 @@ implement the `to_indexed_json` method in your model:
           }
         }.to_json
       end
-
     end
 ```
 
