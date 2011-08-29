@@ -36,7 +36,7 @@ module Tire
                end
             end
           else
-            return [] if @response['hits']['total'] == 0
+            return [] if @response['hits']['hits'].empty?
 
             type  = @response['hits']['hits'].first['_type']
             raise NoMethodError, "You have tried to eager load the model instances, " +

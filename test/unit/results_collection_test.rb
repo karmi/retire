@@ -152,8 +152,8 @@ module Tire
                                                        {'_id' => 2},
                                                        {'_id' => 3},
                                                        {'_id' => 4}],
-                                            'total' => 4,
-                                            'took'  => 1 } }
+                                            'total' => 4 },
+                                'took' => 1 }
           @collection = Results::Collection.new( @default_response, :per_page => 1, :page => 2 )
         end
 
@@ -233,6 +233,18 @@ module Tire
             response = { 'hits' => { 'hits' => [ {'_id' => 1}] } }
             Results::Collection.new(response, :load => true).results
           end
+        end
+
+        should "return empty array for empty hits" do
+          response = { 'hits'  => {
+                         'hits' => [],
+                         'total' => 4
+                       },
+                       'took'  => 1 }
+          @collection = Results::Collection.new( response, :load => true )
+          assert @collection.empty?, 'Collection should be empty'
+          assert @collection.results.empty?, 'Collection results should be empty'
+          assert_equal 0, @collection.size
         end
 
       end
