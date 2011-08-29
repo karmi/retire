@@ -36,25 +36,26 @@ module Tire
                end
             end
           else
+            return [] if @response['hits']['total'] == 0
+
+            type  = @response['hits']['hits'].first['_type']
+            raise NoMethodError, "You have tried to eager load the model instances, " +
+                                 "but Tire cannot find the model class because " +
+                                 "document has no _type property." unless type
+
             begin
-              return [] if @response['hits']['total'] == 0
-
-              type  = @response['hits']['hits'].first['_type']
-              raise NoMethodError, "You have tried to eager load the model instances, " +
-                                   "but Tire cannot find the model class because " +
-                                   "document has no _type property." unless type
-
               klass = type.camelize.constantize
-              ids   = @response['hits']['hits'].map { |h| h['_id'] }
-              records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
-
-              # Reorder records to preserve order from search results
-              ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
             rescue NameError => e
-              raise NameError, "You have tried to eager load the model instances, but" +
+              raise NameError, "You have tried to eager load the model instances, but " +
                                "Tire cannot find the model class '#{type.camelize}' " +
                                "based on _type '#{type}'.", e.backtrace
             end
+
+            ids   = @response['hits']['hits'].map { |h| h['_id'] }
+            records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+
+            # Reorder records to preserve order from search results
+            ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
           end
         end
       end
