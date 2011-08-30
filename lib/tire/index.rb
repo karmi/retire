@@ -105,7 +105,8 @@ module Tire
         when method
           options = {:page => 1, :per_page => 1000}.merge options
           while documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page])) \
-                            and not documents.empty?
+                            and documents.length > 0
+
             documents = yield documents if block_given?
 
             bulk_store documents
