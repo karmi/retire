@@ -1,6 +1,22 @@
 module Tire
   module Model
 
+    # Main module containing the search infrastructure for ActiveModel classes.
+    #
+    # By including this module, you'll provide the model with facilities to
+    # perform searches against index, define index settings and mappings,
+    # access the index object, etc.
+    #
+    # All the _Tire_ methods are accessible via the "proxy" class and instance
+    # methods of the model, named `tire`, eg. `Article.tire.search 'foo'`.
+    #
+    # When there's no clash with a method in the class (your own, defined by another gem, etc)
+    # _Tire_ will bring these methods to the top-level namespace of the class,
+    # eg. `Article.search 'foo'`.
+    #
+    # You'll find the relevant methods in the ClassMethods and InstanceMethods module.
+    #
+    #
     module Search
 
       module ClassMethods
@@ -9,26 +25,36 @@ module Tire
         #
         # Query can be passed simply as a String:
         #
-        #   Article.search 'love'
+        #     Article.search 'love'
         #
         # Any options, such as pagination or sorting, can be passed as a second argument:
         #
-        #   Article.search 'love', :per_page => 25, :page => 2
-        #   Article.search 'love', :sort => 'title'
+        #     Article.search 'love', :per_page => 25, :page => 2
+        #     Article.search 'love', :sort => 'title'
         #
         # For more powerful query definition, use the query DSL passed as a block:
         #
-        #   Article.search do
-        #     query { terms :tags, ['ruby', 'python'] }
-        #     facet 'tags' { terms :tags }
-        #   end
+        #     Article.search do
+        #       query { terms :tags, ['ruby', 'python'] }
+        #       facet 'tags' { terms :tags }
+        #     end
         #
         # You can pass options as the first argument, in this case:
         #
-        #   Article.search :per_page => 25, :page => 2 do
-        #     query { string 'love' }
-        #   end
+        #     Article.search :per_page => 25, :page => 2 do
+        #       query { string 'love' }
+        #     end
         #
+        # This methods returns a Tire::Results::Collection instance, containing instances
+        # of Tire::Results::Item, populated by the data available in _ElasticSearch, by default.
+        #
+        # If you'd like to load the "real" models from the database, you may use the `:load` option:
+        #
+        #     Article.search 'love', :load => true
+        #
+        # You can pass options as a Hash to the model's `find` method:
+        #
+        #     Article.search :load => { :include => 'comments' } do ... end
         #
         def search(*args, &block)
           default_options = {:type => document_type, :index => index.name}
@@ -62,7 +88,9 @@ module Tire
           s.perform.results
         end
 
-        # Wraps an Index instance for this class
+        # Returns a Tire::Index instance for this model.
+        #
+        # Example usage: `Article.index.refresh`.
         #
         def index
           @index = Index.new(index_name)
@@ -72,10 +100,23 @@ module Tire
 
       module InstanceMethods
 
+        # Returns a Tire::Index instance for this instance of the model.
+        #
+        # Example usage: `@article.index.refresh`.
+        #
         def index
           instance.class.tire.index
         end
 
+        # Updates the index in _ElasticSearch_.
+        #
+        # On model instance create or update, it will store its serialized representation in the index.
+        #
+        # On model destroy, it will remove the corresponding document from the index.
+        #
+        # It will also call the `<after|before>_update_elasticsearch_index` callbacks,
+        # if defined by the model.
+        #
         def update_index
           instance.send :_run_update_elasticsearch_index_callbacks do
             if instance.destroyed?
@@ -94,6 +135,13 @@ module Tire
         alias :update_elasticsearch_index  :update_index
         alias :update_elastic_search_index :update_index
 
+        # The default JSON serialization of the model, based on its `#to_hash` representation.
+        #
+        # If you don't define any mapping, the model is serialized as-is.
+        #
+        # If you do define the mapping for _ElasticSearch_, only attributes
+        # declared in the mapping are serialized.
+        #
         def to_indexed_json
           if instance.class.tire.mapping.empty?
             instance.to_hash.to_json
@@ -108,7 +156,10 @@ module Tire
 
       module Loader
 
-        # Load the "real" model from the database via the corresponding model's `find` method
+        # Load the "real" model from the database via the corresponding model's `find` method.
+        #
+        # Notice that there's an option to eagerly load models with the `:load` option
+        # for the search method.
         #
         def load(options=nil)
           options ? self.class.find(self.id, options) : self.class.find(self.id)
@@ -116,6 +167,8 @@ module Tire
 
       end
 
+      # An object containing _Tire's_ model class methods, accessed as `Article.tire`.
+      #
       class ClassMethodsProxy
         include Tire::Model::Naming::ClassMethods
         include Tire::Model::Import::ClassMethods
@@ -132,6 +185,8 @@ module Tire
 
       end
 
+      # An object containing _Tire's_ model instance methods, accessed as `@article.tire`.
+      #
       class InstanceMethodsProxy
         include Tire::Model::Naming::InstanceMethods
         include Tire::Model::Percolate::InstanceMethods
@@ -152,8 +207,13 @@ module Tire
         end
       end
 
+      # A hook triggered by the `include Tire::Model::Search` statement in the model.
+      #
       def self.included(base)
         base.class_eval do
+
+          # Returns proxy to the _Tire's_ class methods.
+          #
           def self.tire &block
             @__tire__ ||= ClassMethodsProxy.new(self)
 
@@ -161,6 +221,8 @@ module Tire
             @__tire__
           end
 
+          # Returns proxy to the _Tire's_ instance methods.
+          #
           def tire &block
             @__tire__ ||= InstanceMethodsProxy.new(self)
 
@@ -168,28 +230,40 @@ module Tire
             @__tire__
           end
 
+          # Serialize the model as a Hash.
+          #
+          # Uses `serializable_hash` representation of the model,
+          # unless implemented in the model already.
+          #
           def to_hash
             self.serializable_hash
           end unless instance_methods.map(&:to_sym).include?(:to_hash)
 
         end
 
+        # Alias _Tire's_ class methods in the top-level namespace of the model,
+        # unless there's a conflict with existing method.
+        #
         ClassMethodsProxy::INTERFACE.each do |method|
           base.class_eval <<-"end;", __FILE__, __LINE__ unless base.public_methods.map(&:to_sym).include?(method.to_sym)
-            def self.#{method}(*args, &block)
-              tire.__send__(#{method.inspect}, *args, &block)
-            end
+            def self.#{method}(*args, &block)                     # def search(*args, &block)
+              tire.__send__(#{method.inspect}, *args, &block)     #   tire.__send__(:search, *args, &block)
+            end                                                   # end
           end;
         end
 
+        # Alias _Tire's_ instance methods in the top-level namespace of the model,
+        # unless there's a conflict with existing method
         InstanceMethodsProxy::INTERFACE.each do |method|
           base.class_eval <<-"end;", __FILE__, __LINE__ unless base.instance_methods.map(&:to_sym).include?(method.to_sym)
-            def #{method}(*args, &block)
-              tire.__send__(#{method.inspect}, *args, &block)
-            end
+            def #{method}(*args, &block)                          # def to_indexed_json(*args, &block)
+              tire.__send__(#{method.inspect}, *args, &block)     #   tire.__send__(:to_indexed_json, *args, &block)
+            end                                                   # end
           end;
         end
 
+        # Include the `load` functionality in Results::Item
+        #
         Results::Item.send :include, Loader
       end
 
