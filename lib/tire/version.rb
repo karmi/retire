@@ -1,5 +1,5 @@
 module Tire
-  VERSION   = "0.3.0"
+  VERSION   = "0.3.1"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
@@ -18,7 +18,7 @@ module Tire
     # Fixed errors when importing data with will_paginate vs Kaminari (MongoDB)
     # Added support for histogram facets [Paco Guzman]
 
-    0.2.1
+    0.3.0
     ---------------------------------------------------------
     # Isolated Tire ActiveModel integration into `tire` class and instance method.
     
