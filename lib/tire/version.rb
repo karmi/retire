@@ -1,5 +1,5 @@
 module Tire
-  VERSION   = "0.2.1"
+  VERSION   = "0.3.0"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
@@ -17,5 +17,12 @@ module Tire
     # Added the 'settings' method for models to define index settings
     # Fixed errors when importing data with will_paginate vs Kaminari (MongoDB)
     # Added support for histogram facets [Paco Guzman]
+
+    0.2.1
+    ---------------------------------------------------------
+    # Isolated Tire ActiveModel integration into `tire` class and instance method.
+    
+      When there's no conflict with existing methods, Tire methods are added
+      to the class namespace, as well, so the change is 100% backwards-compatible.
   END
 end
