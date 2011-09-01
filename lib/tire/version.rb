@@ -1,13 +1,21 @@
 module Tire
-  VERSION   = "0.2.0"
+  VERSION   = "0.2.1"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    # By default, results are wrapped in Item class (05a1331)
+    0.2.0
+    ---------------------------------------------------------
+    # By default, results are wrapped in Item class
     # Completely rewritten ActiveModel/ActiveRecord support
-    # Added method to items for loading the "real" model from database (f9273bc)
-    # Added the ':load' option to eagerly load results from database (1e34cde)
-    # Deprecated the dynamic sort methods, use the 'sort { by :field_name }' syntax
+    # Added infrastructure for loading "real" models from database (eagerly or in runtime)
+    # Deprecated the dynamic sort methods in favour of the 'sort { by :field_name }' syntax
+
+    0.2.1
+    ---------------------------------------------------------
+    # Lighweight check for index presence
+    # Added the 'settings' method for models to define index settings
+    # Fixed errors when importing data with will_paginate vs Kaminari (MongoDB)
+    # Added support for histogram facets [Paco Guzman]
   END
 end
