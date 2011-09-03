@@ -92,6 +92,14 @@ module Tire
           end
         end
 
+        should "allow to set per-instance custom index name" do
+          ActiveModelArticle.index_name "class-index-name"
+          instance = ActiveModelArticle.new
+          instance.index_name "instance-index-name"
+          assert_equal "instance-index-name", instance.index_name
+          assert_equal "class-index-name", ActiveModelArticle.index_name
+        end
+
         should "allow to refresh index" do
           Index.any_instance.expects(:refresh)
 

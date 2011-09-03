@@ -15,8 +15,9 @@ module Tire
       end
 
       module InstanceMethods
-        def index_name
-          instance.class.tire.index_name
+        def index_name name=nil
+          @index_name = name if name
+          @index_name || instance.class.tire.index_name
         end
 
         def document_type
