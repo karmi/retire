@@ -15,7 +15,8 @@ module Tire
           @mapping ||= {}
           if block_given?
             @store_mapping = true and yield and @store_mapping = false
-            create_elasticsearch_index
+            # Defer index create with dynamic index names
+            create_elasticsearch_index unless dynamic_index_name?
           else
             @mapping
           end
