@@ -3,12 +3,13 @@ module Tire
 
     module Persistence
 
+      # Provides infrastructure for declaring the model properties and accessing them.
+      #
       module Attributes
 
         module ClassMethods
 
           def property(name, options = {})
-            # p "#{self}, PERSISTENCE PROPERTY, #{name}"
             attr_accessor name.to_sym
             properties << name.to_s unless properties.include?(name.to_s)
             define_query_method      name.to_sym

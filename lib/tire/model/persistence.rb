@@ -1,6 +1,26 @@
 module Tire
   module Model
 
+    # Allows to use _ElasticSearch_ as a primary database (storage).
+    #
+    # Contains all the `Tire::Model::Search` features and provides
+    # an [_ActiveModel_](http://rubygems.org/gems/activemodel)-compatible
+    # interface for persistance.
+    #
+    # Usage:
+    #
+    #     class Article
+    #       include Tire::Model::Persistence
+    #     
+    #       property :title
+    #     end
+    #
+    #     Article.create :id => 1, :title => 'One'
+    #
+    #     article = Article.find
+    #
+    #     article.destroy
+    #
     module Persistence
 
       def self.included(base)
