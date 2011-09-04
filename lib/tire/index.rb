@@ -259,7 +259,6 @@ module Tire
       false
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{MultiJson.encode(options)}'|
-      puts curl
       logged(error, 'ALIASES', curl)
     end
 
