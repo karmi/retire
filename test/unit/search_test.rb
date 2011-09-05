@@ -110,12 +110,12 @@ module Tire
         assert_not_nil s.response
       end
 
-      should "print debugging information on exception and re-raise it" do
-        Configuration.client.expects(:get).raises(RestClient::InternalServerError)
+      should "print debugging information on exception and retun false" do
+        Configuration.client.expects(:get).returns(mock_response('failed', '404'))
         STDERR.expects(:puts)
 
         s = Search::Search.new('index')
-        assert_raise(RestClient::InternalServerError) { s.perform }
+        assert !s.perform
       end
 
       should "log request, but not response, when logger is set" do

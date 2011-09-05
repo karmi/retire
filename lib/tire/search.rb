@@ -68,14 +68,15 @@ module Tire
 
       def perform
         @response = Configuration.client.get(@url, self.to_json)
+        if(@response.code != 200)
+          STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
+          return false
+        end
         @json     = MultiJson.decode(@response.body)
         @results  = Results::Collection.new(@json, @options)
-        self
-      rescue Exception => error
-        STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
-        raise
+        return self
       ensure
-        logged(error)
+        logged(@response.body)
       end
 
       def to_curl
