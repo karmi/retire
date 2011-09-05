@@ -43,9 +43,7 @@ module Tire
           assert @index.unregister_percolator_query('alert')
           Tire.index('_percolator').refresh
 
-          assert_raise(RestClient::ResourceNotFound) do
-            Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert")
-          end
+          assert Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert").code != 200
         end
 
       end
