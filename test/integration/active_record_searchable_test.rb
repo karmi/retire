@@ -35,10 +35,15 @@ module Tire
     context "ActiveRecord integration" do
 
       setup    do
+        ActiveRecordArticle.destroy_all
         Tire.index('active_record_articles').delete
+
         load File.expand_path('../../models/active_record_models.rb', __FILE__)
       end
-      teardown { Tire.index('active_record_articles').delete }
+      teardown do
+        ActiveRecordArticle.destroy_all
+        Tire.index('active_record_articles').delete
+      end
 
       should "configure mapping" do
         assert_equal 'snowball', ActiveRecordArticle.mapping[:title][:analyzer]
@@ -90,8 +95,9 @@ module Tire
         end
 
         should "load records with options on query search" do
-          assert_equal ActiveRecordArticle.find(['1', '2'], :include => 'comments'),
-                       ActiveRecordArticle.search('"Test 1" OR "Test 2"', :load => { :include => 'comments' }).results
+          assert_equal ActiveRecordArticle.find(['1'], :include => 'comments').first,
+                       ActiveRecordArticle.search('"Test 1"',
+                                                  :load => { :include => 'comments' }).results.first
         end
 
         should "return empty collection for nonmatching query" do
