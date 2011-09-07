@@ -60,10 +60,10 @@ module Tire
         Configuration.url 'http://example.com'
         Configuration.index_prefix 'app_environment_'
         assert_equal      'http://example.com', Configuration.url
-        assert_equal 'app_environment_', Configuration.index_prefix
+        assert_equal      'app_environment_', Configuration.index_prefix
         Configuration.reset :url
         assert_equal      'http://localhost:9200', Configuration.url
-        assert_equal 'app_environment_', Configuration.index_prefix
+        assert_equal      'app_environment_', Configuration.index_prefix
       end
 
       should "allow to reset the configuration for all properties" do
@@ -71,7 +71,7 @@ module Tire
         Configuration.index_prefix 'app_environment_'
         Configuration.wrapper Hash
         assert_equal          'http://example.com', Configuration.url
-        assert_equal 'app_environment_', Configuration.index_prefix
+        assert_equal          'app_environment_', Configuration.index_prefix
         Configuration.reset
         assert_equal          'http://localhost:9200', Configuration.url
         assert_equal          Client::RestClient, Configuration.client
