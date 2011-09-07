@@ -6,6 +6,10 @@ module Tire
       @url    = (value ? value.to_s.gsub(%r|/*$|, '') : nil) || @url || "http://localhost:9200"
     end
 
+    def self.index_prefix(index_prefix = nil)
+      @index_prefix = index_prefix || @index_prefix || nil
+    end
+
     def self.client(klass=nil)
       @client = klass || @client || Client::RestClient
     end

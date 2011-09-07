@@ -12,6 +12,7 @@ module Tire
       setup do
         Configuration.instance_variable_set(:@url,    nil)
         Configuration.instance_variable_set(:@client, nil)
+        Configuration.instance_variable_set(:@index_prefix, nil)
       end
 
       teardown do
@@ -46,20 +47,36 @@ module Tire
         assert_instance_of Tire::Logger, Configuration.logger
       end
 
-      should "allow to reset the configuration for specific property" do
+      should "return default nil index prefix" do
+        assert_nil Configuration.index_prefix
+      end
+
+      should "allow setting and retrieving the index prefix" do
+        assert_nothing_raised { Configuration.index_prefix 'app_environment_' }
+        assert_equal 'app_environment_', Configuration.index_prefix
+      end
+
+      should "allow to reset the configuration for specific property, and does not affect others" do
         Configuration.url 'http://example.com'
+        Configuration.index_prefix 'app_environment_'
         assert_equal      'http://example.com', Configuration.url
+        assert_equal 'app_environment_', Configuration.index_prefix
         Configuration.reset :url
         assert_equal      'http://localhost:9200', Configuration.url
+        assert_equal 'app_environment_', Configuration.index_prefix
       end
 
       should "allow to reset the configuration for all properties" do
         Configuration.url     'http://example.com'
+        Configuration.index_prefix 'app_environment_'
         Configuration.wrapper Hash
         assert_equal          'http://example.com', Configuration.url
+        assert_equal 'app_environment_', Configuration.index_prefix
         Configuration.reset
         assert_equal          'http://localhost:9200', Configuration.url
         assert_equal          Client::RestClient, Configuration.client
+        assert_nil Configuration.index_prefix
+        
       end
     end
 

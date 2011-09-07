@@ -10,3 +10,4 @@ scratch/
 examples/*.html
 *.log
 .rvmrc
+.redcar
