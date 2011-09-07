@@ -68,6 +68,14 @@ module Tire
           ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
         end
 
+        should "search in custom type" do
+          name = ActiveModelArticleWithCustomDocumentType.index_name
+          Tire::Search::Search.expects(:new).with(name, { :type => 'my_custom_type' }).returns(@stub).twice
+
+          ActiveModelArticleWithCustomDocumentType.search 'foo'
+          ActiveModelArticleWithCustomDocumentType.search { query { string 'foo' } }
+        end
+
         should "allow to pass custom document type" do
           Tire::Search::Search.
             expects(:new).

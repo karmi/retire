@@ -9,6 +9,9 @@ module Tire
 
         # Get or set the index name for this model, based on arguments.
         #
+        # By default, uses ActiveSupport inflection, so a class named `Article`
+        # will be stored in the `articles` index.
+        #
         # To get the index name:
         #
         #     Article.index_name
@@ -22,10 +25,22 @@ module Tire
           @index_name || klass.model_name.plural
         end
 
-        # Get the document type for this model, based on the class name.
+        # Get or set the document type for this model, based on arguments.
         #
-        def document_type
-          klass.model_name.singular
+        # By default, uses ActiveSupport inflection, so a class named `Article`
+        # will be stored as the `article` type.
+        #
+        # To get the document type:
+        #
+        #     Article.document_type
+        #
+        # To set the document type:
+        #
+        #     Article.document_type 'my-custom-type'
+        #
+        def document_type name=nil
+          @document_type = name if name
+          @document_type || klass.model_name.singular
         end
       end
 
