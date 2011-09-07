@@ -20,6 +20,23 @@ module Tire
           assert_equal 'another-index-name', PersistentArticleWithCustomIndexName.index.name
         end
 
+        context "with index_prefix configured" do
+          setup do
+            PersistentArticle.instance_variable_set(:@index_name, nil)
+            Tire::Configuration.index_prefix 'prefix_'
+          end
+          
+          teardown do
+            Tire::Configuration.reset(:index_prefix)
+          end
+          
+          should "have configured prefix in index_name" do
+            assert_equal 'prefix_persistent_articles', PersistentArticle.index_name
+            assert_equal 'prefix_persistent_articles', PersistentArticle.new(:title => 'Test').index_name
+          end
+          
+        end
+
         should "have document_type" do
           assert_equal 'persistent_article', PersistentArticle.document_type
           assert_equal 'persistent_article', PersistentArticle.new(:title => 'Test').document_type

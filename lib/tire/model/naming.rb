@@ -19,7 +19,7 @@ module Tire
         #
         def index_name name=nil
           @index_name = name if name
-          @index_name || klass.model_name.plural
+          @index_name || "#{Tire::Configuration.index_prefix.nil? ? '' : Tire::Configuration.index_prefix}#{klass.model_name.plural}"
         end
 
         # Get the document type for this model, based on the class name.
