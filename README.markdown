@@ -356,7 +356,7 @@ When you now save a record:
                    :published_on => Time.now
 ```
 
-it is automatically added into the index, because of the included callbacks.
+it is automatically added into an index called 'articles', because of the included callbacks.
 (You may want to skip them in special cases, like when your records are indexed via some external
 mechanism, let's say a _CouchDB_ or _RabbitMQ_
 [river](http://www.elasticsearch.org/blog/2010/09/28/the_river.html).
@@ -686,6 +686,17 @@ To use the persistence features, just include the `Tire::Persistence` module in 
 Of course, not all validations or `ActionPack` helpers will be available to your models,
 but if you can live with that, you've just got a schema-free, highly-scalable storage
 and retrieval engine for your data.
+
+If you are using persistence features and thus using ES instead of a database, you may want to separate your indexes based on your environments.
+You can do so by configuring an index_prefix that will be used to prefix the default index names. 
+
+Add to your initializers a similar snippet to the following:
+
+```ruby
+    Tire.configure { index_prefix "#{Rails.env.to_s.downcase}_" }
+```
+
+This will result in Article instances being stored in an index called 'test_articles' when used in tests but in the index 'development_articles' when used in the development environment.
 
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
 for examples of the API and _ActiveModel_ integration usage.
