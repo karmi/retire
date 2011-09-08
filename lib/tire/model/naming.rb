@@ -22,8 +22,34 @@ module Tire
         #
         def index_name name=nil
           @index_name = name if name
-          @index_name || "#{Model::Search.index_prefix.nil? ? '' : Model::Search.index_prefix}#{klass.model_name.plural}"
+          @index_name || [index_prefix, klass.model_name.plural].compact.join('_')
         end
+
+        # Set or get index prefix for all models or for a specific model.
+        #
+        # To set the prefix for all models (preferably in an initializer inside Rails):
+        #
+        #     Tire::Model::Search.index_prefix Rails.env
+        #
+        # To set the prefix for specific model:
+        #
+        #     class Article
+        #       # ...
+        #       index_prefix 'my_prefix'
+        #     end
+        #
+        # TODO: Maybe this would be more sane with ActiveSupport extensions such as `class_attribute`?
+        #
+        @@__index_prefix__ = nil
+        def index_prefix(*args)
+          # Uses class or instance variable depending on the context
+          if args.size > 0
+            value = args.pop
+            self.is_a?(Module) ? ( @@__index_prefix__ = value ) : ( @__index_prefix__ = value )
+          end
+          self.is_a?(Module) ? ( @@__index_prefix__ || nil ) : ( @__index_prefix__ || @@__index_prefix__ || nil )
+        end
+        extend self
 
         # Get or set the document type for this model, based on arguments.
         #

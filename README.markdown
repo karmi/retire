@@ -687,15 +687,6 @@ Of course, not all validations or `ActionPack` helpers will be available to your
 but if you can live with that, you've just got a schema-free, highly-scalable storage
 and retrieval engine for your data.
 
-If you are using persistence features and thus using ES instead of a database, you may want to separate your indexes based on your environments.
-You can do so by configuring an index_prefix that will be used to prefix the default index names. 
-
-Add to your initializers a similar snippet to the following:
-
-```ruby
-    Tire::Model::Search.index_prefix "#{Rails.env.to_s.downcase}_"
-```
-
 This will result in Article instances being stored in an index called 'test_articles' when used in tests but in the index 'development_articles' when used in the development environment.
 
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)

@@ -19,12 +19,10 @@ module Tire
     #
     module Search
 
-      # Model::Search specific settings
+      # Alias for Tire::Model::Naming::ClassMethods.index_prefix
       #
-      
-      # Sets a prefix for default index names
-      def self.index_prefix(index_prefix = nil)
-        @index_prefix = index_prefix || @index_prefix || nil
+      def self.index_prefix(*args)
+        Naming::ClassMethods.index_prefix(*args)
       end
 
       module ClassMethods

@@ -20,15 +20,13 @@ module Tire
           assert_equal 'another-index-name', PersistentArticleWithCustomIndexName.index.name
         end
 
-        context "with index_prefix configured" do
+        context "with index prefix" do
           setup do
-            PersistentArticle.instance_variable_set(:@index_name, nil)
-            Model::Search.index_prefix 'prefix_'
+            Model::Search.index_prefix 'prefix'
           end
           
           teardown do
-            Model::Search.instance_variable_set(:@index_prefix, nil)
-            PersistentArticle.instance_variable_set(:@index_name, nil)
+            Model::Search.index_prefix nil
           end
           
           should "have configured prefix in index_name" do
