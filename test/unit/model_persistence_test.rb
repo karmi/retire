@@ -411,7 +411,8 @@ module Tire
                                  end.returns(mock_response('{"ok":true,"_id":"123"}'))
 
             Configuration.client.expects(:delete).
-                                 with("#{Configuration.url}/persistent_articles/persistent_article/123")
+                                 with("#{Configuration.url}/persistent_articles/persistent_article/123").
+                                 returns(mock_response('{"ok":true,"acknowledged":true}', 200))
 
             article = PersistentArticle.new :id => '123', :title => 'Test'
             article.save
