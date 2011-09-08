@@ -43,7 +43,7 @@ module Tire
           assert @index.unregister_percolator_query('alert')
           Tire.index('_percolator').refresh
 
-          assert Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert").code != 200
+          assert Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/alert").failure?
         end
 
       end

@@ -313,7 +313,7 @@ module Tire
         end
 
         should "try again when an exception occurs" do
-          Configuration.client.expects(:post).returns(mock_response('', 404)).at_least(2)
+          Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
 
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end

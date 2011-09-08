@@ -7,7 +7,7 @@ module Tire
     end
 
     def self.client(klass=nil)
-      @client = klass || @client || Client::RestClient
+      @client = klass || @client || HTTP::Client::RestClient
     end
 
     def self.wrapper(klass=nil)

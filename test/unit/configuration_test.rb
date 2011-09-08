@@ -33,7 +33,7 @@ module Tire
       end
 
       should "return default client" do
-        assert_equal Client::RestClient, Configuration.client
+        assert_equal HTTP::Client::RestClient, Configuration.client
       end
 
       should "return nil as logger by default" do
@@ -59,7 +59,7 @@ module Tire
         assert_equal          'http://example.com', Configuration.url
         Configuration.reset
         assert_equal          'http://localhost:9200', Configuration.url
-        assert_equal          Client::RestClient, Configuration.client
+        assert_equal          HTTP::Client::RestClient, Configuration.client
       end
     end
 

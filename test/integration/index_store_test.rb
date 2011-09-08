@@ -24,9 +24,9 @@ module Tire
 
       teardown { Tire.index('articles-test-ids').delete }
 
-      should "exists if looked up by the index" do
-        assert Tire.index("articles-test-ids").exists?
-        assert !Tire.index("invalid-index").exists?
+      should "happen in existing index" do
+        assert   Tire.index("articles-test-ids").exists?
+        assert ! Tire.index("four-oh-four-index").exists?
       end
 
       should "store hashes under their IDs" do

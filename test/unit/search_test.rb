@@ -100,7 +100,7 @@ module Tire
       end
 
       should "perform the search" do
-        response = stub(:body => '{"took":1,"hits":[]}', :code => 200)
+        response = mock_response '{"took":1,"hits":[]}', 200
         Configuration.client.expects(:get).returns(response)
         Results::Collection.expects(:new).returns([])
 
@@ -110,19 +110,20 @@ module Tire
         assert_not_nil s.response
       end
 
-      should "print debugging information on exception and retun false" do
-        Configuration.client.expects(:get).returns(mock_response('failed', '404'))
+      should "print debugging information on exception and return false" do
+        ::RestClient::Request.any_instance.
+                              expects(:execute).
+                              raises(::RestClient::InternalServerError)
         STDERR.expects(:puts)
 
         s = Search::Search.new('index')
-        assert !s.perform
+        assert ! s.perform
       end
 
       should "log request, but not response, when logger is set" do
         Configuration.logger STDERR
 
-        response = stub(:body => '{"took":1,"hits":[]}', :code => 200)
-        Configuration.client.expects(:get).returns(response)
+        Configuration.client.expects(:get).returns(mock_response( '{"took":1,"hits":[]}', 200 ))
 
         Results::Collection.expects(:new).returns([])
         Configuration.logger.expects(:log_request).returns(true)

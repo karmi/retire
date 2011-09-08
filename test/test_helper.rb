@@ -16,8 +16,8 @@ Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
 
 class Test::Unit::TestCase
 
-  def mock_response(body, code=200)
-    stub(:body => body, :code => code)
+  def mock_response(body, code=200, headers={})
+    Tire::HTTP::Response.new(body, code, headers)
   end
 
   def fixtures_path

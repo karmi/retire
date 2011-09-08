@@ -9,12 +9,12 @@ module Tire
     end
 
     def exists?
-      Configuration.client.head("#{Configuration.url}/#{@name}").code == 200
+      Configuration.client.head("#{Configuration.url}/#{@name}").success?
     end
 
     def delete
       @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
-      return true if @response.code == 200
+      return @response.success?
     ensure
       curl = %Q|curl -X DELETE "#{Configuration.url}/#{@name}"|
       logged(@response.body, 'DELETE', curl)
@@ -23,7 +23,7 @@ module Tire
     def create(options={})
       @options = options
       @response = Configuration.client.post "#{Configuration.url}/#{@name}", MultiJson.encode(options)
-      @response.code == 200 ? @response : false
+      @response.success? ? @response : false
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{MultiJson.encode(options)}'|
       logged(@response.body, 'CREATE', curl)
@@ -78,7 +78,7 @@ module Tire
 
       begin
         response = Configuration.client.post("#{Configuration.url}/_bulk", payload.join("\n"))
-        raise response.body if response.code != 200
+        raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
         response
       rescue Exception => error
         if count < tries
@@ -86,8 +86,7 @@ module Tire
           STDERR.puts "[ERROR] #{error.message}, retrying (#{count})..."
           retry
         else
-          STDERR.puts "[ERROR] Too many exceptions occured, giving up..."
-          STDERR.puts "Response: #{error.message}"
+          STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"
         end
       ensure
         curl = %Q|curl -X POST "#{Configuration.url}/_bulk" -d '{... data omitted ...}'|
@@ -130,7 +129,7 @@ module Tire
       raise ArgumentError, "Please pass a document ID" unless id
 
       result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
-      MultiJson.decode(result.body) if result.code == 200
+      MultiJson.decode(result.body) if result.success?
     end
 
     def retrieve(type, id)

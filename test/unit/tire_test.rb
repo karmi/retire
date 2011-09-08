@@ -25,7 +25,7 @@ module Tire
         should "allow searching with a Ruby Hash" do
           Tire::Configuration.client.expects(:post).
             with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
-            returns( stub(:body => '{}') )
+            returns( mock_response('{}') )
           Tire::Results::Collection.expects(:new)
 
           Tire.search 'dummy', :query => { :query_string => { :query => 'foo' }}
@@ -34,7 +34,7 @@ module Tire
         should "allow searching with a JSON string" do
           Tire::Configuration.client.expects(:post).
             with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
-            returns( stub(:body => '{}') )
+            returns( mock_response('{}') )
           Tire::Results::Collection.expects(:new)
 
           Tire.search 'dummy', '{"query":{"query_string":{"query":"foo"}}}'

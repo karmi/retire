@@ -452,6 +452,7 @@ module Tire
             }}
           }
 
+          Tire::Index.any_instance.stubs(:exists?).returns(false)
           Tire::Index.any_instance.expects(:create).with(expected)
 
           class ::PersistentArticleWithMapping
