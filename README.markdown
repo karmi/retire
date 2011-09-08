@@ -693,7 +693,7 @@ You can do so by configuring an index_prefix that will be used to prefix the def
 Add to your initializers a similar snippet to the following:
 
 ```ruby
-    Model::Search.index_prefix "#{Rails.env.to_s.downcase}_"
+    Tire::Model::Search.index_prefix "#{Rails.env.to_s.downcase}_"
 ```
 
 This will result in Article instances being stored in an index called 'test_articles' when used in tests but in the index 'development_articles' when used in the development environment.
