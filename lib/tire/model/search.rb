@@ -19,6 +19,14 @@ module Tire
     #
     module Search
 
+      # Model::Search specific settings
+      #
+      
+      # Sets a prefix for default index names
+      def self.index_prefix(index_prefix = nil)
+        @index_prefix = index_prefix || @index_prefix || nil
+      end
+
       module ClassMethods
 
         # Returns search results for a given query.
@@ -267,6 +275,7 @@ module Tire
         Results::Item.send :include, Loader
       end
 
+      
     end
 
   end
