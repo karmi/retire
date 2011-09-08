@@ -659,6 +659,23 @@ module Tire
 
       end
 
+      context "#index_prefix" do
+        
+        should "return nil by default" do
+          assert_nil Model::Search.index_prefix
+        end
+        
+        should "allow setting and retrieving" do
+          assert_nothing_raised { Model::Search.index_prefix 'app_environment_' }
+          assert_equal 'app_environment_', Model::Search.index_prefix
+        end
+
+        teardown do
+          Model::Search.instance_variable_set(:@index_prefix, nil)
+        end
+        
+      end
+
     end
 
   end
