@@ -44,6 +44,12 @@ module Tire
           include Persistence::Attributes::InstanceMethods
 
           include Persistence::Storage
+
+          ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches'].each do |attr|
+            define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
+            define_method("#{attr}")  { @attributes[attr] }
+          end
+
         end
 
       end
