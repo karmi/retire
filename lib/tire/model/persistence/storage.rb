@@ -3,6 +3,8 @@ module Tire
 
     module Persistence
 
+      # Provides infrastructure for storing records in _ElasticSearch_.
+      #
       module Storage
 
         def self.included(base)

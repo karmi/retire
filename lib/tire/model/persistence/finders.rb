@@ -3,6 +3,8 @@ module Tire
 
     module Persistence
 
+      # Provides infrastructure for an _ActiveRecord_-like interface for finding records.
+      #
       module Finders
 
         module ClassMethods

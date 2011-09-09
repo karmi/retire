@@ -9,30 +9,24 @@ module Tire
     end
 
     def exists?
-      !!Configuration.client.head("#{Configuration.url}/#{@name}")
-    rescue Exception => error
-      false
+      Configuration.client.head("#{Configuration.url}/#{@name}").success?
     end
 
     def delete
-      # FIXME: RestClient does not return response for DELETE requests?
       @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
-      return @response.body =~ /error/ ? false : true
-    rescue Exception => error
-      false
+      return @response.success?
     ensure
       curl = %Q|curl -X DELETE "#{Configuration.url}/#{@name}"|
-      logged(error, 'DELETE', curl)
+      logged(@response.body, 'DELETE', curl)
     end
 
     def create(options={})
       @options = options
       @response = Configuration.client.post "#{Configuration.url}/#{@name}", MultiJson.encode(options)
-    rescue Exception => error
-      false
+      @response.success? ? @response : false
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{MultiJson.encode(options)}'|
-      logged(error, 'CREATE', curl)
+      logged(@response.body, 'CREATE', curl)
     end
 
     def mapping
@@ -83,16 +77,16 @@ module Tire
       count = 0
 
       begin
-        Configuration.client.post("#{Configuration.url}/_bulk", payload.join("\n"))
+        response = Configuration.client.post("#{Configuration.url}/_bulk", payload.join("\n"))
+        raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
+        response
       rescue Exception => error
         if count < tries
           count += 1
-          STDERR.puts "[ERROR] #{error.message}:#{error.http_body rescue nil}, retrying (#{count})..."
+          STDERR.puts "[ERROR] #{error.message}, retrying (#{count})..."
           retry
         else
-          STDERR.puts "[ERROR] Too many exceptions occured, giving up..."
-          STDERR.puts "Response: #{error.http_body rescue nil}"
-          raise
+          STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"
         end
       ensure
         curl = %Q|curl -X POST "#{Configuration.url}/_bulk" -d '{... data omitted ...}'|
@@ -135,7 +129,7 @@ module Tire
       raise ArgumentError, "Please pass a document ID" unless id
 
       result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
-      MultiJson.decode(result) if result
+      MultiJson.decode(result.body) if result.success?
     end
 
     def retrieve(type, id)

@@ -7,10 +7,7 @@ module Tire
 
     context "Storing the documents in index" do
 
-      teardown { Tire.index('articles-test-ids').delete }
-
-      should "store hashes under their IDs" do
-
+      setup do
         Tire.index 'articles-test-ids' do
           delete
           create
@@ -23,7 +20,16 @@ module Tire
 
           refresh
         end
+      end
 
+      teardown { Tire.index('articles-test-ids').delete }
+
+      should "happen in existing index" do
+        assert   Tire.index("articles-test-ids").exists?
+        assert ! Tire.index("four-oh-four-index").exists?
+      end
+
+      should "store hashes under their IDs" do
         s = Tire.search('articles-test-ids') { query { string '*' } }
 
         assert_equal 4, s.results.count

@@ -1,16 +1,47 @@
 module Tire
   module Model
 
+    # Contains logic for definition of index settings and mappings.
+    #
     module Indexing
 
       module ClassMethods
 
+        # Define [_settings_](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
+        # for the corresponding index, such as number of shards and replicas, custom analyzers, etc.
+        #
+        # Usage:
+        #
+        #     class Article
+        #       # ...
+        #       settings :number_of_shards => 1 do
+        #         mapping do
+        #           # ...
+        #         end
+        #       end
+        #     end
+        #
         def settings(*args)
           @settings ||= {}
           args.empty?  ? (return @settings) : @settings = args.pop
           yield if block_given?
         end
 
+        # Define the [_mapping_](http://www.elasticsearch.org/guide/reference/mapping/index.html)
+        # for the corresponding index, telling _ElasticSearch_ how to understand your documents:
+        # what type is which property, whether it is analyzed or no, which analyzer to use, etc.
+        #
+        # Usage:
+        #
+        #     class Article
+        #       # ...
+        #       mapping do
+        #         indexes :id,    :type => 'string',  :index    => :not_analyzed
+        #         indexes :title, :type => 'string',  :analyzer => 'snowball',   :boost => 100
+        #         # ...
+        #       end
+        #     end
+        #
         def mapping
           @mapping ||= {}
           if block_given?
@@ -22,6 +53,21 @@ module Tire
           end
         end
 
+        # Define mapping for the property passed as the first argument (`name`)
+        # using definition from the second argument (`options`).
+        #
+        # `:type` is optional and defaults to `'string'`.
+        #
+        # Usage:
+        #
+        # * Index property but do not analyze it: `indexes :id, :index    => :not_analyzed`
+        #
+        # * Use different analyzer for indexing a property: `indexes :title, :analyzer => 'snowball'`
+        #
+        # Please refer to the
+        # [_mapping_ documentation](http://www.elasticsearch.org/guide/reference/mapping/index.html)
+        # for more information.
+        #
         def indexes(name, options = {}, &block)
           options[:type] ||= 'string'
 
@@ -41,14 +87,16 @@ module Tire
           end
         end
 
-        def store_mapping?
-          @store_mapping || false
-        end
-
+        # Creates the corresponding index with desired settings and mappings, when it does not exists yet.
+        #
         def create_elasticsearch_index
           unless index.exists?
             index.create :mappings => mapping_to_hash, :settings => settings
           end
+        end
+
+        def store_mapping?
+          @store_mapping || false
         end
 
         def mapping_to_hash

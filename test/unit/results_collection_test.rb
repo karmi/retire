@@ -50,6 +50,13 @@ module Tire
         assert_equal 2,  collection.options[:page]
       end
 
+      should "be will_paginate compatible" do
+        collection = Results::Collection.new(@default_response)
+        %w(total_pages offset current_page per_page total_entries).each do |method|
+          assert_respond_to collection, method
+        end
+      end
+
       context "wrapping results" do
 
         setup do

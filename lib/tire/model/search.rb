@@ -19,6 +19,12 @@ module Tire
     #
     module Search
 
+      # Alias for Tire::Model::Naming::ClassMethods.index_prefix
+      #
+      def self.index_prefix(*args)
+        Naming::ClassMethods.index_prefix(*args)
+      end
+
       module ClassMethods
 
         # Returns search results for a given query.
@@ -169,6 +175,14 @@ module Tire
           end
         end
 
+        def matches
+          @attributes['matches']
+        end
+
+        def matches=(value)
+          @attributes ||= {}; @attributes['matches'] = value
+        end
+
       end
 
       module Loader
@@ -208,13 +222,6 @@ module Tire
         include Tire::Model::Naming::InstanceMethods
         include Tire::Model::Percolate::InstanceMethods
         include InstanceMethods
-
-        ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches'].each do |attr|
-          # TODO: Find a sane way to add attributes like _score for ActiveRecord -
-          #       `define_attribute_methods [attr]` does not work in AR.
-          define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
-          define_method("#{attr}")  { @attributes[attr] }
-        end
 
         INTERFACE = public_instance_methods.map(&:to_sym) - Object.public_instance_methods.map(&:to_sym)
 
@@ -284,6 +291,7 @@ module Tire
         Results::Item.send :include, Loader
       end
 
+      
     end
 
   end

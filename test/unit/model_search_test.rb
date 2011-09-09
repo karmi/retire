@@ -68,6 +68,14 @@ module Tire
           ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
         end
 
+        should "search in custom type" do
+          name = ActiveModelArticleWithCustomDocumentType.index_name
+          Tire::Search::Search.expects(:new).with(name, { :type => 'my_custom_type' }).returns(@stub).twice
+
+          ActiveModelArticleWithCustomDocumentType.search 'foo'
+          ActiveModelArticleWithCustomDocumentType.search { query { string 'foo' } }
+        end
+
         should "allow to pass custom document type" do
           Tire::Search::Search.
             expects(:new).
@@ -618,9 +626,71 @@ module Tire
 
           should "NOT overload existing top-level instance methods" do
             ActiveRecordClassWithTireMethods.stubs(:columns).returns([])
+            ActiveRecordClassWithTireMethods.stubs(:column_defaults).returns({})
             assert_equal "THIS IS MY INDEX!", ActiveRecordClassWithTireMethods.new.index
             assert_equal 'active_record_class_with_tire_methods',
                          ActiveRecordClassWithTireMethods.new.tire.index.name
+          end
+
+        end
+
+        context "with index prefix" do
+          class ::ModelWithoutPrefix
+            extend ActiveModel::Naming
+            extend ActiveModel::Callbacks
+
+            include Tire::Model::Search
+            include Tire::Model::Callbacks
+          end
+          class ::ModelWithPrefix
+            extend ActiveModel::Naming
+            extend ActiveModel::Callbacks
+
+            include Tire::Model::Search
+            include Tire::Model::Callbacks
+
+            tire.index_prefix 'custom_prefix'
+          end
+
+          class ::OtherModelWithPrefix
+            extend ActiveModel::Naming
+            extend ActiveModel::Callbacks
+
+            include Tire::Model::Search
+            include Tire::Model::Callbacks
+
+            index_prefix 'other_custom_prefix'
+          end
+
+          teardown do
+            # FIXME: Depends on the interface itself
+            Model::Search.index_prefix nil
+          end
+
+          should "return nil by default" do
+            assert_nil Model::Search.index_prefix
+          end
+
+          should "allow to set and retrieve the value" do
+            assert_nothing_raised { Model::Search.index_prefix 'app_environment' }
+            assert_equal 'app_environment', Model::Search.index_prefix
+          end
+
+          should "allow to reset the value" do
+            Model::Search.index_prefix 'prefix'
+            Model::Search.index_prefix nil
+            assert_nil Model::Search.index_prefix
+          end
+
+          should "not add any prefix by default" do
+            assert_equal 'model_without_prefixes', ModelWithoutPrefix.index_name
+          end
+
+          should "add general and custom prefixes to model index names" do
+            Model::Search.index_prefix 'general_prefix'
+            assert_equal 'general_prefix_model_without_prefixes',         ModelWithoutPrefix.index_name
+            assert_equal 'custom_prefix_model_with_prefixes',             ModelWithPrefix.index_name
+            assert_equal 'other_custom_prefix_other_model_with_prefixes', OtherModelWithPrefix.index_name
           end
 
         end

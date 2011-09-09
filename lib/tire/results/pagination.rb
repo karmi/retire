@@ -7,8 +7,12 @@ module Tire
         @total
       end
 
+      def per_page
+        (@options[:per_page] || @options[:size] || 10 ).to_i
+      end
+
       def total_pages
-        ( @total.to_f / (@options[:per_page] || @options[:size] || 10 ).to_i ).ceil
+        ( @total.to_f / per_page ).ceil
       end
 
       def current_page
@@ -25,6 +29,10 @@ module Tire
 
       def next_page
         current_page < total_pages ? (current_page + 1) : nil
+      end
+
+      def offset
+        per_page * (current_page - 1)
       end
 
       def out_of_bounds?

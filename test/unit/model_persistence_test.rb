@@ -20,6 +20,22 @@ module Tire
           assert_equal 'another-index-name', PersistentArticleWithCustomIndexName.index.name
         end
 
+        context "with index prefix" do
+          setup do
+            Model::Search.index_prefix 'prefix'
+          end
+          
+          teardown do
+            Model::Search.index_prefix nil
+          end
+          
+          should "have configured prefix in index_name" do
+            assert_equal 'prefix_persistent_articles', PersistentArticle.index_name
+            assert_equal 'prefix_persistent_articles', PersistentArticle.new(:title => 'Test').index_name
+          end
+          
+        end
+
         should "have document_type" do
           assert_equal 'persistent_article', PersistentArticle.document_type
           assert_equal 'persistent_article', PersistentArticle.new(:title => 'Test').document_type
@@ -395,7 +411,8 @@ module Tire
                                  end.returns(mock_response('{"ok":true,"_id":"123"}'))
 
             Configuration.client.expects(:delete).
-                                 with("#{Configuration.url}/persistent_articles/persistent_article/123")
+                                 with("#{Configuration.url}/persistent_articles/persistent_article/123").
+                                 returns(mock_response('{"ok":true,"acknowledged":true}', 200))
 
             article = PersistentArticle.new :id => '123', :title => 'Test'
             article.save
@@ -435,6 +452,7 @@ module Tire
             }}
           }
 
+          Tire::Index.any_instance.stubs(:exists?).returns(false)
           Tire::Index.any_instance.expects(:create).with(expected)
 
           class ::PersistentArticleWithMapping

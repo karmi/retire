@@ -1,5 +1,5 @@
 module Tire
-  VERSION   = "0.3.1"
+  VERSION   = "0.3.3"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
@@ -24,5 +24,11 @@ module Tire
     
       When there's no conflict with existing methods, Tire methods are added
       to the class namespace, as well, so the change is 100% backwards-compatible.
+
+    0.3.3
+    ---------------------------------------------------------
+    # Added proper will_paginate compatibility
+    # Added support for plugging in another HTTP library (see lib/http/clients/curb for an example)
+
   END
 end

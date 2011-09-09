@@ -68,14 +68,15 @@ module Tire
 
       def perform
         @response = Configuration.client.get(@url, self.to_json)
+        if @response.failure?
+          STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
+          return false
+        end
         @json     = MultiJson.decode(@response.body)
         @results  = Results::Collection.new(@json, @options)
-        self
-      rescue Exception => error
-        STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
-        raise
+        return self
       ensure
-        logged(error)
+        logged
       end
 
       def to_curl
@@ -104,21 +105,20 @@ module Tire
 
           Configuration.logger.log_request '_search', indices, to_curl
 
-          code = @response ? @response.code : error.message
           took = @json['took'] rescue nil
 
           if Configuration.logger.level.to_s == 'debug'
             # FIXME: Depends on RestClient implementation
-            body = if @response
+            body = if @json
               defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
             else
-              error.http_body rescue ''
+              @response.body
             end
           else
             body = ''
           end
 
-          Configuration.logger.log_response code, took, body
+          Configuration.logger.log_response @response.code, took, body
         end
       end
 

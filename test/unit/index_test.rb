@@ -20,7 +20,7 @@ module Tire
       end
 
       should "return false when does not exist" do
-        Configuration.client.expects(:head).raises(RestClient::ResourceNotFound)
+        Configuration.client.expects(:head).returns(mock_response('', 404))
         assert ! @index.exists?
       end
 
@@ -30,7 +30,7 @@ module Tire
       end
 
       should "not raise exception and just return false when trying to create existing index" do
-        Configuration.client.expects(:post).raises(RestClient::BadRequest)
+        Configuration.client.expects(:post).returns(mock_response('{"error":"IndexAlreadyExistsException[\'dummy\']"}', 400))
         assert_nothing_raised { assert ! @index.create }
       end
 
@@ -40,9 +40,7 @@ module Tire
       end
 
       should "not raise exception and just return false when deleting non-existing index" do
-        Configuration.client.expects(:delete).returns(mock_response('{"error":"[articles] missing"}'))
-        assert_nothing_raised { assert ! @index.delete }
-        Configuration.client.expects(:delete).raises(RestClient::BadRequest)
+        Configuration.client.expects(:delete).returns(mock_response('{"error":"[articles] missing"}', 404))
         assert_nothing_raised { assert ! @index.delete }
       end
 
@@ -229,33 +227,33 @@ module Tire
 
         should "get type from document" do
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
-                                                returns('{"ok":true,"_id":"1"}').twice
+                                                returns(mock_response('{"ok":true,"_id":"1"}')).twice
           @index.remove :id => 1, :type => 'article', :title => 'Test'
           @index.remove :id => 1, :type => 'article', :title => 'Test'
         end
 
         should "set default type" do
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
-                                                returns('{"ok":true,"_id":"1"}')
+                                                returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove :id => 1, :title => 'Test'
         end
 
         should "get ID from hash" do
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
-                                                returns('{"ok":true,"_id":"1"}')
+                                                returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove :id => 1
         end
 
         should "get ID from method" do
           document = stub('document', :id => 1)
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
-                                                returns('{"ok":true,"_id":"1"}')
+                                                returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove document
         end
 
         should "get type and ID from arguments" do
           Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
-                                                returns('{"ok":true,"_id":"1"}')
+                                                returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove :article, 1
         end
 
@@ -288,7 +286,7 @@ module Tire
             json =~ /"id":"2"/ &&
             json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
-          end.returns('{}')
+          end.returns(mock_response('{}'), 200)
 
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
 
@@ -305,7 +303,7 @@ module Tire
             json =~ /"id":"2"/ &&
             json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
-          end.returns('{}')
+          end.returns(mock_response('{}', 200))
 
           one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
           two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
@@ -315,15 +313,13 @@ module Tire
         end
 
         should "try again when an exception occurs" do
-          Configuration.client.expects(:post).raises(RestClient::RequestFailed).at_least(2)
+          Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
 
-          assert_raise(RestClient::RequestFailed) do
-            @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
-          end
+          assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
 
         should "display error message when collection item does not have ID" do
-          Configuration.client.expects(:post).with { |url, json| url  == "#{Configuration.url}/_bulk" }
+          Configuration.client.expects(:post).with{ |url, json| url  == "#{Configuration.url}/_bulk" }.returns(mock_response('success', 200))
           STDERR.expects(:puts).once
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
