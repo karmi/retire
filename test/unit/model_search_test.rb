@@ -626,6 +626,7 @@ module Tire
 
           should "NOT overload existing top-level instance methods" do
             ActiveRecordClassWithTireMethods.stubs(:columns).returns([])
+            ActiveRecordClassWithTireMethods.stubs(:column_defaults).returns({})
             assert_equal "THIS IS MY INDEX!", ActiveRecordClassWithTireMethods.new.index
             assert_equal 'active_record_class_with_tire_methods',
                          ActiveRecordClassWithTireMethods.new.tire.index.name
