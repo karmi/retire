@@ -19,6 +19,13 @@ module Tire
           assert_respond_to Client::RestClient, :head
         end
 
+        should "not rescue generic exceptions" do
+          Client::RestClient.expects(:get).raises(RuntimeError, "Something bad happened in YOUR code")
+          assert_raise(RuntimeError) do
+            Client::RestClient.get 'http://example.com'
+          end
+        end
+
       end
 
     end
