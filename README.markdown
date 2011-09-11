@@ -699,8 +699,6 @@ _Tire_ is already used in production by its authors. Nevertheless, it's not cons
 
 There are todos, plans and ideas, some of which are listed below, in the order of importance:
 
-* Wrap all Tire functionality mixed into a model in a "forwardable" object, and proxy everything via this object. (The immediate problem: [Mongoid](http://mongoid.org/docs/indexing.html))
-* If we're not stepping on other's toes, bring Tire methods like `index`, `search`, `mapping` also to the class/instance top-level namespace.
 * Proper RDoc annotations for the source code
 * [Statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html) facets
 * [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
