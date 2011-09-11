@@ -134,6 +134,17 @@ We can easily manipulate the documents before storing them in the index, by pass
     end
 ```
 
+If this _declarative_ notation does not fit well in your context,
+you can use _Tire's_ classes directly, in a more imperative manner:
+
+```ruby
+    index = Tire::Index.new('oldskool')
+    index.delete
+    index.create
+    index.store :title => "Let's do it the old way!"
+    index.refresh
+```
+
 OK. Now, let's go search all the data.
 
 We will be searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
@@ -281,7 +292,21 @@ a plain old Ruby `Hash` (or JSON string) with the query declaration to the `sear
 If this sounds like a great idea to you, you are probably able to write your application
 using just `curl`, `sed` and `awk`.
 
-For debugging purposes, we can display the full query JSON for close inspection:
+Do note again, however, that you're not tied to the declarative block-style DSL _Tire_ offers to you.
+If it makes more sense in your context, you can use its classes directly, in a more imperative style:
+
+```ruby
+    search = Tire::Search::Search.new('articles')
+    search.query  { string('title:T*') }
+    search.filter :terms, :tags => ['ruby']
+    search.sort   { by :title, 'desc' }
+    search.facet('global-tags') { terms :tags, :global => true }
+    # ...
+    p search.perform.results
+```
+
+To debug the query we have laboriously set up like this,
+we can display the full query JSON for close inspection:
 
 ```ruby
     puts s.to_json
