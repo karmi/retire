@@ -52,7 +52,7 @@ module Tire
             end
 
             ids   = @response['hits']['hits'].map { |h| h['_id'] }
-            records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+            records =  @options[:load] === true ? klass.where(:id => ids) : klass.where(:id => ids).where(@options[:load])
 
             # Reorder records to preserve order from search results
             ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
