@@ -40,3 +40,6 @@ module Tire
   end
   module_function :warn
 end
+
+require 'tire/rails/railtie' if defined?(Rails)
+
