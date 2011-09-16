@@ -717,6 +717,14 @@ This will result in Article instances being stored in an index called 'test_arti
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
 for examples of the API and _ActiveModel_ integration usage.
 
+
+Extensions and Additions
+------------------------
+
+The [_tire-contrib_](http://github.com/karmi/tire-contrib/) project contains additions
+and extensions to the _Tire_ functionality.
+
+
 Todo, Plans & Ideas
 -------------------
 
