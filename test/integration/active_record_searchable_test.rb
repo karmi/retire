@@ -147,10 +147,19 @@ module Tire
             results = ActiveRecordArticle.search 'test*', :sort => 'title', :per_page => 5, :page => 1
             assert_equal 5, results.size
 
+            # WillPaginate
+            #
             assert_equal 2, results.total_pages
             assert_equal 1, results.current_page
             assert_equal nil, results.previous_page
             assert_equal 2, results.next_page
+
+            # Kaminari
+            #
+            assert_equal 5, results.limit_value
+            assert_equal 9, results.total_count
+            assert_equal 2, results.num_pages
+            assert_equal 0, results.offset_value
 
             assert_equal 'Test1', results.first.title
           end
@@ -164,6 +173,12 @@ module Tire
             assert_equal 1, results.previous_page
             assert_equal nil, results.next_page
 
+            #kaminari
+            assert_equal 5, results.limit_value
+            assert_equal 9, results.total_count
+            assert_equal 2, results.num_pages
+            assert_equal 5, results.offset_value
+
             assert_equal 'Test6', results.first.title
           end
 
@@ -175,6 +190,12 @@ module Tire
             assert_equal 3, results.current_page
             assert_equal 2, results.previous_page
             assert_equal nil, results.next_page
+
+            #kaminari
+            assert_equal 5, results.limit_value
+            assert_equal 9, results.total_count
+            assert_equal 2, results.num_pages
+            assert_equal 10, results.offset_value
 
             assert_nil results.first
           end

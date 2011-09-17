@@ -26,7 +26,7 @@ module Tire
         results = PersistentArticle.find [1, 2]
 
         assert_equal 2, results.size
-        
+
       end
 
       context "with pagination" do
@@ -40,10 +40,19 @@ module Tire
           results = PersistentArticle.search( :per_page => 5, :page => 1 ) { query { all } }
           assert_equal 5, results.size
 
+          # WillPaginate
+          #
           assert_equal 2, results.total_pages
           assert_equal 1, results.current_page
           assert_equal nil, results.previous_page
           assert_equal 2, results.next_page
+
+          # Kaminari
+          #
+          assert_equal 5, results.limit_value
+          assert_equal 9, results.total_count
+          assert_equal 2, results.num_pages
+          assert_equal 0, results.offset_value
         end
       end
 
