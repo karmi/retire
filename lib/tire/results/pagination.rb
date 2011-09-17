@@ -39,6 +39,23 @@ module Tire
         current_page > total_pages
       end
 
+      #kaminari support
+      def limit_value
+        per_page
+      end
+
+      def total_count
+        @total
+      end
+
+      def num_pages
+        total_pages
+      end
+
+      def offset_value
+        offset
+      end
+
     end
 
   end
