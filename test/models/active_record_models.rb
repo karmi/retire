@@ -69,3 +69,12 @@ class ActiveRecordClassWithTireMethods < ActiveRecord::Base
     end
   end
 end
+
+class ActiveRecordClassWithDynamicIndexName < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+
+  index_name do
+    "dynamic" + '_' + "index"
+  end
+end

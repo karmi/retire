@@ -695,6 +695,29 @@ module Tire
 
         end
 
+        context "with dynamic index name" do
+          class ::ModelWithDynamicIndexName
+            extend ActiveModel::Naming
+            extend ActiveModel::Callbacks
+
+            include Tire::Model::Search
+            include Tire::Model::Callbacks
+
+            index_name do
+              "dynamic" + '_' + "index"
+            end
+          end
+
+          should "have index name as a proc" do
+            assert_kind_of Proc, ::ModelWithDynamicIndexName.index_name
+          end
+
+          should "evaluate the proc in Model.index" do
+            assert_equal 'dynamic_index', ::ModelWithDynamicIndexName.index.name
+          end
+
+        end
+
       end
 
       context "Results::Item" do

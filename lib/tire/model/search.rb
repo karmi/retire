@@ -99,7 +99,8 @@ module Tire
         # Example usage: `Article.index.refresh`.
         #
         def index
-          @index = Index.new(index_name)
+          name = index_name.respond_to?(:to_proc) ? klass.instance_eval(&index_name) : index_name
+          @index = Index.new(name)
         end
 
       end

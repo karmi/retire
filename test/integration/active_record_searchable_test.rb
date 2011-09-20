@@ -29,6 +29,9 @@ module Tire
         create_table :active_record_class_with_tire_methods do |t|
           t.string     :title
         end
+        create_table :active_record_class_with_dynamic_index_names do |t|
+          t.string     :title
+        end
       end
     end
 
@@ -286,6 +289,21 @@ module Tire
           assert_equal 'One', results.first.title
         end
 
+      end
+
+      context "with dynamic index name" do
+        setup do
+          @a = ActiveRecordClassWithDynamicIndexName.create! :title => 'Test'
+          @a.index.refresh
+        end
+
+        should "search in proper index" do
+          assert_equal 'dynamic_index', ActiveRecordClassWithDynamicIndexName.index.name
+          assert_equal 'dynamic_index', @a.index.name
+
+          results = ActiveRecordClassWithDynamicIndexName.search 'test'
+          assert_equal 'dynamic_index', results.first._index
+        end
       end
 
       context "within Rails" do

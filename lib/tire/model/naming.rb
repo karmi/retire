@@ -20,8 +20,16 @@ module Tire
         #
         #     Article.index_name 'my-custom-name'
         #
-        def index_name name=nil
+        # You can also use a block for defining the index name,
+        # which is evaluated in the class context:
+        #
+        #     Article.index_name { "articles-#{Time.now.year}" }
+        #
+        #     Article.index_name { "articles-#{Rails.env}" }
+        #
+        def index_name name=nil, &block
           @index_name = name if name
+          @index_name = block if block_given?
           @index_name || [index_prefix, klass.model_name.plural].compact.join('_')
         end
 
