@@ -177,7 +177,7 @@ module Tire
         # for the search method.
         #
         def load(options=nil)
-          options ? self.class.find(self.id, options) : self.class.find(self.id)
+          options ? self.class.where(:id => self.id).where(options) : self.class.where(:id => self.id)
         end
 
       end
