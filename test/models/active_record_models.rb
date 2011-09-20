@@ -5,14 +5,6 @@ class ActiveRecordArticle < ActiveRecord::Base
   has_many :comments, :class_name => "ActiveRecordComment", :foreign_key => "article_id"
   has_many :stats,    :class_name => "ActiveRecordStat",    :foreign_key => "article_id"
 
-  # def index
-  #   "KEEP OFF MY INDEX!!!"
-  # end
-  #
-  # def self.settings
-  #   "KEEP OFF MY SETTINGS!!!"
-  # end
-
   include Tire::Model::Search
   include Tire::Model::Callbacks
 
@@ -27,10 +19,6 @@ class ActiveRecordArticle < ActiveRecord::Base
       end
     end
   end
-
-  # tire.mapping do
-  #   indexes :title,      :type => 'string', :boost => 10, :analyzer => 'snowball'
-  # end
 
   def to_indexed_json
     {
