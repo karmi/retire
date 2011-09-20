@@ -220,6 +220,42 @@ module Tire
         logged(error, '_percolate', curl)
     end
 
+    # Add an alias to this index.
+    # 
+    #     index.add_alias 'alias1'
+    #
+    def add_alias(alias_name)
+      aliases(:add => {:index => @name, :alias => alias_name})
+    end
+
+    # Remove alias from this index.
+    # 
+    #     index.remove_alias 'alias1'
+    #
+    def remove_alias(alias_name)
+      aliases(:remove => {:index => @name, :alias => alias_name})
+    end
+
+    # Add or remove aliases
+    # (see http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html).
+    #
+    # Usage:
+    #
+    #     index.aliases {:add => {:index => 'index1', :alias => 'alias1'}}
+    #     index.aliases {:remove => {:index => 'index1', :alias => 'alias1'}}
+    #     index.aliases {:add => ...}, {:add => ...}, {:remove => ...}
+    #     index.aliases {:add => {:index => 'index1', :alias => 'alias1', :filter => ...}}
+    #
+    def aliases(*args)
+      options = {:actions => args}
+      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(options)
+    rescue Exception => error
+      false
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{MultiJson.encode(options)}'|
+      logged(error, 'ALIASES', curl)
+    end
+
     def logged(error=nil, endpoint='/', curl='')
       if Configuration.logger
 

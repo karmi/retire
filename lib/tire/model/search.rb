@@ -63,13 +63,19 @@ module Tire
         #     Article.search :load => { :include => 'comments' } do ... end
         #
         def search(*args, &block)
-          default_options = {:type => document_type, :index => index.name}
+          default_options = {:type => document_type}
+          default_options[:index] = index.name unless dynamic_index_name?
 
           if block_given?
             options = args.shift || {}
           else
             query, options = args
             options ||= {}
+          end
+
+          # Make sure you specify an index name when dynamically generated
+          if dynamic_index_name? && !options[:index]
+            raise "Make sure you specify the index name when calling #{self.class}.search"
           end
 
           sort      = Array( options[:order] || options[:sort] )
@@ -99,6 +105,7 @@ module Tire
         # Example usage: `Article.index.refresh`.
         #
         def index
+          raise 'You must not use this class method with dynamic index names.' if dynamic_index_name?
           @index = Index.new(index_name)
         end
 
@@ -111,7 +118,17 @@ module Tire
         # Example usage: `@article.index.refresh`.
         #
         def index
-          instance.class.tire.index
+          if dynamic_index_name?
+            Tire.index(index_name).tap do |index|
+              unless index.exists?
+                index.create(:mappings => instance.class.tire.mapping_to_hash, 
+                             :settings => instance.class.tire.settings)
+              end
+            end
+          else
+            instance.class.index
+            #instance.class.tire.index
+          end
         end
 
         # Updates the index in _ElasticSearch_.
