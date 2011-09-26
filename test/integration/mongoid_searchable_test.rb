@@ -30,7 +30,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
           assert_equal 'snowball', MongoidArticle.mapping[:title][:analyzer]
           assert_equal 10, MongoidArticle.mapping[:title][:boost]
 
-          assert_equal 'snowball', MongoidArticle.index.mapping['mongoid_article']['properties']['title']['analyzer']
+          assert_equal 'snowball', MongoidArticle.tire.index.mapping['mongoid_article']['properties']['title']['analyzer']
         end
 
         should "save document into index on save and find it" do
@@ -40,7 +40,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
 
           a.index.refresh
 
-          results = MongoidArticle.search 'test'
+          results = MongoidArticle.tire.search 'test'
 
           assert       results.any?
           assert_equal 1, results.count
@@ -57,18 +57,18 @@ if ENV["MONGODB_IS_AVAILABLE"]
           setup do
             MongoidArticle.destroy_all
             5.times { |n| MongoidArticle.create! :title => "Test #{n+1}" }
-            MongoidArticle.index.refresh
+            MongoidArticle.tire.index.refresh
           end
 
           should "load records on query search" do
-            results = MongoidArticle.search '"Test 1"', :load => true
+            results = MongoidArticle.tire.search '"Test 1"', :load => true
 
             assert       results.any?
             assert_equal MongoidArticle.find(1), results.first
           end
 
           should "load records on block search" do
-            results = MongoidArticle.search :load => true do
+            results = MongoidArticle.tire.search :load => true do
               query { string '"Test 1"' }
             end
 
@@ -77,13 +77,13 @@ if ENV["MONGODB_IS_AVAILABLE"]
 
           should "load records with options on query search" do
             assert_equal MongoidArticle.find(['1'], :include => 'comments').first,
-            MongoidArticle.search('"Test 1"',
+            MongoidArticle.tire.search('"Test 1"',
                                   :load => { :include => 'comments' }).results.first
           end
 
           should "return empty collection for nonmatching query" do
             assert_nothing_raised do
-              results = MongoidArticle.search :load => true do
+              results = MongoidArticle.tire.search :load => true do
                 query { string '"Hic Sunt Leones"' }
               end
               assert_equal 0, results.size
@@ -101,7 +101,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
           assert_equal 0, MongoidArticle.all.size
 
           a.index.refresh
-          results = MongoidArticle.search 'test'
+          results = MongoidArticle.tire.search 'test'
           assert_equal 0, results.count
         end
 
@@ -110,7 +110,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
           MongoidArticle.create! :title => 'bar'
 
           MongoidArticle.index.refresh
-          results = MongoidArticle.search 'foo OR bar^100'
+          results = MongoidArticle.tire.search 'foo OR bar^100'
           assert_equal 2, results.count
 
           assert_equal 'bar', results.first.title
@@ -119,13 +119,13 @@ if ENV["MONGODB_IS_AVAILABLE"]
         context "with pagination" do
           setup do
             1.upto(9) { |number| MongoidArticle.create :title => "Test#{number}" }
-            MongoidArticle.index.refresh
+            MongoidArticle.tire.index.refresh
           end
 
           context "and parameter searches" do
 
             should "find first page with five results" do
-              results = MongoidArticle.search 'test*', :sort => 'title', :per_page => 5, :page => 1
+              results = MongoidArticle.tire.search 'test*', :sort => 'title', :per_page => 5, :page => 1
               assert_equal 5, results.size
 
               assert_equal 2, results.total_pages
@@ -137,7 +137,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             end
 
             should "find next page with five results" do
-              results = MongoidArticle.search 'test*', :sort => 'title', :per_page => 5, :page => 2
+              results = MongoidArticle.tire.search 'test*', :sort => 'title', :per_page => 5, :page => 2
               assert_equal 4, results.size
 
               assert_equal 2, results.total_pages
@@ -149,7 +149,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             end
 
             should "find not find missing page" do
-              results = MongoidArticle.search 'test*', :sort => 'title', :per_page => 5, :page => 3
+              results = MongoidArticle.tire.search 'test*', :sort => 'title', :per_page => 5, :page => 3
               assert_equal 0, results.size
 
               assert_equal 2, results.total_pages
@@ -166,7 +166,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             setup { @q = 'test*' }
 
             should "find first page with five results" do
-              results = MongoidArticle.search do |search|
+              results = MongoidArticle.tire.search do |search|
                 search.query { |query| query.string @q }
                 search.sort  { by :title }
                 search.from 0
@@ -183,7 +183,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             end
 
             should "find next page with five results" do
-              results = MongoidArticle.search do |search|
+              results = MongoidArticle.tire.search do |search|
                 search.query { |query| query.string @q }
                 search.sort  { by :title }
                 search.from 5
@@ -200,7 +200,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             end
 
             should "not find a missing page" do
-              results = MongoidArticle.search do |search|
+              results = MongoidArticle.tire.search do |search|
                 search.query { |query| query.string @q }
                 search.sort  { by :title }
                 search.from 10
@@ -230,7 +230,8 @@ if ENV["MONGODB_IS_AVAILABLE"]
           end
 
           should "allow access to Tire class methods" do
-            class ::MongoidClassWithTireMethods < Mongoid::Base
+            class ::MongoidClassWithTireMethods
+              include Mongoid::Document
               def self.search(*)
                 "THIS IS MY SEARCH!"
               end
@@ -260,7 +261,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             @id = a.id.to_s
 
             a.index.refresh
-            @item = MongoidArticle.search('test').first
+            @item = MongoidArticle.tire.search('test').first
           end
 
           should "have access to indexed properties" do
