@@ -697,7 +697,7 @@ s = Tire.search 'articles' do
 
     # and by their `title` property, in _descending_ order.
     #
-    by :title 'desc'
+    by :title, 'desc'
   end
 end
 
