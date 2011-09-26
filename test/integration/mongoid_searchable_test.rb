@@ -261,9 +261,11 @@ if ENV["MONGODB_IS_AVAILABLE"]
             module ::Rails; end
 
             a = MongoidArticle.new :title => 'Test'
-            a.comments.build :author => 'fool', :body => 'Works!'
-            a.stats.build    :pageviews  => 12, :period => '2011-08'
+            c = a.comments.build :author => 'fool', :body => 'Works!'
+            s = a.stats.build    :pageviews  => 12, :period => '2011-08'
             a.save!
+            c.save!
+            s.save!
             @id = a.id.to_s
 
             a.index.refresh
