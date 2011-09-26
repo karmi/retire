@@ -56,7 +56,13 @@ if ENV["MONGODB_IS_AVAILABLE"]
         context "with eager loading" do
           setup do
             MongoidArticle.destroy_all
-            5.times { |n| MongoidArticle.create! :title => "Test #{n+1}" }
+
+            @first_article  = MongoidArticle.create! :title => "Test 1"
+            @second_article = MongoidArticle.create! :title => "Test 2"
+            @third_article  = MongoidArticle.create! :title => "Test 3"
+            @fourth_article = MongoidArticle.create! :title => "Test 4"
+            @fifth_article  = MongoidArticle.create! :title => "Test 5"
+
             MongoidArticle.tire.index.refresh
           end
 
@@ -64,7 +70,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
             results = MongoidArticle.tire.search '"Test 1"', :load => true
 
             assert       results.any?
-            assert_equal MongoidArticle.find(1), results.first
+            assert_equal MongoidArticle.all.first, results.first
           end
 
           should "load records on block search" do
@@ -72,11 +78,11 @@ if ENV["MONGODB_IS_AVAILABLE"]
               query { string '"Test 1"' }
             end
 
-            assert_equal MongoidArticle.find(1), results.first
+            assert_equal MongoidArticle.all.first, results.first
           end
 
           should "load records with options on query search" do
-            assert_equal MongoidArticle.find(['1'], :include => 'comments').first,
+            assert_equal MongoidArticle.find([@first_article[:_id]], :include => 'comments').first,
             MongoidArticle.tire.search('"Test 1"',
                                   :load => { :include => 'comments' }).results.first
           end
@@ -87,7 +93,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
                 query { string '"Hic Sunt Leones"' }
               end
               assert_equal 0, results.size
-              assert ! results.any?
+              assert !results.any?
             end
           end
         end
@@ -109,7 +115,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
           MongoidArticle.create! :title => 'foo'
           MongoidArticle.create! :title => 'bar'
 
-          MongoidArticle.index.refresh
+          MongoidArticle.tire.index.refresh
           results = MongoidArticle.tire.search 'foo OR bar^100'
           assert_equal 2, results.count
 
@@ -281,8 +287,7 @@ if ENV["MONGODB_IS_AVAILABLE"]
           end
 
           should "load the underlying model with options" do
-            MongoidArticle.expects(:find).with(@id, :include => 'comments')
-            @item.load(:include => 'comments')
+            assert_equal MongoidArticle.find(@id), @item.load(:include => 'comments')
           end
 
         end
