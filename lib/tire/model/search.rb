@@ -126,7 +126,7 @@ module Tire
         #
         def update_index
           instance.send :_run_update_elasticsearch_index_callbacks do
-            if instance.destroyed?
+            if instance.destroyed? || !instance.should_be_indexed?
               index.remove instance
             else
               response  = index.store( instance, {:percolate => percolator} )
@@ -157,6 +157,10 @@ module Tire
             reject { |key, value| ! instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
             to_json
           end
+        end
+        
+        def should_be_indexed?
+          true
         end
 
         def matches

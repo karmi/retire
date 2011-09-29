@@ -32,6 +32,10 @@ class ActiveRecordArticle < ActiveRecord::Base
       :stats        => stats.map    { |s| { :pageviews  => s.pageviews } }
     }.to_json
   end
+  
+  def should_be_indexed?
+    title != 'should_not_be_indexed'
+  end
 
   def length
     title.length
