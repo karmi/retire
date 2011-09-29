@@ -1,5 +1,14 @@
 require 'test_helper'
 
+begin
+  require "mongo"
+  Mongo::Connection.new("localhost", 27017)
+
+  ENV["MONGODB_IS_AVAILABLE"] = 'true'
+rescue Mongo::ConnectionFailure => e
+  ENV["MONGODB_IS_AVAILABLE"] = nil
+end
+
 if ENV["MONGODB_IS_AVAILABLE"]
   module Tire
 

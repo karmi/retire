@@ -7,21 +7,10 @@ require 'yajl/json_gem'
 require 'sqlite3'
 
 require 'shoulda'
-# require 'turn' unless ENV["TM_FILEPATH"] || ENV["CI"]
+require 'turn' unless ENV["TM_FILEPATH"] || ENV["CI"]
 require 'mocha'
 
 require 'tire'
-
-begin
-  require "mongo"
-  Mongo::Connection.new("localhost", 27017)
-
-  ENV["MONGODB_IS_AVAILABLE"] = "true"
-  puts "MongoDB is available"
-rescue Mongo::ConnectionFailure => e
-  ENV["MONGODB_IS_AVAILABLE"] = nil
-  puts "MongoDB is not available"
-end
 
 Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
 
