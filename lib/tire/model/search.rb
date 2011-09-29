@@ -121,8 +121,7 @@ module Tire
         #
         # On model destroy, it will remove the corresponding document from the index.
         #
-        # It will also call the `<after|before>_update_elasticsearch_index` callbacks,
-        # if defined by the model.
+        # It will also execute any `<after|before>_update_elasticsearch_index` callback hooks.
         #
         def update_index
           instance.send :_run_update_elasticsearch_index_callbacks do
@@ -237,6 +236,11 @@ module Tire
             @__tire__.instance_eval(&block) if block_given?
             @__tire__
           end
+
+          # Define _Tire's_ callbacks (<after|before>_update_elasticsearch_index).
+          #
+          define_model_callbacks(:update_elasticsearch_index, :only => [:after, :before]) if \
+            respond_to?(:define_model_callbacks)
 
           # Serialize the model as a Hash.
           #

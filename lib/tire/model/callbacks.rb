@@ -8,9 +8,6 @@ module Tire
     #
     # The model must respond to `after_save` and `after_destroy` callbacks
     # (ActiveModel and ActiveRecord models do so, by default).
-    #
-    # By including the model, you will also have the `after_update_elasticsearch_index` and
-    # `before_update_elasticsearch_index` callbacks available.
     # 
     module Callbacks
 
@@ -35,11 +32,6 @@ module Tire
           end
         end
 
-        # Define _Tire's_ callbacks.
-        #
-        base.class_eval do
-          define_model_callbacks(:update_elasticsearch_index, :only => [:after, :before])
-        end if base.respond_to?(:define_model_callbacks)
       end
 
     end
