@@ -8,7 +8,7 @@ module Tire
     #
     # The model must respond to `after_save` and `after_destroy` callbacks
     # (ActiveModel and ActiveRecord models do so, by default).
-    # 
+    #
     module Callbacks
 
       # A hook triggered by the `include Tire::Model::Callbacks` statement in the model.

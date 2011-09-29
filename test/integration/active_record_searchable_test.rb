@@ -75,6 +75,14 @@ module Tire
         assert_equal   'Test', results.first.title
       end
 
+      should "raise exception on invalid query" do
+        ActiveRecordArticle.create! :title => 'Test'
+
+        assert_raise Search::SearchRequestFailed do
+          ActiveRecordArticle.search '[x'
+        end
+      end
+
       context "with eager loading" do
         setup do
           ActiveRecordArticle.destroy_all

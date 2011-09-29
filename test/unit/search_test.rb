@@ -117,7 +117,9 @@ module Tire
         STDERR.expects(:puts)
 
         s = Search::Search.new('index')
-        assert ! s.perform
+        assert_raise Search::SearchRequestFailed do
+          s.perform
+        end
       end
 
       should "log request, but not response, when logger is set" do
