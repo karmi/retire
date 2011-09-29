@@ -9,7 +9,11 @@ module Tire
     end
 
     def exists?
-      Configuration.client.head("#{Configuration.url}/#{@name}").success?
+      @response = Configuration.client.head("#{Configuration.url}/#{@name}")
+      @response.success?
+    ensure
+      curl = %Q|curl -I "#{Configuration.url}/#{@name}"|
+      logged(@response.body, 'HEAD', curl) if @response
     end
 
     def delete
@@ -26,7 +30,7 @@ module Tire
       @response.success? ? @response : false
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{MultiJson.encode(options)}'|
-      logged(@response.body, 'CREATE', curl)
+      logged(@response.body, 'CREATE', curl) if @response
     end
 
     def mapping

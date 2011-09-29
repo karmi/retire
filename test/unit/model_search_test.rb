@@ -287,6 +287,26 @@ module Tire
             assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
           end
 
+          should "not raise an error when defining mapping" do
+            Tire::Index.any_instance.unstub(:exists?)
+            Configuration.client.expects(:head).raises(Errno::ECONNREFUSED)
+
+            assert_nothing_raised do
+              class ::ModelWithCustomMapping
+                extend ActiveModel::Naming
+                extend ActiveModel::Callbacks
+
+                include Tire::Model::Search
+                include Tire::Model::Callbacks
+
+                mapping do
+                  indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
+                end
+
+              end
+            end
+          end
+
           should "define mapping for nested properties with a block" do
             expected = {
               :settings => {},

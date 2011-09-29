@@ -92,6 +92,9 @@ module Tire
           unless index.exists?
             index.create :mappings => mapping_to_hash, :settings => settings
           end
+        rescue Errno::ECONNREFUSED => e
+          STDERR.puts "Skipping index creation, cannot connect to ElasticSearch",
+                      "(The original exception was: #{e.inspect})"
         end
 
         def store_mapping?
