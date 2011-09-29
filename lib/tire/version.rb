@@ -1,34 +1,14 @@
 module Tire
-  VERSION   = "0.3.3"
+  VERSION   = "0.3.4"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    0.2.0
+    0.3.4
     ---------------------------------------------------------
-    # By default, results are wrapped in Item class
-    # Completely rewritten ActiveModel/ActiveRecord support
-    # Added infrastructure for loading "real" models from database (eagerly or in runtime)
-    # Deprecated the dynamic sort methods in favour of the 'sort { by :field_name }' syntax
-
-    0.2.1
-    ---------------------------------------------------------
-    # Lighweight check for index presence
-    # Added the 'settings' method for models to define index settings
-    # Fixed errors when importing data with will_paginate vs Kaminari (MongoDB)
-    # Added support for histogram facets [Paco Guzman]
-
-    0.3.0
-    ---------------------------------------------------------
-    # Isolated Tire ActiveModel integration into `tire` class and instance method.
-    
-      When there's no conflict with existing methods, Tire methods are added
-      to the class namespace, as well, so the change is 100% backwards-compatible.
-
-    0.3.3
-    ---------------------------------------------------------
-    # Added proper will_paginate compatibility
-    # Added support for plugging in another HTTP library (see lib/http/clients/curb for an example)
+    # Added documentation (RDoc annotations and README)
+    # Kaminari pagination support
+    # Bugfixes (dependency on ES running, callbacks, bogus exceptions)
 
   END
 end
