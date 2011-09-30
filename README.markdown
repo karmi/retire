@@ -382,9 +382,6 @@ When you now save a record:
 ```
 
 it is automatically added into an index called 'articles', because of the included callbacks.
-(You may want to skip them in special cases, like when your records are indexed via some external
-mechanism, let's say a _CouchDB_ or _RabbitMQ_
-[river](http://www.elasticsearch.org/blog/2010/09/28/the_river.html).
 
 The document attributes are indexed exactly as when you call the `Article#to_json` method.
 
@@ -459,8 +456,8 @@ In this case, just wrap the `mapping` method in a `settings` one, passing it the
 ```
 
 It may well be reasonable to wrap the index creation logic declared with `Tire.index('urls').create`
-in a class method of your model, in a module method, etc, so have better control on index creation when
-bootstrapping your application with Rake tasks or when setting up the test suite.
+in a class method of your model, in a module method, etc, to have better control on index creation when
+bootstrapping the application with Rake tasks or when setting up the test suite.
 _Tire_ will not hold that against you.
 
 You may have just stopped wondering: what if I have my own `settings` class method defined?
@@ -541,6 +538,21 @@ Of course, it may well be reasonable to define the indexed JSON from the ground 
             :last_name  => last_name
           }
         }.to_json
+      end
+    end
+```
+
+Notice, that you may want to skip including the `Tire::Model::Callbacks` module in special cases,
+like when your records are indexed via some external mechanism, let's say a _CouchDB_ or _RabbitMQ_
+[river](http://www.elasticsearch.org/blog/2010/09/28/the_river.html), or when you need better
+control on how the documents are added to or removed from the index:
+
+```ruby
+    class Article < ActiveRecord::Base
+      include Tire::Model::Search
+
+      after_save do
+        update_index if state == 'published'
       end
     end
 ```
