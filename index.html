@@ -92,7 +92,7 @@ on a sane operation system in less then 10 minutes.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-6">&#182;</a>
         </div>
-        <p><em>Tire</em> uses the <a href="https://github.com/intridea/multi_json"><em>multi_json</em></a> gem as a generic JSON library.
+        <p><em>Tire</em> uses the <a href="https://github.com/intridea/multi_json"><em>multi</em>json_</a> gem as a generic JSON library.
 We want to use the <a href="https://github.com/brianmario/yajl-ruby"><em>yajl-ruby</em></a> gem in its full on mode here.</p>
       </td>
       <td class=code>
@@ -133,9 +133,9 @@ We want to use the <a href="https://github.com/brianmario/yajl-ruby"><em>yajl-ru
 
 <span class="sh"> [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:</span>
 
-<span class="sh"> curl -k -L -o elasticsearch-0.16.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.16.0.tar.gz</span>
-<span class="sh"> tar -zxvf elasticsearch-0.16.0.tar.gz</span>
-<span class="sh"> ./elasticsearch-0.16.0/bin/elasticsearch -f</span>
+<span class="sh"> curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz</span>
+<span class="sh"> tar -zxvf elasticsearch-0.17.6.tar.gz</span>
+<span class="sh"> ./elasticsearch-0.17.6/bin/elasticsearch -f</span>
 <span class="no">INSTALL</span></pre></div>
       </td>
     </tr>
@@ -538,10 +538,8 @@ back to the <code>import</code> method.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-41">&#182;</a>
         </div>
-        <p>The results:</p>
-
-<pre><code>* One [tags: ruby]
-</code></pre>
+        <p>The results:
+    * One [tags: ruby]</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
@@ -569,12 +567,10 @@ back to the <code>import</code> method.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-43">&#182;</a>
         </div>
-        <p>The results:</p>
-
-<pre><code>* One [published: 2011-01-01]
-* Two [published: 2011-01-02]
-* Three [published: 2011-01-02]
-</code></pre>
+        <p>The results:
+    * One [published: 2011-01-01]
+    * Two [published: 2011-01-02]
+    * Three [published: 2011-01-02]</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
@@ -621,11 +617,9 @@ back to the <code>import</code> method.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-47">&#182;</a>
         </div>
-        <p>The results:</p>
-
-<pre><code>* Two [tags: ruby, python]
-* Three [tags: java]
-</code></pre>
+        <p>The results:
+    * Two [tags: ruby, python]
+    * Three [tags: java]</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
@@ -736,7 +730,7 @@ for the <code>query_string</code> queries.</p>
         </div>
         <p>For debugging our queries, we can display the JSON which is being sent to <em>ElasticSearch</em>.</p>
 
-<pre><code>{"query":{"query_string":{"query":"title:T*"}}}
+<pre><code>{&ldquo;query&rdquo;:{&ldquo;query_string&rdquo;:{&ldquo;query&rdquo;:&ldquo;title:T*&rdquo;}}}
 </code></pre>
       </td>
       <td class=code>
@@ -752,8 +746,8 @@ for the <code>query_string</code> queries.</p>
         <p>Or better yet, we may display a complete <code>curl</code> command to recreate the request in terminal,
 so we can see the naked response, tweak request parameters and meditate on problems.</p>
 
-<pre><code>curl -X POST "http://localhost:9200/articles/_search?pretty=true" \
-     -d '{"query":{"query_string":{"query":"title:T*"}}}'
+<pre><code>curl -X POST &ldquo;http://localhost:9200/articles/_search?pretty=true&rdquo; \
+     -d &lsquo;{&ldquo;query&rdquo;:{&ldquo;query_string&rdquo;:{&ldquo;query&rdquo;:&ldquo;title:T*&rdquo;}}}&rsquo;
 </code></pre>
       </td>
       <td class=code>
@@ -792,9 +786,9 @@ will be logged using this <code>curl</code>-friendly format.</p>
         <p>By default, at the <em>info</em> level, only the <code>curl</code>-format of request and
 basic information about the response will be logged:</p>
 
-<pre><code># 2011-04-24 11:34:01:150 [CREATE] ("articles")
+<pre><code># 2011-04-24 11:34:01:150 [CREATE] (&ldquo;articles&rdquo;)
 #
-curl -X POST "http://localhost:9200/articles"
+curl -X POST &ldquo;http://localhost:9200/articles&rdquo;
 
 # 2011-04-24 11:34:01:152 [200]
 </code></pre>
@@ -1117,7 +1111,7 @@ to mix and reuse them later, since we can call the <code>boolean</code> method m
         <div class="pilwrap">
           <a class="pilcrow" href="#section-85">&#182;</a>
         </div>
-        <p>&hellip; and a query for the <em>published_on</em> property.</p>
+        <p>&hellip; and a query for the <em>published</em>on_ property.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">published_on_query</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="k">do</span> <span class="o">|</span><span class="n">boolean</span><span class="o">|</span>
@@ -1259,7 +1253,7 @@ For that, we&rsquo;ll use a <em>terms</em> facet.</p>
 <p>The counts shouldn&rsquo;t surprise us:</p>
 
 <pre><code>Counts by tag:
--------------------------
+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;
 ruby       1
 python     1
 java       1
@@ -1344,7 +1338,7 @@ with globally scoped facets — we&rsquo;ll just use a different name.</p>
         <p>Aggregated results for the current query are the same as previously:</p>
 
 <pre><code>Current query facets:
--------------------------
+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;
 ruby       1
 python     1
 java       1
@@ -1366,7 +1360,7 @@ java       1
 tags for articles not matched by the query, such as “java” or “php”:</p>
 
 <pre><code>Global facets:
--------------------------
+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;
 ruby       3
 python     1
 php        1
@@ -1393,6 +1387,7 @@ java       1
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/terms-facet.html">terms</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html">date</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/range-facet.html">range</a></li>
+<li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html">histogram</a></li>
 </ul>
       </td>
       <td class=code>
@@ -1501,7 +1496,7 @@ are returned.</p>
         <p>The <em>count</em> for article <em>Three</em>&rsquo;s tags, “java”, on the other hand, <em>is</em> in fact included:</p>
 
 <pre><code>Counts by tag:
--------------------------
+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;
 ruby       1
 python     1
 java       1
@@ -1664,7 +1659,7 @@ such as published date or product price? We can do that.</p>
         <p>and by their <code>title</code> property, in <em>descending</em> order.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>    <span class="n">by</span> <span class="ss">:title</span> <span class="s1">&#39;desc&#39;</span>
+        <div class='highlight'><pre>    <span class="n">by</span> <span class="ss">:title</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span>
   <span class="k">end</span>
 <span class="k">end</span></pre></div>
       </td>
@@ -1674,13 +1669,11 @@ such as published date or product price? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-124">&#182;</a>
         </div>
-        <p>The results:</p>
-
-<pre><code>* One         (Published on: 2011-01-01)
-* Two         (Published on: 2011-01-02)
-* Three       (Published on: 2011-01-02)
-* Four        (Published on: 2011-01-03)
-</code></pre>
+        <p>The results:
+    * One         (Published on: 2011-01-01)
+    * Two         (Published on: 2011-01-02)
+    * Three       (Published on: 2011-01-02)
+    * Four        (Published on: 2011-01-03)</p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
@@ -1741,10 +1734,8 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-129">&#182;</a>
         </div>
-        <p>The results:</p>
-
-<pre><code>Title: Two; Highlighted: &lt;em&gt;Two&lt;/em&gt;
-</code></pre>
+        <p>The results:
+    Title: Two; Highlighted: <em>Two</em></p>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
@@ -1925,7 +1916,7 @@ just like any other document in <em>ElasticSearch</em>.</p>
         </div>
         <p>The result will contain, unsurprisingly, names of all the three registered queries:</p>
 
-<pre><code>Matching queries: ["floods", "tsunami", "warning"]
+<pre><code>Matching queries: [&ldquo;floods&rdquo;, &ldquo;tsunami&rdquo;, &ldquo;warning&rdquo;]
 </code></pre>
       </td>
       <td class=code>
@@ -1963,7 +1954,7 @@ the <code>percolate</code> method.</p>
         </div>
         <p>In this case, the result will contain only the name of the “tsunami” query.</p>
 
-<pre><code>Matching queries: ["tsunami"]
+<pre><code>Matching queries: [&ldquo;tsunami&rdquo;]
 </code></pre>
       </td>
       <td class=code>
@@ -2026,7 +2017,7 @@ getting back a list of matching queries.</p>
         </div>
         <p>We will get the names of all matching queries in response.</p>
 
-<pre><code>Matching queries: ["floods", "tsunami", "warning"]
+<pre><code>Matching queries: [&ldquo;floods&rdquo;, &ldquo;tsunami&rdquo;, &ldquo;warning&rdquo;]
 </code></pre>
       </td>
       <td class=code>
@@ -2062,7 +2053,7 @@ getting back a list of matching queries.</p>
         </div>
         <p>Unsurprisingly, the response will contain just the name of the “tsunami” query.</p>
 
-<pre><code>Matching queries: ["tsunami"]
+<pre><code>Matching queries: [&ldquo;tsunami&rdquo;]
 </code></pre>
       </td>
       <td class=code>
