@@ -43,7 +43,6 @@ and wondered what all the fuss is about.</p>
 <li>You perform a search query.</li>
 </ol>
 
-
 <p>In <a href="http://www.elasticsearch.org/"><em>ElasticSearch</em></a>, there&rsquo;s a default delay
 of 1 second between indexing a document and being able to search it.
 You can, of course, force refresh the index. That&rsquo;s enough “realtime”
@@ -59,7 +58,6 @@ called <a href="http://www.elasticsearch.org/guide/reference/api/percolate.html"
 or <em>while the documents are being indexed</em>.</li>
 <li>You index some documents.</li>
 </ol>
-
 
 <p>The search engine will match your documents against your queries, and return names of matching queries
 in the response. Yes, <em>names</em>.</p>
@@ -109,7 +107,7 @@ receiving notifications when any status message matches one of our queries.</p>
         </div>
         <p>Let&rsquo;s define a class to hold our data in <em>ElasticSearch</em>.</p>
 
-<p>We&rsquo;re using the <em>persistence</em> mode of <em>Tire</em>, so we don&rsquo;t need a database, because
+<p>We&rsquo;re using the <em>persistence</em> mode of <em>Tire</em>, so we don&rsquo;t need a database, because 
 <a href="http://www.slideshare.net/karmi/your-data-your-search-elasticsearch-euruko-2011/49"><em>the index is our database</em></a>.</p>
       </td>
       <td class=code>
@@ -134,7 +132,7 @@ and we will have access to matching queries in the <code>Status#matches</code> p
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="n">on_percolate</span> <span class="k">do</span>
-    <span class="nb">puts</span> <span class="n">green</span> <span class="p">{</span> <span class="s2">&quot;“</span><span class="si">#{</span><span class="n">text</span><span class="si">}</span><span class="s2">” from @</span><span class="si">#{</span><span class="n">user</span><span class="si">}</span><span class="s2"> matches queries: </span><span class="si">#{</span><span class="n">matches</span><span class="o">.</span><span class="n">inspect</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">}</span> <span class="k">unless</span> <span class="n">matches</span><span class="o">.</span><span class="n">empty?</span>
+    <span class="nb">puts</span> <span class="n">green</span> <span class="p">{</span> <span class="s2">&quot;&#39;</span><span class="si">#{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39; from @</span><span class="si">#{</span><span class="n">user</span><span class="si">}</span><span class="s2"> matches queries: </span><span class="si">#{</span><span class="n">matches</span><span class="o">.</span><span class="n">inspect</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">}</span> <span class="k">unless</span> <span class="n">matches</span><span class="o">.</span><span class="n">empty?</span>
   <span class="k">end</span>
 <span class="k">end</span></pre></div>
       </td>
@@ -163,9 +161,9 @@ and we will have access to matching queries in the <code>Status#matches</code> p
         <p>Second, let&rsquo;s save those queries in <em>ElasticSearch</em>.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Status</span><span class="o">.</span><span class="n">elasticsearch_index</span><span class="o">.</span><span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;newspeak&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span> <span class="n">query</span><span class="o">.</span><span class="n">string</span> <span class="n">q</span><span class="o">[</span><span class="ss">:newspeak</span><span class="o">]</span> <span class="p">}</span>
-<span class="no">Status</span><span class="o">.</span><span class="n">elasticsearch_index</span><span class="o">.</span><span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;fails&#39;</span><span class="p">)</span>    <span class="p">{</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span> <span class="n">query</span><span class="o">.</span><span class="n">string</span> <span class="n">q</span><span class="o">[</span><span class="ss">:fail</span><span class="o">]</span> <span class="p">}</span>
-<span class="no">Status</span><span class="o">.</span><span class="n">elasticsearch_index</span><span class="o">.</span><span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;memes&#39;</span><span class="p">)</span>    <span class="p">{</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span> <span class="n">query</span><span class="o">.</span><span class="n">string</span> <span class="n">q</span><span class="o">[</span><span class="ss">:memes</span><span class="o">]</span> <span class="p">}</span>
+        <div class='highlight'><pre><span class="no">Status</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;newspeak&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span> <span class="n">query</span><span class="o">.</span><span class="n">string</span> <span class="n">q</span><span class="o">[</span><span class="ss">:newspeak</span><span class="o">]</span> <span class="p">}</span>
+<span class="no">Status</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;fails&#39;</span><span class="p">)</span>    <span class="p">{</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span> <span class="n">query</span><span class="o">.</span><span class="n">string</span> <span class="n">q</span><span class="o">[</span><span class="ss">:fail</span><span class="o">]</span> <span class="p">}</span>
+<span class="no">Status</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;memes&#39;</span><span class="p">)</span>    <span class="p">{</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span> <span class="n">query</span><span class="o">.</span><span class="n">string</span> <span class="n">q</span><span class="o">[</span><span class="ss">:memes</span><span class="o">]</span> <span class="p">}</span>
 
 <span class="nb">puts</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">bold</span> <span class="p">{</span> <span class="s2">&quot;Testing percolation&quot;</span> <span class="p">},</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">80</span></pre></div>
       </td>
