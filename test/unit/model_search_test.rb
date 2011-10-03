@@ -243,6 +243,16 @@ module Tire
 
           @model.destroy
         end
+        
+        should "remove from index if should not be indexed" do
+          @model = ActiveModelArticleWithCallbacks.new
+          @model.stubs(:id).returns(1)
+
+          @model.expects(:should_be_indexed?).returns(false)
+          Tire::Index.any_instance.expects(:remove)
+          @model.update_index
+        end
+        
 
         should "store the record in index on :update_elasticsearch_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new

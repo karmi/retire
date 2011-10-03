@@ -74,6 +74,27 @@ module Tire
         assert_not_nil results.first._score
         assert_equal   'Test', results.first.title
       end
+      
+      should "remove document from index on save if should not be indexed" do
+        a = ActiveRecordArticle.new :title => 'Test'
+        a.save!
+        id = a.id
+
+        a.index.refresh
+
+        results = ActiveRecordArticle.search 'test'
+
+        assert       results.any?
+        assert_equal 1, results.count
+
+        a.update_attribute(:title, "should_not_be_indexed")
+        assert ! a.should_be_indexed?
+
+        a.index.refresh
+
+        results = ActiveRecordArticle.search 'should_not_be_indexed'
+        assert results.empty?
+      end
 
       should "raise exception on invalid query" do
         ActiveRecordArticle.create! :title => 'Test'
