@@ -30,7 +30,10 @@ module Tire
 
                  # Update the document with meta information
                  ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
-
+                 
+                 highlight = document['highlight']
+                 # Removes unecessary (for highlight) extra names after the field name
+                 document['highlight'] = highlight.map{|name, value| { name.scan(/\w+/).first => value }}.reduce(:merge) if highlight
                  # Return an instance of the "wrapper" class
                  @wrapper.new(document)
                end
