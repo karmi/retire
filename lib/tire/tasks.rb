@@ -55,7 +55,7 @@ namespace :tire do
       mapping = defined?(Yajl) ? Yajl::Encoder.encode(klass.tire.mapping_to_hash, :pretty => true) :
                                  MultiJson.encode(klass.tire.mapping_to_hash)
       puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
-      index.create :mappings => klass.tire.mapping_to_hash
+      index.create :mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings
     end
 
     STDOUT.sync = true
