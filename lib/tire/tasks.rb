@@ -70,7 +70,7 @@ namespace :tire do
       index.import(klass, 'paginate', params) do |documents|
 
         if total
-          done += documents.size
+          done += defined?(Mongoid::Criteria) && documents.is_a?(Mongoid::Criteria) ? documents.count(true) : documents.size
           # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
           percent  = ( (done.to_f / total) * 100 ).to_i
           glyphs   = ( percent * ( (tty_cols-offset).to_f/100 ) ).to_i
