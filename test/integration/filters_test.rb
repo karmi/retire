@@ -36,7 +36,7 @@ module Tire
         end
 
         assert_equal 1, s.results.count
-        assert_equal 3, s.results.facets['tags'].size
+        assert_equal 3, s.results.facets['tags']['terms'].size
       end
 
     end
