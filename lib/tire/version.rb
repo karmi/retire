@@ -1,14 +1,10 @@
 module Tire
-  VERSION   = "0.3.4"
+  VERSION   = "0.3.5"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    0.3.4
-    ---------------------------------------------------------
-    # Added documentation (RDoc annotations and README)
-    # Kaminari pagination support
-    # Bugfixes (dependency on ES running, callbacks, bogus exceptions)
+    # Added a "query" facet for free-form aggregations
 
   END
 end
