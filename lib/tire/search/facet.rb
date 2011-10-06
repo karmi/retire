@@ -37,6 +37,10 @@ module Tire
         self
       end
 
+      def query(&block)
+        @value = { :query => Query.new(&block).to_hash }
+      end
+
       def to_json
         to_hash.to_json
       end

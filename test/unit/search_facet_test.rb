@@ -81,6 +81,15 @@ module Tire::Search
         end
       end
 
+      context "query facet" do
+        should "encode facet options" do
+          f = Facet.new('q_facet') do
+            query { string '_exists_:foo' }
+          end
+          assert_equal({ :q_facet => { :query => { :query_string => { :query => '_exists_:foo' } } } }.to_json, f.to_json)
+        end
+      end
+
     end
 
   end

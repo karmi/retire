@@ -77,6 +77,7 @@ module Tire
       end
 
       context "histogram" do
+
         should "return aggregated values for all results" do
           s = Tire.search('articles-test') do
             query { all }
@@ -91,6 +92,53 @@ module Tire
           assert_equal({"key" => 200, "count" => 2}, facets.entries[1], facets.inspect)
           assert_equal({"key" => 300, "count" => 1}, facets.entries[2], facets.inspect)
         end
+
+      end
+
+      context "query facets" do
+
+        should "return aggregated values for a string query" do
+          s = Tire.search('articles-test') do
+            facet 'tees' do
+              query { string 'T*' }
+            end
+          end
+
+          count = s.results.facets['tees']['count']
+          assert_equal 2, count, s.results.facets['tees'].inspect
+        end
+
+        should "return aggregated values for _exists_ string query" do
+          s = Tire.search('articles-test') do
+            facet 'drafts' do
+              query { string '_exists_:draft' }
+            end
+          end
+
+          count = s.results.facets['drafts']['count']
+          assert_equal 1, count, s.results.facets['drafts'].inspect
+        end
+
+        should "return aggregated values for a terms query" do
+          s = Tire.search('articles-test') do
+            facet 'friends' do
+              query { terms :tags, ['ruby', 'python'] }
+            end
+          end
+
+          count = s.results.facets['friends']['count']
+          assert_equal 2, count, s.results.facets['friends'].inspect
+
+          s = Tire.search('articles-test') do
+            facet 'friends' do
+              query { terms :tags, ['ruby', 'python'], :minimum_match => 2 }
+            end
+          end
+
+          count = s.results.facets['friends']['count']
+          assert_equal 1, count, s.results.facets['friends'].inspect
+        end
+
       end
 
     end
