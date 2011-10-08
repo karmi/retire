@@ -39,6 +39,16 @@ module Tire
         assert_equal 3, s.results.facets['tags']['terms'].size
       end
 
+      should "filter the results with multiple calls to filters" do
+        s = Tire.search('articles-test') do
+          filter :term,  :words => 125
+          filter :terms, :tags => ["java"]
+        end
+
+        assert_equal 1, s.results.count
+        assert_equal 'Five', s.results.first.title
+      end
+
     end
 
   end
