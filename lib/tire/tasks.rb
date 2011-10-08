@@ -55,7 +55,7 @@ namespace :tire do
       mapping = defined?(Yajl) ? Yajl::Encoder.encode(klass.tire.mapping_to_hash, :pretty => true) :
                                  MultiJson.encode(klass.tire.mapping_to_hash)
       puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
-      index.create :mappings => klass.tire.mapping_to_hash
+      index.create :mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings
     end
 
     STDOUT.sync = true
@@ -70,7 +70,7 @@ namespace :tire do
       index.import(klass, 'paginate', params) do |documents|
 
         if total
-          done += documents.size
+          done += defined?(Mongoid::Criteria) && documents.is_a?(Mongoid::Criteria) ? documents.count(true) : documents.size
           # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
           percent  = ( (done.to_f / total) * 100 ).to_i
           glyphs   = ( percent * ( (tty_cols-offset).to_f/100 ) ).to_i
