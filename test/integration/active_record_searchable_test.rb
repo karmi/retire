@@ -55,6 +55,13 @@ module Tire
         assert_equal 'snowball', ActiveRecordArticle.index.mapping['active_record_article']['properties']['title']['analyzer']
       end
 
+      should "configure defaults for mappings" do
+        assert_equal 'object', ActiveRecordArticle.mapping[:author][:type]
+        assert_equal 'string', ActiveRecordArticle.mapping[:author][:properties][:name][:type]
+
+        assert_equal 'string', ActiveRecordArticle.index.mapping['active_record_article']['properties']['author']['properties']['name']['type']
+      end
+
       should "save document into index on save and find it" do
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!
