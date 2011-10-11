@@ -55,6 +55,23 @@ module Tire
         assert_equal 'snowball', ActiveRecordArticle.index.mapping['active_record_article']['properties']['title']['analyzer']
       end
 
+      should "configure defaults for mappings" do
+        assert_equal 'object', ActiveRecordArticle.mapping[:author][:type]
+        assert_equal 'string', ActiveRecordArticle.mapping[:author][:properties][:name][:type]
+
+        assert_equal 'string', ActiveRecordArticle.index.mapping['active_record_article']['properties']['author']['properties']['name']['type']
+      end
+
+      should "use options passed to nested indexes if given" do
+        assert_equal 'nested', ActiveRecordArticle.mapping[:comments][:type]
+        assert_equal true, ActiveRecordArticle.mapping[:comments][:include_in_parent]
+        assert_equal [:author_name, :body], ActiveRecordArticle.mapping[:comments][:properties].keys
+
+        assert_equal 'nested', ActiveRecordArticle.index.mapping['active_record_article']['properties']['comments']['type']
+        assert_equal ['author_name', 'body'].sort, ActiveRecordArticle.index.mapping['active_record_article']['properties']['comments']['properties'].keys.sort
+      end
+
+
       should "save document into index on save and find it" do
         a = ActiveRecordArticle.new :title => 'Test'
         a.save!

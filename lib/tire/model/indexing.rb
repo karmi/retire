@@ -68,15 +68,14 @@ module Tire
         # for more information.
         #
         def indexes(name, options = {}, &block)
-          options[:type] ||= 'string'
-
           if block_given?
-            mapping[name] ||= { :type => 'object', :properties => {} }
+            mapping[name] ||= { :type => 'object', :properties => {} }.update(options)
             @_nested_mapping = name
             nested = yield
             @_nested_mapping = nil
             self
           else
+            options[:type] ||= 'string'
             if @_nested_mapping
               mapping[@_nested_mapping][:properties][name] = options
             else
