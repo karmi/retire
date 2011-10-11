@@ -192,8 +192,8 @@ module Tire
           end
 
           assert_equal 2, s.filters.size
-          assert_not_nil  s.filters.first["terms"]
-          assert_not_nil  s.filters.last["term"]
+          assert_not_nil  s.filters.first[:terms]
+          assert_not_nil  s.filters.last[:term]
         end
 
         should "join multiple filters with 'and'" do
