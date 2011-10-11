@@ -197,12 +197,12 @@ module Tire
         end
 
         should "join multiple filters with 'and'" do
-          s = Search::Search.new('index') do
+          s = ::Tire::Search::Search.new('index') do
             filter :terms, :tags => ['foo']
             filter :term,  :words => 125
           end
 
-          assert_equal({ :and => [ {:terms => {:tags => ['foo']}}, {:term => {:words => 125}} ] },
+          assert_equal({ :and => [ {:terms => {:tags => ['foo']}}, {:term => {:words => 125}} ] }.to_json,
                        s.to_hash[:filter].to_json)
         end
 
