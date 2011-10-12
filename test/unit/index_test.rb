@@ -59,6 +59,13 @@ module Tire
         assert_nothing_raised { assert @index.close }
       end
 
+      should "analyze text" do
+        Configuration.client.expects(:get).returns(mock_response(
+            '{"tokens":[{"token":"tire","start_offset":0,"end_offset":4,"type":"<ALPHANUM>","position":1}]}'
+        ))
+        assert_nothing_raised { assert @index.analyze("tire") }
+      end
+
       context "mapping" do
 
         should "create index with mapping" do
