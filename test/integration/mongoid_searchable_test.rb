@@ -49,6 +49,15 @@ if ENV["MONGODB_IS_AVAILABLE"]
           assert_equal 'string', ActiveRecordArticle.index.mapping['active_record_article']['properties']['author']['properties']['name']['type']
         end
 
+        should "use options passed to nested indexes if given" do
+          assert_equal 'nested', ActiveRecordArticle.mapping[:comments][:type]
+          assert_equal true, ActiveRecordArticle.mapping[:comments][:include_in_parent]
+          assert_equal [:author_name, :body], ActiveRecordArticle.mapping[:comments][:properties].keys
+
+          assert_equal 'nested', ActiveRecordArticle.index.mapping['active_record_article']['properties']['comments']['type']
+          assert_equal ['author_name', 'body'].sort, ActiveRecordArticle.index.mapping['active_record_article']['properties']['comments']['properties'].keys.sort
+        end
+
         should "save document into index on save and find it" do
           a = MongoidArticle.new :title => 'Test'
           a.save!
