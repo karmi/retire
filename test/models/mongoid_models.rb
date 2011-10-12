@@ -25,8 +25,12 @@ class MongoidArticle
       indexes :title,      :type => 'string', :boost => 10, :analyzer => 'snowball'
       indexes :created_at, :type => 'date'
 
-      indexes :comments do
-        indexes :author
+      indexes :author do
+        indexes :name
+      end
+
+      indexes :comments, :type => 'nested', :include_in_parent => true do
+        indexes :author_name
         indexes :body
       end
     end
