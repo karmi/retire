@@ -382,6 +382,55 @@ module Tire
 
         end
 
+        context "with dynamic templates" do
+
+          should "create the index with settings, mappings and dynamic templates" do
+            expected = {
+              :settings => { :number_of_shards => 1, :number_of_replicas => 1 },
+              :mappings => { :model_with_custom_mapping => {
+                :dynamic_templates => [ {:long => { :match_mapping_type => 'long',
+                                          :match =>'*',
+                                          :mapping => {
+                                              :index => 'not_analyzed',
+                                              :type => 'long',
+                                              :store=>'no' }
+                                          } } ],
+                :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
+              }}
+            }
+
+            Tire::Index.any_instance.expects(:create).with do |expected|
+              expected[:settings][:number_of_shards] == 1 &&
+              expected[:mappings].size > 0 &&
+              expected[:mappings][:model_with_custom_dynamic_templates][:dynamic_templates].size > 0
+            end
+
+            class ::ModelWithCustomDynamicTemplates
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+               settings :number_of_shards => 1, :number_of_replicas => 1 do
+                mapping do
+                  dynamic_template do
+                    templates :long, :match => "*", :match_mapping_type => "long", :mapping => {:type => "long", :index => 'not_analyzed', :store => 'no' }
+                  end
+                  indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
+                end
+              end
+
+            end
+
+            assert_instance_of Hash, ModelWithCustomDynamicTemplates.settings
+            assert_equal 1, ModelWithCustomDynamicTemplates.settings[:number_of_shards]
+            assert_equal 'snowball', ModelWithCustomDynamicTemplates.mapping[:title][:analyzer]
+            assert_equal 'not_analyzed', ModelWithCustomDynamicTemplates.dynamic_template[:long][:mapping][:index]
+          end
+
+        end
+
         context "with index update callbacks" do
           setup do
             class ::ModelWithIndexCallbacks
