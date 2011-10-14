@@ -213,6 +213,12 @@ module Tire
             ActiveModelArticle.search @q, :per_page => 10, :page => 3
           end
 
+          should "allow to specify fields option" do
+            Tire::Search::Search.any_instance.expects(:fields).with(["id"])
+
+            ActiveModelArticle.search @q, :fields => "id"
+          end
+
         end
 
         should "not set callback when hooks are missing" do
