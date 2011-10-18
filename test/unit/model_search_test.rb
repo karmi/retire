@@ -295,6 +295,38 @@ module Tire
             assert_equal 'snowball', ModelWithCustomMapping.mapping[:title][:analyzer]
           end
 
+          should "create the index with proper mapping options" do
+            expected = {
+              :settings => {},
+              :mappings => {
+                :model_with_custom_mapping_and_options => {
+                  :_source    => { :compress => true  },
+                  :_all       => { :enabled  => false },
+                  :properties => { :title => { :type => 'string', :analyzer => 'snowball', :boost => 10 } }
+                }
+              }
+            }
+
+            Tire::Index.any_instance.expects(:create).with(expected)
+
+            class ::ModelWithCustomMappingAndOptions
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              mapping :_source => { :compress => true }, :_all => { :enabled => false } do
+                indexes :title, :type => 'string', :analyzer => 'snowball', :boost => 10
+              end
+
+            end
+
+            assert_equal 'snowball', ModelWithCustomMappingAndOptions.mapping[:title][:analyzer]
+            assert_equal true,       ModelWithCustomMappingAndOptions.mapping_options[:_source][:compress]
+            assert_equal false,      ModelWithCustomMappingAndOptions.mapping_options[:_all][:enabled]
+          end
+
           should "not raise an error when defining mapping" do
             Tire::Index.any_instance.unstub(:exists?)
             Configuration.client.expects(:head).raises(Errno::ECONNREFUSED)
