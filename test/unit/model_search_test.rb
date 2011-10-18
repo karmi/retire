@@ -347,6 +347,28 @@ module Tire
             assert_equal   100, ModelWithNestedMapping.mapping[:author][:properties][:last_name][:boost]
           end
 
+          should "define mapping for nested documents" do
+            class ::ModelWithNestedDocuments
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              mapping do
+                indexes :comments, :type => 'nested', :include_in_parent => true do
+                  indexes :author_name
+                  indexes :body, :boost => 100
+                end
+              end
+
+            end
+
+            assert_equal 'nested', ModelWithNestedDocuments.mapping[:comments][:type]
+            assert_not_nil         ModelWithNestedDocuments.mapping[:comments][:properties][:author_name]
+            assert_equal 100,      ModelWithNestedDocuments.mapping[:comments][:properties][:body][:boost]
+          end
+
         end
 
         context "with settings" do

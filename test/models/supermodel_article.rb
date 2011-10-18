@@ -11,15 +11,6 @@ class SupermodelArticle < SuperModel::Base
 
   mapping do
     indexes :title,      :type => 'string', :boost => 15, :analyzer => 'czech'
-
-    indexes :author do
-      indexes :name
-    end
-
-    indexes :comments, :type => 'nested', :include_in_parent => true do
-      indexes :author_name
-      indexes :body
-    end
   end
 
   alias :persisted? :exists?
