@@ -13,9 +13,9 @@ module Tire
         @attributes = {}
         args.each_pair do |key, value|
           if value.is_a?(Array)
-            @attributes[key.to_sym] = value.map { |item| @attributes[key.to_sym] = item.is_a?(Hash) ? self.class.new(item.to_hash) : item }
+            @attributes[key.to_sym] = value.map { |item| @attributes[key.to_sym] = item.is_a?(Hash) ? Item.new(item.to_hash) : item }
           else
-            @attributes[key.to_sym] = value.is_a?(Hash) ? self.class.new(value.to_hash) : value
+            @attributes[key.to_sym] = value.is_a?(Hash) ? Item.new(value.to_hash) : value
           end
         end
       end
@@ -59,6 +59,8 @@ module Tire
       #
       def class
         defined?(::Rails) && @attributes[:_type] ? @attributes[:_type].camelize.constantize : super
+      rescue NameError
+        super
       end
 
       def inspect

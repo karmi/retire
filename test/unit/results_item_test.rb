@@ -118,6 +118,12 @@ module Tire
           assert_equal 'fake_rails_models', ActiveModel::Naming.plural(@document)
         end
 
+        should "instantiate itself for deep hashes, not a Ruby class corresponding to type" do
+          document = Results::Item.new :_type => 'my_model', :title => 'Test', :author => { :name => 'John' }
+
+          assert_equal Tire::Results::Item, document.class
+        end
+
       end
 
     end
