@@ -87,7 +87,13 @@ module Tire
       rescue Exception => error
         if count < tries
           count += 1
-          STDERR.puts "[ERROR] #{error.message}, retrying (#{count})..."
+          if ENV['BULK_RETRY_SLEEP_SECS']
+            sleep_time = count * ENV['BULK_RETRY_SLEEP_SECS'].to_i
+            STDERR.puts "[ERROR] #{error.message}, sleeping for #{sleep_time}sec & retrying (#{count})..."
+            sleep(sleep_time)
+          else
+            STDERR.puts "[ERROR] #{error.message}, retrying (#{count})..."
+          end
           retry
         else
           STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"

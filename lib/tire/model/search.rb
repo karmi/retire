@@ -90,6 +90,7 @@ module Tire
           else
             s.query { string query }
           end
+          s.fields [options[:fields]] if options[:fields]
 
           s.perform.results
         end

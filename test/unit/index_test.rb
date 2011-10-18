@@ -132,6 +132,29 @@ p response
           assert_equal 2.0,      @index.mapping['article']['properties']['title']['boost']
         end
 
+
+        should "create index with dynamic templates" do
+          Configuration.client.expects(:post).returns(mock_response('{"ok":true,"acknowledged":true}'))
+
+          assert @index.create :settings => { :number_of_shards => 1 },
+            :mappings => {
+              :article => {
+                :dynamic_templates => [ {:string => { :match_mapping_type => 'string',
+                                          :match =>'*',
+                                          :mapping => {
+                                             :index => 'analyzed',
+                                              :type => 'string',
+                                              :include_in_all => false, :store=>'no' }
+                                          } } ],
+                :properties => {
+                  :title => { :boost => 2.0,
+                    :type => 'string',
+                    :store => 'yes',
+                    :analyzer => 'snowball' }
+                }
+              }
+            }
+        end
       end
 
       context "when storing" do
