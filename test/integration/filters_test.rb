@@ -8,6 +8,8 @@ module Tire
     context "Filters" do
 
       should "filter the results" do
+        # 2.json > Begins with "T" and is tagged "ruby"
+
         s = Tire.search('articles-test') do
           query { string 'title:T*' }
           filter :terms, :tags => ['ruby']
@@ -17,7 +19,9 @@ module Tire
         assert_equal 'Two', s.results.first.title
       end
 
-      should "filter the results with multiple filters" do
+      should "filter the results with multiple 'or' filters" do
+        # 4.json > Begins with "F" and is tagged "erlang"
+
         s = Tire.search('articles-test') do
           query { string 'title:F*' }
           filter :or, {:terms => {:tags => ['ruby']}},
@@ -28,25 +32,28 @@ module Tire
         assert_equal 'Four', s.results.first.title
       end
 
+      should "filter the results with multiple 'and' filters" do
+        # 5.json > Is tagged ["java", "javascript"] and is published on 2011-01-04
+
+        s = Tire.search('articles-test') do
+          filter :terms, :tags         => ["java"]
+          filter :term,  :published_on => "2011-01-04"
+        end
+
+        assert_equal 1, s.results.count
+        assert_equal 'Five', s.results.first.title
+      end
+
       should "not influence facets" do
         s = Tire.search('articles-test') do
           query { string 'title:T*' }
           filter :terms, :tags => ['ruby']
+
           facet('tags') { terms :tags }
         end
 
         assert_equal 1, s.results.count
         assert_equal 3, s.results.facets['tags']['terms'].size
-      end
-
-      should "filter the results with multiple calls to filters" do
-        s = Tire.search('articles-test') do
-          filter :term,  :words => 125
-          filter :terms, :tags => ["java"]
-        end
-
-        assert_equal 1, s.results.count
-        assert_equal 'Five', s.results.first.title
       end
 
     end

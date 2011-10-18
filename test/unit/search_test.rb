@@ -181,38 +181,29 @@ module Tire
           end
 
           assert_equal 1, s.filters.size
+
           assert_not_nil s.filters.first
           assert_not_nil s.filters.first[:terms]
+
+          assert_equal( {:terms => {:tags => ['foo']}}.to_json,
+                        s.to_hash[:filter].to_json )
         end
 
-        should "allow adding multiple filters" do
+        should "allow to add multiple filters" do
           s = Search::Search.new('index') do
-            filter :terms, :tags => ['foo']
+            filter :terms, :tags  => ['foo']
             filter :term,  :words => 125
           end
 
           assert_equal 2, s.filters.size
+
           assert_not_nil  s.filters.first[:terms]
           assert_not_nil  s.filters.last[:term]
+
+          assert_equal( { :and => [ {:terms => {:tags => ['foo']}}, {:term => {:words => 125}} ] }.to_json,
+                        s.to_hash[:filter].to_json )
         end
 
-        should "join multiple filters with 'and'" do
-          s = ::Tire::Search::Search.new('index') do
-            filter :terms, :tags => ['foo']
-            filter :term,  :words => 125
-          end
-
-          assert_equal({ :and => [ {:terms => {:tags => ['foo']}}, {:term => {:words => 125}} ] }.to_json,
-                       s.to_hash[:filter].to_json)
-        end
-
-        should "not add 'and' to single filter" do
-          s = Search::Search.new('index') do
-            filter :terms, :tags => ['foo']
-          end
-
-          assert_equal({:terms => {:tags => ['foo']}}.to_json, s.to_hash[:filter].to_json)
-        end
       end
 
       context "highlight" do

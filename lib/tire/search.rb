@@ -90,7 +90,7 @@ module Tire
         request.update( { :sort   => @sort.to_ary   } )    if @sort
         request.update( { :facets => @facets.to_hash } )   if @facets
         request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
-        request.update( { :filter => { :and => @filters.inject([]) { |filters, filter| filters << filter.to_hash } } } ) if  @filters && @filters.size > 1
+        request.update( { :filter => { :and => @filters.map { |filter| filter.to_hash } } } ) if  @filters && @filters.size > 1
         request.update( { :highlight => @highlight.to_hash } ) if @highlight
         request.update( { :size => @size } )               if @size
         request.update( { :from => @from } )               if @from
