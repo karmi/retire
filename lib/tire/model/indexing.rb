@@ -35,7 +35,7 @@ module Tire
         #
         #     class Article
         #       # ...
-        #       mapping do
+        #       mapping :_source => { :compress => true } do
         #         indexes :id,    :type => 'string',  :index    => :not_analyzed
         #         indexes :title, :type => 'string',  :analyzer => 'snowball',   :boost => 100
         #         # ...
