@@ -59,13 +59,41 @@ module Tire
         assert_nothing_raised { assert @index.close }
       end
 
-      should "analyze text" do
-        Configuration.client.expects(:get).times(3).returns(mock_response(
-            '{"tokens":[{"token":"tire","start_offset":0,"end_offset":4,"type":"<ALPHANUM>","position":1}]}'
-        ))
-        assert_nothing_raised { assert @index.analyze("tire") }
-        assert_nothing_raised { assert @index.analyze("tire", :analyzer => 'whitespace') }
-        assert_nothing_raised { assert @index.analyze("tire", :field => 'title') }
+      context "analyze support" do
+        setup do
+          @mock_analyze_response = '{"tokens":[{"token":"foo","start_offset":0,"end_offset":4,"type":"<ALPHANUM>","position":1}]}'
+        end
+
+        should "send text to the Analyze API" do
+          Configuration.client.expects(:get).
+                               with("#{Configuration.url}/dummy/_analyze?pretty=true", "foo bar").
+                               returns(mock_response(@mock_analyze_response))
+
+          response = @index.analyze("foo bar")
+p response
+          assert_equal 1, response['tokens'].size
+        end
+
+        should "properly encode parameters" do
+          Configuration.client.expects(:get).with do |url, payload|
+                                url == "#{Configuration.url}/dummy/_analyze?analyzer=whitespace&pretty=true"
+                               end.returns(mock_response(@mock_analyze_response))
+
+          @index.analyze("foo bar", :analyzer => 'whitespace')
+
+          Configuration.client.expects(:get).with do |url, payload|
+                                url == "#{Configuration.url}/dummy/_analyze?field=title&pretty=true"
+                               end.returns(mock_response(@mock_analyze_response))
+
+          @index.analyze("foo bar", :field => 'title')
+
+          Configuration.client.expects(:get).with do |url, payload|
+                                url == "#{Configuration.url}/dummy/_analyze?analyzer=keyword&format=text&pretty=true"
+                               end.returns(mock_response(@mock_analyze_response))
+
+          @index.analyze("foo bar", :analyzer => 'keyword', :format => 'text')
+        end
+
       end
 
       context "mapping" do

@@ -183,14 +183,13 @@ module Tire
 
     def analyze(text, options={})
       options = {:pretty => true}.update(options)
-      query = options.inject("") { |query, arr| query << arr[0].to_s << "=" << arr[1].to_s << "&" }
-      query = query.slice(0, query.size - 1)
-      @response = Configuration.client.get "#{Configuration.url}/#{@name}/_analyze?#{query}", text
+      params  = options.to_param
+      @response = Configuration.client.get "#{Configuration.url}/#{@name}/_analyze?#{params}", text
       @response.success? ? MultiJson.decode(@response.body) : false
     rescue Exception => error
       raise
     ensure
-      curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/_analyze?#{query}" -d '#{text}'|
+      curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/_analyze?#{params}" -d '#{text}'|
       logged(error, '_analyze', curl)
     end
 
