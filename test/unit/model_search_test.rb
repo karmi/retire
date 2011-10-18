@@ -160,8 +160,8 @@ module Tire
           setup do
             @q = 'foo AND bar'
 
-            Tire::Search::Query.any_instance.expects(:string).with( @q ).returns(@stub)
-            Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
+            Tire::Search::Query.any_instance.expects(:string).at_least_once.with(@q).returns(@stub)
+            Tire::Search::Search.any_instance.expects(:perform).at_least_once.returns(@stub)
           end
 
           should "search for query string" do
@@ -213,10 +213,12 @@ module Tire
             ActiveModelArticle.search @q, :per_page => 10, :page => 3
           end
 
-          should "allow to specify fields option" do
+          should "allow to limit returned fields" do
             Tire::Search::Search.any_instance.expects(:fields).with(["id"])
+            ActiveModelArticle.search @q, :fields => 'id'
 
-            ActiveModelArticle.search @q, :fields => "id"
+            Tire::Search::Search.any_instance.expects(:fields).with(["id", "title"])
+            ActiveModelArticle.search @q, :fields => ['id', 'title']
           end
 
         end
