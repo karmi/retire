@@ -45,7 +45,6 @@ Gem::Specification.new do |s|
   # These gems are not needed for CI at <http://travis-ci.org/#!/karmi/tire>
   #
   unless ENV["CI"]
-    s.add_development_dependency "sdoc"
     s.add_development_dependency "rdoc"
     s.add_development_dependency "rcov"
     s.add_development_dependency "turn"
