@@ -26,6 +26,7 @@ end
 
 # Generate documentation
 begin
+  require 'rdoc'
   begin; require 'sdoc'; rescue LoadError; end
   require 'rdoc/task'
   Rake::RDocTask.new do |rdoc|
