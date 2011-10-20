@@ -21,7 +21,7 @@ module Tire
         if @options[:page]
           @options[:page].to_i
         else
-          (@options[:size].to_i + @options[:from].to_i) / @options[:size].to_i
+          (per_page + @options[:from].to_i) / per_page
         end
       end
 

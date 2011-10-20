@@ -193,6 +193,11 @@ module Tire
           assert_equal 2, @collection.current_page
         end
 
+        should "return current page for empty result" do
+          collection = Results::Collection.new( { 'hits' => { 'hits' => [], 'total' => 0 } } )
+          assert_equal 1, collection.current_page
+        end
+
         should "return previous page" do
           assert_equal 1, @collection.previous_page
         end
