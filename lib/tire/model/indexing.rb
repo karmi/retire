@@ -35,16 +35,17 @@ module Tire
         #
         #     class Article
         #       # ...
-        #       mapping do
+        #       mapping :_source => { :compress => true } do
         #         indexes :id,    :type => 'string',  :index    => :not_analyzed
         #         indexes :title, :type => 'string',  :analyzer => 'snowball',   :boost => 100
         #         # ...
         #       end
         #     end
         #
-        def mapping
+        def mapping(*args)
           @mapping ||= {}
           if block_given?
+            @fields = args.pop
             @store_mapping = true and yield and @store_mapping = false
             create_elasticsearch_index
           else
@@ -100,8 +101,12 @@ module Tire
           @store_mapping || false
         end
 
+        def fields
+          @fields || {}
+        end
+
         def mapping_to_hash
-          { document_type.to_sym => { :properties => mapping } }
+          { document_type.to_sym => fields.merge({ :properties => mapping }) }
         end
 
       end
