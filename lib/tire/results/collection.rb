@@ -40,30 +40,46 @@ module Tire
           else
             return [] if hits.empty?
 
-            type  = @response['hits']['hits'].first['_type']
-            raise NoMethodError, "You have tried to eager load the model instances, " +
-                                 "but Tire cannot find the model class because " +
-                                 "document has no _type property." unless type
-
-            begin
-              klass = type.camelize.constantize
-            rescue NameError => e
-              raise NameError, "You have tried to eager load the model instances, but " +
-                               "Tire cannot find the model class '#{type.camelize}' " +
-                               "based on _type '#{type}'.", e.backtrace
+            ranked_results = hits.map do |hit|
+              type = hit['_type']
+              raise NoMethodError, "You have tried to eager load the model instances, " +
+                                   "but Tire cannot find the model class because " +
+                                   "document has no _type property." unless type
+              [type, hit['_id']]
             end
 
-            ids   = @response['hits']['hits'].map { |h| h['_id'] }
+            # Collect all ids of one type to perform one database query per type
+            ids_by_type = {}
+            ranked_results.each do |type, id|
+              ids_by_type[type] ||= []
+              ids_by_type[type] <<= id
+            end
+            objects_by_type = {}
+            ids_by_type.each do |type, ids|
+              begin
+                model = type.camelize.constantize
+              rescue NameError => e
+                raise NameError, "You have tried to eager load the model instances, but " +
+                                 "Tire cannot find the model class '#{type.camelize}' " +
+                                 "based on _type '#{type}'.", e.backtrace
+              end
 
-            load_options = options[:load] === true ? {} : options[:load]
-            # Tolerate missing records by not giving find the array of ids
-            records = klass.where(klass.primary_key.to_sym => ids).find(:all, load_options)
+              objects_by_id = {}
+              load_options = options[:load] === true ? {} : options[:load]
+              # Tolerate missing records
+              model.where(model.primary_key.to_sym => ids).find(:all, load_options).each do |result|
+                objects_by_id[result.id.to_s] = result
+              end
+              objects_by_type[type] = objects_by_id
+            end
+            # Preserve original order from search results
+            ranked_results.map! { |type, id| objects_by_type[type][id.to_s] }
+            ranked_results.compact!
 
             # Remove missing records from the total
-            @total -= ids.size - records.size
+            @total -= hits.size - ranked_results.size
 
-            # Reorder records to preserve order from search results
-            ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
+            ranked_results
           end
         end
       end
