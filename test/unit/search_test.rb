@@ -134,6 +134,17 @@ module Tire
         Search::Search.new('index').perform
       end
 
+      should "log the original exception on failed request" do
+        Configuration.logger STDERR
+
+        Configuration.client.expects(:get).raises(Errno::ECONNREFUSED)
+        Configuration.logger.expects(:log_response).with('N/A', 'N/A', '')
+
+        assert_raise Errno::ECONNREFUSED do
+          Search::Search.new('index').perform
+        end
+      end
+
       context "sort" do
 
         should "allow sorting by multiple fields" do

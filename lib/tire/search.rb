@@ -107,20 +107,21 @@ module Tire
 
           Configuration.logger.log_request '_search', indices, to_curl
 
-          took = @json['took'] rescue nil
+          took = @json['took']  rescue nil
+          code = @response.code rescue nil
 
           if Configuration.logger.level.to_s == 'debug'
             # FIXME: Depends on RestClient implementation
             body = if @json
               defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
             else
-              @response.body
+              @response.body rescue nil
             end
           else
             body = ''
           end
 
-          Configuration.logger.log_response @response.code, took, body
+          Configuration.logger.log_response code || 'N/A', took || 'N/A', body
         end
       end
 
