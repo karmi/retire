@@ -54,7 +54,13 @@ module Tire
             end
 
             ids   = @response['hits']['hits'].map { |h| h['_id'] }
-            records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+
+            load_options = options[:load] === true ? {} : options[:load]
+            # Tolerate missing records by not giving find the array of ids
+            records = klass.where(klass.primary_key.to_sym => ids).find(:all, load_options)
+
+            # Remove missing records from the total
+            @total -= ids.size - records.size
 
             # Reorder records to preserve order from search results
             ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
