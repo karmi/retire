@@ -34,6 +34,10 @@ module Tire::Search
                       Query.new.terms(:foo, ['bar', 'baz'], :minimum_match => 2) )
       end
 
+      should "allow search for a range" do
+        assert_equal( { :range => { :age => { :gte => 21 } } }, Query.new.range(:age, { :gte => 21 }) )
+      end
+
       should "allow search with a query string" do
         assert_equal( { :query_string => { :query => 'title:foo' } },
                       Query.new.string('title:foo') )
