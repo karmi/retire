@@ -1,13 +1,13 @@
 module Tire
-  VERSION   = "0.3.7"
+  VERSION   = "0.3.8"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
     * Fixed a bug: `Results::Item` was referencing Ruby classes incorrectly within Rails
-    * Added support for the Analyze API (#124)
-    * Added support for adding multiple filters (#122)
-    * Fixed incorrect passing of options in the `date` and `terms` facets
-    * Removed SDoc since it breaks with current RDoc
+    * Fixed `ZeroDivisionError` for empty result sets
+    * Display correct exception on request failure
+    * Added support for range queries
+    * Added support for mapping options
   END
 end
