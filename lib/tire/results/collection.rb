@@ -13,7 +13,7 @@ module Tire
         @time     = response['took'].to_i
         @total    = response['hits']['total'].to_i
         @facets   = response['facets']
-        @wrapper  = Configuration.wrapper
+        @wrapper  = options[:wrapper] || Configuration.wrapper
       end
 
       def results

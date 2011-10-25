@@ -13,8 +13,6 @@ module Tire
 
         @url     = Configuration.url+['/', @indices.join(','), @type, '_search'].compact.join('/').squeeze('/')
 
-        # TODO: Do not allow changing the wrapper here or set it back after yield
-        Configuration.wrapper @options[:wrapper] if @options[:wrapper]
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
 
