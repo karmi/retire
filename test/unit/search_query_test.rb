@@ -118,11 +118,11 @@ module Tire::Search
       end
 
       should "allow passing variables from outer scope" do
-        q1 = 'foo'
-        q2 = 'bar'
+        @q1 = 'foo'
+        @q2 = 'bar'
         query = Query.new.boolean do |boolean|
-          boolean.must { |query| query.string q1 }
-          boolean.must { |query| query.string q2 }
+          boolean.must { |query| query.string @q1 }
+          boolean.must { |query| query.string @q2 }
         end
 
         assert_equal( 2, query[:bool][:must].size, query[:bool][:must].inspect )
