@@ -26,12 +26,8 @@ module Tire
         q = 'tags:ruby'
         s = Tire.search('articles-test') do
           query { string q }
-          facet 'scoped-tags' do
-            terms :tags
-          end
-          facet 'global-tags', :global => true do
-            terms :tags
-          end
+          facet('scoped-tags')                  { terms :tags }
+          facet('global-tags', :global => true) { terms :tags }
         end
 
         scoped_facets = s.results.facets['scoped-tags']['terms']
@@ -39,6 +35,15 @@ module Tire
 
         assert_equal 2, scoped_facets.count
         assert_equal 5, global_facets.count
+      end
+
+      should "allow to define multiple facets" do
+        s = Tire.search('articles-test') do
+          facet('tags') { terms :tags }
+          facet('date') { date :published_on }
+        end
+
+        assert_equal 2, s.results.facets.size
       end
 
       context "date histogram" do
