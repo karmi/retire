@@ -139,7 +139,7 @@ module Tire::Search
         assert_nothing_raised { Query.new.filtered }
       end
 
-      should "encode options" do
+      should "properly encode filter" do
         query = Query.new.filtered do
           query { term :foo, 'bar' }
           filter :terms, :tags => ['ruby']
@@ -149,12 +149,25 @@ module Tire::Search
         assert_equal( { :tags => ['ruby'] }, query[:filtered][:filter].first[:terms] )
       end
 
-      should "allow passing variables from outer scope" do
-        bar = 'bar'
-        ruby = 'ruby'
+      should "properly encode multiple filters" do
         query = Query.new.filtered do
-          query { term :foo, bar }
-          filter :terms, :tags => [ruby]
+          query { term :foo, 'bar' }
+          filter :terms, :tags => ['ruby']
+          filter :terms, :tags => ['python']
+        end
+
+        assert_equal 2, query[:filtered][:filter].size
+        assert_equal( { :tags => ['ruby'] },   query[:filtered][:filter].first[:terms] )
+        assert_equal( { :tags => ['python'] }, query[:filtered][:filter].last[:terms] )
+      end
+
+      should "allow passing variables from outer scope" do
+        @my_query  = 'bar'
+        @my_filter = { :tags => ['ruby'] }
+
+        query = Query.new.filtered do |f|
+          f.query { |q| q.term :foo, @my_query }
+          f.filter :terms, @my_filter
         end
 
         assert_equal( { :term => { :foo => 'bar' } }, query[:filtered][:query].to_hash )
