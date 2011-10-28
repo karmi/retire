@@ -132,6 +132,37 @@ module Tire::Search
 
     end
 
+
+    context "FilteredQuery" do
+
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.filtered }
+      end
+
+      should "encode options" do
+        query = Query.new.filtered do
+          query { term :foo, 'bar' }
+          filter :terms, :tags => ['ruby']
+        end
+
+        assert_equal( { :term => { :foo => 'bar' } }, query[:filtered][:query].to_hash )
+        assert_equal( { :tags => ['ruby'] }, query[:filtered][:filter].first[:terms] )
+      end
+
+      should "allow passing variables from outer scope" do
+        bar = 'bar'
+        ruby = 'ruby'
+        query = Query.new.filtered do
+          query { term :foo, bar }
+          filter :terms, :tags => [ruby]
+        end
+
+        assert_equal( { :term => { :foo => 'bar' } }, query[:filtered][:query].to_hash )
+        assert_equal( { :tags => ['ruby'] }, query[:filtered][:filter].first[:terms] )
+      end
+
+    end
+
   end
 
 end

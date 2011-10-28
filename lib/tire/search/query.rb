@@ -35,6 +35,13 @@ module Tire
         @value
       end
 
+      def filtered(&block)
+        @filtered = FilteredQuery.new
+        block.arity < 1 ? @filtered.instance_eval(&block) : block.call(@filtered) if block_given?
+        @value[:filtered] = @filtered.to_hash
+        @value
+      end
+
       def all
         @value = { :match_all => {} }
         @value
@@ -91,6 +98,33 @@ module Tire
 
       def to_hash
         @value.update(@options)
+      end
+    end
+
+
+    class FilteredQuery
+      def initialize(&block)
+        @value = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def query(options={}, &block)
+        @value[:query] = Query.new(&block).to_hash
+        @value
+      end
+
+      def filter(type, *options)
+        @value[:filter] ||= []
+        @value[:filter] << Filter.new(type, *options).to_hash
+        @value
+      end
+
+      def to_hash
+        @value
+      end
+
+      def to_json
+        to_hash.to_json
       end
     end
 
