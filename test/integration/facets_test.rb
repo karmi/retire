@@ -46,6 +46,19 @@ module Tire
         assert_equal 2, s.results.facets.size
       end
 
+      should "allow to restrict facets with filters" do
+        s = Tire.search('articles-test') do
+          query { string 'tags:ruby' }
+          facet('tags', :facet_filter => { :range => { :published_on => { :from => '2011-01-01', :to => '2011-01-01' } }  }) do
+            terms :tags
+          end
+        end
+
+        assert_equal 1,      s.results.facets.size
+        assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
+        assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
+      end
+
       context "date histogram" do
 
         should "return aggregated values for all results" do

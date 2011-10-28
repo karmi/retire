@@ -22,6 +22,14 @@ module Tire::Search
                         Facet.new('foo', :global => true).terms(:bar).to_json )
         end
 
+        should "pass options to facets" do
+          payload = Facet.new('foo', :facet_filter => { :term => { :account_id => 'foo' } }).terms(:bar).to_hash
+
+          assert_not_nil payload['foo'][:facet_filter]
+          assert_equal( { :term => { :account_id => 'foo' } },
+                        payload['foo'][:facet_filter] )
+        end
+
         should "encode facet options" do
           assert_equal( { :foo => { :terms => {:field=>'bar',:size=>5,:all_terms=>false} } }.to_json,
                         Facet.new('foo').terms(:bar, :size => 5).to_json )
