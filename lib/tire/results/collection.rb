@@ -13,15 +13,17 @@ module Tire
         @time     = response['took'].to_i
         @total    = response['hits']['total'].to_i
         @facets   = response['facets']
-        @wrapper  = Configuration.wrapper
+        @wrapper  = options[:wrapper] || Configuration.wrapper
       end
 
       def results
         @results ||= begin
+          hits = @response['hits']['hits']
           unless @options[:load]
-            @response['hits']['hits'].map do |h|
-               if @wrapper == Hash then h
-               else
+            if @wrapper == Hash
+              hits
+            else
+              hits.map do |h|
                  document = {}
 
                  # Update the document with content and ID
@@ -33,10 +35,10 @@ module Tire
 
                  # Return an instance of the "wrapper" class
                  @wrapper.new(document)
-               end
+              end
             end
           else
-            return [] if @response['hits']['hits'].empty?
+            return [] if hits.empty?
 
             type  = @response['hits']['hits'].first['_type']
             raise NoMethodError, "You have tried to eager load the model instances, " +
