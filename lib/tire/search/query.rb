@@ -28,6 +28,13 @@ module Tire
         @value
       end
 
+      def custom_score(options={}, &block)
+        @custom_score ||= Query.new(&block)
+        @value[:custom_score] = options
+        @value[:custom_score].update({:query => @custom_score.to_hash})
+        @value
+      end
+
       def boolean(options={}, &block)
         @boolean ||= BooleanQuery.new(options)
         block.arity < 1 ? @boolean.instance_eval(&block) : block.call(@boolean) if block_given?

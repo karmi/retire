@@ -58,6 +58,14 @@ module Tire::Search
                       Query.new.string('foo', :fields => ['title.*'], :use_dis_max => true) )
       end
 
+      should "allow set options when searching with custom score" do
+        query = Query.new.custom_score(:script => "1 / _score") do
+          string 'foo'
+        end
+
+        assert_equal "1 / _score", query[:custom_score][:script]
+      end
+
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
       end
@@ -175,7 +183,6 @@ module Tire::Search
       end
 
     end
-
   end
 
 end
