@@ -58,12 +58,22 @@ module Tire::Search
                       Query.new.string('foo', :fields => ['title.*'], :use_dis_max => true) )
       end
 
-      should "allow set options when searching with custom score" do
+      should "allow to set script for custom score queries" do
         query = Query.new.custom_score(:script => "_score * doc['price'].value") do
           string 'foo'
         end
 
         assert_equal "_score * doc['price'].value", query[:custom_score][:script]
+      end
+
+      should "allow to pass parameters for custom score queries" do
+        query = Query.new.custom_score(:script => "_score * doc['price'].value / max(a, b)",
+                                       :params => { :a => 1, :b => 2 }) do
+          string 'foo'
+        end
+
+        assert_equal 1, query[:custom_score][:params][:a]
+        assert_equal 2, query[:custom_score][:params][:b]
       end
 
       should "search for all documents" do
