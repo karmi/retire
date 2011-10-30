@@ -1,13 +1,10 @@
 module Tire
-  VERSION   = "0.3.8"
+  VERSION   = "0.3.9"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Fixed a bug: `Results::Item` was referencing Ruby classes incorrectly within Rails
-    * Fixed `ZeroDivisionError` for empty result sets
-    * Display correct exception on request failure
-    * Added support for range queries
-    * Added support for mapping options
+    * Added support for filtered queries [#134]
+    * Added support for "custom_score" queries [#133]
   END
 end
