@@ -59,11 +59,11 @@ module Tire::Search
       end
 
       should "allow set options when searching with custom score" do
-        query = Query.new.custom_score(:script => "1 / _score") do
+        query = Query.new.custom_score(:script => "_score * doc['price'].value") do
           string 'foo'
         end
 
-        assert_equal "1 / _score", query[:custom_score][:script]
+        assert_equal "_score * doc['price'].value", query[:custom_score][:script]
       end
 
       should "search for all documents" do
