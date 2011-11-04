@@ -40,46 +40,32 @@ module Tire
           else
             return [] if hits.empty?
 
-            ranked_results = hits.map do |hit|
-              type = hit['_type']
+            load_options = options[:load] === true ? {} : options[:load]
+
+            # Collect all ids of one type to perform one database query per type
+            records_by_type = {}
+            hits.group_by { |hit| hit['_type'] }.each do |type, hits|
               raise NoMethodError, "You have tried to eager load the model instances, " +
                                    "but Tire cannot find the model class because " +
                                    "document has no _type property." unless type
-              [type, hit['_id']]
-            end
-
-            # Collect all ids of one type to perform one database query per type
-            ids_by_type = {}
-            ranked_results.each do |type, id|
-              ids_by_type[type] ||= []
-              ids_by_type[type] <<= id
-            end
-            objects_by_type = {}
-            ids_by_type.each do |type, ids|
+              ids = hits.map{ |hit| hit['_id'] }
               begin
                 model = type.camelize.constantize
               rescue NameError => e
-                raise NameError, "You have tried to eager load the model instances, but " +
-                                 "Tire cannot find the model class '#{type.camelize}' " +
-                                 "based on _type '#{type}'.", e.backtrace
+                raise NameError, "Cannot find the model class '#{type.camelize}' " +
+                                 "based on _type '#{type}' during eager loading.", e.backtrace
               end
-
-              objects_by_id = {}
-              load_options = options[:load] === true ? {} : options[:load]
-              # Tolerate missing records
-              model.where(model.primary_key.to_sym => ids).find(:all, load_options).each do |result|
-                objects_by_id[result.id.to_s] = result
-              end
-              objects_by_type[type] = objects_by_id
+              records = model.where(model.primary_key => ids).all(load_options)
+              records_by_type[type] = records.index_by(&:id)
             end
             # Preserve original order from search results
-            ranked_results.map! { |type, id| objects_by_type[type][id.to_s] }
-            ranked_results.compact!
+            records = hits.map { |hit| records_by_type[hit['_type']][hit['_id'].to_i] }
+            records.compact!
 
             # Remove missing records from the total
-            @total -= hits.size - ranked_results.size
+            @total -= hits.size - records.size
 
-            ranked_results
+            records
           end
         end
       end

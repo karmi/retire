@@ -218,9 +218,9 @@ module Tire
 
         should "load the records via model find method from database" do
           mock_relation = Object.new
-          ActiveRecordArticle.expects(:where).with(:id => [1, 2, 3]).
+          ActiveRecordArticle.expects(:where).with('id' => [1, 2, 3]).
                               returns(mock_relation)
-          mock_relation.expects(:find).with(:all, {}).
+          mock_relation.expects(:all).with({}).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
@@ -229,9 +229,9 @@ module Tire
 
         should "pass the :load option Hash to model find metod" do
           mock_relation = Object.new
-          ActiveRecordArticle.expects(:where).with(:id => [1, 2, 3]).
+          ActiveRecordArticle.expects(:where).with('id' => [1, 2, 3]).
                               returns(mock_relation)
-          mock_relation.expects(:find).with(:all, { :include => 'comments' }).
+          mock_relation.expects(:all).with({ :include => 'comments' }).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
@@ -240,9 +240,9 @@ module Tire
 
         should "preserve the order of records returned from search" do
           mock_relation = Object.new
-          ActiveRecordArticle.expects(:where).with(:id => [1, 2, 3]).
+          ActiveRecordArticle.expects(:where).with('id' => [1, 2, 3]).
                               returns(mock_relation)
-          mock_relation.expects(:find).with(:all, {}).
+          mock_relation.expects(:all).with({}).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
