@@ -9,9 +9,9 @@ module Tire
       def initialize(indices=nil, options = {}, &block)
         @indices = Array(indices)
         @options = options
-        @type    = @options[:type]
+        @type    = Array(@options[:type])
 
-        @url     = Configuration.url+['/', @indices.join(','), @type, '_search'].compact.join('/').squeeze('/')
+        @url     = Configuration.url+['/', @indices.join(','), @type.join(','), '_search'].compact.join('/').squeeze('/')
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end

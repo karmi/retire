@@ -217,7 +217,10 @@ module Tire
         end
 
         should "load the records via model find method from database" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
+          mock_relation = Object.new
+          ActiveRecordArticle.expects(:where).with('id' => [1, 2, 3]).
+                              returns(mock_relation)
+          mock_relation.expects(:all).with({}).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
@@ -225,7 +228,10 @@ module Tire
         end
 
         should "pass the :load option Hash to model find metod" do
-          ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
+          mock_relation = Object.new
+          ActiveRecordArticle.expects(:where).with('id' => [1, 2, 3]).
+                              returns(mock_relation)
+          mock_relation.expects(:all).with({ :include => 'comments' }).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
@@ -233,7 +239,10 @@ module Tire
         end
 
         should "preserve the order of records returned from search" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
+          mock_relation = Object.new
+          ActiveRecordArticle.expects(:where).with('id' => [1, 2, 3]).
+                              returns(mock_relation)
+          mock_relation.expects(:all).with({}).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])

@@ -40,24 +40,32 @@ module Tire
           else
             return [] if hits.empty?
 
-            type  = @response['hits']['hits'].first['_type']
-            raise NoMethodError, "You have tried to eager load the model instances, " +
-                                 "but Tire cannot find the model class because " +
-                                 "document has no _type property." unless type
+            load_options = options[:load] === true ? {} : options[:load]
 
-            begin
-              klass = type.camelize.constantize
-            rescue NameError => e
-              raise NameError, "You have tried to eager load the model instances, but " +
-                               "Tire cannot find the model class '#{type.camelize}' " +
-                               "based on _type '#{type}'.", e.backtrace
+            # Collect all ids of one type to perform one database query per type
+            records_by_type = {}
+            hits.group_by { |hit| hit['_type'] }.each do |type, hits|
+              raise NoMethodError, "You have tried to eager load the model instances, " +
+                                   "but Tire cannot find the model class because " +
+                                   "document has no _type property." unless type
+              ids = hits.map{ |hit| hit['_id'] }
+              begin
+                model = type.camelize.constantize
+              rescue NameError => e
+                raise NameError, "Cannot find the model class '#{type.camelize}' " +
+                                 "based on _type '#{type}' during eager loading.", e.backtrace
+              end
+              records = model.where(model.primary_key => ids).all(load_options)
+              records_by_type[type] = records.index_by(&:id)
             end
+            # Preserve original order from search results
+            records = hits.map { |hit| records_by_type[hit['_type']][hit['_id'].to_i] }
+            records.compact!
 
-            ids   = @response['hits']['hits'].map { |h| h['_id'] }
-            records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+            # Remove missing records from the total
+            @total -= hits.size - records.size
 
-            # Reorder records to preserve order from search results
-            ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
+            records
           end
         end
       end
