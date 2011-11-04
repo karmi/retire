@@ -11,26 +11,29 @@ module Tire
     def exists?
       @response = Configuration.client.head("#{Configuration.url}/#{@name}")
       @response.success?
+
     ensure
       curl = %Q|curl -I "#{Configuration.url}/#{@name}"|
-      logged(@response.body, 'HEAD', curl) if @response
+      logged('HEAD', curl)
     end
 
     def delete
       @response = Configuration.client.delete "#{Configuration.url}/#{@name}"
-      return @response.success?
+      @response.success?
+
     ensure
       curl = %Q|curl -X DELETE "#{Configuration.url}/#{@name}"|
-      logged(@response.body, 'DELETE', curl)
+      logged('DELETE', curl)
     end
 
     def create(options={})
       @options = options
       @response = Configuration.client.post "#{Configuration.url}/#{@name}", MultiJson.encode(options)
       @response.success? ? @response : false
+
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{MultiJson.encode(options)}'|
-      logged(@response.body, 'CREATE', curl) if @response
+      logged('CREATE', curl)
     end
 
     def mapping
@@ -56,11 +59,9 @@ module Tire
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
 
-    rescue Exception => error
-      raise
     ensure
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
-      logged(error, "/#{@name}/#{type}/", curl)
+      logged([type, id].join('/'), curl)
     end
 
     def bulk_store documents
@@ -92,9 +93,10 @@ module Tire
         else
           STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"
         end
+
       ensure
         curl = %Q|curl -X POST "#{Configuration.url}/_bulk" -d '{... data omitted ...}'|
-        logged(error, 'BULK', curl)
+        logged('BULK', curl)
       end
     end
 
@@ -132,14 +134,21 @@ module Tire
       end
       raise ArgumentError, "Please pass a document ID" unless id
 
-      result = Configuration.client.delete "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      url    = "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      result = Configuration.client.delete url
       MultiJson.decode(result.body) if result.success?
+
+    ensure
+      curl = %Q|curl -X DELETE "#{url}"|
+      logged(id, curl)
     end
 
     def retrieve(type, id)
       raise ArgumentError, "Please pass a document ID" unless id
 
-      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      url       = "#{Configuration.url}/#{@name}/#{type}/#{id}"
+      @response = Configuration.client.get url
+
       h = MultiJson.decode(@response.body)
       if Configuration.wrapper == Hash then h
       else
@@ -148,37 +157,37 @@ module Tire
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
         Configuration.wrapper.new(document)
       end
+
+    ensure
+      curl = %Q|curl -X GET "#{url}"|
+      logged(id, curl)
     end
 
     def refresh
       @response = Configuration.client.post "#{Configuration.url}/#{@name}/_refresh", ''
-    rescue Exception => error
-      raise
+
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_refresh"|
-      logged(error, '_refresh', curl)
+      logged('_refresh', curl)
     end
 
     def open(options={})
       # TODO: Remove the duplication in the execute > rescue > ensure chain
       @response = Configuration.client.post "#{Configuration.url}/#{@name}/_open", MultiJson.encode(options)
       MultiJson.decode(@response.body)['ok']
-    rescue Exception => error
-      raise
+
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/open"|
-      logged(error, '_open', curl)
+      logged('_open', curl)
     end
 
     def close(options={})
-      # TODO: Remove the duplication in the execute > rescue > ensure chain
       @response = Configuration.client.post "#{Configuration.url}/#{@name}/_close", MultiJson.encode(options)
       MultiJson.decode(@response.body)['ok']
-    rescue Exception => error
-      raise
+
     ensure
       curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_close"|
-      logged(error, '_close', curl)
+      logged('_close', curl)
     end
 
     def analyze(text, options={})
@@ -186,11 +195,10 @@ module Tire
       params  = options.to_param
       @response = Configuration.client.get "#{Configuration.url}/#{@name}/_analyze?#{params}", text
       @response.success? ? MultiJson.decode(@response.body) : false
-    rescue Exception => error
-      raise
+
     ensure
       curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/_analyze?#{params}" -d '#{text}'|
-      logged(error, '_analyze', curl)
+      logged('_analyze', curl)
     end
 
     def register_percolator_query(name, options={}, &block)
@@ -198,21 +206,19 @@ module Tire
 
       @response = Configuration.client.put "#{Configuration.url}/_percolator/#{@name}/#{name}", MultiJson.encode(options)
       MultiJson.decode(@response.body)['ok']
-      rescue Exception => error
-        raise
-      ensure
-        curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
-        logged(error, '_percolator', curl)
+
+    ensure
+      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
+      logged('_percolator', curl)
     end
 
     def unregister_percolator_query(name)
       @response = Configuration.client.delete "#{Configuration.url}/_percolator/#{@name}/#{name}"
       MultiJson.decode(@response.body)['ok']
-      rescue Exception => error
-        raise
-      ensure
-        curl = %Q|curl -X DELETE "#{Configuration.url}/_percolator/#{@name}"|
-        logged(error, '_percolator', curl)
+
+    ensure
+      curl = %Q|curl -X DELETE "#{Configuration.url}/_percolator/#{@name}"|
+      logged('_percolator', curl)
     end
 
     def percolate(*args, &block)
@@ -229,26 +235,24 @@ module Tire
       @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/_percolate", MultiJson.encode(payload)
       MultiJson.decode(@response.body)['matches']
 
-      rescue Exception => error
-        # raise
-      ensure
-        curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/#{type}/_percolate?pretty=1" -d '#{payload.to_json}'|
-        logged(error, '_percolate', curl)
+    ensure
+      curl = %Q|curl -X GET "#{Configuration.url}/#{@name}/#{type}/_percolate?pretty=1" -d '#{payload.to_json}'|
+      logged('_percolate', curl)
     end
 
-    def logged(error=nil, endpoint='/', curl='')
+    def logged(endpoint='/', curl='')
       if Configuration.logger
+        error = $!
 
         Configuration.logger.log_request endpoint, @name, curl
 
-        code = @response ? @response.code : error.message rescue 200
+        code = @response ? @response.code : error.class rescue 200
 
         if Configuration.logger.level.to_s == 'debug'
-          # FIXME: Depends on RestClient implementation
           body = if @response
             defined?(Yajl) ? Yajl::Encoder.encode(@response.body, :pretty => true) : MultiJson.encode(@response.body)
           else
-            error.http_body rescue ''
+            error.message rescue ''
           end
         else
           body = ''
