@@ -119,7 +119,7 @@ module Tire
             body = ''
           end
 
-          Configuration.logger.log_response code || 'N/A', took || 'N/A', body
+          Configuration.logger.log_response code || 'N/A', took || 'N/A', body || 'N/A'
         end
       end
 
