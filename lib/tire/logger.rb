@@ -46,8 +46,8 @@ module Tire
       content  = "# #{time}"
       content += " [#{status}]"
       content += " (#{took} msec)" if took
-      content += "\n#\n" unless json == ''
-      json.each_line { |line| content += "# #{line}" } unless json == ''
+      content += "\n#\n" unless json.to_s !~ /\S/
+      json.to_s.each_line { |line| content += "# #{line}" } unless json.to_s !~ /\S/
       content += "\n\n"
       write content
     end
