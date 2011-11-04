@@ -16,6 +16,10 @@ module Tire
       def failure?
         ! success?
       end
+
+      def to_s
+        [code, body].join(' : ')
+      end
     end
 
   end

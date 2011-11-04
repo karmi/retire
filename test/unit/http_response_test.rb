@@ -37,6 +37,10 @@ module Tire
           assert Response.new('NotFound', 404).failure?
         end
 
+        should "return string representation" do
+          assert_equal "200 : Hello", Response.new('Hello', 200).to_s
+        end
+
       end
 
     end
