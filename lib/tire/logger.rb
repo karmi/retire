@@ -7,9 +7,9 @@ module Tire
       else
         File.open(device, 'a')
       end
-      @device.sync = true
+      @device.sync = true if @device.respond_to?(:sync)
       @options = options
-      at_exit { @device.close unless @device.closed? }
+      at_exit { @device.close unless @device.closed? } if @device.respond_to?(:closed?) && @device.respond_to?(:close)
     end
 
     def level
