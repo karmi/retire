@@ -1,10 +1,10 @@
 module Tire
-  VERSION   = "0.3.9"
+  VERSION   = "0.3.10"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Added support for filtered queries [#134]
-    * Added support for "custom_score" queries [#133]
+    * Fixes and improvements for Logger    [#142]
+    * Better handling of search exceptions [#145]
   END
 end
