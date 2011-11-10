@@ -16,11 +16,12 @@ module Tire
         end
 
         response = Configuration.client.post( "#{Configuration.url}/#{indices}/_search", payload)
+        raise Tire::Search::SearchRequestFailed, response.to_s if response.failure?
         json     = MultiJson.decode(response.body)
         results  = Results::Collection.new(json, options)
       end
     rescue Exception => error
-      STDERR.puts "[REQUEST FAILED] #{error.class} #{error.http_body rescue nil}\n"
+      STDERR.puts "[REQUEST FAILED] #{error.class} #{error.message rescue nil}\n"
       raise
     ensure
     end

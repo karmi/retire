@@ -46,6 +46,13 @@ module Tire
           end
         end
 
+        should "raise SearchRequestFailed when receiving bad response from backend" do
+          assert_raise(Search::SearchRequestFailed) do
+            Tire::Configuration.client.expects(:post).returns( mock_response('INDEX DOES NOT EXIST', 404) )
+            Tire.search 'not-existing', :query => { :query_string => { :query => 'foo' }}
+          end
+        end
+
       end
 
     end
