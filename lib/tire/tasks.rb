@@ -9,6 +9,9 @@ namespace :tire do
           Pass params for the `paginate` method:
             $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}'
 
+          Use a method other than `paginate` (only use if your db operates batch retrievals natively):
+            $ rake environment tire:import CLASS='Article' FINDER_METHOD='all'
+
           Force rebuilding the index (delete and create):
             $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
 
@@ -43,6 +46,7 @@ namespace :tire do
 
     klass  = eval(ENV['CLASS'].to_s)
     params = eval(ENV['PARAMS'].to_s) || {}
+    finder_method = ENV['FINDER_METHOD'] || 'paginate'
 
     index = Tire::Index.new( ENV['INDEX'] || klass.tire.index.name )
 
@@ -67,7 +71,7 @@ namespace :tire do
 
     STDOUT.puts '-'*tty_cols
     elapsed = Benchmark.realtime do
-      index.import(klass, 'paginate', params) do |documents|
+      index.import(klass, finder_method, params) do |documents|
 
         if total
           done += documents.size
