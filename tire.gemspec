@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mongoid",      "~> 2.2.1"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "supermodel"
+  s.add_development_dependency "minitest"
 
   # These gems are not needed for CI at <http://travis-ci.org/#!/karmi/tire>
   #
