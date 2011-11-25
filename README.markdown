@@ -359,7 +359,7 @@ example Rails application, with an `ActiveRecord` model and a search form, to pl
 (it even downloads _ElasticSearch_ itself, generates the application skeleton and leaves you with
 a _Git_ repository to explore the steps and the code):
 
-    $ rails new searchapp -m https://github.com/karmi/tire/raw/master/examples/rails-application-template.rb
+    $ rails new searchapp -m https://raw.github.com/karmi/tire/master/examples/rails-application-template.rb
 
 For the rest of us, let's suppose you have an `Article` class in your _Rails_ application.
 
