@@ -284,7 +284,6 @@ module Tire
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/r2d2" &&
-                                   doc['id'] == 'r2d2' &&
                                    doc['title'] == 'Test' &&
                                    doc['published_on'] == nil
                                  end.
@@ -309,7 +308,6 @@ module Tire
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/" &&
-                                   doc['id'] == nil &&
                                    doc['title'] == 'Test'
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"1"}'))
@@ -323,7 +321,6 @@ module Tire
                                   with do |url, payload|
                                     doc = MultiJson.decode(payload)
                                     url == "#{Configuration.url}/persistent_articles/persistent_article/123" &&
-                                    doc['id'] == '123' &&
                                     doc['title'] == 'Test' &&
                                     doc['published_on'] == nil
                                   end.
@@ -344,7 +341,6 @@ module Tire
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
-                                   doc['id'] == '1' &&
                                    doc['title'] == 'Test' &&
                                    doc['published_on'] == nil
                                  end.
@@ -357,7 +353,6 @@ module Tire
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
-                                   doc['id'] == '1' &&
                                    doc['title'] == 'Updated'
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"1"}'))
@@ -369,7 +364,7 @@ module Tire
             assert ! article.save
           end
 
-          should "set the id property" do
+          should "set the id property itself" do
             article = PersistentArticle.new
             article.title = 'Test'
 
@@ -389,7 +384,6 @@ module Tire
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/456" &&
-                                   doc['id'] == '456' &&
                                    doc['title'] == 'Test'
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"XXX"}'))
@@ -406,7 +400,6 @@ module Tire
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/123" &&
-                                   doc['id'] == '123' &&
                                    doc['title'] == 'Test'
                                  end.returns(mock_response('{"ok":true,"_id":"123"}'))
 

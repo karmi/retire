@@ -153,10 +153,10 @@ module Tire
         #
         def to_indexed_json
           if instance.class.tire.mapping.empty?
-            instance.to_hash.to_json
+            instance.to_hash.reject {|key,_| key.to_s == 'id' || key.to_s == 'type' }.to_json
           else
             instance.to_hash.
-            reject { |key, value| ! instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
+            select { |key, value| instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
             to_json
           end
         end

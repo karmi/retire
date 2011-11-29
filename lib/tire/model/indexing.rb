@@ -48,7 +48,7 @@ module Tire
           @mapping ||= {}
           if block_given?
             @mapping_options = args.pop
-            @store_mapping   = true and yield and @store_mapping = false
+            yield
             create_elasticsearch_index
           else
             @mapping
@@ -97,10 +97,6 @@ module Tire
         rescue Errno::ECONNREFUSED => e
           STDERR.puts "Skipping index creation, cannot connect to ElasticSearch",
                       "(The original exception was: #{e.inspect})"
-        end
-
-        def store_mapping?
-          @store_mapping || false
         end
 
         def mapping_options

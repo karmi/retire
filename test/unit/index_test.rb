@@ -336,8 +336,6 @@ p response
             json =~ /"_type":"active_model_article"/ &&
             json =~ /"_id":"1"/ &&
             json =~ /"_id":"2"/ &&
-            json =~ /"id":"1"/ &&
-            json =~ /"id":"2"/ &&
             json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
           end.returns(mock_response('{}', 200))
