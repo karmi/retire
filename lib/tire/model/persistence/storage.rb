@@ -30,14 +30,12 @@ module Tire
         module InstanceMethods
 
           def update_attribute(name, value)
-            send("#{name}=", value)
+            __update_attributes name => value
             save
           end
 
           def update_attributes(attributes={})
-            attributes.each do |name, value|
-              send("#{name}=", value)
-            end
+            __update_attributes attributes
             save
           end
 

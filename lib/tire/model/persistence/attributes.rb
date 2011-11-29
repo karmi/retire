@@ -75,7 +75,7 @@ module Tire
           attr_accessor :id
 
           def initialize(attributes={})
-            attributes.each { |name, value| send("#{name}=", value) }
+            __update_attributes(attributes)
           end
 
           def attributes
@@ -91,6 +91,10 @@ module Tire
             properties.include?(name.to_s)
           end
           alias :has_property? :has_attribute?
+
+          def __update_attributes(attributes)
+            attributes.each { |name, value| send "#{name}=", value }
+          end
 
         end
 
