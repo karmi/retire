@@ -13,6 +13,7 @@ module Tire
     def teardown
       super
       PersistentArticle.index.delete
+      PersistentArticleWithDefaults.index.delete
     end
 
     context "PersistentModel" do
@@ -27,6 +28,15 @@ module Tire
 
         assert_equal 2, results.size
 
+      end
+
+      should "return default values for properties without value" do
+        PersistentArticleWithDefaults.create :id => 1, :title => 'One'
+        PersistentArticleWithDefaults.index.refresh
+
+        results = PersistentArticleWithDefaults.all
+
+        assert_equal [], results.first.tags
       end
 
       context "with pagination" do

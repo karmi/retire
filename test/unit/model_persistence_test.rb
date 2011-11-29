@@ -185,14 +185,8 @@ module Tire
             assert_nil article.published_on
           end
 
-          should_eventually "return default value for attribute" do
-            article = PersistentArticle.new :title => 'Test'
-            article.class_eval do
-              property :title
-              property :tags, :default => []
-            end
-
-            assert_nothing_raised { article.tags }
+          should "return default value for attribute" do
+            article = PersistentArticleWithDefaults.new :title => 'Test'
             assert_equal [], article.tags
           end
 

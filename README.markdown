@@ -708,23 +708,17 @@ To use the persistence features, just include the `Tire::Persistence` module in 
 ```ruby
     class Article
       include Tire::Model::Persistence
-      include Tire::Model::Search
-      include Tire::Model::Callbacks
 
       validates_presence_of :title, :author
 
-      property :title
-      property :author
-      property :content
-      property :published_on
+      property :title,        :analyzer => 'snowball'
+      property :published_on, :type => 'date'
+      property :tags,         :default => [], :analyzer => 'keyword'
     end
 ```
 
-Of course, not all validations or `ActionPack` helpers will be available to your models,
-but if you can live with that, you've just got a schema-free, highly-scalable storage
-and retrieval engine for your data.
-
-This will result in Article instances being stored in an index called 'test_articles' when used in tests but in the index 'development_articles' when used in the development environment.
+Of course, not all validations or `ActionPack` helpers will be available to your models, but if you can live with that,
+you've just got a schema-free, highly-scalable storage and retrieval engine for your data.
 
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
 for examples of the API and _ActiveModel_ integration usage.
