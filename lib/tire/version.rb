@@ -1,11 +1,11 @@
 module Tire
-  VERSION   = "0.3.11"
+  VERSION   = "0.3.12"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Fixes and improvements for Logger    [#142]
-    * Better handling of search exceptions [#145]
-    * Removed pinning Rake to specific version
+    * Loosened dependency specification for Bundler
+    * Do not store `id` and `type` properties in ES _source document
+    * Refactorings
   END
 end
