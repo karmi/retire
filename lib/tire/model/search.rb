@@ -156,7 +156,7 @@ module Tire
             instance.to_hash.reject {|key,_| key.to_s == 'id' || key.to_s == 'type' }.to_json
           else
             instance.to_hash.
-            select { |key, value| instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
+            reject { |key, value| ! instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
             to_json
           end
         end
