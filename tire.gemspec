@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rest-client", "~> 1.6.0"
   s.add_dependency "multi_json",  "~> 1.0"
   s.add_dependency "activemodel", "~> 3.0"
+  s.add_dependency "hashr",       "~> 0.0.16"
 
   # = Development dependencies
   #
