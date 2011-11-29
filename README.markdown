@@ -728,22 +728,7 @@ Extensions and Additions
 ------------------------
 
 The [_tire-contrib_](http://github.com/karmi/tire-contrib/) project contains additions
-and extensions to the _Tire_ functionality.
-
-
-Todo, Plans & Ideas
--------------------
-
-_Tire_ is already used in production by its authors. Nevertheless, it's not considered finished yet.
-
-There are todos, plans and ideas, some of which are listed below, in the order of importance:
-
-* Proper RDoc annotations for the source code
-* [Statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html) facets
-* [Geo Distance](http://www.elasticsearch.org/guide/reference/api/search/facets/geo-distance-facet.html) facets
-* [Index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html) management
-* [Analyze](http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze.html) API support
-* Embedded webserver to display statistics and to allow easy searches
+and extensions to the core _Tire_ functionality — be sure to check them out.
 
 
 Other Clients
