@@ -49,6 +49,9 @@ module Tire
               property_defaults[name.to_sym] = default_value
             end
 
+            # Save property casting (when relevant):
+            property_types[name.to_sym] = options[:class] if options[:class]
+
             # Store mapping for the property:
             mapping[name] = options
             self
@@ -60,6 +63,10 @@ module Tire
 
           def property_defaults
             @property_defaults ||= {}
+          end
+
+          def property_types
+            @property_types ||= {}
           end
 
           private
@@ -93,7 +100,31 @@ module Tire
           alias :has_property? :has_attribute?
 
           def __update_attributes(attributes)
-            attributes.each { |name, value| send "#{name}=", value }
+            attributes.each { |name, value| send "#{name}=", __cast_value(name, value) }
+          end
+
+          # Casts the values according to the <tt>:class</tt> option set when
+          # defining the property, cast Hashes as Hashr[http://rubygems.org/gems/hashr]
+          # instances and automatically convert UTC formatted strings to Time.
+          #
+          def __cast_value(name, value)
+            case
+
+              when klass = self.class.property_types[name.to_sym]
+                if klass.is_a?(Array) && value.is_a?(Array)
+                  value.map { |v| klass.first.new(v) }
+                else
+                  klass.new(value)
+                end
+
+              when value.is_a?(Hash)
+                Hashr.new(value)
+
+              else
+                # Strings formatted as <http://en.wikipedia.org/wiki/ISO8601> are automatically converted to Time
+                value = Time.parse(value) if value.is_a?(String) && value =~ /^\d{4}[\/\-]\d{2}[\/\-]\d{2}T\d{2}\:\d{2}\:\d{2}Z$/
+                value
+            end
           end
 
         end

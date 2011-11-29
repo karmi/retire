@@ -255,6 +255,37 @@ module Tire
 
         end
 
+        context "with casting" do
+
+          should "cast the value as custom class" do
+            article = PersistentArticleWithCastedItem.new :title => 'Test',
+                                                          :author => { :first_name => 'John', :last_name => 'Smith' }
+            assert_instance_of Author, article.author
+            assert_equal 'John', article.author.first_name
+          end
+
+          should "cast the value as collection of custom classes" do
+            article = PersistentArticleWithCastedCollection.new :title => 'Test',
+                                                                :comments => [{:nick => '4chan', :body => 'WHY U NO?'}]
+            assert_instance_of Array,   article.comments
+            assert_instance_of Comment, article.comments.first
+            assert_equal '4chan',       article.comments.first.nick
+          end
+
+          should "automatically format strings in UTC format as Time" do
+            article = PersistentArticle.new :published_on => '2011-11-01T23:00:00Z'
+            assert_instance_of Time, article.published_on
+            assert_equal 2011, article.published_on.year
+          end
+
+          should "cast anonymous Hashes as Hashr instances" do
+            article = PersistentArticleWithCastedItem.new :stats => { :views => 100, :meta => { :tags => 'A' }  }
+            assert_equal 100, article.stats.views
+            assert_equal 'A', article.stats.meta.tags
+          end
+
+        end
+
         context "when creating" do
 
           should "save the document with generated ID in the database" do

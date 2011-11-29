@@ -10,6 +10,8 @@ require 'shoulda'
 require 'turn' unless ENV["TM_FILEPATH"] || ENV["CI"]
 require 'mocha'
 
+require 'active_support/core_ext/hash/indifferent_access'
+
 require 'tire'
 
 Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }

@@ -671,12 +671,11 @@ Well, things stay mostly the same:
       include Tire::Model::Search
       include Tire::Model::Callbacks
 
-      # Let's use a different index name so stuff doesn't get mixed up
+      # Let's use a different index name so stuff doesn't get mixed up.
       #
       index_name 'mongo-articles'
 
-      # These Mongo guys sure do some funky stuff with their IDs
-      # in +serializable_hash+, let's fix it.
+      # These Mongo guys sure do get funky with their IDs in +serializable_hash+, let's fix it.
       #
       def to_indexed_json
         self.to_json
@@ -696,14 +695,16 @@ _Tire_ implements not only _searchable_ features, but also _persistence_ feature
 
 Well, because you're tired of database migrations and lots of hand-holding with your
 database to store stuff like `{ :name => 'Tire', :tags => [ 'ruby', 'search' ] }`.
-Because what you need is to just dump a JSON-representation of your data into a database and
-load it back when needed.
+Because all you need, really, is to just dump a JSON-representation of your data into a database and load it back again.
 Because you've noticed that _searching_ your data is a much more effective way of retrieval
 then constructing elaborate database query conditions.
-Because you have _lots_ of data and want to use _ElasticSearch's_
-advanced distributed features.
+Because you have _lots_ of data and want to use _ElasticSearch's_ advanced distributed features.
 
-To use the persistence features, just include the `Tire::Persistence` module in your class and define the properties (like with _CouchDB_- or _MongoDB_-based models):
+All good reasons to use _ElasticSearch_ as a schema-free and highly-scalable storage and retrieval/aggregation engine for your data.
+
+To use the persistence mode, we'll include the `Tire::Persistence` module in our class and define its properties;
+we can add the standard mapping declarations, set default values, or define casting for the property to create
+lightweight associations between the models.
 
 ```ruby
     class Article
@@ -714,11 +715,10 @@ To use the persistence features, just include the `Tire::Persistence` module in 
       property :title,        :analyzer => 'snowball'
       property :published_on, :type => 'date'
       property :tags,         :default => [], :analyzer => 'keyword'
+      property :author,       :class => Author
+      property :comments,     :class => [Comment]
     end
 ```
-
-Of course, not all validations or `ActionPack` helpers will be available to your models, but if you can live with that,
-you've just got a schema-free, highly-scalable storage and retrieval engine for your data.
 
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
 for examples of the API and _ActiveModel_ integration usage.
