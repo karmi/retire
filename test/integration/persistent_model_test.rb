@@ -18,6 +18,30 @@ module Tire
 
     context "PersistentModel" do
 
+      should "search with simple query" do
+        PersistentArticle.create :id => 1, :title => 'One'
+        PersistentArticle.index.refresh
+
+        results = PersistentArticle.search 'one'
+        assert_equal 'One', results.first.title
+      end
+
+      should "search with a block" do
+        PersistentArticle.create :id => 1, :title => 'One'
+        PersistentArticle.index.refresh
+
+        results = PersistentArticle.search(:sort => 'title') { query { string 'one' } }
+        assert_equal 'One', results.first.title
+      end
+
+      should "return instances of model" do
+        PersistentArticle.create :id => 1, :title => 'One'
+        PersistentArticle.index.refresh
+
+        results = PersistentArticle.search 'one'
+        assert_instance_of PersistentArticle, results.first
+      end
+
       should "save documents into index and find them by IDs" do
         one = PersistentArticle.create :id => 1, :title => 'One'
         two = PersistentArticle.create :id => 2, :title => 'Two'

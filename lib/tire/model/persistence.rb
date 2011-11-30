@@ -50,6 +50,18 @@ module Tire
             define_method("#{attr}")  { @attributes[attr] }
           end
 
+          def self.search(*args, &block)
+            # Update options Hash with the wrapper definition
+            args.last.update(:wrapper => self) if args.last.is_a? Hash
+            args << { :wrapper => self }       unless args.any? { |a| a.is_a? Hash }
+
+            self.__search_without_persistence(*args, &block)
+          end
+
+          def self.__search_without_persistence(*args, &block)
+            self.tire.search(*args, &block)
+          end
+
         end
 
       end
