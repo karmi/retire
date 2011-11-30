@@ -16,8 +16,11 @@ module Tire
             options = args.pop if args.last.is_a?(Hash)
             args.flatten!
             if args.size > 1
-              Tire::Search::Search.new(index.name).query do |query|
-                query.ids(args, document_type)
+              Tire::Search::Search.new(index.name) do |search|
+                search.query do |query|
+                  query.ids(args, document_type)
+                end
+                search.size args.size
               end.perform.results
             else
               case args = args.pop

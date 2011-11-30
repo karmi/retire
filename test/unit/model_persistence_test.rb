@@ -65,6 +65,7 @@ module Tire
           ] } }
           @find_first = { 'hits' => { 'hits' => [ @first ] } }
           @find_last_two = { 'hits' => { 'hits' => [ @second, @third ] } }
+          @find_twenty_ids = { 'hits' => { 'hits' => 20.times.map { @first }   } }
         end
 
         should "find document by numeric ID" do
@@ -113,6 +114,15 @@ module Tire
           documents = PersistentArticle.find [2, 3]
 
           assert_equal 2, documents.count
+        end
+
+        should "find all documents listed in IDs array" do
+          ids = (1..20).to_a
+          Configuration.client.expects(:get).returns(mock_response(@find_twenty_ids.to_json))
+          Tire::Search::Search.any_instance.expects(:size).with(ids.size)
+
+          documents = PersistentArticle.find ids
+          assert_equal ids.size, documents.count
         end
 
         should "find all documents" do
