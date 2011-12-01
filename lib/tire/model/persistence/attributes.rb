@@ -45,7 +45,7 @@ module Tire
             define_attribute_methods [name.to_sym]
 
             # Save property default value (when relevant):
-            if default_value = options.delete(:default)
+            unless (default_value = options.delete(:default)).nil?
               property_defaults[name.to_sym] = default_value
             end
 

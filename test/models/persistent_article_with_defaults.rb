@@ -4,6 +4,7 @@ class PersistentArticleWithDefaults
 
   property :title
   property :published_on
-  property :tags, :default => []
+  property :tags,   :default => []
+  property :hidden, :default => false
 
 end

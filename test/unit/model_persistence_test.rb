@@ -197,7 +197,8 @@ module Tire
 
           should "return default value for attribute" do
             article = PersistentArticleWithDefaults.new :title => 'Test'
-            assert_equal [], article.tags
+            assert_equal [],    article.tags
+            assert_equal false, article.hidden
           end
 
           should "have query method for attribute" do
