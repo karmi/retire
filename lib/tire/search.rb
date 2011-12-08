@@ -4,16 +4,20 @@ module Tire
   
     class Search
 
-      attr_reader :indices, :url, :results, :response, :json, :query, :facets, :filters, :options
+      attr_reader :indices, :results, :response, :json, :query, :facets, :filters, :options
 
       def initialize(indices=nil, options = {}, &block)
         @indices = Array(indices)
         @types   = Array(options.delete(:type))
         @options = options
 
-        @url     = Configuration.url+['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
+        @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def url
+        Configuration.url + @path
       end
 
       def query(&block)
@@ -66,7 +70,7 @@ module Tire
       end
 
       def perform
-        @response = Configuration.client.get(@url, self.to_json)
+        @response = Configuration.client.get(self.url, self.to_json)
         if @response.failure?
           STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
           raise SearchRequestFailed, @response.to_s
@@ -79,7 +83,7 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{@url}?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{self.url}?pretty=true" -d '#{self.to_json}'|
       end
 
       def to_hash
