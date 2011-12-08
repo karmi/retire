@@ -5,7 +5,7 @@ module Tire
   class SearchTest < Test::Unit::TestCase
 
     context "Search" do
-      setup { Configuration.reset :logger }
+      setup { Configuration.reset }
 
       should "be initialized with single index" do
         s = Search::Search.new('index') { query { string 'foo' } }
@@ -143,6 +143,20 @@ module Tire
         assert_raise Errno::ECONNREFUSED do
           Search::Search.new('index').perform
         end
+      end
+
+      should "allow to set the server url" do
+        search = Search::Search.new('indexA')
+        Configuration.url 'http://es1.example.com'
+
+        Configuration.client.
+          expects(:get).
+            with do |url, payload|
+              url == 'http://es1.example.com/indexA/_search'
+            end.
+          returns(mock_response( '{"took":1,"hits":{"total": 0, "hits" : []}}', 200 ))
+
+        search.perform
       end
 
       context "sort" do
