@@ -154,10 +154,40 @@ you can use _Tire's_ classes directly, in a more imperative manner:
 ## Field types
 
 For a complete list of types, complete and elaborate information upon each one of them, please refer
-[server documentation](http://www.elasticsearch.org/guide/reference/mapping/core-types.html).
+[ElasticSearch guide](http://www.elasticsearch.org/guide/reference/mapping/core-types.html).
 
 ElasticSearch provides following `string`, `date`, `boolean`, numeric (`integer`, `long`, `float` and
-`double`) and `binary`.
+`double`) and `binary`. When string fields are indexed, they are first broken to grams (tokenized) and
+processed through the set of filters. You can control the way your text is processed by using Analyzer,
+which will be explained in more details below.
+
+Depending on a data type, you can pass certain attributes for processing. For example, for `string`
+you can pass :index attribute, and set it to `analyzed` (if you want field to be indexed and searchable),
+`not_analyzed` (if you want it to be searchable, but it won't go through any analysis) or `no` (if
+you don't want that field to be searchable at all).
+
+Let's take a look on the example menioned above once again:
+
+```ruby
+      create :mappings => {
+        :article => {
+          :properties => {
+            :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
+            :title    => { :type => 'string', :boost => 2.0,            :analyzer => 'snowball'  },
+            :tags     => { :type => 'string', :analyzer => 'keyword'                             },
+            :content  => { :type => 'string', :analyzer => 'snowball'                            }
+          }
+        }
+      }
+```
+
+`id` field is important for us to store, since it will help us to map that object back to the one
+in our database, but we don't want that field to be searchable. `title` is a `string` field, and
+we want to boost it's relevancy, and use Showball analyzer over the standard one. Keyword analyzer
+should be used for `tags`. All these things are specified through the attributes.
+
+You can find a complete list of attributes for all data types in
+[core types section of ElasticSearch guide](http://www.elasticsearch.org/guide/reference/mapping/core-types.html).
 
 ## Analyzers
 
