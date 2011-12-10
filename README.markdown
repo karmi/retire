@@ -64,6 +64,12 @@ which allows you to use your preferred JSON library. We'll use the
     require 'yajl/json_gem'
 ```
 
+# Configuring objects (indexing)
+
+In order for ElasticSearch to find your objects, you have to specify which fields you want to store there,
+their type, analyzer and other things, which will improve quality of your search results. In order to
+inform tire about these things, you should use `Tire.index` method, or `mapping` class method on your models.
+
 Let's create an index named `articles` and store/index some documents:
 
 ```ruby
@@ -145,7 +151,52 @@ you can use _Tire's_ classes directly, in a more imperative manner:
     index.refresh
 ```
 
+## Field types
+
+For a complete list of types, complete and elaborate information upon each one of them, please refer
+[server documentation](http://www.elasticsearch.org/guide/reference/mapping/core-types.html).
+
+ElasticSearch provides following `string`, `date`, `boolean`, numeric (`integer`, `long`, `float` and
+`double`) and `binary`.
+
+## Analyzers
+
+For a complete list of Analyzers, complete and elaborate information upon each one of them, please refer
+[server documentation](http://www.elasticsearch.org/guide/reference/index-modules/analysis/index.html)
+
+In general analyzer in Lucene has toketizer, and token filter. Tokenizer splits text into chunks, filters
+process splitted text (for example, trunkate filter trunkates each token to specific length, stemmer extracts
+the word root, lowercase filter makes all characters in string lowercase etc.).
+
+Available analyzers are:
+  - [Standard](http://www.elasticsearch.org/guide/reference/index-modules/analysis/standard-analyzer.html),
+  - [Simple](http://www.elasticsearch.org/guide/reference/index-modules/analysis/simple-analyzer.html)
+  - [Stop](http://www.elasticsearch.org/guide/reference/index-modules/analysis/stop-analyzer.html)
+  - [Keyword](http://www.elasticsearch.org/guide/reference/index-modules/analysis/keyword-analyzer.html)
+  - [Pattern](http://www.elasticsearch.org/guide/reference/index-modules/analysis/pattern-analyzer.html)
+  - [Language](http://www.elasticsearch.org/guide/reference/index-modules/analysis/lang-analyzer.html)
+  - [Snowball](http://www.elasticsearch.org/guide/reference/index-modules/analysis/snowball-analyzer.html)
+
+You can also create a [custom](http://www.elasticsearch.org/guide/reference/index-modules/analysis/custom-analyzer.html)
+analyzer by combining any of he available Tokenizers and Filters.
+
+Even more information on analyzers is available in [Lucene project](http://lucene.apache.org/java/3_4_0/api/all/index.html),
+which powers ElasticSearch, too.
+
+## Boost
+
+Boosting helps you to control relevance of documents. For example, you can specify that matching of a :title
+field is more important than matching :body field in case with articles. Terms of the full-text search
+query can also be boosted, so you can specify which terms are more important, so that they could get a better
+(or worse, in case of the negative boost), ranking.
+
+By default boost factor is 1. It should always be positive, but may be less that 1 (for example 0.5). The
+higher the boost factor is, the more relevant the field / term will be.
+
+
 OK. Now, let's go search all the data.
+
+## Search
 
 We will be searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
 filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
