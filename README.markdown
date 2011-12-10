@@ -64,6 +64,12 @@ which allows you to use your preferred JSON library. We'll use the
     require 'yajl/json_gem'
 ```
 
+# Configuring objects (indexing)
+
+In order for ElasticSearch to find your objects, you have to specify which fields you want to store there,
+their type, analyzer and other things, which will improve quality of your search results. In order to
+inform tire about these things, you should use `Tire.index` method, or `mapping` class method on your models.
+
 Let's create an index named `articles` and store/index some documents:
 
 ```ruby
@@ -145,7 +151,82 @@ you can use _Tire's_ classes directly, in a more imperative manner:
     index.refresh
 ```
 
+## Field types
+
+For a complete list of types, complete and elaborate information upon each one of them, please refer
+[ElasticSearch guide](http://www.elasticsearch.org/guide/reference/mapping/core-types.html).
+
+ElasticSearch provides following `string`, `date`, `boolean`, numeric (`integer`, `long`, `float` and
+`double`) and `binary`. When string fields are indexed, they are first broken to grams (tokenized) and
+processed through the set of filters. You can control the way your text is processed by using Analyzer,
+which will be explained in more details below.
+
+Depending on a data type, you can pass certain attributes for processing. For example, for `string`
+you can pass :index attribute, and set it to `analyzed` (if you want field to be indexed and searchable),
+`not_analyzed` (if you want it to be searchable, but it won't go through any analysis) or `no` (if
+you don't want that field to be searchable at all).
+
+Let's take a look on the example menioned above once again:
+
+```ruby
+      create :mappings => {
+        :article => {
+          :properties => {
+            :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
+            :title    => { :type => 'string', :boost => 2.0,            :analyzer => 'snowball'  },
+            :tags     => { :type => 'string', :analyzer => 'keyword'                             },
+            :content  => { :type => 'string', :analyzer => 'snowball'                            }
+          }
+        }
+      }
+```
+
+`id` field is important for us to store, since it will help us to map that object back to the one
+in our database, but we don't want that field to be searchable. `title` is a `string` field, and
+we want to boost it's relevancy, and use Showball analyzer over the standard one. Keyword analyzer
+should be used for `tags`. All these things are specified through the attributes.
+
+You can find a complete list of attributes for all data types in
+[core types section of ElasticSearch guide](http://www.elasticsearch.org/guide/reference/mapping/core-types.html).
+
+## Analyzers
+
+For a complete list of Analyzers, complete and elaborate information upon each one of them, please refer
+[server documentation](http://www.elasticsearch.org/guide/reference/index-modules/analysis/index.html)
+
+In general analyzer in Lucene has toketizer, and token filter. Tokenizer splits text into chunks, filters
+process splitted text (for example, trunkate filter trunkates each token to specific length, stemmer extracts
+the word root, lowercase filter makes all characters in string lowercase etc.).
+
+Available analyzers are:
+  - [Standard](http://www.elasticsearch.org/guide/reference/index-modules/analysis/standard-analyzer.html),
+  - [Simple](http://www.elasticsearch.org/guide/reference/index-modules/analysis/simple-analyzer.html)
+  - [Stop](http://www.elasticsearch.org/guide/reference/index-modules/analysis/stop-analyzer.html)
+  - [Keyword](http://www.elasticsearch.org/guide/reference/index-modules/analysis/keyword-analyzer.html)
+  - [Pattern](http://www.elasticsearch.org/guide/reference/index-modules/analysis/pattern-analyzer.html)
+  - [Language](http://www.elasticsearch.org/guide/reference/index-modules/analysis/lang-analyzer.html)
+  - [Snowball](http://www.elasticsearch.org/guide/reference/index-modules/analysis/snowball-analyzer.html)
+
+You can also create a [custom](http://www.elasticsearch.org/guide/reference/index-modules/analysis/custom-analyzer.html)
+analyzer by combining any of he available Tokenizers and Filters.
+
+Even more information on analyzers is available in [Lucene project](http://lucene.apache.org/java/3_4_0/api/all/index.html),
+which powers ElasticSearch, too.
+
+## Boost
+
+Boosting helps you to control relevance of documents. For example, you can specify that matching of a :title
+field is more important than matching :body field in case with articles. Terms of the full-text search
+query can also be boosted, so you can specify which terms are more important, so that they could get a better
+(or worse, in case of the negative boost), ranking.
+
+By default boost factor is 1. It should always be positive, but may be less that 1 (for example 0.5). The
+higher the boost factor is, the more relevant the field / term will be.
+
+
 OK. Now, let's go search all the data.
+
+## Search
 
 We will be searching for articles whose `title` begins with letter “T”, sorted by `title` in `descending` order,
 filtering them for ones tagged “ruby”, and also retrieving some [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/)
