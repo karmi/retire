@@ -8,6 +8,8 @@ module Tire
 
       class Curb
         @client = ::Curl::Easy.new
+        @client.resolve_mode = :ipv4
+
         # @client.verbose = true
 
         def self.get(url, data=nil)
