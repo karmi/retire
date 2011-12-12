@@ -12,11 +12,16 @@ module Tire
 
         def self.get(url, data=nil)
           @client.url = url
-          @client.post_body = data
+
           # FIXME: Curb cannot post bodies with GET requests?
           #        Roy Fielding seems to approve:
           #        <http://tech.groups.yahoo.com/group/rest-discuss/message/9962>
-          @client.http_post
+          if data
+            @client.post_body = data
+            @client.http_post
+          else
+            @client.http_get
+          end
           Response.new @client.body_str, @client.response_code
         end
 
