@@ -12,6 +12,12 @@ module Tire
         assert_equal 1, search(q).results.count
         assert_equal 'One', search(q).results.first[:title]
       end
+      
+      should "find article by free text" do
+        q = 'one' 
+        assert_equal 1, text('title', q).results.count
+        assert_equal 'One', text('title', q).results.first[:title]
+      end
 
       should "find articles by title with boosting" do
         q = 'title:one^100 OR title:two'
@@ -45,6 +51,10 @@ module Tire
 
     def search(q)
       Tire.search('articles-test') { query { string q } }
+    end
+    
+    def text(field, q)
+      Tire.search('articles-test') { query { text(field, q) } }
     end
 
   end
