@@ -22,7 +22,24 @@ module Tire
 
         should "not rescue generic exceptions" do
           Client::RestClient.expects(:get).raises(RuntimeError, "Something bad happened in YOUR code")
+
           assert_raise(RuntimeError) do
+            Client::RestClient.get 'http://example.com'
+          end
+        end
+
+        should "not rescue ServerBrokeConnection errors" do
+          Client::RestClient.expects(:get).raises(RestClient::ServerBrokeConnection)
+
+          assert_raise(RestClient::ServerBrokeConnection) do
+            Client::RestClient.get 'http://example.com'
+          end
+        end
+
+        should "not rescue RequestTimeout errors" do
+          Client::RestClient.expects(:get).raises(RestClient::RequestTimeout)
+
+          assert_raise(RestClient::RequestTimeout) do
             Client::RestClient.get 'http://example.com'
           end
         end
