@@ -32,6 +32,26 @@ module Tire
         assert_equal 'http://slash.com:9200', Configuration.url
       end
 
+      should "allow setting more URLS" do
+        assert_nothing_raised { Configuration.urls ['http://example1.com', 'http://example2.com'] }
+        assert_equal ['http://example1.com', 'http://example2.com'], Configuration.urls
+      end
+
+      should "strip trailing slash from all the URLS" do
+        assert_nothing_raised { Configuration.urls ['http://slash1.com:9200/', 'http://slash2.com:9200/'] }
+        assert_equal ['http://slash1.com:9200', 'http://slash2.com:9200'], Configuration.urls
+      end
+
+      should "retrieve a random URL from the ones available" do
+        assert_nothing_raised { Configuration.urls ['http://example1.com', 'http://example2.com'] }
+        url = Configuration.url
+        begin
+          assert_equal 'http://example1.com', url
+        rescue
+          assert_equal 'http://example2.com', url
+        end
+      end
+
       should "return default client" do
         assert_equal HTTP::Client::RestClient, Configuration.client
       end
@@ -49,7 +69,7 @@ module Tire
       should "allow to reset the configuration for specific property" do
         Configuration.url 'http://example.com'
         assert_equal      'http://example.com', Configuration.url
-        Configuration.reset :url
+        Configuration.reset :urls
         assert_equal      'http://localhost:9200', Configuration.url
       end
 
