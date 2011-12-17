@@ -22,6 +22,11 @@ module Tire
         assert_equal 'http://localhost:9200', Configuration.url
       end
 
+      should "return default URL when URLS are empty" do
+        assert_nothing_raised { Configuration.url [] }
+        assert_equal 'http://localhost:9200', Configuration.url
+      end
+
       should "allow setting and retrieving the URL" do
         assert_nothing_raised { Configuration.url 'http://example.com' }
         assert_equal 'http://example.com', Configuration.url
@@ -38,7 +43,7 @@ module Tire
       end
 
       should "strip trailing slash from all the URLS" do
-        assert_nothing_raised { Configuration.url 'http://slash1.com:9200/', 'http://slash2.com:9200/' }
+        assert_nothing_raised { Configuration.url ['http://slash1.com:9200/', 'http://slash2.com:9200/'] }
         assert_equal ['http://slash1.com:9200', 'http://slash2.com:9200'], Configuration.urls
       end
 

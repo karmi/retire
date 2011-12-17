@@ -7,6 +7,7 @@ module Tire
     end
 
     def self.url(*values)
+      values.flatten!
       @urls = values.map{|value| value.to_s.gsub(%r|/*$|, '')} if values.any?
       urls.respond_to?(:sample) ? urls.sample : urls.choice
     end
