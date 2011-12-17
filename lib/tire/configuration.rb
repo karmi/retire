@@ -2,13 +2,13 @@ module Tire
 
   class Configuration
 
-    def self.urls(values=nil)
-      @urls = (values && values.any? ? values.map{|value| value.to_s.gsub(%r|/*$|, '')} : nil) || @urls || ["http://localhost:9200"]
+    def self.urls
+      @urls || ["http://localhost:9200"]
     end
 
-    def self.url(value=nil)
-      urls([value])
-      @urls.respond_to?(:sample) ? @urls.sample : @urls.choice
+    def self.url(*values)
+      @urls = values.map{|value| value.to_s.gsub(%r|/*$|, '')} if values.any?
+      urls.respond_to?(:sample) ? urls.sample : urls.choice
     end
 
     def self.client(klass=nil)
