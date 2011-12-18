@@ -42,6 +42,15 @@ module Tire::Search
           assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false} } }.to_json, f.to_json )
         end
 
+        should "encode facets when passed as a block, using variables from outer scope" do
+          def foo; 'bar'; end
+
+          f = Facet.new('foo') do |facet|
+            facet.terms foo, :size => 20
+          end
+          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>20,:all_terms=>false} } }.to_json, f.to_json )
+        end
+
       end
 
       context "terms facet" do

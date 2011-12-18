@@ -11,7 +11,7 @@ module Tire
       def initialize(name, options={}, &block)
         @name    = name
         @options = options
-        self.instance_eval(&block) if block_given?
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
       def terms(field, options={})
