@@ -155,9 +155,20 @@ module Tire
           if instance.class.tire.mapping.empty?
             instance.to_hash.reject {|key,_| key.to_s == 'id' || key.to_s == 'type' }.to_json
           else
-            instance.to_hash.
-            reject { |key, value| ! instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
-            to_json
+            mapping = instance.class.tire.mapping
+            hash = instance.to_hash.reject { |key, value| !mapping.keys.map(&:to_s).include?(key.to_s) }
+            
+            mapping.each do |key, options|
+              case options[:as]
+              when String
+                hash[key.to_s] = instance.instance_eval(options[:as])
+              when Proc
+                hash[key.to_s] = instance.instance_eval(&options[:as])
+              else
+              end
+            end
+            
+            hash.to_json
           end
         end
 

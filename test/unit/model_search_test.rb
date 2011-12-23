@@ -592,6 +592,36 @@ module Tire
             assert_equal( {:one => 1}.to_json, model.to_indexed_json )
 
           end
+          
+          should "serialize mapped properties when mapping procs are set" do
+            class ::ModelWithMappingProcs
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+              include ActiveModel::Serialization
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              mapping do
+                indexes :one,   :type => 'string', :analyzer => 'keyword'
+                indexes :two,   :type => 'string', :analyzer => 'keyword', :as => proc { one * 2 }
+                indexes :three, :type => 'string', :analyzer => 'keyword', :as => 'one * 3'
+              end
+
+              attr_reader :attributes
+
+              def initialize(attributes = {}); @attributes = attributes; end
+
+              def method_missing(name, *args, &block)
+                attributes[name.to_sym] || attributes[name.to_s] || super
+              end
+            end
+
+            model = ::ModelWithMappingProcs.new :one => 1, :two => 1, :three => 1
+            assert_equal( {:one => 1, :three => 1, :two => 1}, model.serializable_hash )
+
+            assert_equal( {:one => 1, :three => 3, :two => 2}.to_json, model.to_indexed_json )
+            
+          end
 
         end
 
