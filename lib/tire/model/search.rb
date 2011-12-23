@@ -94,7 +94,7 @@ module Tire
             s.fields Array(options[:fields]) if options[:fields]
           end
 
-          s.perform.results
+          s.results
         end
 
         # Returns a Tire::Index instance for this model.
