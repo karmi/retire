@@ -39,23 +39,32 @@ module Tire
             end
           else
             return [] if hits.empty?
-
-            type  = @response['hits']['hits'].first['_type']
-            raise NoMethodError, "You have tried to eager load the model instances, " +
-                                 "but Tire cannot find the model class because " +
-                                 "document has no _type property." unless type
-
-            begin
-              klass = type.camelize.constantize
-            rescue NameError => e
-              raise NameError, "You have tried to eager load the model instances, but " +
-                               "Tire cannot find the model class '#{type.camelize}' " +
-                               "based on _type '#{type}'.", e.backtrace
+            records   = []
+            last_type = nil
+            ids       = []
+            # sort by type and push a false item the we use as a stop marker
+            hits.sort_by{|h| h['_type']}.push(false).each do |h|
+              raise NoMethodError, "You have tried to eager load the model instances, " +
+                                   "but Tire cannot find the model class because " +
+                                   "document has no _type property." unless h['_type']
+              # retrieve the chunk
+              if  h === false || !last_type.nil? && last_type != h['_type']
+                begin
+                  klass = last_type.camelize.constantize
+                rescue NameError => e
+                  raise NameError, "You have tried to eager load the model instances, but " +
+                                   "Tire cannot find the model class '#{h['_type'].camelize}' " +
+                                   "based on _type '#{h['_type']}'.", e.backtrace
+                end
+                records |= @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+                ids = []
+              end
+              break if h === false
+              ids << h['_id']
+              last_type = h['_type']
             end
 
-            ids   = @response['hits']['hits'].map { |h| h['_id'] }
-            records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
-
+            ids = hits.map { |h| h['_id'] }
             # Reorder records to preserve order from search results
             ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
           end
