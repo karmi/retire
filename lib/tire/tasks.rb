@@ -67,6 +67,19 @@ namespace :tire do
 
     STDOUT.puts '-'*tty_cols
     elapsed = Benchmark.realtime do
+
+      # Add Kaminari-powered "paginate" method
+      #
+      if defined?(Kaminari) && klass.respond_to?(:page)
+        klass.instance_eval do
+          def paginate(options = {})
+            page(options[:page]).per(options[:per_page]).to_a
+          end
+        end
+      end unless klass.respond_to?(:paginate)
+
+      # Import the documents
+      #
       index.import(klass, 'paginate', params) do |documents|
 
         if total
