@@ -252,6 +252,13 @@ p response
           assert_equal 'Test', article.title
         end
 
+        should "return nil for missing document" do
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+                                             returns(mock_response('{"_id":"id-1","exists":false}'))
+          article = @index.retrieve :article, 'id-1'
+          assert_equal nil, article
+        end
+
         should "raise error when no ID passed" do
           assert_raise ArgumentError do
             @index.retrieve 'article', nil
