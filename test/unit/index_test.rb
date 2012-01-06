@@ -70,7 +70,6 @@ module Tire
                                returns(mock_response(@mock_analyze_response))
 
           response = @index.analyze("foo bar")
-p response
           assert_equal 1, response['tokens'].size
         end
 
@@ -250,6 +249,13 @@ p response
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Article, article
           assert_equal 'Test', article.title
+        end
+
+        should "return nil for missing document" do
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+                                             returns(mock_response('{"_id":"id-1","exists":false}'))
+          article = @index.retrieve :article, 'id-1'
+          assert_equal nil, article
         end
 
         should "raise error when no ID passed" do

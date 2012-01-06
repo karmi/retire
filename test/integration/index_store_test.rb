@@ -57,14 +57,36 @@ module Tire
       end
 
       should "remove document from the index" do
-
         assert_equal 2, Tire.search('articles-test-remove') { query { string '*' } }.results.count
 
         assert_nothing_raised do
           assert Tire.index('articles-test-remove').remove 1
           assert ! Tire.index('articles-test-remove').remove(1)
         end
+      end
 
+    end
+
+    context "Retrieving documents from the index" do
+
+      teardown { Tire.index('articles-test-retrieve').delete }
+
+      setup do
+        Tire.index 'articles-test-retrieve' do
+          delete
+          create
+          store :id => 1, :title => 'One'
+          store :id => 2, :title => 'Two'
+          refresh
+        end
+      end
+
+      should "retrieve document from the index" do
+        assert_instance_of Tire::Results::Item, Tire.index('articles-test-retrieve').retrieve(:document, 1)
+      end
+
+      should "return nil when retrieving missing document" do
+        assert_nil Tire.index('articles-test-retrieve').retrieve :document, 4
       end
 
     end
