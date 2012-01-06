@@ -177,7 +177,7 @@ module Tire
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/open"|
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_open"|
       logged('_open', curl)
     end
 
