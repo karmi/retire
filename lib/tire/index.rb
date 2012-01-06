@@ -152,10 +152,9 @@ module Tire
       h = MultiJson.decode(@response.body)
       if Configuration.wrapper == Hash then h
       else
-        document = {}
-        document = h['_source'] ? document.update( h['_source'] ) : document.update( h['fields'] )
+        document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
-        Configuration.wrapper.new(document)
+        h['exists'] != false ? Configuration.wrapper.new(document) : nil
       end
 
     ensure
