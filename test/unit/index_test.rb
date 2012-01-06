@@ -132,6 +132,16 @@ p response
           assert_equal 2.0,      @index.mapping['article']['properties']['title']['boost']
         end
 
+        should "update the mapping" do
+          Configuration.client.expects(:put).twice.returns(mock_response('{"ok":true,"acknowledged":true}'))
+
+          mapping = {
+            :article => { :properties => { :title => { :type => 'string', :boost => 2.0 } } },
+            :user => { :properties => { :name => { :type => 'string' } } },
+          }
+          assert @index.update_mapping mapping
+        end
+
       end
 
       context "when storing" do
