@@ -38,8 +38,9 @@ module Tire
         #     class Article
         #       # ...
         #       mapping :_source => { :compress => true } do
-        #         indexes :id,    :type => 'string',  :index    => :not_analyzed
-        #         indexes :title, :type => 'string',  :analyzer => 'snowball',   :boost => 100
+        #         indexes :id,    :index    => :not_analyzed
+        #         indexes :title, :analyzer => 'snowball', :boost => 100
+        #         indexes :words, :as       => 'content.split(/\W/).length'
         #         # ...
         #       end
         #     end
@@ -65,6 +66,10 @@ module Tire
         # * Index property but do not analyze it: `indexes :id, :index    => :not_analyzed`
         #
         # * Use different analyzer for indexing a property: `indexes :title, :analyzer => 'snowball'`
+        #
+        # * Use the `:as` option to dynamically define the serialized property value, eg:
+        #
+        #       :as => 'content.split(/\W/).length'
         #
         # Please refer to the
         # [_mapping_ documentation](http://www.elasticsearch.org/guide/reference/mapping/index.html)

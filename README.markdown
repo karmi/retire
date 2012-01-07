@@ -413,17 +413,25 @@ For serious usage, though, you'll definitely want to define a custom _mapping_ f
       include Tire::Model::Callbacks
 
       mapping do
-        indexes :id,           :type => 'string',  :index    => :not_analyzed
-        indexes :title,        :type => 'string',  :analyzer => 'snowball', :boost => 100
-        indexes :content,      :type => 'string',  :analyzer => 'snowball'
-        indexes :author,       :type => 'string',  :analyzer => 'keyword'
-        indexes :published_on, :type => 'date',    :include_in_all => false
+        indexes :id,           :index    => :not_analyzed
+        indexes :title,        :analyzer => 'snowball', :boost => 100
+        indexes :content,      :analyzer => 'snowball'
+        indexes :content_size, :as       => 'content.size'
+        indexes :author,       :analyzer => 'keyword'
+        indexes :published_on, :type => 'date', :include_in_all => false
       end
     end
 ```
 
 In this case, _only_ the defined model attributes are indexed. The `mapping` declaration creates the
 index when the class is loaded or when the importing features are used, and _only_ when it does not yet exist.
+
+You can define different [_analyzers_](http://www.elasticsearch.org/guide/reference/index-modules/analysis/index.html),
+[_boost_](http://www.elasticsearch.org/guide/reference/mapping/boost-field.html) levels for different properties,
+or any other configuration for _elasticsearch_.
+
+You're not limited to 1:1 mapping between your model properties and the serialized document. With the `:as` option,
+you can pass a string or a _Proc_ object which is evaluated in the instance context (see the `content_size` property).
 
 Chances are, you want to declare also a custom _settings_ for the index, such as set the number of shards,
 replicas, or create elaborate analyzer chains, such as the hipster's choice: [_ngrams_](https://gist.github.com/1160430).
