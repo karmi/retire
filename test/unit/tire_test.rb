@@ -53,6 +53,41 @@ module Tire
           end
         end
 
+        context "#search is lazy loaded and" do
+          def a_query
+            Tire.search 'dummy' do
+              query do
+                string "dummy"
+              end
+            end
+          end
+
+          should "not be called immediately" do
+            s = a_query
+            s.expects(:perform).never
+          end
+
+          should "be called by #perform" do
+            s = a_query
+            s.expects(:perform).once
+            s.perform
+          end
+
+          should "be called by #results" do
+            s = a_query
+            s.expects(:perform).once
+            s.results
+          end
+
+          should "allow search criteria to be chained" do
+            s = a_query
+            s.expects(:perform).once
+            s.filter :term, other_field: 'another dummy'
+            s.results
+          end
+
+        end
+
       end
 
     end
