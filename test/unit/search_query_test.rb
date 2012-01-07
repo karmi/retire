@@ -94,6 +94,17 @@ module Tire::Search
                       Query.new.ids([1, 2], 'foo') )
       end
 
+      should "search for similar documents" do
+        assert_equal({ :more_like_this =>  { :like_text => 'similar text' } }, Query.new.mlt('similar text'))
+#        fields like_text percent_terms_to_match min_term_freq
+#        max_query_terms stop_words  min_doc_freq max_doc_freq min_word_len
+#        max_word_len boost_terms boost 	 analyzer
+      end
+
+      should "allow to pass a list of fields to a mlt query" do
+        assert_equal( { :more_like_this =>  { :like_text => 'similar text', :fields => ['foo', 'bar.baz'] } },
+                      Query.new.mlt('similar text', :fields => ['foo', 'bar.baz']))
+      end
     end
 
     context "BooleanQuery" do
@@ -211,3 +222,4 @@ module Tire::Search
   end
 
 end
+

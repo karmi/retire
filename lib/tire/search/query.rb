@@ -64,6 +64,12 @@ module Tire
         @value = { :ids => { :values => values, :type => type }  }
       end
 
+      def mlt(like_text, options = {})
+        @value = { :more_like_this => { :like_text => like_text }}
+        @value[:more_like_this].update(options)
+        @value
+      end
+
       def to_hash
         @value
       end
@@ -144,3 +150,4 @@ module Tire
 
   end
 end
+
