@@ -5,7 +5,7 @@ module Tire
   class ActiveModelSearchableIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
-    class ActiveModelArticleWithCustomAsSerialization < ActiveModelArticleWithCallbacks
+    class ::ActiveModelArticleWithCustomAsSerialization < ActiveModelArticleWithCallbacks
       mapping do
         indexes :title
         indexes :content
