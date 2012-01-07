@@ -282,6 +282,15 @@ Note, that you can pass options for configuring queries, facets, etc. by passing
     end
 ```
 
+You don't have to define the search criteria in one monolithic _Ruby_ block -- you can build the search step by step,
+until you call the `results` method:
+
+```ruby
+    s = Tire.search('articles') { query { string 'title:T*' } }
+    s.filter :terms, :tags => ['ruby']
+    p s.results
+```
+
 If configuring the search payload with blocks feels somehow too weak for you, you can pass
 a plain old Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
@@ -293,7 +302,7 @@ If this sounds like a great idea to you, you are probably able to write your app
 using just `curl`, `sed` and `awk`.
 
 Do note again, however, that you're not tied to the declarative block-style DSL _Tire_ offers to you.
-If it makes more sense in your context, you can use its classes directly, in a more imperative style:
+If it makes more sense in your context, you can use the API directly, in a more imperative style:
 
 ```ruby
     search = Tire::Search::Search.new('articles')
@@ -302,7 +311,7 @@ If it makes more sense in your context, you can use its classes directly, in a m
     search.sort   { by :title, 'desc' }
     search.facet('global-tags') { terms :tags, :global => true }
     # ...
-    p search.perform.results
+    p search.results
 ```
 
 To debug the query we have laboriously set up like this,
