@@ -67,6 +67,14 @@ namespace :tire do
 
     STDOUT.puts '-'*tty_cols
     elapsed = Benchmark.realtime do
+      if (!klass.respond_to?(:paginate) && klass.respond_to?(:page))
+        klass.instance_eval do
+          def paginate(options = {})
+            page(options[:page]).per(options[:per_page])
+          end
+        end
+      end
+      
       index.import(klass, 'paginate', params) do |documents|
 
         if total
