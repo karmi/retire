@@ -275,7 +275,7 @@ module Tire
           document.type
         end
       $VERBOSE = old_verbose
-      type || :document
+      type ? CGI.escape(type.to_s) : :document
     end
 
     def get_id_from_document(document)

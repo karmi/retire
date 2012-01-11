@@ -2,6 +2,7 @@ require 'rest_client'
 require 'multi_json'
 require 'active_model'
 require 'hashr'
+require 'cgi'
 
 require 'tire/rubyext/hash'
 require 'tire/rubyext/symbol'
