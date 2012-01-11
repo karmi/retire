@@ -181,6 +181,15 @@ module Tire
           @index.store article
         end
 
+        should "escape the namespaced type" do
+          article = MyNamespace::ModelInNamespace.new(:title => 'Test', :body => 'Lorem')
+
+          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/my_namespace%2Fmodel_in_namespace/",
+                                                   article.to_indexed_json).
+            returns(mock_response('{"ok":true,"_id":"123"}'))
+          @index.store article
+        end
+
         should "set default type" do
           Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :title => 'Test'
@@ -286,6 +295,13 @@ module Tire
                                                 returns(mock_response('{"ok":true,"_id":"1"}')).twice
           @index.remove :id => 1, :type => 'article', :title => 'Test'
           @index.remove :id => 1, :type => 'article', :title => 'Test'
+        end
+
+        should "get namespaced type from document" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/articles%2Farticle/1").
+                                                returns(mock_response('{"ok":true,"_id":"1"}')).twice
+          @index.remove :id => 1, :type => 'articles/article', :title => 'Test'
+          @index.remove :id => 1, :type => 'articles/article', :title => 'Test'
         end
 
         should "set default type" do

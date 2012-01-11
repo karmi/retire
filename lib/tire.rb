@@ -2,6 +2,7 @@ require 'rest_client'
 require 'multi_json'
 require 'active_model'
 require 'hashr'
+require 'cgi'
 
 require 'active_support/core_ext/object/to_param'
 require 'active_support/core_ext/object/to_query'

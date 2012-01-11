@@ -63,6 +63,15 @@ module Tire
         assert_equal '', s.params
       end
 
+      should "allow namespaced document types" do
+        types = ['article', 'articles/article']
+        s = Search::Search.new('index', :type => types) do
+          query { string 'foo' }
+        end
+
+        assert_match %r|index/article,articles%2Farticle/_search|, s.url
+      end
+
       should "allow to pass block to query" do
         Search::Query.any_instance.expects(:instance_eval)
 
