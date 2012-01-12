@@ -35,6 +35,14 @@ module Tire
         assert_match %r|index/bar/_search|, s.url
       end
 
+      should "allow to search with a different search type" do
+        s = Search::Search.new do
+          search_type "query_and_fetch"
+        end
+
+        assert_match %r|localhost:9200/_search\?search_type=query_and_fetch|, s.url
+      end
+
       should "allow to pass block to query" do
         Search::Query.any_instance.expects(:instance_eval)
 
@@ -68,6 +76,16 @@ module Tire
           query { string 'title:foo' }
         end
         assert_equal %q|curl -X GET "http://localhost:9200/index/_search?pretty=true" -d | +
+                     %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
+                     s.to_curl
+      end
+
+      should "return curl snippet with a search_type for debugging" do
+        s = Search::Search.new('index') do
+          search_type "scan"
+          query { string 'title:foo' }
+        end
+        assert_equal %q|curl -X GET "http://localhost:9200/index/_search?search_type=scan&pretty=true" -d | +
                      %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
                      s.to_curl
       end
