@@ -30,7 +30,7 @@ module Tire
         def index_name name=nil, &block
           @index_name = name if name
           @index_name = block if block_given?
-          @index_name || [index_prefix, klass.model_name.plural].compact.join('_')
+          @index_name || [index_prefix, klass.model_name.tableize.gsub('/', '__')].compact.join('_')
         end
 
         # Set or get index prefix for all models or for a specific model.
@@ -74,7 +74,7 @@ module Tire
         #
         def document_type name=nil
           @document_type = name if name
-          @document_type || klass.model_name.singular
+          @document_type || klass.model_name.underscore.gsub('/', '__')
         end
       end
 

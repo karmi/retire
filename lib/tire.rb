@@ -5,6 +5,7 @@ require 'hashr'
 
 require 'tire/rubyext/hash'
 require 'tire/rubyext/symbol'
+require 'tire/rubyext/string'
 require 'tire/logger'
 require 'tire/configuration'
 require 'tire/http/response'
