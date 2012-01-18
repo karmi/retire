@@ -35,5 +35,15 @@ module Tire
       Search::Scan.new(names, options, &block)
     end
 
+    def aliases
+      @response = Configuration.client.get "#{Configuration.url}/_aliases"
+      MultiJson.decode(@response.body).inject({}) do |acc, (index, value)|
+        next acc if value['aliases'].empty?
+
+        acc[index] = value['aliases'].keys
+        acc
+      end
+    end
+
   end
 end

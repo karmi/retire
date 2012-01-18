@@ -65,6 +65,7 @@ module Tire
         end
 
         context "when scanning an index" do
+
           should "initiate the scan" do
             Search::Scan.expects(:new).with { |index,options| index == 'dummy' }
 
@@ -85,7 +86,17 @@ module Tire
 
             Tire.scan 'dummy', payload
           end
+        end
 
+      end
+
+      context "aliases" do
+
+        should "list all aliases" do
+          json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
+          Configuration.client.expects(:get).returns(mock_response(json))
+
+          assert_equal({'dummy' => ['foo']}, Tire.aliases)
         end
 
       end
