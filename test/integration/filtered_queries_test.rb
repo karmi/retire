@@ -40,6 +40,35 @@ module Tire
         assert_equal 'Two', s.results.first.title
       end
 
+      context "boolean filter queries" do
+
+        context "must" do
+
+          should "apply both filters" do
+
+            s = Tire.search('articles-test') do
+              query do
+                filtered do
+                  query { all }
+                  boolean do
+                    must do
+                      filter :terms, { :tags => ['ruby'] }
+                      filter :terms, { :tags => ['python'] }
+                    end
+                  end
+                end
+              end
+            end
+
+            # assert_equal({}, s.to_hash)
+            assert_equal 1, s.results.count
+
+          end
+
+        end
+
+      end
+
     end
 
   end
