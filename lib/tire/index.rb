@@ -103,9 +103,9 @@ module Tire
       count = 0
 
       begin
-        response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
-        raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
-        response
+        @response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
+        raise RuntimeError, "#{@response.code} > #{@response.body}" if @response && @response.failure?
+        @response
       rescue StandardError => error
         if count < tries
           count += 1
@@ -281,7 +281,7 @@ module Tire
 
         Configuration.logger.log_request endpoint, @name, curl
 
-        code = @response ? @response.code : error.class rescue 200
+        code = @response ? @response.code : error.class rescue 'N/A'
 
         if Configuration.logger.level.to_s == 'debug'
           body = if @response
