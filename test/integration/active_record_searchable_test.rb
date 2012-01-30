@@ -368,9 +368,9 @@ module Tire
             query do
               string 'Descendant'
             end
-          end.results.results
+          end.results
 
-          assert_length_of res.results, 2
+          assert_equal 2, res.length
           assert_instance_of FirstStiDescendant, res[0]
           assert_instance_of SecondStiDescendant, res[1]
         end
