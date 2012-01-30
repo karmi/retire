@@ -78,3 +78,16 @@ class ActiveRecordClassWithDynamicIndexName < ActiveRecord::Base
     "dynamic" + '_' + "index"
   end
 end
+
+class StiAncestor < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+end
+
+class FirstStiDescendant < StiAncestor
+  index_name 'sti_ancestors'
+end
+
+class SecondStiDescendant < StiAncestor
+  index_name 'sti_ancestors'
+end
