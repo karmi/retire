@@ -353,10 +353,12 @@ module Tire
 
         end
 
-        should "try again when an exception occurs" do
+        should "try again and then raise when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
 
-          assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+          assert_raise(RuntimeError) do
+            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+          end
         end
 
         should "display error message when collection item does not have ID" do

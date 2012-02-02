@@ -92,6 +92,7 @@ module Tire
           retry
         else
           STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"
+          raise
         end
 
       ensure
