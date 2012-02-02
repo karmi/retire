@@ -64,7 +64,7 @@ module Tire
       logged([type, id].join('/'), curl)
     end
 
-    def bulk_store documents
+    def bulk_store(documents, options={})
       payload = documents.map do |document|
         id   = get_id_from_document(document)
         type = get_type_from_document(document)
@@ -92,7 +92,7 @@ module Tire
           retry
         else
           STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"
-          raise
+          raise if options[:raise]
         end
 
       ensure
@@ -110,13 +110,13 @@ module Tire
 
             documents = yield documents if block_given?
 
-            bulk_store documents
+            bulk_store documents, options.slice(:raise)
             options[:page] += 1
           end
 
         when klass_or_collection.respond_to?(:map)
           documents = block_given? ? yield(klass_or_collection) : klass_or_collection
-          bulk_store documents
+          bulk_store documents, options.slice(:raise)
 
         else
           raise ArgumentError, "Please pass either a collection of objects, " +

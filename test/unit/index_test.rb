@@ -353,11 +353,17 @@ module Tire
 
         end
 
-        should "try again and then raise when an exception occurs" do
+        should "try again when an exception occurs" do
+          Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
+
+          assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+        end
+
+        should "try again and the raise when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
 
           assert_raise(RuntimeError) do
-            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], {:raise => true})
           end
         end
 
@@ -405,32 +411,45 @@ module Tire
 
           should "just store it in bulk" do
             collection = [{ :id => 1, :title => 'Article' }]
-            @index.expects(:bulk_store).with( collection ).returns(true)
+            @index.expects(:bulk_store).with( collection, options={} ).returns(true)
 
             @index.import collection
           end
+
+        should "pass the :raise option only to bulk_store" do
+          collection = [{ :id => 1, :title => 'Article' }]
+          @index.expects(:bulk_store).with( collection, options={:raise => true} ).returns(true)
+
+          @index.import collection, method=nil, options={:raise => true, :lol => 'cats'}
+        end
 
         end
 
         context "class" do
 
           should "call the passed method and bulk store the results" do
-            @index.expects(:bulk_store).with([1, 2, 3, 4]).returns(true)
+            @index.expects(:bulk_store).with([1, 2, 3, 4], options={}).returns(true)
 
             @index.import ImportData, :paginate
           end
 
           should "pass the params to the passed method and bulk store the results" do
-            @index.expects(:bulk_store).with([1, 2]).returns(true)
-            @index.expects(:bulk_store).with([3, 4]).returns(true)
+            @index.expects(:bulk_store).with([1, 2], options={}).returns(true)
+            @index.expects(:bulk_store).with([3, 4], options={}).returns(true)
 
             @index.import ImportData, :paginate, :page => 1, :per_page => 2
           end
 
           should "pass the class when method not passed" do
-            @index.expects(:bulk_store).with(ImportData).returns(true)
+            @index.expects(:bulk_store).with(ImportData, options={}).returns(true)
 
             @index.import ImportData
+          end
+
+          should "pass the :raise option only to bulk_store" do
+            @index.expects(:bulk_store).with(ImportData, options={:raise => true}).returns(true)
+
+            @index.import ImportData, method=nil, options={:raise => true, :lol => 'cats'}
           end
 
         end
@@ -440,7 +459,7 @@ module Tire
           context "and plain collection" do
 
             should "allow to manipulate the collection in the block" do
-              Tire::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }])
+              Tire::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }], options={})
 
 
               @index.import [{ :id => 1, :title => 'Article' }] do |articles|
@@ -453,8 +472,8 @@ module Tire
           context "and object" do
 
             should "call the passed block on every batch" do
-              Tire::Index.any_instance.expects(:bulk_store).with([1, 2])
-              Tire::Index.any_instance.expects(:bulk_store).with([3, 4])
+              Tire::Index.any_instance.expects(:bulk_store).with([1, 2], options={})
+              Tire::Index.any_instance.expects(:bulk_store).with([3, 4], options={})
 
               runs = 0
               @index.import ImportData, :paginate, :per_page => 2 do |documents|
@@ -467,8 +486,8 @@ module Tire
             end
 
             should "allow to manipulate the documents in passed block" do
-              Tire::Index.any_instance.expects(:bulk_store).with([2, 3])
-              Tire::Index.any_instance.expects(:bulk_store).with([4, 5])
+              Tire::Index.any_instance.expects(:bulk_store).with([2, 3], options={})
+              Tire::Index.any_instance.expects(:bulk_store).with([4, 5], options={})
 
 
               @index.import ImportData, :paginate, :per_page => 2 do |documents|
