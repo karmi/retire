@@ -161,8 +161,8 @@ from the database:
 
       sort { by :title, 'desc' }
 
-      facet 'global-tags' do
-        terms :tags, :global => true
+      facet 'global-tags', :global => true do
+        terms :tags
       end
 
       facet 'current-tags' do
