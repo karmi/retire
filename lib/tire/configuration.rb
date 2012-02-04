@@ -2,8 +2,14 @@ module Tire
 
   class Configuration
 
-    def self.url(value=nil)
-      @url    = (value ? value.to_s.gsub(%r|/*$|, '') : nil) || @url || "http://localhost:9200"
+    def self.urls
+      @urls || ["http://localhost:9200"]
+    end
+
+    def self.url(*values)
+      values.flatten!
+      @urls = values.map{|value| value.to_s.gsub(%r|/*$|, '')} if values.any?
+      urls.respond_to?(:sample) ? urls.sample : urls.choice
     end
 
     def self.client(klass=nil)
