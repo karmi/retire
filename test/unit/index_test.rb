@@ -330,6 +330,8 @@ module Tire
             json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
           end.returns(mock_response('{}'), 200)
+          Configuration.logger STDERR
+          Configuration.logger.expects(:log_response).with(200, any_parameters)
 
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
 
@@ -355,6 +357,8 @@ module Tire
 
         should "try again when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
+          Configuration.logger STDERR
+          Configuration.logger.expects(:log_response).with(503, any_parameters).at_least(1)
 
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
