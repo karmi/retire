@@ -359,7 +359,7 @@ module Tire
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
 
-        should "try again when an connection error occurs" do
+        should "try again when a connection error occurs" do
           Configuration.client.expects(:post).raises(Errno::ECONNREFUSED, "Connection refused - connect(2)").at_least(2)
 
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
