@@ -83,7 +83,7 @@ namespace :tire do
       index.import(klass, 'paginate', params) do |documents|
 
         if total
-          done += documents.size
+          done += documents.to_a.size
           # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
           percent  = ( (done.to_f / total) * 100 ).to_i
           glyphs   = ( percent * ( (tty_cols-offset).to_f/100 ) ).to_i
