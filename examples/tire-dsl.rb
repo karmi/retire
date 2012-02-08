@@ -532,11 +532,11 @@ s = Tire.search 'articles' do
   #
   query { string 'title:T*' }
 
-  facet 'global-tags' do
+  facet 'global-tags', :global => true do
 
     # ...but set the `global` scope for the facet in this case.
     #
-    terms :tags, :global => true
+    terms :tags
   end
 
   # We can even _combine_ facets scoped to the current query

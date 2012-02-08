@@ -99,15 +99,24 @@ module Tire
         end
       end
 
-      should "perform the search" do
+      should "perform the search lazily" do
         response = mock_response '{"took":1,"hits":[]}', 200
         Configuration.client.expects(:get).returns(response)
         Results::Collection.expects(:new).returns([])
 
         s = Search::Search.new('index')
-        s.perform
         assert_not_nil s.results
         assert_not_nil s.response
+      end
+
+      should "allow the search criteria to be chained" do
+        s = Search::Search.new('index').query { string 'foo' }
+        assert_nil s.filters, "Should NOT have filters"
+
+        s.expects(:perform).once
+        s.filter :term, :other_field => 'bar'
+        assert s.filters.size == 1, "Should have filters"
+        s.results
       end
 
       should "print debugging information on exception and return false" do

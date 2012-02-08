@@ -161,8 +161,8 @@ from the database:
 
       sort { by :title, 'desc' }
 
-      facet 'global-tags' do
-        terms :tags, :global => true
+      facet 'global-tags', :global => true do
+        terms :tags
       end
 
       facet 'current-tags' do
@@ -282,6 +282,15 @@ Note, that you can pass options for configuring queries, facets, etc. by passing
     end
 ```
 
+You don't have to define the search criteria in one monolithic _Ruby_ block -- you can build the search step by step,
+until you call the `results` method:
+
+```ruby
+    s = Tire.search('articles') { query { string 'title:T*' } }
+    s.filter :terms, :tags => ['ruby']
+    p s.results
+```
+
 If configuring the search payload with blocks feels somehow too weak for you, you can pass
 a plain old Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
@@ -293,7 +302,7 @@ If this sounds like a great idea to you, you are probably able to write your app
 using just `curl`, `sed` and `awk`.
 
 Do note again, however, that you're not tied to the declarative block-style DSL _Tire_ offers to you.
-If it makes more sense in your context, you can use its classes directly, in a more imperative style:
+If it makes more sense in your context, you can use the API directly, in a more imperative style:
 
 ```ruby
     search = Tire::Search::Search.new('articles')
@@ -302,7 +311,7 @@ If it makes more sense in your context, you can use its classes directly, in a m
     search.sort   { by :title, 'desc' }
     search.facet('global-tags') { terms :tags, :global => true }
     # ...
-    p search.perform.results
+    p search.results
 ```
 
 To debug the query we have laboriously set up like this,
@@ -413,17 +422,25 @@ For serious usage, though, you'll definitely want to define a custom _mapping_ f
       include Tire::Model::Callbacks
 
       mapping do
-        indexes :id,           :type => 'string',  :index    => :not_analyzed
-        indexes :title,        :type => 'string',  :analyzer => 'snowball', :boost => 100
-        indexes :content,      :type => 'string',  :analyzer => 'snowball'
-        indexes :author,       :type => 'string',  :analyzer => 'keyword'
-        indexes :published_on, :type => 'date',    :include_in_all => false
+        indexes :id,           :index    => :not_analyzed
+        indexes :title,        :analyzer => 'snowball', :boost => 100
+        indexes :content,      :analyzer => 'snowball'
+        indexes :content_size, :as       => 'content.size'
+        indexes :author,       :analyzer => 'keyword'
+        indexes :published_on, :type => 'date', :include_in_all => false
       end
     end
 ```
 
 In this case, _only_ the defined model attributes are indexed. The `mapping` declaration creates the
 index when the class is loaded or when the importing features are used, and _only_ when it does not yet exist.
+
+You can define different [_analyzers_](http://www.elasticsearch.org/guide/reference/index-modules/analysis/index.html),
+[_boost_](http://www.elasticsearch.org/guide/reference/mapping/boost-field.html) levels for different properties,
+or any other configuration for _elasticsearch_.
+
+You're not limited to 1:1 mapping between your model properties and the serialized document. With the `:as` option,
+you can pass a string or a _Proc_ object which is evaluated in the instance context (see the `content_size` property).
 
 Chances are, you want to declare also a custom _settings_ for the index, such as set the number of shards,
 replicas, or create elaborate analyzer chains, such as the hipster's choice: [_ngrams_](https://gist.github.com/1160430).

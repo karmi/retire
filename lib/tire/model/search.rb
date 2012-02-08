@@ -94,7 +94,7 @@ module Tire
             s.fields Array(options[:fields]) if options[:fields]
           end
 
-          s.perform.results
+          s.results
         end
 
         # Returns a Tire::Index instance for this model.
@@ -151,13 +151,29 @@ module Tire
         # If you do define the mapping for _ElasticSearch_, only attributes
         # declared in the mapping are serialized.
         #
+        # For properties declared with the `:as` option, the passed String or Proc
+        # is evaluated in the instance context.
+        #
         def to_indexed_json
           if instance.class.tire.mapping.empty?
+            # Reject the id and type keys
             instance.to_hash.reject {|key,_| key.to_s == 'id' || key.to_s == 'type' }.to_json
           else
-            instance.to_hash.
-            reject { |key, value| ! instance.class.tire.mapping.keys.map(&:to_s).include?(key.to_s) }.
-            to_json
+            mapping = instance.class.tire.mapping
+            # Reject keys not declared in mapping
+            hash = instance.to_hash.reject { |key, value| ! mapping.keys.map(&:to_s).include?(key.to_s) }
+
+            # Evalute the `:as` options
+            mapping.each do |key, options|
+              case options[:as]
+                when String
+                  hash[key] = instance.instance_eval(options[:as])
+                when Proc
+                  hash[key] = instance.instance_eval(&options[:as])
+              end
+            end
+
+            hash.to_json
           end
         end
 

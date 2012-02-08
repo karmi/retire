@@ -7,7 +7,7 @@ module Tire
 
     def search(indices=nil, options={}, &block)
       if block_given?
-        Search::Search.new(indices, options, &block).perform
+        Search::Search.new(indices, options, &block)
       else
         payload = case options
           when Hash    then options.to_json

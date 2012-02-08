@@ -6,6 +6,7 @@ rdoc/
 doc/
 .yardoc/
 coverage/
+.idea/
 scratch/
 examples/*.html
 *.log

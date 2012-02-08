@@ -21,7 +21,7 @@ module Tire
                   query.ids(args, document_type)
                 end
                 search.size args.size
-              end.perform.results
+              end.results
             else
               case args = args.pop
                 when Fixnum, String
@@ -41,7 +41,7 @@ module Tire
             old_wrapper = Tire::Configuration.wrapper
             Tire::Configuration.wrapper self
             s = Tire::Search::Search.new(index.name).query { all }
-            s.perform.results
+            s.results
           ensure
             Tire::Configuration.wrapper old_wrapper
           end
@@ -51,7 +51,7 @@ module Tire
             old_wrapper = Tire::Configuration.wrapper
             Tire::Configuration.wrapper self
             s = Tire::Search::Search.new(index.name).query { all }.size(1)
-            s.perform.results.first
+            s.results.first
           ensure
             Tire::Configuration.wrapper old_wrapper
           end

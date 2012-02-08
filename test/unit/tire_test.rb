@@ -53,6 +53,21 @@ module Tire
           end
         end
 
+        context "when retrieving results" do
+
+          should "not call the #perform method immediately" do
+            s = Tire.search('dummy') { query { string 'foo' } }
+            s.expects(:perform).never
+          end
+
+          should "call #perform from #results" do
+            s = Tire.search('dummy') { query { string 'foo' } }
+            s.expects(:perform).once
+            s.results
+          end
+
+        end
+
       end
 
     end

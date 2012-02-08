@@ -152,8 +152,8 @@ module Tire
       h = MultiJson.decode(@response.body)
       if Configuration.wrapper == Hash then h
       else
-        document = {}
-        document = h['_source'] ? document.update( h['_source'] ) : document.update( h['fields'] )
+        return nil if h['exists'] == false
+        document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
         Configuration.wrapper.new(document)
       end
@@ -177,7 +177,7 @@ module Tire
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/open"|
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_open"|
       logged('_open', curl)
     end
 
