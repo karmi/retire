@@ -343,6 +343,33 @@ module Tire
 
       end
 
+      context "explain" do
+
+        should "default to false" do
+          s = Search::Search.new('index') do
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_nil hash['explain']
+        end
+
+        should "set the explain field in the request when true" do
+          s = Search::Search.new('index') do
+            explain true
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal true, hash['explain']
+        end
+
+        should "not set the explain field when false" do
+          s = Search::Search.new('index') do
+            explain false
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_nil hash['explain']
+        end
+
+      end
+
       context "boolean queries" do
 
         should "wrap other queries" do

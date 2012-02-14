@@ -1,10 +1,10 @@
 module Tire
   module Search
     class SearchRequestFailed < StandardError; end
-  
+
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options
+      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
 
       def initialize(indices=nil, options = {}, &block)
         @indices = Array(indices)
@@ -77,6 +77,11 @@ module Tire
         self
       end
 
+      def explain(value)
+        @explain = value
+        self
+      end
+
       def version(value)
         @version = value
       end
@@ -110,6 +115,7 @@ module Tire
         request.update( { :from => @from } )               if @from
         request.update( { :fields => @fields } )           if @fields
         request.update( { :version => @version } )         if @version
+        request.update( { :explain => @explain } )         if @explain
         request
       end
 
