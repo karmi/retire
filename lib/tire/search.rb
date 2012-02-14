@@ -4,7 +4,7 @@ module Tire
   
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options
+      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
 
       def initialize(indices=nil, options = {}, &block)
         @indices = Array(indices)
@@ -76,6 +76,11 @@ module Tire
         @fields = Array(fields.flatten)
         self
       end
+      
+      def explain(value)
+        @explain = value
+        self
+      end
 
       def perform
         @response = Configuration.client.get(self.url, self.to_json)
@@ -105,6 +110,7 @@ module Tire
         request.update( { :size => @size } )               if @size
         request.update( { :from => @from } )               if @from
         request.update( { :fields => @fields } )           if @fields
+        request.update( { :explain => @explain } )         if @explain
         request
       end
 
