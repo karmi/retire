@@ -37,9 +37,14 @@ module Tire::Search
       should "allow search for a range" do
         assert_equal( { :range => { :age => { :gte => 21 } } }, Query.new.range(:age, { :gte => 21 }) )
       end
-      
-      should "allow use of the text search" do
+
+      should "allow search with a text search" do
         assert_equal( { :text => {'field' => {:query => 'foo'}}}, Query.new.text('field', 'foo'))
+      end
+
+      should "allow search with a different operator for text search" do
+        assert_equal( { :text => {'field' => {:query => 'foo', :operator => 'and'}}},
+                      Query.new.text('field', 'foo', :operator => 'and'))
       end
 
       should "allow search with a query string" do

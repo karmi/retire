@@ -474,6 +474,7 @@ end
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
 #
 # * [string](http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html)
+# * [text](http://www.elasticsearch.org/guide/reference/query-dsl/text-query.html)
 # * [term](http://elasticsearch.org/guide/reference/query-dsl/term-query.html)
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
 # * [bool](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)

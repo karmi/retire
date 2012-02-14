@@ -9,31 +9,25 @@ module Tire
 
       should "find article by title" do
         q = 'title:one'
-        assert_equal 1, search(q).results.count
-        assert_equal 'One', search(q).results.first[:title]
-      end
-      
-      should "find article by free text" do
-        q = 'one' 
-        assert_equal 1, text('title', q).results.count
-        assert_equal 'One', text('title', q).results.first[:title]
+        assert_equal 1, string_query(q).results.count
+        assert_equal 'One', string_query(q).results.first[:title]
       end
 
       should "find articles by title with boosting" do
         q = 'title:one^100 OR title:two'
-        assert_equal 2, search(q).results.count
-        assert_equal 'One', search(q).results.first[:title]
+        assert_equal 2, string_query(q).results.count
+        assert_equal 'One', string_query(q).results.first[:title]
       end
 
       should "find articles by tags" do
         q = 'tags:ruby AND tags:python'
-        assert_equal 1, search(q).results.count
-        assert_equal 'Two', search(q).results.first[:title]
+        assert_equal 1, string_query(q).results.count
+        assert_equal 'Two', string_query(q).results.first[:title]
       end
 
       should "find any article with tags" do
         q = 'tags:ruby OR tags:python OR tags:java'
-        assert_equal 4, search(q).results.count
+        assert_equal 4, string_query(q).results.count
       end
 
       should "pass options to query definition" do
@@ -49,12 +43,8 @@ module Tire
 
     private
 
-    def search(q)
+    def string_query(q)
       Tire.search('articles-test') { query { string q } }
-    end
-    
-    def text(field, q)
-      Tire.search('articles-test') { query { text(field, q) } }
     end
 
   end
