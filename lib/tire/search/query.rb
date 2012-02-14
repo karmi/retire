@@ -20,6 +20,12 @@ module Tire
       def range(field, value)
         @value = { :range => { field => value } }
       end
+      
+      def text(field, value, options={})
+        query_options = { :query => value }.update(options)
+        @value = { :text => { field => query_options } }
+        @value
+      end
 
       def string(value, options={})
         @value = { :query_string => { :query => value } }
