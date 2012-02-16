@@ -387,6 +387,46 @@ module Tire
             assert_equal   100, ModelWithNestedMapping.mapping[:author][:properties][:last_name][:boost]
           end
 
+          should "define mapping for nested properties with a block and class specified" do
+            expected = {
+              :settings => {},
+              :mappings => { :model_with_nested_mapping => {
+                :properties => {
+                  :title =>  { :type => 'string' },
+                  :author => {
+                    :type => 'object',
+                    :properties => {
+                      :first_name => { :type => 'string' },
+                      :last_name  => { :type => 'string', :boost => 100 }
+                    }
+                  }
+                }
+              }
+            }}
+
+            Tire::Index.any_instance.expects(:create).with(expected)
+
+            class ::ModelWithNestedMapping
+              extend ActiveModel::Naming
+              extend ActiveModel::Callbacks
+
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              mapping do
+                indexes :title, :type => 'string'
+                indexes :author do
+                  indexes :first_name, :type => 'string'
+                  indexes :last_name,  :type => 'string', :boost => 100
+                end
+              end
+
+            end
+
+            assert_not_nil ModelWithNestedMapping.mapping[:author][:properties][:last_name]
+            assert_equal   100, ModelWithNestedMapping.mapping[:author][:properties][:last_name][:boost]
+          end
+
           should "define mapping for nested documents" do
             class ::ModelWithNestedDocuments
               extend ActiveModel::Naming

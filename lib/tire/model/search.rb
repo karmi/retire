@@ -171,6 +171,14 @@ module Tire
                 when Proc
                   hash[key] = instance.instance_eval(&options[:as])
               end
+              if options[:type] == 'object'
+                nested_hash = {}
+                associated_class = Kernel.const_get(key.to_s.camelize)
+                mapping[key][:properties].map do |nested_key, options|
+                  nested_hash[nested_key] = associated_class.where("id" => instance.send("#{key.to_s}_id".to_sym)).first.send(nested_key)
+                end
+                hash[key] = nested_hash
+              end
             end
 
             hash.to_json
