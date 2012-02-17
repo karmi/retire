@@ -1,3 +1,4 @@
+*.un~
 *.gem
 .bundle
 Gemfile.lock
