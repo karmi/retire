@@ -38,6 +38,10 @@ module Tire::Search
         assert_equal( { :range => { :age => { :gte => 21 } } }, Query.new.range(:age, { :gte => 21 }) )
       end
 
+      should "allow search for a wildcard" do
+        assert_equal( { :wildcard => { "foo" => "bar" } }, Query.new.wildcard("foo", "bar") )
+      end
+
       should "allow search with a text search" do
         assert_equal( { :text => {'field' => {:query => 'foo'}}}, Query.new.text('field', 'foo'))
       end
