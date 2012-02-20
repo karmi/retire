@@ -65,7 +65,7 @@ module Tire
     end
 
     def bulk_store(documents, options = {})
-      options.merge({:method => "index"}) unless options[:method]
+      options.merge!({:method => "index"}) unless options[:method]
 
       payload = documents.map do |document|
         id   = get_id_from_document(document)
