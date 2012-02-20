@@ -70,6 +70,7 @@ module Tire
       payload = documents.map do |document|
         id   = get_id_from_document(document)
         type = get_type_from_document(document)
+        parent = get_parent_from_document(document)
 
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
@@ -262,6 +263,10 @@ module Tire
 
         Configuration.logger.log_response code, nil, body
       end
+    end
+
+    def get_parent_from_document(document)
+      'implement me'
     end
 
     def get_type_from_document(document)
