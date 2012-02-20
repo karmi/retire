@@ -64,7 +64,9 @@ module Tire
       logged([type, id].join('/'), curl)
     end
 
-    def bulk_store documents
+    def bulk_store(documents, options = {})
+      options.merge({:method => "index"}) unless options[:method]
+
       payload = documents.map do |document|
         id   = get_id_from_document(document)
         type = get_type_from_document(document)
@@ -72,7 +74,7 @@ module Tire
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
-        output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        output << %Q|{"#{options[:method]}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
         output << convert_document_to_json(document)
         output.join("\n")
       end
