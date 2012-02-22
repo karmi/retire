@@ -75,7 +75,11 @@ module Tire
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
-        output << %Q|{"#{options[:method]}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        if parent
+          output << %Q|{"#{options[:method]}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}","_parent":"#{parent}"}}|
+        else
+          output << %Q|{"#{options[:method]}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        end
         output << convert_document_to_json(document)
         output.join("\n")
       end
@@ -266,7 +270,15 @@ module Tire
     end
 
     def get_parent_from_document(document)
-      'implement me'
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
+      parent = case
+             when document.is_a?(Hash)
+               document[:_parent] || document['_parent'] || document[:parent] || document['parent']
+             when document.respond_to?(:_parent)
+               document.parent
+             end
+      $VERBOSE = old_verbose
+      parent
     end
 
     def get_type_from_document(document)
