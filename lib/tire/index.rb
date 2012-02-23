@@ -68,14 +68,9 @@ module Tire
       options.merge!({:method => "index"}) unless options[:method]
 
       payload = documents.map do |document|
-        id   = get_id_from_document(document)
-        type = get_type_from_document(document)
-        parent = get_parent_from_document(document)
-
-        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
-        output << %Q|{"#{options[:method]}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        output << construct_document_meta(document, options[:method])
         output << convert_document_to_json(document)
         output.join("\n")
       end
@@ -266,7 +261,13 @@ module Tire
     end
 
     def get_parent_from_document(document)
-      'implement me'
+      parent = case
+             when document.is_a?(Hash)
+               document[:_parent] || document['_parent'] || document[:parent] || document['parent']
+             when document.respond_to?(:parent)
+               document.parent
+             end
+      parent
     end
 
     def get_type_from_document(document)
@@ -303,6 +304,20 @@ module Tire
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
       end
+    end
+
+    def construct_document_meta(document, op_type)
+        id   = get_id_from_document(document)
+        type = get_type_from_document(document)
+        parent = get_parent_from_document(document)
+        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
+
+        meta_hash = {op_type => { '_index'=>@name, '_type'=>type, '_id'=>id}}
+
+        meta_hash[op_type]['_parent'] = parent if parent
+
+        meta_json = meta_hash.to_json
+        return meta_json
     end
 
   end
