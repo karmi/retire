@@ -42,6 +42,11 @@ module Tire
         self
       end
 
+      def terms_stats(key_field, value_field, options={})
+        @value = { :terms_stats => {:key_field => key_field, :value_field => value_field}.update(options) }
+        self
+      end
+
       def query(&block)
         @value = { :query => Query.new(&block).to_hash }
       end

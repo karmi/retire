@@ -120,6 +120,13 @@ module Tire::Search
           assert_equal({:statistical => {:statistical => {:params => {:factor => 5 }}}}.to_json, f.to_json)
         end
       end
+      
+      context "terms_stats facet" do
+        should "should encode facet options" do
+          f = Facet.new('terms_stats') { terms_stats :tags, :words }
+          assert_equal({:terms_stats => {:terms_stats => {:key_field => 'tags', :value_field => 'words'}}}.to_json, f.to_json)
+        end
+      end
 
       context "query facet" do
         should "encode facet options" do
