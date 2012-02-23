@@ -37,6 +37,11 @@ module Tire
         self
       end
 
+      def statistical(field, options={})
+        @value = { :statistical => (options.delete(:statistical) || {:field => field}.update(options)) }
+        self
+      end
+
       def query(&block)
         @value = { :query => Query.new(&block).to_hash }
       end
