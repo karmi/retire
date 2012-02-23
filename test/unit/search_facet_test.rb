@@ -109,6 +109,18 @@ module Tire::Search
         end
       end
 
+      context "statistical facet" do
+        should "encode facet options with default key" do
+          f = Facet.new('statistical') { statistical :words }
+          assert_equal({:statistical => {:statistical => {:field => 'words'}}}.to_json, f.to_json)
+        end
+
+        should "encode the JSON if define a statistical" do
+          f = Facet.new('statistical') { statistical :words, {:statistical => {:params => {:factor => 5}}}}
+          assert_equal({:statistical => {:statistical => {:params => {:factor => 5 }}}}.to_json, f.to_json)
+        end
+      end
+
       context "query facet" do
         should "encode facet options" do
           f = Facet.new('q_facet') do

@@ -113,6 +113,29 @@ module Tire
 
       end
 
+      context "statistical" do
+
+        should "return computed statistical data on a numeric field" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'words' do
+              statistical :words
+            end
+          end
+
+          facets = s.results.facets["words"]
+          assert_equal 5, facets["count"], facets.inspect
+          assert_equal 1125.0, facets["total"], facets.inspect
+          assert_equal 125.0, facets["min"], facets.inspect
+          assert_equal 375.0, facets["max"], facets.inspect
+          assert_equal 225.0, facets["mean"], facets.inspect
+          assert_equal 296875.0, facets["sum_of_squares"], facets.inspect
+          assert_equal 8750.0, facets["variance"], facets.inspect
+          assert_equal 94.54143466934853, facets["std_deviation"], facets.inspect
+        end
+
+      end
+
       context "query facets" do
 
         should "return aggregated values for a string query" do

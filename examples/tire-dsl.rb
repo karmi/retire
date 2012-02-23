@@ -584,6 +584,7 @@ end
 # * [date](http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html)
 # * [range](http://www.elasticsearch.org/guide/reference/api/search/facets/range-facet.html)
 # * [histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html)
+# * [statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html)
 # * [query](http://www.elasticsearch.org/guide/reference/api/search/facets/query-facet.html)
 
 # We have seen that _ElasticSearch_ facets enable us to fetch complex aggregations from our data.
