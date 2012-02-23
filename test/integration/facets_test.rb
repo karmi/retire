@@ -129,9 +129,23 @@ module Tire
           assert_equal 125.0, facets["min"], facets.inspect
           assert_equal 375.0, facets["max"], facets.inspect
           assert_equal 225.0, facets["mean"], facets.inspect
-          assert_equal 296875.0, facets["sum_of_squares"], facets.inspect
-          assert_equal 8750.0, facets["variance"], facets.inspect
-          assert_equal 94.54143466934853, facets["std_deviation"], facets.inspect
+        end
+
+      end
+      
+      context "terms_stats" do
+
+        should "return computed stats computed on a field, per term value driven by another field" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'words' do
+              terms_stats :tags, :words
+            end
+          end
+          facets = s.results.facets['words']['terms']
+          assert_equal({"term" => "ruby", "count" => 2, "total_count"=> 2, "min"=> 125.0, "max"=> 250.0, "total"=> 375.0, "mean"=> 187.5}, facets[0], facets.inspect)
+          assert_equal({"term" => "java", "count" => 2, "total_count"=> 2, "min"=> 125.0, "max"=> 375.0, "total"=> 500.0, "mean"=> 250.0}, facets[1], facets.inspect)
+          assert_equal({"term" => "python", "count" => 1, "total_count"=> 1, "min"=> 250.0, "max"=> 250.0, "total"=> 250.0, "mean"=> 250.0}, facets[2], facets.inspect)
         end
 
       end
