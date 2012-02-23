@@ -261,14 +261,12 @@ module Tire
     end
 
     def get_parent_from_document(document)
-      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       parent = case
              when document.is_a?(Hash)
                document[:_parent] || document['_parent'] || document[:parent] || document['parent']
-             when document.respond_to?(:_parent)
+             when document.respond_to?(:parent)
                document.parent
              end
-      $VERBOSE = old_verbose
       parent
     end
 
