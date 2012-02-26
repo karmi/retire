@@ -127,8 +127,9 @@ module Tire
       end
 
       def filter(type, *options)
-        @value[:filter] ||= []
-        @value[:filter] << Filter.new(type, *options).to_hash
+        @value[:filter] ||= {}
+        @value[:filter][:and] ||= []
+        @value[:filter][:and] << Filter.new(type, *options).to_hash
         @value
       end
 
