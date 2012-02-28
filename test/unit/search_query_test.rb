@@ -202,6 +202,42 @@ module Tire::Search
       end
 
     end
+
+    context "BooleanFilteredQuery" do
+
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { FilteredQuery.new.boolean }
+      end
+
+      context "must" do
+
+        should "properly encode filter with one filter" do
+
+          boolean_filtered_query = FilteredQuery.new.boolean do
+            must { filter :term, :tag => 'ruby' }
+          end
+
+          assert_equal( { :filter => { :bool => { :must => [ { :term => { :tag => "ruby" } } ] } } }, boolean_filtered_query.to_hash )
+
+        end
+
+        should "properly encode filter with multiple filters" do
+
+          boolean_filtered_query = FilteredQuery.new.boolean do
+            must do
+              filter :term, :tag => 'ruby'
+              filter :terms, :tags => ['ruby', 'rails']
+            end
+          end
+
+          assert_equal( { :filter=> { :bool => { :must => [ { :term => { :tag => "ruby" } } , { :terms => { :tags => [ "ruby", "rails" ] } } ] } } }, boolean_filtered_query.to_hash )
+
+        end
+
+      end
+
+    end
+
   end
 
 end

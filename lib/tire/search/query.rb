@@ -116,6 +116,7 @@ module Tire
 
 
     class FilteredQuery
+
       def initialize(&block)
         @value = {}
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
@@ -139,6 +140,60 @@ module Tire
       def to_json
         to_hash.to_json
       end
+
+      def boolean(options={}, &block)
+        @boolean ||= BooleanFilteredQuery.new(options)
+        block.arity < 1 ? @boolean.instance_eval(&block) : block.call(@boolean) if block_given?
+        @value[:filter] ||= {}
+        @value[:filter][:bool] = @boolean.to_hash
+        @value
+      end
+
+    end
+
+
+    class BooleanFilteredQuery
+
+      def initialize(options={}, &block)
+        @options = options
+        @value   = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def must(&block)
+        @value[:must] = BooleanFilter.new(&block).to_array
+      end
+
+      def to_hash
+        @value
+      end
+
+      def to_json
+        to_hash.to_json
+      end
+
+    end
+
+    class BooleanFilter
+
+      def initialize(options={}, &block)
+        @options   = options
+        @value     = []
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def filter(type, *options)
+        @value << Filter.new(type, *options).to_hash
+      end
+
+      def to_array
+        @value
+      end
+
+      def to_json
+        to_array.to_json
+      end
+
     end
 
   end
