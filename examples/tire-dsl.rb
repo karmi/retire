@@ -39,14 +39,15 @@ require 'tire'
 #### Prerequisites
 
 # We'll need a working and running _ElasticSearch_ server, of course. Thankfully, that's easy.
-( puts <<-"INSTALL" ; exit(1) ) unless (RestClient.get('http://localhost:9200') rescue false)
-
- [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
+INSTALL = <<EOF
+ [ERROR] You don't appear to have ElasticSearch installed. Please install and launch it with the following commands:
 
  curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz
  tar -zxvf elasticsearch-0.17.6.tar.gz
  ./elasticsearch-0.17.6/bin/elasticsearch -f
-INSTALL
+EOF
+
+( puts INSTALL ; exit(1) ) unless (RestClient.get('http://localhost:9200') rescue false)
 
 ### Storing and indexing documents
 
