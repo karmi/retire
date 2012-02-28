@@ -1,3 +1,5 @@
+# encoding: UTF-8
+#
 # **Tire** provides rich and comfortable Ruby API for the
 # [_ElasticSearch_](http://www.elasticsearch.org/) search engine/database.
 #
