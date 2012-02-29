@@ -35,6 +35,14 @@ module Tire
         assert_match %r|index/bar/_search|, s.url
       end
 
+      should_eventually "allow specify routing query parameter" do
+        s = Search::Search.new('index', :routing => 123) do
+          query { string 'foo' }
+        end
+
+        assert_match %r|routing=123|, s.url
+      end
+
       should "allow to pass block to query" do
         Search::Query.any_instance.expects(:instance_eval)
 
