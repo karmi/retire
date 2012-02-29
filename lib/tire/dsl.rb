@@ -20,7 +20,7 @@ module Tire
         end
 
         search = Search::Search.new(indices, options) { |search| nil }
-        response = Configuration.client.post search.url, payload
+        response = Configuration.client.get search.url, payload
         raise Tire::Search::SearchRequestFailed, response.to_s if response.failure?
         json     = MultiJson.decode(response.body)
         results  = Results::Collection.new(json, options)

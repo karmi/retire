@@ -23,7 +23,7 @@ module Tire
         end
 
         should "allow searching with a Ruby Hash" do
-          Tire::Configuration.client.expects(:post).
+          Tire::Configuration.client.expects(:get).
             with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
             returns( mock_response('{}') )
           Tire::Results::Collection.expects(:new).with({}, {})
@@ -32,7 +32,7 @@ module Tire
         end
 
         should "allow searching with a payload option" do
-          Tire::Configuration.client.expects(:post).
+          Tire::Configuration.client.expects(:get).
             with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
             returns( mock_response('{}') )
           Tire::Results::Collection.expects(:new).with({}, { :load => true })
@@ -41,7 +41,7 @@ module Tire
         end
 
         should "allow searching on a specific type with a payload option" do
-          Tire::Configuration.client.expects(:post).
+          Tire::Configuration.client.expects(:get).
             with('http://localhost:9200/dummy/doctype/_search','{"query":{"query_string":{"query":"foo"}}}').
             returns( mock_response('{}') )
           Tire::Results::Collection.expects(:new).with({}, {})
@@ -50,7 +50,7 @@ module Tire
         end
 
         should "allow searching with a JSON string" do
-          Tire::Configuration.client.expects(:post).
+          Tire::Configuration.client.expects(:get).
             with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
             returns( mock_response('{}') )
           Tire::Results::Collection.expects(:new).with({}, {})
@@ -66,7 +66,7 @@ module Tire
 
         should "raise SearchRequestFailed when receiving bad response from backend" do
           assert_raise(Search::SearchRequestFailed) do
-            Tire::Configuration.client.expects(:post).returns( mock_response('INDEX DOES NOT EXIST', 404) )
+            Tire::Configuration.client.expects(:get).returns( mock_response('INDEX DOES NOT EXIST', 404) )
             Tire.search 'not-existing', :query => { :query_string => { :query => 'foo' }}
           end
         end
