@@ -367,6 +367,27 @@ module Tire
 
       end
 
+      context "min score" do
+
+         should "set the values in request" do
+          s = Search::Search.new('index') do
+            min_score 1
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal 1, hash['size']
+        end
+
+        should "set the min_score value in options" do
+          Results::Collection.any_instance.stubs(:total).returns(50)
+          s = Search::Search.new('index') do
+            min_score 1
+          end
+
+          assert_equal 1, s.options[:size]
+        end
+
+      end
+
     end
 
   end
