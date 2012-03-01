@@ -21,6 +21,10 @@ module Tire
         @value = { :range => { field => value } }
       end
 
+      def wildcard(field, value)
+        @value = { :wildcard => { field => value } }
+      end
+      
       def text(field, value, options={})
         query_options = { :query => value }.update(options)
         @value = { :text => { field => query_options } }
