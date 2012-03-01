@@ -1,11 +1,16 @@
 module Tire
-  VERSION   = "0.3.12"
+  VERSION   = "0.3.13.pre"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Loosened dependency specification for Bundler
-    * Do not store `id` and `type` properties in ES _source document
-    * Refactorings
+    * Added support for property defaults and casting model properties as Ruby objects in Tire::Model::Persistence
+    * Added Hashr (https://rubygems.org/gems/hashr) as dependency
+    * Changed that search in persistence returns instances of model not Item
+    * Fixed errors in the Curb client
+    * Re-raise the RestClient::RequestTimeout and RestClient::ServerBrokeConnection exceptions
+    * Added the `:as` option for model mapping to dynamically set property value in serialization
+    * Prefer ELASTICSEARCH_URL environment variable as the default URL, if present
+    * Added the "text" search query
   END
 end

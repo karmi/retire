@@ -1,3 +1,5 @@
+# encoding: UTF-8
+#
 # **Tire** provides rich and comfortable Ruby API for the
 # [_ElasticSearch_](http://www.elasticsearch.org/) search engine/database.
 #
@@ -584,6 +586,8 @@ end
 # * [date](http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html)
 # * [range](http://www.elasticsearch.org/guide/reference/api/search/facets/range-facet.html)
 # * [histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html)
+# * [statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html)
+# * [terms_stats](http://www.elasticsearch.org/guide/reference/api/search/facets/terms-stats-facet.html)
 # * [query](http://www.elasticsearch.org/guide/reference/api/search/facets/query-facet.html)
 
 # We have seen that _ElasticSearch_ facets enable us to fetch complex aggregations from our data.
