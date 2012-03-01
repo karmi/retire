@@ -31,7 +31,7 @@ module Tire
                  document.update( {'id' => h['_id']} )
 
                  # Update the document with meta information
-                 ['_score', '_type', '_index', '_version', 'sort', 'highlight'].each { |key| document.update( {key => h[key]} || {} ) }
+                 ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
 
                  # Return an instance of the "wrapper" class
                  @wrapper.new(document)
