@@ -310,14 +310,15 @@ module Tire
         id   = get_id_from_document(document)
         type = get_type_from_document(document)
         parent = get_parent_from_document(document)
-        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
-        meta_hash = {op_type => { '_index'=>@name, '_type'=>type, '_id'=>id}}
+        meta_hash = { '_index' => @name, '_type' => type}
+        meta_hash['_id'] = id if id
+        meta_hash['_parent'] = parent if parent
 
-        meta_hash[op_type]['_parent'] = parent if parent
+        action_meta_hash = {op_type => meta_hash}
 
-        meta_json = meta_hash.to_json
-        return meta_json
+        action_meta_json = action_meta_hash.to_json
+        return action_meta_json
     end
 
   end
