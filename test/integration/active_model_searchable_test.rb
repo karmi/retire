@@ -84,6 +84,29 @@ module Tire
         assert_equal 'abc123', results.first.id
       end
 
+      context "with default filter" do
+        setup do
+          SupermodelArticleWithDefaultFilter.index.delete
+          SupermodelArticleWithDefaultFilter.create! :title => 'foo', :status => 'active'
+          SupermodelArticleWithDefaultFilter.create! :title => 'foo', :status => 'inactive'
+          SupermodelArticleWithDefaultFilter.index.refresh
+        end
+
+        should "search with default filter" do
+          results = SupermodelArticleWithDefaultFilter.search 'foo'
+
+          assert_equal 1, results.count
+          assert_equal false, results.to_a.collect(&:status).include?('inactive')
+        end
+
+        should "not search with default filter when unscoped options is true" do
+          results = SupermodelArticleWithDefaultFilter.search 'foo', :unscoped => true
+
+          assert_equal 2, results.count
+          assert_equal true, results.to_a.collect(&:status).include?('inactive')
+        end
+      end
+
       context "within Rails" do
 
         setup do

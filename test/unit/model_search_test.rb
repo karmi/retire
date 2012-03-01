@@ -153,6 +153,30 @@ module Tire
             end
           end
 
+          context "with default filter" do
+
+            setup do
+              ActiveModelArticle.default_search_filter :status => 'active'
+            end
+
+            should "filter with default filter" do
+              Tire::Search::Search.any_instance.expects(:filter).with(:term, :status => 'active')
+              ActiveModelArticle.search 'foo'
+              ActiveModelArticle.default_search_filter nil
+            end
+
+            should "not filter with default filter when unscoped option is true" do
+              Tire::Search::Search.any_instance.expects(:filter).with(:term, :status => 'active').never
+              ActiveModelArticle.default_search_filter :status => 'active'
+              ActiveModelArticle.search 'foo', :unscoped => true
+            end
+
+            teardown do
+              ActiveModelArticle.default_search_filter nil
+            end
+
+          end
+
         end
 
         context "searching with query string" do

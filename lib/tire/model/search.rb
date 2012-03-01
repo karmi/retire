@@ -85,6 +85,8 @@ module Tire
             end
           end unless sort.empty?
 
+          s.filter(:term, klass.default_filter)  if klass.default_filter && !options[:unscoped]
+
           if block_given?
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
           else
@@ -104,6 +106,16 @@ module Tire
         def index
           name = index_name.respond_to?(:to_proc) ? klass.instance_eval(&index_name) : index_name
           @index = Index.new(name)
+        end
+
+        # To define default search filter for this model. Similar to default_scope of activerecord.
+        #
+        # Example usage: `default_search_filter :status => "active"`.
+        #
+        # It adds term filter with the hash given to all searches.
+        # If you wish to search excluding this filter pass 'unscoped => true' option to search
+        def default_search_filter(filter_hash)
+          klass.default_filter = filter_hash
         end
 
       end
@@ -236,6 +248,7 @@ module Tire
       # A hook triggered by the `include Tire::Model::Search` statement in the model.
       #
       def self.included(base)
+        class << base; attr_accessor :default_filter; end
         base.class_eval do
 
           # Returns proxy to the _Tire's_ class methods.
