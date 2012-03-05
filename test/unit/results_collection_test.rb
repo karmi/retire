@@ -232,6 +232,12 @@ module Tire
           Results::Collection.new(@response, :load => { :include => 'comments' }).results
         end
 
+        should "pass the :raw_hits option Hash to model find metod" do
+          ActiveRecordArticle.expects(:find).returns([ArticleWithRawHit.new(:id => 1)])
+          results = Results::Collection.new(@response, :load => true, :raw_hits => true).results
+          assert_equal({"_id"=>1, "_type"=>"active_record_article"}, results.first.raw_hit)
+        end
+
         should "preserve the order of records returned from search" do
           ActiveRecordArticle.expects(:find).with([1,2,3]).
                               returns([ Results::Item.new(:id => 3),
