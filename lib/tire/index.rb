@@ -240,6 +240,15 @@ module Tire
       logged('_percolate', curl)
     end
 
+    def update(type, id, options={})
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/#{type}/#{id}/_update", MultiJson.encode(options)
+      @response.success? ? @response : false
+
+    ensure
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/#{type}/#{id}/_update?pretty=1" -d '#{options.to_json}'|
+      logged('_update', curl)
+    end
+
     def logged(endpoint='/', curl='')
       if Configuration.logger
         error = $!
