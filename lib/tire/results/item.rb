@@ -13,9 +13,9 @@ module Tire
         @attributes = {}
         args.each_pair do |key, value|
           if value.is_a?(Array)
-            @attributes[key.to_sym] = value.map { |item| @attributes[key.to_sym] = item.is_a?(Hash) ? Item.new(item.to_hash) : item }
+            @attributes[key.to_s] = value.map { |item| @attributes[key.to_s] = item.is_a?(Hash) ? Item.new(item.to_hash) : item }
           else
-            @attributes[key.to_sym] = value.is_a?(Hash) ? Item.new(value.to_hash) : value
+            @attributes[key.to_s] = value.is_a?(Hash) ? Item.new(value.to_hash) : value
           end
         end
       end
@@ -24,15 +24,15 @@ module Tire
       # otherwise return +nil+.
       #
       def method_missing(method_name, *arguments)
-        @attributes.has_key?(method_name.to_sym) ? @attributes[method_name.to_sym] : nil
+        @attributes.has_key?(method_name.to_s) ? @attributes[method_name.to_s] : nil
       end
 
       def [](key)
-        @attributes[key]
+        @attributes[key.to_s]
       end
 
       def id
-        @attributes[:_id] || @attributes[:id]
+        @attributes['_id'] || @attributes['id']
       end
 
       def persisted?
@@ -58,7 +58,7 @@ module Tire
       # Let's pretend we're someone else in Rails
       #
       def class
-        defined?(::Rails) && @attributes[:_type] ? @attributes[:_type].camelize.constantize : super
+        defined?(::Rails) && @attributes['_type'] ? @attributes['_type'].camelize.constantize : super
       rescue NameError
         super
       end
