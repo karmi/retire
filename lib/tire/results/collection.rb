@@ -46,11 +46,18 @@ module Tire
                                  "document has no _type property." unless type
 
             begin
-              klass = @options[:class_name].nil? ? type.camelize.constantize : @options[:class_name].constantize
+              explicit_class_name = @options[:class_name]
+              klass = explicit_class_name.nil? ? type.camelize.constantize : @options[:class_name].constantize
             rescue NameError => e
+              class_name, type_source = if @options[:class_name].nil?
+                [type.camelize, "_type #{type}"]
+              else
+                [explicit_class_name, "class_name #{explicit_class_name}"]
+              end
+
               raise NameError, "You have tried to eager load the model instances, but " +
-                               "Tire cannot find the model class '#{type.camelize}' " +
-                               "based on _type '#{type}'.", e.backtrace
+                               "Tire cannot find the model class '#{class_name}' " +
+                               "based on '#{type_source}'.", e.backtrace
             end
 
             ids   = @response['hits']['hits'].map { |h| h['_id'] }
