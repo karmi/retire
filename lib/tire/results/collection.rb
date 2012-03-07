@@ -49,7 +49,7 @@ module Tire
               explicit_class_name = @options[:class_name]
               klass = explicit_class_name.nil? ? type.camelize.constantize : @options[:class_name].constantize
             rescue NameError => e
-              class_name, type_source = if @options[:class_name].nil?
+              class_name, class_source = if @options[:class_name].nil?
                 [type.camelize, "_type #{type}"]
               else
                 [explicit_class_name, "class_name #{explicit_class_name}"]
@@ -57,7 +57,7 @@ module Tire
 
               raise NameError, "You have tried to eager load the model instances, but " +
                                "Tire cannot find the model class '#{class_name}' " +
-                               "based on '#{type_source}'.", e.backtrace
+                               "based on '#{class_source}'.", e.backtrace
             end
 
             ids   = @response['hits']['hits'].map { |h| h['_id'] }
