@@ -47,9 +47,9 @@ module Tire
 
             begin
               explicit_class_name = @options[:class_name]
-              klass = explicit_class_name.nil? ? type.camelize.constantize : @options[:class_name].constantize
+              klass = explicit_class_name.nil? ? type.camelize.constantize : explicit_class_name.constantize
             rescue NameError => e
-              class_name, class_source = if @options[:class_name].nil?
+              class_name, class_source = if explicit_class_name.nil?
                 [type.camelize, "_type #{type}"]
               else
                 [explicit_class_name, "class_name #{explicit_class_name}"]
