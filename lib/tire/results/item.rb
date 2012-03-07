@@ -51,6 +51,10 @@ module Tire
         persisted? ? [id] : nil
       end
 
+      def to_param
+        @attributes[:to_param] || [id] if persisted?
+      end
+
       def to_hash
         @attributes
       end
