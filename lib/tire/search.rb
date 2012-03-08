@@ -80,6 +80,11 @@ module Tire
         @min_score = value
         self
       end
+
+      def track_scores(value)
+        @track_scores = value
+        self
+      end
       
       def fields(*fields)
         @fields = Array(fields.flatten)

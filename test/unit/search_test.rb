@@ -249,6 +249,15 @@ module Tire
 
       end
 
+      context "track_scores" do
+        should "allow track scores to be turned on" do
+          s = Search::Search.new('index') do
+            track_scores true
+          end
+          assert_equal 'true', s.to_hash[:track_scores].to_json
+        end
+      end
+      
       context "min_score" do
         should "allow to specify min score" do
           s = Search::Search.new('index') do
