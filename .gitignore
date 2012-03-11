@@ -12,3 +12,4 @@ examples/*.html
 .rvmrc
 .rbenv-version
 tags
+.idea

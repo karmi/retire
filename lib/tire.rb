@@ -41,3 +41,4 @@ module Tire
   end
   module_function :warn
 end
+
