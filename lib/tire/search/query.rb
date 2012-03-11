@@ -65,8 +65,14 @@ module Tire
       end
 
       def mlt(like_text, options = {})
-        @value = { :more_like_this => { :like_text => like_text }}
-        @value[:more_like_this].update(options)
+        @value = { :mlt => { :like_text => like_text }}
+        @value[:mlt].update(options)
+        @value
+      end
+
+      def mlt_field(field, like_text, options = {})
+        @value = {:mlt_field => { field => { :like_text => like_text }}}
+        @value[:mlt_field][field].update(options)
         @value
       end
 
