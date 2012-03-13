@@ -1,11 +1,11 @@
 module Tire
-  VERSION   = "0.3.13.pre"
+  VERSION   = "0.4.0.pre"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
     * Added support for property defaults and casting model properties as Ruby objects in Tire::Model::Persistence
-    * Added Hashr (https://rubygems.org/gems/hashr) as dependency
+    * Added Hashr (http://rubygems.org/gems/hashr) as dependency
     * Changed that search in persistence returns instances of model not Item
     * Fixed errors in the Curb client
     * Re-raise the RestClient::RequestTimeout and RestClient::ServerBrokeConnection exceptions
