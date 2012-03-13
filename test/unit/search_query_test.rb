@@ -38,6 +38,15 @@ module Tire::Search
         assert_equal( { :range => { :age => { :gte => 21 } } }, Query.new.range(:age, { :gte => 21 }) )
       end
 
+      should "allow search with a text search" do
+        assert_equal( { :text => {'field' => {:query => 'foo'}}}, Query.new.text('field', 'foo'))
+      end
+
+      should "allow search with a different operator for text search" do
+        assert_equal( { :text => {'field' => {:query => 'foo', :operator => 'and'}}},
+                      Query.new.text('field', 'foo', :operator => 'and'))
+      end
+
       should "allow search with a query string" do
         assert_equal( { :query_string => { :query => 'title:foo' } },
                       Query.new.string('title:foo') )
@@ -163,8 +172,10 @@ module Tire::Search
           filter :terms, :tags => ['ruby']
         end
 
-        assert_equal( { :term => { :foo => 'bar' } }, query[:filtered][:query].to_hash )
-        assert_equal( { :tags => ['ruby'] }, query[:filtered][:filter].first[:terms] )
+        query[:filtered].tap do |f|
+          assert_equal( { :term => { :foo => 'bar' } }, f[:query].to_hash )
+          assert_equal( { :tags => ['ruby'] }, f[:filter][:and].first[:terms] )
+        end
       end
 
       should "properly encode multiple filters" do
@@ -174,9 +185,11 @@ module Tire::Search
           filter :terms, :tags => ['python']
         end
 
-        assert_equal 2, query[:filtered][:filter].size
-        assert_equal( { :tags => ['ruby'] },   query[:filtered][:filter].first[:terms] )
-        assert_equal( { :tags => ['python'] }, query[:filtered][:filter].last[:terms] )
+        query[:filtered][:filter].tap do |filter|
+          assert_equal 1, filter.size
+          assert_equal( { :tags => ['ruby'] },   filter[:and].first[:terms] )
+          assert_equal( { :tags => ['python'] }, filter[:and].last[:terms] )
+        end
       end
 
       should "allow passing variables from outer scope" do
@@ -188,8 +201,10 @@ module Tire::Search
           f.filter :terms, @my_filter
         end
 
-        assert_equal( { :term => { :foo => 'bar' } }, query[:filtered][:query].to_hash )
-        assert_equal( { :tags => ['ruby'] }, query[:filtered][:filter].first[:terms] )
+        query[:filtered].tap do |f|
+          assert_equal( { :term => { :foo => 'bar' } }, f[:query].to_hash )
+          assert_equal( { :tags => ['ruby'] }, f[:filter][:and].first[:terms] )
+        end
       end
 
     end

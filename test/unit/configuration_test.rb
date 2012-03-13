@@ -6,6 +6,7 @@ module Tire
 
     def teardown
       Tire::Configuration.reset
+      ENV['ELASTICSEARCH_URL'] = nil
     end
 
     context "Configuration" do
@@ -20,6 +21,11 @@ module Tire
 
       should "return default URL" do
         assert_equal 'http://localhost:9200', Configuration.url
+      end
+
+      should "use environment variable, if present" do
+        ENV['ELASTICSEARCH_URL'] = 'http://es.example.com'
+        assert_equal 'http://es.example.com', Configuration.url
       end
 
       should "allow setting and retrieving the URL" do

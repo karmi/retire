@@ -21,6 +21,12 @@ module Tire
         @value = { :range => { field => value } }
       end
 
+      def text(field, value, options={})
+        query_options = { :query => value }.update(options)
+        @value = { :text => { field => query_options } }
+        @value
+      end
+
       def string(value, options={})
         @value = { :query_string => { :query => value } }
         @value[:query_string].update(options)
@@ -121,8 +127,9 @@ module Tire
       end
 
       def filter(type, *options)
-        @value[:filter] ||= []
-        @value[:filter] << Filter.new(type, *options).to_hash
+        @value[:filter] ||= {}
+        @value[:filter][:and] ||= []
+        @value[:filter][:and] << Filter.new(type, *options).to_hash
         @value
       end
 

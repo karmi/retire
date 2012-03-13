@@ -99,16 +99,67 @@ module Tire
         should "return aggregated values for all results" do
           s = Tire.search('articles-test') do
             query { all }
-            facet 'words' do
+            facet 'words_histogram' do
               histogram :words, :interval => 100
             end
           end
 
-          facets = s.results.facets['words']['entries']
+          facets = s.results.facets['words_histogram']['entries']
           assert_equal 3, facets.size, facets.inspect
           assert_equal({"key" => 100, "count" => 2}, facets.entries[0], facets.inspect)
           assert_equal({"key" => 200, "count" => 2}, facets.entries[1], facets.inspect)
           assert_equal({"key" => 300, "count" => 1}, facets.entries[2], facets.inspect)
+        end
+
+      end
+
+      context "statistical" do
+
+        should "return computed statistical data on a numeric field" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'word_stats' do
+              statistical :words
+            end
+          end
+
+          facets = s.results.facets["word_stats"]
+          assert_equal 5,      facets["count"], facets.inspect
+          assert_equal 1125.0, facets["total"], facets.inspect
+          assert_equal 125.0,  facets["min"], facets.inspect
+          assert_equal 375.0,  facets["max"], facets.inspect
+          assert_equal 225.0,  facets["mean"], facets.inspect
+        end
+
+        should "return computed statistical data by given script" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'word_stats' do
+              statistical :statistical => { :script => "doc['words'].value * factor",
+                                            :params => { :factor => 2 } }
+            end
+          end
+
+          facets = s.results.facets["word_stats"]
+          assert_equal 2250.0, facets["total"], facets.inspect
+        end
+
+      end
+
+      context "terms_stats" do
+
+        should "return computed stats computed on a field, per term value driven by another field" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'words_per_tag_stats' do
+              terms_stats :tags, :words
+            end
+          end
+          facets = s.results.facets['words_per_tag_stats']['terms']
+
+          assert_equal({"term" => "ruby", "count" => 2, "total_count"=> 2, "min"=> 125.0, "max"=> 250.0, "total"=> 375.0, "mean"=> 187.5}, facets[0], facets.inspect)
+          assert_equal({"term" => "java", "count" => 2, "total_count"=> 2, "min"=> 125.0, "max"=> 375.0, "total"=> 500.0, "mean"=> 250.0}, facets[1], facets.inspect)
+          assert_equal({"term" => "python", "count" => 1, "total_count"=> 1, "min"=> 250.0, "max"=> 250.0, "total"=> 250.0, "mean"=> 250.0}, facets[2], facets.inspect)
         end
 
       end

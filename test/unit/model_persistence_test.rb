@@ -201,6 +201,16 @@ module Tire
             assert_equal false, article.hidden
           end
 
+          should "not affect default value" do
+            article = PersistentArticleWithDefaults.new :title => 'Test'
+            article.tags << "ruby"
+
+            article.options[:switches] << "switch_1"
+
+            assert_equal [], PersistentArticleWithDefaults.new.tags
+            assert_equal [], PersistentArticleWithDefaults.new.options[:switches]
+           end
+
           should "have query method for attribute" do
             assert_equal true, @article.title?
           end
