@@ -52,7 +52,6 @@ Gem::Specification.new do |s|
   unless ENV["CI"]
     s.add_development_dependency "rdoc"
     s.add_development_dependency "turn", "~> 0.9"
-    s.add_development_dependency "pry"
   end
 
   s.description = <<-DESC
