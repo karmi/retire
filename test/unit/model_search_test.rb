@@ -357,7 +357,13 @@ module Tire
                     :type => 'object',
                     :properties => {
                       :first_name => { :type => 'string' },
-                      :last_name  => { :type => 'string', :boost => 100 }
+                      :last_name  => { :type => 'string', :boost => 100 },
+                      :posts => {
+                        :type => 'object',
+                        :properties => {
+                          :title  => { :type => 'string', :boost => 10 }
+                        }
+                      }
                     }
                   }
                 }
@@ -378,6 +384,10 @@ module Tire
                 indexes :author do
                   indexes :first_name, :type => 'string'
                   indexes :last_name,  :type => 'string', :boost => 100
+
+                  indexes :posts do
+                    indexes :title, :type => 'string', :boost => 10
+                  end
                 end
               end
 
@@ -385,6 +395,7 @@ module Tire
 
             assert_not_nil ModelWithNestedMapping.mapping[:author][:properties][:last_name]
             assert_equal   100, ModelWithNestedMapping.mapping[:author][:properties][:last_name][:boost]
+            assert_equal   10, ModelWithNestedMapping.mapping[:author][:properties][:posts][:properties][:title][:boost]
           end
 
           should "define mapping for nested documents" do

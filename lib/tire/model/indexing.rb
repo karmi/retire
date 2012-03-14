@@ -76,21 +76,21 @@ module Tire
         # for more information.
         #
         def indexes(name, options = {}, &block)
+          mapping[name] = options
+
           if block_given?
-            mapping[name] ||= { :type => 'object', :properties => {} }.update(options)
-            @_nested_mapping = name
-            nested = yield
-            @_nested_mapping = nil
-            self
-          else
-            options[:type] ||= 'string'
-            if @_nested_mapping
-              mapping[@_nested_mapping][:properties][name] = options
-            else
-              mapping[name] = options
-            end
-            self
+            mapping[name][:type]       ||= 'object'
+            mapping[name][:properties] ||= {}
+
+            previous = @mapping
+            @mapping = mapping[name][:properties]
+            yield
+            @mapping = previous
           end
+
+          mapping[name][:type] ||= 'string'
+
+          self
         end
 
         # Creates the corresponding index with desired settings and mappings, when it does not exists yet.
