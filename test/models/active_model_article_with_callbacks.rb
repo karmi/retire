@@ -19,6 +19,9 @@ class ActiveModelArticleWithCallbacks
 
   attr_reader :attributes
 
+  def id;         attributes[:id] || attributes['_id']; end
+  def id=(value); attributes[:id] = value;              end
+
   def initialize(attributes = {})
     @attributes = attributes
   end

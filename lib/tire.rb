@@ -30,6 +30,7 @@ require 'tire/model/persistence/finders'
 require 'tire/model/persistence/attributes'
 require 'tire/model/persistence/storage'
 require 'tire/model/persistence'
+require 'tire/job/reindex_job'
 require 'tire/tasks'
 
 module Tire
