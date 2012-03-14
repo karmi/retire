@@ -21,7 +21,7 @@ module Tire
 
     def self.reset(*properties)
       reset_variables = properties.empty? ? instance_variables : instance_variables.map { |p| p.to_s } & \
-                                                                 properties.map { |p| "@#{p}" }
+                                                                 properties.map         { |p| "@#{p}" }
       reset_variables.each { |v| instance_variable_set(v.to_sym, nil) }
     end
 
@@ -41,10 +41,8 @@ module Tire
       classes_hash = args.pop
 
       associated_class = Kernel.const_get(classes_hash.keys.first.to_s.camelcase)
-      root_classes = [classes_hash.values.first.to_s.camelcase]
+      root_class_sym = classes_hash.values.first.to_s.camelcase
       delayed_job = @delayed_job
-
-      root_class_sym = hash.values.first
 
       root_class = Kernel.const_get(root_class_sym.to_s.camelcase)
       change_attributes = []
