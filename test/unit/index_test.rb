@@ -190,6 +190,10 @@ module Tire
           assert_raise(ArgumentError) { @index.store document }
         end
 
+        should "raise deprecation warning when trying to store a JSON string" do
+          @index.store '{"foo" : "bar"}'
+        end
+
         context "document with ID" do
 
           should "store Hash it under its ID property" do

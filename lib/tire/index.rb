@@ -292,7 +292,10 @@ module Tire
 
     def convert_document_to_json(document)
       document = case
-        when document.is_a?(String) then document
+        when document.is_a?(String)
+          Tire.warn "Passing the document as JSON string in Index#store has been deprecated, " +
+                     "please pass an object which responds to `to_indexed_json` or a plain Hash."
+          document
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
       end
