@@ -688,21 +688,17 @@ Well, things stay mostly the same:
       include Tire::Model::Search
       include Tire::Model::Callbacks
 
-      # Let's use a different index name so stuff doesn't get mixed up.
-      #
-      index_name 'mongo-articles'
-
       # These Mongo guys sure do get funky with their IDs in +serializable_hash+, let's fix it.
       #
       def to_indexed_json
-        self.to_json
+        self.as_json
       end
 
     end
 
     Article.create :title => 'I Love ElasticSearch'
 
-    Article.search 'love'
+    Article.tire.search 'love'
 ```
 
 _Tire_ does not care what's your primary data storage solution, if it has an _ActiveModel_-compatible
