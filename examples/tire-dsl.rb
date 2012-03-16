@@ -45,9 +45,9 @@ require 'tire'
 
  [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
 
- curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz
- tar -zxvf elasticsearch-0.17.6.tar.gz
- ./elasticsearch-0.17.6/bin/elasticsearch -f
+ curl -k -L -o elasticsearch-0.19.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz
+ tar -zxvf elasticsearch-0.19.0.tar.gz
+ ./elasticsearch-0.19.0/bin/elasticsearch -f
 INSTALL
 
 ### Storing and indexing documents
@@ -319,7 +319,7 @@ Tire.configure do
   #     # 2011-04-24 11:34:01:150 [CREATE] ("articles")
   #     #
   #     curl -X POST "http://localhost:9200/articles"
-  #     
+  #
   #     # 2011-04-24 11:34:01:152 [200]
   #
   logger 'elasticsearch.log'
@@ -606,10 +606,10 @@ end
 # are returned.
 #
 s = Tire.search 'articles' do
-  
+
   # We will use just the same **query** as before.
   #
-  query { string 'title:T*' } 
+  query { string 'title:T*' }
 
   # But we will add a _terms_ **filter** based on tags.
   #
@@ -671,7 +671,7 @@ s = Tire.search 'articles' do
 
   # We will search for articles tagged “ruby”, again, ...
   #
-  query { string 'tags:ruby' } 
+  query { string 'tags:ruby' }
 
    # ... but will sort them by their `title`, in descending order.
    #
@@ -694,7 +694,7 @@ s = Tire.search 'articles' do
 
   # We will just get all articles in this case.
   #
-  query { all } 
+  query { all }
 
   sort do
 
@@ -728,7 +728,7 @@ end
 s = Tire.search 'articles' do
 
   # Let's search for documents containing word “Two” in their titles,
-  query { string 'title:Two' } 
+  query { string 'title:Two' }
 
    # and instruct _ElasticSearch_ to highlight relevant snippets.
    #

@@ -19,9 +19,9 @@ Installation
 
 OK. First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's define easy:
 
-    $ curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz
-    $ tar -zxvf elasticsearch-0.17.6.tar.gz
-    $ ./elasticsearch-0.17.6/bin/elasticsearch -f
+    $ curl -k -L -o elasticsearch-0.19.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz
+    $ tar -zxvf elasticsearch-0.19.0.tar.gz
+    $ ./elasticsearch-0.19.0/bin/elasticsearch -f
 
 See, easy. On a Mac, you can also use _Homebrew_:
 
