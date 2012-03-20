@@ -271,6 +271,18 @@ module Tire
 
       end
 
+      context "with version" do
+
+        should "set the version value in options" do
+          s = Search::Search.new('index') do
+            version true
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal true, hash['version']
+        end
+
+      end
+
       context "with from/size" do
 
         should "set the values in request" do

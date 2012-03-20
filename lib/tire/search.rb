@@ -77,6 +77,10 @@ module Tire
         self
       end
 
+      def version(value)
+        @version = value
+      end
+
       def perform
         @response = Configuration.client.get(self.url, self.to_json)
         if @response.failure?
@@ -105,6 +109,7 @@ module Tire
         request.update( { :size => @size } )               if @size
         request.update( { :from => @from } )               if @from
         request.update( { :fields => @fields } )           if @fields
+        request.update( { :version => @version } )         if @version
         request
       end
 
