@@ -8,7 +8,7 @@ module Tire
 
       def initialize(indices=nil, options = {}, &block)
         @indices = Array(indices)
-        @types   = Array(options.delete(:type))
+        @types   = Array(options.delete(:type)).map { |type| CGI.escape(type.to_s) }
         @options = options
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
