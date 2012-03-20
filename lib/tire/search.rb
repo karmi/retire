@@ -25,7 +25,14 @@ module Tire
       end
 
       def url
-        Configuration.url + @path
+        url = Configuration.url + @path
+        @search_type ? "#{url}?search_type=#{@search_type}" : url
+      end
+
+      def search_type(value)
+        @search_type = value
+        @options[:search_type] = value
+        self
       end
 
       def query(&block)
@@ -95,7 +102,7 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{self.url}?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{self.url}#{@search_type ? "&" : "?"}pretty=true" -d '#{self.to_json}'|
       end
 
       def to_hash
