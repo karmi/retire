@@ -64,15 +64,13 @@ module Tire
       logged([type, id].join('/'), curl)
     end
 
-    def bulk_store documents
-      payload = documents.map do |document|
-        id   = get_id_from_document(document)
-        type = get_type_from_document(document)
+    def bulk_store(documents, options = {})
+      options.merge!({:method => "index"}) unless options[:method]
 
-        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
+      payload = documents.map do |document|
 
         output = []
-        output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        output << construct_document_meta(document, options[:method])
         output << convert_document_to_json(document)
         output.join("\n")
       end
@@ -262,6 +260,16 @@ module Tire
       end
     end
 
+    def get_parent_from_document(document)
+      parent = case
+             when document.is_a?(Hash)
+               document[:_parent] || document['_parent'] || document[:parent] || document['parent']
+             when document.respond_to?(:parent)
+               document.parent
+             end
+      parent
+    end
+
     def get_type_from_document(document)
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       type = case
@@ -299,6 +307,21 @@ module Tire
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
       end
+    end
+
+    def construct_document_meta(document, op_type)
+        id   = get_id_from_document(document)
+        type = get_type_from_document(document)
+        parent = get_parent_from_document(document)
+
+        meta_hash = { '_index' => @name, '_type' => type}
+        meta_hash['_id'] = id if id
+        meta_hash['_parent'] = parent if parent
+
+        action_meta_hash = {op_type => meta_hash}
+
+        action_meta_json = action_meta_hash.to_json
+        return action_meta_json
     end
 
   end

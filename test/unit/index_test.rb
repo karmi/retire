@@ -325,6 +325,7 @@ module Tire
         should "serialize Hashes" do
           Configuration.client.expects(:post).with do |url, json|
             url  == "#{Configuration.url}/_bulk" &&
+            json =~ /{"index":{/ &&
             json =~ /"_index":"dummy"/ &&
             json =~ /"_type":"document"/ &&
             json =~ /"_id":"1"/ &&
