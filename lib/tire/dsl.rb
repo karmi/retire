@@ -9,13 +9,18 @@ module Tire
       if block_given?
         Search::Search.new(indices, options, &block)
       else
-        payload = case options
-          when Hash    then options.to_json
-          when String  then options
+        case options
+          when Hash    then
+            payload = (options[:payload] || options).to_json
+            options = {} unless options.delete(:payload)
+          when String  then
+            payload = options
+            options = {}
           else raise ArgumentError, "Please pass a Ruby Hash or String with JSON"
         end
 
-        response = Configuration.client.post( "#{Configuration.url}/#{indices}/_search", payload)
+        search = Search::Search.new(indices, options) { |search| nil }
+        response = Configuration.client.get search.url, payload
         raise Tire::Search::SearchRequestFailed, response.to_s if response.failure?
         json     = MultiJson.decode(response.body)
         results  = Results::Collection.new(json, options)
