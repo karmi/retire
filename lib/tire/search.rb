@@ -12,6 +12,7 @@ module Tire
         @options = options
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
+        @params = options.slice(:routing)
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
@@ -25,7 +26,9 @@ module Tire
       end
 
       def url
-        Configuration.url + @path
+        query = @params.to_param
+        query = "?" + query unless query.empty?
+        Configuration.url + @path + query
       end
 
       def query(&block)
@@ -95,7 +98,10 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{self.url}?pretty=true" -d '#{self.to_json}'|
+        @params[:pretty] = true
+        curl = %Q|curl -X GET "#{self.url}" -d '#{self.to_json}'|
+        @params.delete(:pretty)
+        curl
       end
 
       def to_hash
