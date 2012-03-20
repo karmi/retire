@@ -14,7 +14,7 @@ namespace :tire do
 
           Set target index name:
             $ rake environment tire:import CLASS='Article' INDEX='articles-new'
-    
+
   DESC
 
   desc usage.split("\n").first.to_s
@@ -43,6 +43,8 @@ namespace :tire do
 
     klass  = eval(ENV['CLASS'].to_s)
     params = eval(ENV['PARAMS'].to_s) || {}
+
+    params.update :method => 'paginate'
 
     index = Tire::Index.new( ENV['INDEX'] || klass.tire.index.name )
 
@@ -80,7 +82,7 @@ namespace :tire do
 
       # Import the documents
       #
-      index.import(klass, 'paginate', params) do |documents|
+      index.import(klass, params) do |documents|
 
         if total
           done += documents.to_a.size

@@ -101,26 +101,26 @@ module Tire
       end
     end
 
-    def import(klass_or_collection, method=nil, options={})
+    def import(klass_or_collection, options={})
       case
-        when method
+        when method = options.delete(:method)
           options = {:page => 1, :per_page => 1000}.merge options
           while documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page])) \
                             and documents.to_a.length > 0
 
             documents = yield documents if block_given?
 
-            bulk_store documents, options.slice(:raise)
+            bulk_store documents, options
             options[:page] += 1
           end
 
         when klass_or_collection.respond_to?(:map)
           documents = block_given? ? yield(klass_or_collection) : klass_or_collection
-          bulk_store documents, options.slice(:raise)
+          bulk_store documents, options
 
         else
-          raise ArgumentError, "Please pass either a collection of objects, " +
-                               "or method for fetching records, or Enumerable compatible class"
+          raise ArgumentError, "Please pass either an Enumerable compatible class, or a collection object" +
+                               "with a method for fetching records in batches (such as 'paginate')"
       end
     end
 

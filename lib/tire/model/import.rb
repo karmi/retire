@@ -1,3 +1,4 @@
+
 module Tire
   module Model
 
@@ -13,8 +14,8 @@ module Tire
       module ClassMethods
 
         def import options={}, &block
-          method = options.delete(:method) || 'paginate'
-          index.import klass, method, options, &block
+          options = { :method => 'paginate' }.update options
+          index.import klass, options, &block
         end
 
       end
