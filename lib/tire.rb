@@ -3,6 +3,9 @@ require 'multi_json'
 require 'active_model'
 require 'hashr'
 
+require 'active_support/core_ext/object/to_param'
+require 'active_support/core_ext/object/to_query'
+
 require 'tire/rubyext/hash'
 require 'tire/rubyext/symbol'
 require 'tire/logger'

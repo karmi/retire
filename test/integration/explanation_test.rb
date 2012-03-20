@@ -21,19 +21,18 @@ module Tire
 
       should "add '_explanation' field to the result item" do
         # Tire::Configuration.logger STDERR, :level => 'debug'
-        s = Tire.search('explanation-test') do
+        s = Tire.search 'explanation-test', :explain => true do
           query do
             boolean do
               should   { string 'content:Fox' }
             end
           end
-          explain :true
         end
 
         doc = s.results.first
 
         explanation = doc._explanation
-        
+
         assert explanation.description.include?("product of:")
         assert explanation.value < 0.6
         assert_not_nil explanation.details

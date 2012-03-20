@@ -35,12 +35,32 @@ module Tire
         assert_match %r|index/bar/_search|, s.url
       end
 
-      should_eventually "allow specify routing query parameter" do
-        s = Search::Search.new('index', :routing => 123) do
-          query { string 'foo' }
-        end
+      should "allow to pass search parameters" do
+        s = Search::Search.new('index', :routing => 123, :timeout => 1) { query { string 'foo' } }
 
-        assert_match %r|routing=123|, s.url
+        assert  ! s.params.empty?
+
+        assert_match %r|routing=123|, s.params
+        assert_match %r|timeout=1|,   s.params
+      end
+
+      should "encode search parameters in the request" do
+        Configuration.client.expects(:get).with do |url, payload|
+          url.include? 'routing=123&timeout=1'
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        Search::Search.new('index', :routing => 123, :timeout => 1) { query { string 'foo' } }.perform
+      end
+
+      should "encode missing params as an empty string" do
+        Configuration.client.expects(:get).with do |url, payload|
+          (! url.include? '?') && (! url.include? '&')
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        s = Search::Search.new('index') { query { string 'foo' } }
+        s.perform
+
+        assert_equal '', s.params
       end
 
       should "allow to pass block to query" do
@@ -188,7 +208,7 @@ module Tire
           hash = MultiJson.decode( s.to_json )
           assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
         end
-        
+
       end
 
       context "facets" do

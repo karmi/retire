@@ -6,7 +6,7 @@ module Tire
 
       attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
 
-      def initialize(indices=nil, options = {}, &block)
+      def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
         @types   = Array(options.delete(:type))
         @options = options
@@ -26,6 +26,10 @@ module Tire
 
       def url
         Configuration.url + @path
+      end
+
+      def params
+        @options.empty? ? '' : '?' + @options.to_param
       end
 
       def query(&block)
@@ -87,7 +91,7 @@ module Tire
       end
 
       def perform
-        @response = Configuration.client.get(self.url, self.to_json)
+        @response = Configuration.client.get(self.url + self.params, self.to_json)
         if @response.failure?
           STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
           raise SearchRequestFailed, @response.to_s
@@ -100,11 +104,10 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{self.url}?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty=true" -d '#{to_json}'|
       end
 
       def to_hash
-        #
         @options.delete(:payload) || begin
           request = {}
           request.update( { :query  => @query.to_hash } )    if @query
