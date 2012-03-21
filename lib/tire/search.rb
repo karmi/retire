@@ -104,23 +104,27 @@ module Tire
       end
 
       def to_hash
-        request = {}
-        request.update( { :query  => @query.to_hash } )    if @query
-        request.update( { :sort   => @sort.to_ary   } )    if @sort
-        request.update( { :facets => @facets.to_hash } )   if @facets
-        request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
-        request.update( { :filter => { :and => @filters.map { |filter| filter.to_hash } } } ) if  @filters && @filters.size > 1
-        request.update( { :highlight => @highlight.to_hash } ) if @highlight
-        request.update( { :size => @size } )               if @size
-        request.update( { :from => @from } )               if @from
-        request.update( { :fields => @fields } )           if @fields
-        request.update( { :version => @version } )         if @version
-        request.update( { :explain => @explain } )         if @explain
-        request
+        @options.delete(:payload) || begin
+          request = {}
+          request.update( { :query  => @query.to_hash } )    if @query
+          request.update( { :sort   => @sort.to_ary   } )    if @sort
+          request.update( { :facets => @facets.to_hash } )   if @facets
+          request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
+          request.update( { :filter => { :and => @filters.map {|filter| filter.to_hash} } } ) if  @filters && @filters.size > 1
+          request.update( { :highlight => @highlight.to_hash } ) if @highlight
+          request.update( { :size => @size } )               if @size
+          request.update( { :from => @from } )               if @from
+          request.update( { :fields => @fields } )           if @fields
+          request.update( { :version => @version } )         if @version
+          request.update( { :explain => @explain } )         if @explain
+          request
+        end
       end
 
       def to_json
-        to_hash.to_json
+        payload = to_hash
+        # TODO: Remove when deprecated interface is removed
+        payload.is_a?(String) ? payload : payload.to_json
       end
 
       def logged(error=nil)

@@ -23,21 +23,17 @@ module Tire
         end
 
         should "allow searching with a Ruby Hash" do
-          Tire::Configuration.client.expects(:post).
-            with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
-            returns( mock_response('{}') )
-          Tire::Results::Collection.expects(:new)
+          payload = { :query => { :query_string => { :query => 'foo' } } }
+          Search::Search.expects(:new).with('dummy', :payload => payload).returns( stub(:perform => true) )
 
-          Tire.search 'dummy', :query => { :query_string => { :query => 'foo' }}
+          Tire.search 'dummy', payload
         end
 
         should "allow searching with a JSON string" do
-          Tire::Configuration.client.expects(:post).
-            with('http://localhost:9200/dummy/_search','{"query":{"query_string":{"query":"foo"}}}').
-            returns( mock_response('{}') )
-          Tire::Results::Collection.expects(:new)
+          payload = '{"query":{"query_string":{"query":"foo"}}}'
+          Search::Search.expects(:new).with('dummy', :payload => payload).returns( stub(:perform => true) )
 
-          Tire.search 'dummy', '{"query":{"query_string":{"query":"foo"}}}'
+          Tire.search 'dummy', payload
         end
 
         should "raise an error when passed incorrect payload" do
@@ -48,8 +44,8 @@ module Tire
 
         should "raise SearchRequestFailed when receiving bad response from backend" do
           assert_raise(Search::SearchRequestFailed) do
-            Tire::Configuration.client.expects(:post).returns( mock_response('INDEX DOES NOT EXIST', 404) )
-            Tire.search 'not-existing', :query => { :query_string => { :query => 'foo' }}
+            Tire::Configuration.client.expects(:get).returns( mock_response('INDEX DOES NOT EXIST', 404) )
+            Tire.search('not-existing', :query => { :query_string => { :query => 'foo' }}).results
           end
         end
 
