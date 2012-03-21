@@ -104,6 +104,7 @@ module Tire
       end
 
       def to_hash
+        #
         @options.delete(:payload) || begin
           request = {}
           request.update( { :query  => @query.to_hash } )    if @query
