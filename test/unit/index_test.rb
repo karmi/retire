@@ -191,6 +191,7 @@ module Tire
         end
 
         should "raise deprecation warning when trying to store a JSON string" do
+          Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store '{"foo" : "bar"}'
         end
 
