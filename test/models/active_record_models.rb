@@ -79,15 +79,32 @@ class ActiveRecordClassWithDynamicIndexName < ActiveRecord::Base
   end
 end
 
-class StiAncestor < ActiveRecord::Base
+# Used in test for multiple class instances in one index,
+# and single table inheritance (STI) support.
+
+class ActiveRecordModelOne < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+  self.table_name = 'active_record_model_one'
+  index_name 'active_record_model_one'
+end
+
+class ActiveRecordModelTwo < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+  self.table_name = 'active_record_model_two'
+  index_name 'active_record_model_two'
+end
+
+class ActiveRecordAsset < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
 end
 
-class FirstStiDescendant < StiAncestor
-  index_name 'sti_ancestors'
+class ActiveRecordVideo < ActiveRecordAsset
+  index_name 'active_record_assets'
 end
 
-class SecondStiDescendant < StiAncestor
-  index_name 'sti_ancestors'
+class ActiveRecordPhoto < ActiveRecordAsset
+  index_name 'active_record_assets'
 end
