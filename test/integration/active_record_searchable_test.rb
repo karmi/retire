@@ -32,6 +32,10 @@ module Tire
         create_table :active_record_class_with_dynamic_index_names do |t|
           t.string     :title
         end
+        create_table :sti_ancestors do |t|
+          t.string :title
+          t.string :type
+        end
       end
     end
 
@@ -350,6 +354,26 @@ module Tire
           @item.load(:include => 'comments')
         end
 
+      end
+
+      context 'with Single Table Inheritance' do
+        setup do
+          StiAncestor.create! :title => 'Ancestor text'
+          FirstStiDescendant.create! :title => 'Descendant text'
+          SecondStiDescendant.create! :title => 'Another Descendant text'
+        end
+
+        should 'load all STI descendants items' do
+          res = Tire.search('sti_ancestors', :load => true) do
+            query do
+              string 'Descendant'
+            end
+          end.results
+
+          assert_equal 2, res.length
+          assert_instance_of FirstStiDescendant, res[0]
+          assert_instance_of SecondStiDescendant, res[1]
+        end
       end
 
     end
