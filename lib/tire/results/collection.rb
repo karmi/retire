@@ -18,7 +18,8 @@ module Tire
 
       def results
         @results ||= begin
-          hits = @response['hits']['hits']
+          hits = @response['hits']['hits'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
+
           unless @options[:load]
             if @wrapper == Hash
               hits
@@ -37,6 +38,7 @@ module Tire
                  @wrapper.new(document)
               end
             end
+
           else
             return [] if hits.empty?
 

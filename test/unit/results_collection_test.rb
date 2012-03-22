@@ -119,6 +119,12 @@ module Tire
           assert_equal "article", document._type
         end
 
+        should "properly decode type" do
+          @response = { 'hits' => { 'hits' => [ { '_id' => 1, '_type' => 'foo%2Fbar' } ] } }
+          document =  Results::Collection.new(@response).first
+          assert_equal "foo/bar", document._type
+        end
+
       end
 
       context "wrapping results with selected fields" do

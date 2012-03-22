@@ -181,13 +181,19 @@ module Tire
           @index.store article
         end
 
-        should "escape the namespaced type" do
-          article = MyNamespace::ModelInNamespace.new(:title => 'Test', :body => 'Lorem')
+        should "properly encode namespaced document types" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{Configuration.url}/dummy/my_namespace%2Fmy_model/"
+          end.returns(mock_response('{"ok":true,"_id":"123"}'))
 
-          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/my_namespace%2Fmodel_in_namespace/",
-                                                   article.to_indexed_json).
-            returns(mock_response('{"ok":true,"_id":"123"}'))
-          @index.store article
+          module MyNamespace
+            class MyModel
+              def document_type;   "my_namespace/my_model"; end
+              def to_indexed_json; "{}";                    end
+            end
+          end
+
+          @index.store MyNamespace::MyModel.new
         end
 
         should "set default type" do
@@ -286,6 +292,12 @@ module Tire
           end
         end
 
+        should "properly encode document type" do
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/my_namespace%2Fmy_model/id-1").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.retrieve 'my_namespace/my_model', 'id-1'
+        end
+
       end
 
       context "when removing" do
@@ -333,6 +345,12 @@ module Tire
           assert_raise ArgumentError do
             @index.remove :document, nil
           end
+        end
+
+        should "properly encode document type" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/my_namespace%2Fmy_model/id-1").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.remove 'my_namespace/my_model', 'id-1'
         end
 
       end

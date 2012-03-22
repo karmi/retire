@@ -127,6 +127,7 @@ module Tire
     def remove(*args)
       if args.size > 1
         type, document = args
+        type           = Utils.escape(type)
         id             = get_id_from_document(document) || document
       else
         document = args.pop
@@ -147,6 +148,7 @@ module Tire
     def retrieve(type, id)
       raise ArgumentError, "Please pass a document ID" unless id
 
+      type      = Utils.escape(type)
       url       = "#{Configuration.url}/#{@name}/#{type}/#{id}"
       @response = Configuration.client.get url
 
@@ -276,7 +278,7 @@ module Tire
           document.type
         end
       $VERBOSE = old_verbose
-      type ? CGI.escape(type.to_s) : :document
+      Utils.escape( type || 'document' )
     end
 
     def get_id_from_document(document)

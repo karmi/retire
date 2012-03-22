@@ -100,13 +100,6 @@ module Tire
           end
         end
 
-        should "properly translate namespaced model into document_type" do
-          # Watch out for <https://github.com/rails/rails/blob/v3.1.3/activemodel/lib/active_model/naming.rb#L50-52>
-          t = MyNamespace::ModelInNamespace.document_type
-          assert_equal 'my_namespace/model_in_namespace', t
-          assert defined?(t), "Cannot infer class from document type: #{t}"
-        end
-
         should "allow to refresh index" do
           Index.any_instance.expects(:refresh)
 
@@ -610,7 +603,7 @@ module Tire
             assert_equal( {:one => 1}.to_json, model.to_indexed_json )
 
           end
-          
+
           should "serialize mapped properties when mapping procs are set" do
             class ::ModelWithMappingProcs
               extend  ActiveModel::Naming

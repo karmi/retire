@@ -108,3 +108,16 @@ end
 class ActiveRecordPhoto < ActiveRecordAsset
   index_name 'active_record_assets'
 end
+
+# Namespaced ActiveRecord models
+
+module ActiveRecordNamespace
+  def self.table_name_prefix
+    'active_record_namespace_'
+  end
+end
+
+class ActiveRecordNamespace::MyModel < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+end

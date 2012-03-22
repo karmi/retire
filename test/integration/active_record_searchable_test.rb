@@ -405,8 +405,39 @@ module Tire
            assert_instance_of ActiveRecordVideo,  s.results[0]
            assert_instance_of ActiveRecordPhoto,  s.results[1]
          end
-       end
+      end
 
+      context "with namespaced models" do
+        setup do
+           ActiveRecord::Schema.define { create_table(:active_record_namespace_my_models) { |t| t.string :title, :timestamp } }
+
+           ActiveRecordNamespace::MyModel.create :title => 'Test'
+           ActiveRecordNamespace::MyModel.tire.index.refresh
+        end
+
+        teardown do
+           ActiveRecordNamespace::MyModel.destroy_all
+           ActiveRecordNamespace::MyModel.tire.index.delete
+        end
+
+        should "save document into index on save and find it" do
+          results = ActiveRecordNamespace::MyModel.search 'test'
+
+          assert       results.any?, "No results returned: #{results.inspect}"
+          assert_equal 1, results.count
+
+          assert_instance_of Results::Item, results.first
+        end
+
+        should "eagerly load the records from returned hits" do
+          results = ActiveRecordNamespace::MyModel.search 'test', :load => true
+
+          assert             results.any?, "No results returned: #{results.inspect}"
+          assert_instance_of ActiveRecordNamespace::MyModel, results.first
+          assert_equal       ActiveRecordNamespace::MyModel.find(1), results.first
+        end
+
+      end
     end
 
   end
