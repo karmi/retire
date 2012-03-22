@@ -16,6 +16,10 @@ module Tire
         @wrapper  = options[:wrapper] || Configuration.wrapper
       end
 
+      def raw_hits
+        @response['hits']['hits']
+      end
+
       def results
         @results ||= begin
           hits = @response['hits']['hits']
@@ -53,8 +57,12 @@ module Tire
                                "based on _type '#{type}'.", e.backtrace
             end
 
-            ids   = @response['hits']['hits'].map { |h| h['_id'] }
+            mapping = Hash[@response['hits']['hits'].map { |h| [h['_id'], h] }]
+            ids = mapping.keys
             records =  @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+
+            # Append the raw hit to the model
+            records.each { |record| record.raw_hit = mapping[record.id] if record.respond_to?(:raw_hit) } if @options[:raw_hits]
 
             # Reorder records to preserve order from search results
             ids.map { |id| records.detect { |record| record.id.to_s == id.to_s } }
