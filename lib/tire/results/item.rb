@@ -28,7 +28,7 @@ module Tire
       end
 
       def [](key)
-        @attributes[key]
+        @attributes[key.to_sym]
       end
 
       def id
