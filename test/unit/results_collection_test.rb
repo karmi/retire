@@ -254,6 +254,27 @@ module Tire
           end
         end
 
+        should "raise error when _type does not reflect a constant name in the library" do
+          assert_raise(NameError) do
+            missing_constant = "some_missing_constant"
+            missing_constant.expects(:camelize).at_least_once
+            response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => missing_constant}] } }
+            Results::Collection.new(response, :load => true).results
+          end
+        end
+
+        context "class_name explicitely specified" do
+          should "not raise error when _type does not reflect a constant name in the library" do
+            class_name = "SomeClass"
+            constantized_class_name = mock()
+
+            class_name.expects(:constantize).returns(constantized_class_name)
+            constantized_class_name.expects(:find).returns([])
+            options = {:load => true, :class_name => class_name}
+            Results::Collection.new(@response, options).results
+          end
+        end
+
         should "return empty array for empty hits" do
           response = { 'hits'  => {
                          'hits' => [],
