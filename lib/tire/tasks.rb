@@ -3,21 +3,18 @@ require 'benchmark'
 
 namespace :tire do
 
-  usage = <<-DESC
-          Import data from your model using paginate: rake environment tire:import CLASS='MyModel'
+  desc <<-DESC.gsub(/    /, '')
+    Import data from your model using paginate: rake environment tire:import CLASS='MyModel'.
 
-          Pass params for the `paginate` method:
-            $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}'
+    Pass params for the `paginate` method:
+      $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}'
 
-          Force rebuilding the index (delete and create):
-            $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
+    Force rebuilding the index (delete and create):
+      $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
 
-          Set target index name:
-            $ rake environment tire:import CLASS='Article' INDEX='articles-new'
-
+    Set target index name:
+      $ rake environment tire:import CLASS='Article' INDEX='articles-new'
   DESC
-
-  desc usage.split("\n").first.to_s
   task :import do
 
     def elapsed_to_human(elapsed)
@@ -37,7 +34,7 @@ namespace :tire do
     end
 
     if ENV['CLASS'].to_s == ''
-      puts '='*80, 'USAGE', '='*80, usage.gsub(/          /, '')
+      puts '='*90, 'USAGE', '='*90, Rake::Task['tire:import'].full_comment, ""
       exit(1)
     end
 
@@ -99,6 +96,6 @@ namespace :tire do
     end
 
     puts "", '='*80, "Import finished in #{elapsed_to_human(elapsed)}"
-
   end
+
 end
