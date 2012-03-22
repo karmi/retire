@@ -9,6 +9,7 @@ require 'active_support/core_ext/object/to_query'
 
 require 'tire/rubyext/hash'
 require 'tire/rubyext/symbol'
+require 'tire/utils'
 require 'tire/logger'
 require 'tire/configuration'
 require 'tire/http/response'
