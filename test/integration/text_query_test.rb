@@ -7,7 +7,7 @@ module Tire
 
     context "Text query" do
       setup do
-        ::RestClient.put "#{URL}/articles-test/article/plus-one", {title: "+1 !!!"}.to_json
+        ::RestClient.put "#{URL}/articles-test/article/plus-one", {:title => "+1 !!!"}.to_json
         ::RestClient.post "#{URL}/articles-test/_refresh", ''
       end
 

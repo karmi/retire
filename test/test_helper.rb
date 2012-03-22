@@ -7,7 +7,7 @@ require 'yajl/json_gem'
 require 'sqlite3'
 
 require 'shoulda'
-require 'turn/autorun' unless ENV["TM_FILEPATH"] || ENV["CI"]
+require 'turn/autorun' unless ENV["TM_FILEPATH"] || ENV["CI"] || defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 require 'mocha'
 
 require 'active_support/core_ext/hash/indifferent_access'

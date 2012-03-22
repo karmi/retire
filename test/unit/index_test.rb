@@ -454,14 +454,14 @@ module Tire
           end
 
           should "pass the params to the passed method and bulk store the results" do
-            @index.expects(:bulk_store).with { |c| c == [1, 2] }.returns(true)
-            @index.expects(:bulk_store).with { |c| c == [3, 4] }.returns(true)
+            @index.expects(:bulk_store).with { |c,o| c == [1, 2] }.returns(true)
+            @index.expects(:bulk_store).with { |c,o| c == [3, 4] }.returns(true)
 
             @index.import ImportData, :method => 'paginate', :page => 1, :per_page => 2
           end
 
           should "pass the class when method not passed" do
-            @index.expects(:bulk_store).with { |c| c == ImportData }.returns(true)
+            @index.expects(:bulk_store).with { |c,o| c == ImportData }.returns(true)
 
             @index.import ImportData
           end
@@ -500,8 +500,8 @@ module Tire
             end
 
             should "allow to manipulate the documents in passed block" do
-              Tire::Index.any_instance.expects(:bulk_store).with { |c| c == [2, 3] }
-              Tire::Index.any_instance.expects(:bulk_store).with { |c| c == [4, 5] }
+              Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [2, 3] }
+              Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [4, 5] }
 
               @index.import ImportData, :method => :paginate, :per_page => 2 do |documents|
                 # Add 1 to every "document" and return them

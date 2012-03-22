@@ -48,7 +48,7 @@ Gem::Specification.new do |s|
   #
   unless ENV["CI"]
     s.add_development_dependency "rdoc"
-    s.add_development_dependency "turn", "~> 0.9"
+    s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
   end
 
   s.description = <<-DESC
