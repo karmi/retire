@@ -18,7 +18,7 @@ module Tire
       end
 
       should "return facets in results" do
-        s = Tire.search 'articles-test' do
+        s = Tire.search 'articles-test', :search_type => 'count' do
           query { term :tags, 'ruby' }
           facet('tags') { terms :tags }
         end
