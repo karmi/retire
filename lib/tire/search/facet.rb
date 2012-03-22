@@ -42,12 +42,6 @@ module Tire
         self
       end
 
-      def filter(field, value, options={})
-        @value = { :filter => { :term => { field => value }}.update(options) }
-        self
-      end
-
-
       def terms_stats(key_field, value_field, options={})
         @value = { :terms_stats => {:key_field => key_field, :value_field => value_field}.update(options) }
         self
@@ -55,6 +49,11 @@ module Tire
 
       def query(&block)
         @value = { :query => Query.new(&block).to_hash }
+      end
+
+      def filter(field, value, options={})
+        @value = { :filter => { :term => { field => value }}.update(options) }
+        self
       end
 
       def to_json
