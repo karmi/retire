@@ -14,6 +14,14 @@ module Tire
         assert_equal 'dummy', @index.name
       end
 
+      should "return HTTP response" do
+        assert_respond_to @index, :response
+
+        Configuration.client.expects(:head).returns(mock_response('OK'))
+        @index.exists?
+        assert_equal      'OK', @index.response.body
+      end
+
       should "return true when exists" do
         Configuration.client.expects(:head).returns(mock_response(''))
         assert @index.exists?

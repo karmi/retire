@@ -1,7 +1,7 @@
 module Tire
   class Index
 
-    attr_reader :name
+    attr_reader :name, :response
 
     def initialize(name, &block)
       @name = name
