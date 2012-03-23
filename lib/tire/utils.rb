@@ -8,7 +8,8 @@ module Tire
     end
 
     def unescape(s)
-      URI.decode_www_form_component( s.to_s.force_encoding(Encoding::UTF_8) )
+      s = s.to_s.respond_to?(:force_encoding) ? s.to_s.force_encoding(Encoding::UTF_8) : s.to_s
+      URI.decode_www_form_component(s)
     end
 
     extend self
