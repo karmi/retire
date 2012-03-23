@@ -1,4 +1,5 @@
 require 'test_helper'
+require File.expand_path('../../models/supermodel_article', __FILE__)
 
 module Tire
 

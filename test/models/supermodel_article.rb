@@ -10,7 +10,6 @@ class SupermodelArticle
   include Tire::Model::Callbacks
 
   property :title
-  property :type
 
   mapping do
     indexes :title,      :type => 'string', :boost => 15, :analyzer => 'czech'
