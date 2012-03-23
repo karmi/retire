@@ -33,7 +33,16 @@ module Tire::Search
         assert_equal( { :terms => { :foo => ['bar', 'baz'], :minimum_match => 2 } },
                       Query.new.terms(:foo, ['bar', 'baz'], :minimum_match => 2) )
       end
-
+      
+      should "allow search for a prefix" do
+        assert_equal( { :prefix => { :user => "foo" } }, Query.new.prefix(:user, "foo") )
+      end
+      
+      should "allow setting boost for prefix" do
+        assert_equal( { :prefix => {:user => {:prefix => "foo", :boost => 2.0 } } },
+                      Query.new.prefix(:user, "foo", :boost => 2.0) )
+      end
+        
       should "allow search for a range" do
         assert_equal( { :range => { :age => { :gte => 21 } } }, Query.new.range(:age, { :gte => 21 }) )
       end
