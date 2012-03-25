@@ -25,6 +25,10 @@ module Tire::Search
         assert_equal( { :term => { :foo => { :term => 'bar' } } }, Query.new.term(:foo, 'bar') )
       end
 
+      should "allow search for single term passing an options hash" do
+        assert_equal( { :term => { :foo => { :term => 'bar', :boost => 2.0 } } }, Query.new.term(:foo, 'bar', :boost => 2.0) )
+      end
+
       should "allow search for multiple terms" do
         assert_equal( { :terms => { :foo => ['bar', 'baz'] } }, Query.new.terms(:foo, ['bar', 'baz']) )
       end
@@ -92,6 +96,18 @@ module Tire::Search
       should "search for documents by IDs" do
         assert_equal( { :ids => { :values => [1, 2], :type => 'foo' }  },
                       Query.new.ids([1, 2], 'foo') )
+      end
+
+    end
+    
+    context "FuzzyQuery" do
+
+      should "allow a fuzzy search" do
+        assert_equal( { :fuzzy => { :foo => { :term => 'bar' } } }, Query.new.fuzzy(:foo, 'bar') )
+      end
+
+      should "allow a fuzzy search with an options hash" do
+        assert_equal( { :term => { :foo => { :term => 'bar', :boost => 1.0, :min_similarity => 0.5 } } }, Query.new.term(:foo, 'bar', :boost => 1.0, :min_similarity => 0.5 ) )
       end
 
     end
