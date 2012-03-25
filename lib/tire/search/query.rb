@@ -9,6 +9,11 @@ module Tire
 
       def term(field, value)
         @value = { :term => { field => value } }
+
+      def fuzzy(field, value, options={})
+        query = { field => { :term => value } }
+        query[field].update(options)
+        @value = { :fuzzy => query }
       end
 
       def terms(field, value, options={})

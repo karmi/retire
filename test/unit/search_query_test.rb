@@ -95,6 +95,18 @@ module Tire::Search
       end
 
     end
+    
+    context "FuzzyQuery" do
+
+      should "allow a fuzzy search" do
+        assert_equal( { :fuzzy => { :foo => { :term => 'bar' } } }, Query.new.fuzzy(:foo, 'bar') )
+      end
+
+      should "allow a fuzzy search with an options hash" do
+        assert_equal( { :term => { :foo => { :term => 'bar', :boost => 1.0, :min_similarity => 0.5 } } }, Query.new.term(:foo, 'bar', :boost => 1.0, :min_similarity => 0.5 ) )
+      end
+
+    end
 
     context "BooleanQuery" do
 
