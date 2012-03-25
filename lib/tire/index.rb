@@ -66,8 +66,9 @@ module Tire
 
     def bulk_store(documents, options={})
       payload = documents.map do |document|
+        # Skip escaping to avoid ES storing _type like "namespace%2Fmodel_name" (we actually want _type like "namespace/model")
+        type = get_type_from_document(document, :escape => false) 
         id   = get_id_from_document(document)
-        type = get_type_from_document(document)
 
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
@@ -265,7 +266,11 @@ module Tire
       end
     end
 
-    def get_type_from_document(document)
+    # opts:
+    #   escape (boolean): whether or not to URI.escape the type (default is true)
+    def get_type_from_document(document, opts = {})
+      opts = {:escape => true}.merge(opts)
+
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       type = case
         when document.respond_to?(:document_type)
@@ -278,7 +283,9 @@ module Tire
           document.type
         end
       $VERBOSE = old_verbose
-      Utils.escape( type || 'document' )
+
+      type ||= 'document'
+      opts[:escape] ? Utils.escape(type) : type
     end
 
     def get_id_from_document(document)
