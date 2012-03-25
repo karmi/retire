@@ -12,17 +12,21 @@ module Tire::Search
 
       should "return itself as a Hash" do
         assert_respond_to Query.new, :to_hash
-        assert_equal( { :term => { :foo => 'bar' } }, Query.new.term(:foo, 'bar').to_hash )
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, Query.new.term(:foo, 'bar').to_hash )
       end
 
       should "allow a block to be given" do
-        assert_equal( { :term => { :foo => 'bar' } }.to_json, Query.new do
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }.to_json, Query.new do
           term(:foo, 'bar')
         end.to_json)
       end
 
       should "allow search for single term" do
-        assert_equal( { :term => { :foo => 'bar' } }, Query.new.term(:foo, 'bar') )
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, Query.new.term(:foo, 'bar') )
+      end
+
+      should "allow search for single term passing an options hash" do
+        assert_equal( { :term => { :foo => { :term => 'bar', :boost => 2.0 } } }, Query.new.term(:foo, 'bar', :boost => 2.0) )
       end
 
       should "allow search for multiple terms" do
@@ -185,7 +189,7 @@ module Tire::Search
         end
 
         query[:filtered].tap do |f|
-          assert_equal( { :term => { :foo => 'bar' } }, f[:query].to_hash )
+          assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
           assert_equal( { :tags => ['ruby'] }, f[:filter][:and].first[:terms] )
         end
       end
@@ -214,7 +218,7 @@ module Tire::Search
         end
 
         query[:filtered].tap do |f|
-          assert_equal( { :term => { :foo => 'bar' } }, f[:query].to_hash )
+          assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
           assert_equal( { :tags => ['ruby'] }, f[:filter][:and].first[:terms] )
         end
       end

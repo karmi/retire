@@ -7,8 +7,11 @@ module Tire
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
-      def term(field, value)
-        @value = { :term => { field => value } }
+      def term(field, value, options={})
+        query = { field => { :term => value } }
+        query[field].update(options)
+        @value = { :term => query }
+      end
 
       def fuzzy(field, value, options={})
         query = { field => { :term => value } }
