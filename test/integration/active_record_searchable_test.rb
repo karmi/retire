@@ -7,42 +7,18 @@ module Tire
 
     def setup
       super
-      ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":memory:" )
-
-      ActiveRecord::Migration.verbose = false
-      ActiveRecord::Schema.define(:version => 1) do
-        create_table :active_record_articles do |t|
-          t.string   :title
-          t.datetime :created_at, :default => 'NOW()'
-        end
-        create_table :active_record_comments do |t|
-          t.string     :author
-          t.text       :body
-          t.references :article
-          t.timestamps
-        end
-        create_table :active_record_stats do |t|
-          t.integer    :pageviews
-          t.string     :period
-          t.references :article
-        end
-        create_table :active_record_class_with_tire_methods do |t|
-          t.string     :title
-        end
-        create_table :active_record_class_with_dynamic_index_names do |t|
-          t.string     :title
-        end
-      end
+      Tire::ActiveRecordSchemaBuilder.build_schema!
     end
 
     context "ActiveRecord integration" do
 
-      setup    do
+      setup do
         ActiveRecordArticle.destroy_all
         Tire.index('active_record_articles').delete
 
         load File.expand_path('../../models/active_record_models.rb', __FILE__)
       end
+
       teardown do
         ActiveRecordArticle.destroy_all
         Tire.index('active_record_articles').delete
@@ -409,8 +385,6 @@ module Tire
 
       context "with namespaced models" do
         setup do
-           ActiveRecord::Schema.define { create_table(:active_record_namespace_my_models) { |t| t.string :title, :timestamp } }
-
            ActiveRecordNamespace::MyModel.create :title => 'Test'
            ActiveRecordNamespace::MyModel.tire.index.refresh
         end
