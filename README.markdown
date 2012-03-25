@@ -298,6 +298,18 @@ a plain old Ruby `Hash` (or JSON string) with the query declaration to the `sear
     Tire.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }
 ```
 
+... but you can also do fuzzy querys using our API:
+
+```ruby
+    Tire.search('articles') { query { fuzzy :title, 'Sour' } }
+```
+
+Tire also allow you to customize the fuzzy call by passsing an options hash:
+
+```ruby
+    Tire.search('articles') { query { fuzzy :title, 'Sour', { boost: 2, min_similarity: 0.5 } } }
+```
+
 If this sounds like a great idea to you, you are probably able to write your application
 using just `curl`, `sed` and `awk`.
 
