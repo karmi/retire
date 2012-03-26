@@ -481,9 +481,9 @@ end
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
 # * [bool](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
 # * [custom_score](http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html)
+# * [fuzzy](http://www.elasticsearch.org/guide/reference/query-dsl/fuzzy-query.html)
 # * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
 # * [ids](http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html)
-# * [fuzzy](http://www.elasticsearch.org/guide/reference/query-dsl/fuzzy-query.html)
 
 #### Faceted Search
 

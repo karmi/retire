@@ -31,7 +31,6 @@ module Tire
       def string(value, options={})
         @value = { :query_string => { :query => value } }
         @value[:query_string].update(options)
-        # TODO: https://github.com/elasticsearch/elasticsearch/wiki/Query-String-Query
         @value
       end
 
