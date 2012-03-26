@@ -8,15 +8,8 @@ module Tire
       end
 
       def term(field, value, options={})
-        query = { field => { :term => value } }
-        query[field].update(options)
+        query = { field => { :term => value }.update(options) }
         @value = { :term => query }
-      end
-
-      def fuzzy(field, value, options={})
-        query = { field => { :term => value } }
-        query[field].update(options)
-        @value = { :fuzzy => query }
       end
 
       def terms(field, value, options={})
@@ -47,6 +40,11 @@ module Tire
         @value[:custom_score] = options
         @value[:custom_score].update({:query => @custom_score.to_hash})
         @value
+      end
+
+      def fuzzy(field, value, options={})
+        query = { field => { :term => value }.update(options) }
+        @value = { :fuzzy => query }
       end
 
       def boolean(options={}, &block)

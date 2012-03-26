@@ -5,7 +5,6 @@ module Tire::Search
   class QueryTest < Test::Unit::TestCase
 
     context "Query" do
-
       should "be serialized to JSON" do
         assert_respond_to Query.new, :to_json
       end
@@ -20,7 +19,9 @@ module Tire::Search
           term(:foo, 'bar')
         end.to_json)
       end
+    end
 
+    context "Term query" do
       should "allow search for single term" do
         assert_equal( { :term => { :foo => { :term => 'bar' } } }, Query.new.term(:foo, 'bar') )
       end
@@ -28,7 +29,9 @@ module Tire::Search
       should "allow search for single term passing an options hash" do
         assert_equal( { :term => { :foo => { :term => 'bar', :boost => 2.0 } } }, Query.new.term(:foo, 'bar', :boost => 2.0) )
       end
+    end
 
+    context "Terms query" do
       should "allow search for multiple terms" do
         assert_equal( { :terms => { :foo => ['bar', 'baz'] } }, Query.new.terms(:foo, ['bar', 'baz']) )
       end
@@ -37,11 +40,15 @@ module Tire::Search
         assert_equal( { :terms => { :foo => ['bar', 'baz'], :minimum_match => 2 } },
                       Query.new.terms(:foo, ['bar', 'baz'], :minimum_match => 2) )
       end
+    end
 
+    context "Range query" do
       should "allow search for a range" do
         assert_equal( { :range => { :age => { :gte => 21 } } }, Query.new.range(:age, { :gte => 21 }) )
       end
+    end
 
+    context "Text query" do
       should "allow search with a text search" do
         assert_equal( { :text => {'field' => {:query => 'foo'}}}, Query.new.text('field', 'foo'))
       end
@@ -50,7 +57,9 @@ module Tire::Search
         assert_equal( { :text => {'field' => {:query => 'foo', :operator => 'and'}}},
                       Query.new.text('field', 'foo', :operator => 'and'))
       end
+    end
 
+    context "Query String query" do
       should "allow search with a query string" do
         assert_equal( { :query_string => { :query => 'title:foo' } },
                       Query.new.string('title:foo') )
@@ -70,7 +79,9 @@ module Tire::Search
         assert_equal( { :query_string => { :query => 'foo', :fields => ['title.*'], :use_dis_max => true } },
                       Query.new.string('foo', :fields => ['title.*'], :use_dis_max => true) )
       end
+    end
 
+    context "Custom Score query" do
       should "allow to set script for custom score queries" do
         query = Query.new.custom_score(:script => "_score * doc['price'].value") do
           string 'foo'
@@ -88,16 +99,19 @@ module Tire::Search
         assert_equal 1, query[:custom_score][:params][:a]
         assert_equal 2, query[:custom_score][:params][:b]
       end
+    end
 
+    context "All query" do
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
       end
+    end
 
+    context "IDs query" do
       should "search for documents by IDs" do
         assert_equal( { :ids => { :values => [1, 2], :type => 'foo' }  },
                       Query.new.ids([1, 2], 'foo') )
       end
-
     end
     
     context "FuzzyQuery" do
@@ -174,7 +188,6 @@ module Tire::Search
       end
 
     end
-
 
     context "FilteredQuery" do
 
