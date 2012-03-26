@@ -7,8 +7,10 @@ module Tire
 
     context "Text query" do
       setup do
-        ::RestClient.put "#{URL}/articles-test/article/plus-one", {:title => "+1 !!!"}.to_json
-        ::RestClient.post "#{URL}/articles-test/_refresh", ''
+        Tire.index('articles-test') do
+          store :type => 'article', :title => '+1 !!!'
+          refresh
+        end
       end
 
       should "find article by title" do
