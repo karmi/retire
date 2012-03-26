@@ -7,14 +7,12 @@ module Tire
 
     context "DSL" do
 
-      should "allow passing search payload as JSON" do
-        s = Tire.search 'articles-test', :query => { :query_string => { :query => 'ruby' } },
-                                         :facets => { 'current-tags' => { :filter => { :term => {:tags => 'ruby' } } },
-                                                   'global-tags'  => { :filter => { :term => {:tags => 'ruby'} }, :global => true } }
+      should "allow passing search payload as a Hash" do
+        s = Tire.search 'articles-test', :query  => { :query_string => { :query => 'ruby' } },
+                                         :facets => { 'tags' => { :filter => { :term => {:tags => 'ruby' } } } }
         # p s.results
         assert_equal 2, s.results.count
-        assert_not_nil s.results.facets['current-tags']
-        assert_not_nil s.results.facets['global-tags']
+        assert_equal 2, s.results.facets['tags']['count']
       end
 
     end
