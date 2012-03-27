@@ -63,6 +63,18 @@ module Tire
         assert_equal '', s.params
       end
 
+      should "allow to search with given payload" do
+        given_payload = { 'query' => { 'query_string' => { 'query' => 'foo' } } }
+        Configuration.client.expects(:get).with do |url, got_payload|
+          assert_equal given_payload, MultiJson.decode( got_payload )
+          !url.include?('payload')
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        s = Search::Search.new('index', :payload => given_payload)
+        assert_equal given_payload, s.to_hash
+        s.perform
+      end
+
       should "properly encode namespaced document type" do
         Configuration.client.expects(:get).with do |url, payload|
           url.match %r|index/my_application%2Farticle/_search|

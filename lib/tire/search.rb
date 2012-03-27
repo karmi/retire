@@ -9,6 +9,7 @@ module Tire
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
+        @payload = options.delete(:payload)
         @options = options
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
@@ -108,7 +109,7 @@ module Tire
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @payload || begin
           request = {}
           request.update( { :query  => @query.to_hash } )    if @query
           request.update( { :sort   => @sort.to_ary   } )    if @sort
