@@ -3,7 +3,7 @@ require 'benchmark'
 
 namespace :tire do
 
-  desc <<-DESC.gsub(/    /, '')
+  full_comment = <<-DESC.gsub(/    /, '')
     Import data from your model using paginate: rake environment tire:import CLASS='MyModel'.
 
     Pass params for the `paginate` method:
@@ -15,7 +15,8 @@ namespace :tire do
     Set target index name:
       $ rake environment tire:import CLASS='Article' INDEX='articles-new'
   DESC
-  task :import do
+  desc full_comment
+  task :import do |t|
 
     def elapsed_to_human(elapsed)
       hour = 60*60
@@ -34,7 +35,7 @@ namespace :tire do
     end
 
     if ENV['CLASS'].to_s == ''
-      puts '='*90, 'USAGE', '='*90, Rake::Task['tire:import'].full_comment, ""
+      puts '='*90, 'USAGE', '='*90, full_comment, ""
       exit(1)
     end
 
@@ -100,7 +101,7 @@ namespace :tire do
 
   namespace :index do
 
-    desc <<-DESC.gsub(/      /, '')
+    full_comment = <<-DESC.gsub(/      /, '')
       Delete indices passed in the INDEX environment variable; separate multiple indices by comma.
 
       Pass name of a single index to drop in the INDEX environmnet variable:
@@ -110,11 +111,12 @@ namespace :tire do
         $ rake environment tire:index:drop INDICES=articles-2011-01,articles-2011-02
 
     DESC
+    desc full_comment
     task :drop do
       index_names = (ENV['INDEX'] || ENV['INDICES']).to_s.split(/,\s*/)
 
       if index_names.empty?
-        puts '='*90, 'USAGE', '='*90, Rake::Task['tire:index:drop'].full_comment, ""
+        puts '='*90, 'USAGE', '='*90, full_comment, ""
         exit(1)
       end
 
