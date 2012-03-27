@@ -400,27 +400,23 @@ module Tire
 
         end
 
-        context "namespaced instances" do
-          setup do
-            load File.expand_path('../../models/active_record_models.rb', __FILE__)
-            Tire::ActiveRecordSchemaBuilder.build_schema!
-          end
-
-          should "serialize namespaced ActiveRecord objects" do
+        context "namespaced models" do
+          should "not URL-escape the document_type" do
             Configuration.client.expects(:post).with do |url, json|
+              puts url, json
               url  == "#{Configuration.url}/_bulk" &&
-              json =~ /"_index":"active_record_namespace_my_models"/ &&
-              json =~ /"_type":"active_record_namespace\/my_model"/ &&
-              json =~ /"_id":"1"/ &&
-              json =~ /"_id":"2"/ &&
-              json =~ /"title":"One"/ &&
-              json =~ /"title":"Two"/
+              json =~ %r|"_index":"my_namespace_my_models"| &&
+              json =~ %r|"_type":"my_namespace/my_model"|
             end.returns(mock_response('{}', 200))
 
-            one = ActiveRecordNamespace::MyModel.new 'title' => 'One'; one.id = '1'
-            two = ActiveRecordNamespace::MyModel.new 'title' => 'Two'; two.id = '2'
+            module MyNamespace
+              class MyModel
+                def document_type;   "my_namespace/my_model"; end
+                def to_indexed_json; "{}";                    end
+              end
+            end
 
-            ActiveRecordNamespace::MyModel.index.bulk_store [ one, two ]
+            Tire.index('my_namespace_my_models').bulk_store [ MyNamespace::MyModel.new ]
           end
         end
 
