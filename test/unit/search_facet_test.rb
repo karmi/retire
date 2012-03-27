@@ -109,12 +109,40 @@ module Tire::Search
         end
       end
 
+      context "statistical facet" do
+        should "encode facet options" do
+          f = Facet.new('statistical') { statistical :words }
+          assert_equal({:statistical => {:statistical => {:field => 'words'}}}.to_json, f.to_json)
+        end
+
+        should "encode the JSON if a 'statistical' custom option is defined" do
+          f = Facet.new('statistical') { statistical :words, :statistical => {:params => {:factor => 5}} }
+          assert_equal({:statistical => {:statistical => {:params => {:factor => 5 }}}}.to_json, f.to_json)
+        end
+      end
+
+      context "terms_stats facet" do
+        should "should encode facet options" do
+          f = Facet.new('terms_stats') { terms_stats :tags, :words }
+          assert_equal({:terms_stats => {:terms_stats => {:key_field => 'tags', :value_field => 'words'}}}.to_json, f.to_json)
+        end
+      end
+
       context "query facet" do
         should "encode facet options" do
           f = Facet.new('q_facet') do
             query { string '_exists_:foo' }
           end
           assert_equal({ :q_facet => { :query => { :query_string => { :query => '_exists_:foo' } } } }.to_json, f.to_json)
+        end
+      end
+
+      context "filter facet" do
+        should "encode facet options" do
+          f = Facet.new('filter_facet') do
+            filter :tags, 'ruby'
+          end
+          assert_equal({ :filter_facet => { :filter => { :term => { :tags => 'ruby' } } } }.to_json, f.to_json)
         end
       end
 

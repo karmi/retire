@@ -27,10 +27,11 @@ Gem::Specification.new do |s|
   # = Library dependencies
   #
   s.add_dependency "rake"
-  s.add_dependency "rest-client", "~> 1.6.0"
+  s.add_dependency "rest-client", "~> 1.6"
   s.add_dependency "multi_json",  "~> 1.0"
-  s.add_dependency "activemodel", "~> 3.0"
-  s.add_dependency "hashr",       "~> 0.0.16"
+  s.add_dependency "activemodel", ">= 3.0"
+  s.add_dependency "hashr",       "~> 0.0.19"
+  s.add_dependency "rack",        ">= 1.4" if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 
   # = Development dependencies
   #
@@ -38,18 +39,19 @@ Gem::Specification.new do |s|
   s.add_development_dependency "yajl-ruby",   "~> 0.8.0"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "mocha"
-  s.add_development_dependency "activerecord", "~> 3.0.7"
-  s.add_development_dependency "mongoid",      "~> 2.2.1"
+  s.add_development_dependency "activerecord", ">= 3.0"
   s.add_development_dependency "sqlite3"
-  s.add_development_dependency "supermodel"
+  s.add_development_dependency "mongoid",      "~> 2.2.1"
+  s.add_development_dependency "bson_ext"
+  s.add_development_dependency "redis-persistence"
   s.add_development_dependency "curb"
+  s.add_development_dependency "minitest"
 
   # These gems are not needed for CI at <http://travis-ci.org/#!/karmi/tire>
   #
   unless ENV["CI"]
     s.add_development_dependency "rdoc"
-    s.add_development_dependency "rcov"
-    s.add_development_dependency "turn"
+    s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
   end
 
   s.description = <<-DESC

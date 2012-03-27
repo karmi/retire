@@ -1,3 +1,5 @@
+# encoding: UTF-8
+#
 # **Tire** provides rich and comfortable Ruby API for the
 # [_ElasticSearch_](http://www.elasticsearch.org/) search engine/database.
 #
@@ -43,9 +45,9 @@ require 'tire'
 
  [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
 
- curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz
- tar -zxvf elasticsearch-0.17.6.tar.gz
- ./elasticsearch-0.17.6/bin/elasticsearch -f
+ curl -k -L -o elasticsearch-0.19.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz
+ tar -zxvf elasticsearch-0.19.0.tar.gz
+ ./elasticsearch-0.19.0/bin/elasticsearch -f
 INSTALL
 
 ### Storing and indexing documents
@@ -317,7 +319,7 @@ Tire.configure do
   #     # 2011-04-24 11:34:01:150 [CREATE] ("articles")
   #     #
   #     curl -X POST "http://localhost:9200/articles"
-  #     
+  #
   #     # 2011-04-24 11:34:01:152 [200]
   #
   logger 'elasticsearch.log'
@@ -474,10 +476,12 @@ end
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
 #
 # * [string](http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html)
+# * [text](http://www.elasticsearch.org/guide/reference/query-dsl/text-query.html)
 # * [term](http://elasticsearch.org/guide/reference/query-dsl/term-query.html)
 # * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
 # * [bool](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
 # * [custom_score](http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html)
+# * [fuzzy](http://www.elasticsearch.org/guide/reference/query-dsl/fuzzy-query.html)
 # * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
 # * [ids](http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html)
 
@@ -532,11 +536,11 @@ s = Tire.search 'articles' do
   #
   query { string 'title:T*' }
 
-  facet 'global-tags' do
+  facet 'global-tags', :global => true do
 
     # ...but set the `global` scope for the facet in this case.
     #
-    terms :tags, :global => true
+    terms :tags
   end
 
   # We can even _combine_ facets scoped to the current query
@@ -583,6 +587,8 @@ end
 # * [date](http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html)
 # * [range](http://www.elasticsearch.org/guide/reference/api/search/facets/range-facet.html)
 # * [histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html)
+# * [statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html)
+# * [terms_stats](http://www.elasticsearch.org/guide/reference/api/search/facets/terms-stats-facet.html)
 # * [query](http://www.elasticsearch.org/guide/reference/api/search/facets/query-facet.html)
 
 # We have seen that _ElasticSearch_ facets enable us to fetch complex aggregations from our data.
@@ -601,10 +607,10 @@ end
 # are returned.
 #
 s = Tire.search 'articles' do
-  
+
   # We will use just the same **query** as before.
   #
-  query { string 'title:T*' } 
+  query { string 'title:T*' }
 
   # But we will add a _terms_ **filter** based on tags.
   #
@@ -666,7 +672,7 @@ s = Tire.search 'articles' do
 
   # We will search for articles tagged “ruby”, again, ...
   #
-  query { string 'tags:ruby' } 
+  query { string 'tags:ruby' }
 
    # ... but will sort them by their `title`, in descending order.
    #
@@ -689,7 +695,7 @@ s = Tire.search 'articles' do
 
   # We will just get all articles in this case.
   #
-  query { all } 
+  query { all }
 
   sort do
 
@@ -723,7 +729,7 @@ end
 s = Tire.search 'articles' do
 
   # Let's search for documents containing word “Two” in their titles,
-  query { string 'title:Two' } 
+  query { string 'title:Two' }
 
    # and instruct _ElasticSearch_ to highlight relevant snippets.
    #

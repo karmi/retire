@@ -14,6 +14,14 @@ module Tire
         assert_equal 'dummy', @index.name
       end
 
+      should "return HTTP response" do
+        assert_respond_to @index, :response
+
+        Configuration.client.expects(:head).returns(mock_response('OK'))
+        @index.exists?
+        assert_equal      'OK', @index.response.body
+      end
+
       should "return true when exists" do
         Configuration.client.expects(:head).returns(mock_response(''))
         assert @index.exists?
@@ -173,6 +181,21 @@ module Tire
           @index.store article
         end
 
+        should "properly encode namespaced document types" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{Configuration.url}/dummy/my_namespace%2Fmy_model/"
+          end.returns(mock_response('{"ok":true,"_id":"123"}'))
+
+          module MyNamespace
+            class MyModel
+              def document_type;   "my_namespace/my_model"; end
+              def to_indexed_json; "{}";                    end
+            end
+          end
+
+          @index.store MyNamespace::MyModel.new
+        end
+
         should "set default type" do
           Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :title => 'Test'
@@ -188,6 +211,11 @@ module Tire
         should "raise error when storing neither String nor object with #to_indexed_json method" do
           class MyDocument;end; document = MyDocument.new
           assert_raise(ArgumentError) { @index.store document }
+        end
+
+        should "raise deprecation warning when trying to store a JSON string" do
+          Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_id":"test"}'))
+          @index.store '{"foo" : "bar"}'
         end
 
         context "document with ID" do
@@ -264,6 +292,12 @@ module Tire
           end
         end
 
+        should "properly encode document type" do
+          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/my_namespace%2Fmy_model/id-1").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.retrieve 'my_namespace/my_model', 'id-1'
+        end
+
       end
 
       context "when removing" do
@@ -273,6 +307,13 @@ module Tire
                                                 returns(mock_response('{"ok":true,"_id":"1"}')).twice
           @index.remove :id => 1, :type => 'article', :title => 'Test'
           @index.remove :id => 1, :type => 'article', :title => 'Test'
+        end
+
+        should "get namespaced type from document" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/articles%2Farticle/1").
+                                                returns(mock_response('{"ok":true,"_id":"1"}')).twice
+          @index.remove :id => 1, :type => 'articles/article', :title => 'Test'
+          @index.remove :id => 1, :type => 'articles/article', :title => 'Test'
         end
 
         should "set default type" do
@@ -304,6 +345,12 @@ module Tire
           assert_raise ArgumentError do
             @index.remove :document, nil
           end
+        end
+
+        should "properly encode document type" do
+          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/my_namespace%2Fmy_model/id-1").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.remove 'my_namespace/my_model', 'id-1'
         end
 
       end
@@ -363,11 +410,53 @@ module Tire
 
         end
 
+        context "namespaced models" do
+          should "not URL-escape the document_type" do
+            Configuration.client.expects(:post).with do |url, json|
+              puts url, json
+              url  == "#{Configuration.url}/_bulk" &&
+              json =~ %r|"_index":"my_namespace_my_models"| &&
+              json =~ %r|"_type":"my_namespace/my_model"|
+            end.returns(mock_response('{}', 200))
+
+            module MyNamespace
+              class MyModel
+                def document_type;   "my_namespace/my_model"; end
+                def to_indexed_json; "{}";                    end
+              end
+            end
+
+            Tire.index('my_namespace_my_models').bulk_store [ MyNamespace::MyModel.new ]
+          end
+        end
+
         should "try again when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
           Configuration.logger.expects(:log_response).with(503, any_parameters).at_least(1)
 
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+        end
+
+        should "try again and the raise when an exception occurs" do
+          Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
+
+          assert_raise(RuntimeError) do
+            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], {:raise => true})
+          end
+        end
+
+        should "try again when a connection error occurs" do
+          Configuration.client.expects(:post).raises(Errno::ECONNREFUSED, "Connection refused - connect(2)").at_least(2)
+
+          assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+        end
+
+        should "signal exceptions should not be caught" do
+          Configuration.client.expects(:post).raises(Interrupt, "abort then interrupt!")
+
+          assert_raise Interrupt do
+            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+          end
         end
 
         should "display error message when collection item does not have ID" do
@@ -414,7 +503,7 @@ module Tire
 
           should "just store it in bulk" do
             collection = [{ :id => 1, :title => 'Article' }]
-            @index.expects(:bulk_store).with( collection ).returns(true)
+            @index.expects(:bulk_store).with(collection, {} ).returns(true)
 
             @index.import collection
           end
@@ -424,20 +513,20 @@ module Tire
         context "class" do
 
           should "call the passed method and bulk store the results" do
-            @index.expects(:bulk_store).with([1, 2, 3, 4]).returns(true)
+            @index.expects(:bulk_store).with { |c, o| c == [1, 2, 3, 4] }.returns(true)
 
-            @index.import ImportData, :paginate
+            @index.import ImportData, :method => 'paginate'
           end
 
           should "pass the params to the passed method and bulk store the results" do
-            @index.expects(:bulk_store).with([1, 2]).returns(true)
-            @index.expects(:bulk_store).with([3, 4]).returns(true)
+            @index.expects(:bulk_store).with { |c,o| c == [1, 2] }.returns(true)
+            @index.expects(:bulk_store).with { |c,o| c == [3, 4] }.returns(true)
 
-            @index.import ImportData, :paginate, :page => 1, :per_page => 2
+            @index.import ImportData, :method => 'paginate', :page => 1, :per_page => 2
           end
 
           should "pass the class when method not passed" do
-            @index.expects(:bulk_store).with(ImportData).returns(true)
+            @index.expects(:bulk_store).with { |c,o| c == ImportData }.returns(true)
 
             @index.import ImportData
           end
@@ -449,7 +538,7 @@ module Tire
           context "and plain collection" do
 
             should "allow to manipulate the collection in the block" do
-              Tire::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }])
+              Tire::Index.any_instance.expects(:bulk_store).with([{ :id => 1, :title => 'ARTICLE' }], {})
 
 
               @index.import [{ :id => 1, :title => 'Article' }] do |articles|
@@ -462,11 +551,11 @@ module Tire
           context "and object" do
 
             should "call the passed block on every batch" do
-              Tire::Index.any_instance.expects(:bulk_store).with([1, 2])
-              Tire::Index.any_instance.expects(:bulk_store).with([3, 4])
+              Tire::Index.any_instance.expects(:bulk_store).with { |collection, options| collection == [1, 2] }
+              Tire::Index.any_instance.expects(:bulk_store).with { |collection, options| collection == [3, 4] }
 
               runs = 0
-              @index.import ImportData, :paginate, :per_page => 2 do |documents|
+              @index.import ImportData, :method => 'paginate', :per_page => 2 do |documents|
                 runs += 1
                 # Don't forget to return the documents at the end of the block
                 documents
@@ -476,11 +565,10 @@ module Tire
             end
 
             should "allow to manipulate the documents in passed block" do
-              Tire::Index.any_instance.expects(:bulk_store).with([2, 3])
-              Tire::Index.any_instance.expects(:bulk_store).with([4, 5])
+              Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [2, 3] }
+              Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [4, 5] }
 
-
-              @index.import ImportData, :paginate, :per_page => 2 do |documents|
+              @index.import ImportData, :method => :paginate, :per_page => 2 do |documents|
                 # Add 1 to every "document" and return them
                 documents.map { |d| d + 1 }
               end

@@ -19,9 +19,9 @@ Installation
 
 OK. First, you need a running _ElasticSearch_ server. Thankfully, it's easy. Let's define easy:
 
-    $ curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz
-    $ tar -zxvf elasticsearch-0.17.6.tar.gz
-    $ ./elasticsearch-0.17.6/bin/elasticsearch -f
+    $ curl -k -L -o elasticsearch-0.19.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz
+    $ tar -zxvf elasticsearch-0.19.0.tar.gz
+    $ ./elasticsearch-0.19.0/bin/elasticsearch -f
 
 See, easy. On a Mac, you can also use _Homebrew_:
 
@@ -161,8 +161,8 @@ from the database:
 
       sort { by :title, 'desc' }
 
-      facet 'global-tags' do
-        terms :tags, :global => true
+      facet 'global-tags', :global => true do
+        terms :tags
       end
 
       facet 'current-tags' do
@@ -295,7 +295,7 @@ If configuring the search payload with blocks feels somehow too weak for you, yo
 a plain old Ruby `Hash` (or JSON string) with the query declaration to the `search` method:
 
 ```ruby
-    Tire.search 'articles', :query => { :fuzzy => { :title => 'Sour' } }
+    Tire.search 'articles', :query => { :prefix => { :title => 'fou' } }
 ```
 
 If this sounds like a great idea to you, you are probably able to write your application
@@ -688,21 +688,17 @@ Well, things stay mostly the same:
       include Tire::Model::Search
       include Tire::Model::Callbacks
 
-      # Let's use a different index name so stuff doesn't get mixed up.
-      #
-      index_name 'mongo-articles'
-
       # These Mongo guys sure do get funky with their IDs in +serializable_hash+, let's fix it.
       #
       def to_indexed_json
-        self.to_json
+        self.as_json
       end
 
     end
 
     Article.create :title => 'I Love ElasticSearch'
 
-    Article.search 'love'
+    Article.tire.search 'love'
 ```
 
 _Tire_ does not care what's your primary data storage solution, if it has an _ActiveModel_-compatible

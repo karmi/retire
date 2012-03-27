@@ -6,5 +6,6 @@ class PersistentArticleWithDefaults
   property :published_on
   property :tags,   :default => []
   property :hidden, :default => false
+  property :options,  :default => {:switches => []}
 
 end

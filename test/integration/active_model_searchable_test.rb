@@ -1,4 +1,5 @@
 require 'test_helper'
+require File.expand_path('../../models/supermodel_article', __FILE__)
 
 module Tire
 
@@ -7,13 +8,14 @@ module Tire
 
     def setup
       super
-      SupermodelArticle.delete_all
+      Redis::Persistence.config.redis = Redis.new db: ENV['REDIS_PERSISTENCE_TEST_DATABASE'] || 14
+      Redis::Persistence.config.redis.flushdb
       @model = SupermodelArticle.new :title => 'Test'
     end
 
     def teardown
       super
-      SupermodelArticle.delete_all
+      SupermodelArticle.all.each { |a| a.destroy }
     end
 
     context "ActiveModel integration" do
@@ -54,7 +56,7 @@ module Tire
         assert_instance_of Results::Item, results.first
         assert_equal       'Test', results.first.title
         assert_not_nil     results.first._score
-        assert_equal       id, results.first.id
+        assert_equal       id.to_s, results.first.id.to_s
       end
 
       should "remove document from index on destroy" do
@@ -72,8 +74,8 @@ module Tire
       end
 
       should "retrieve sorted documents by IDs returned from search" do
-        SupermodelArticle.create! :title => 'foo'
-        SupermodelArticle.create! :id => 'abc123', :title => 'bar'
+        SupermodelArticle.create :title => 'foo'
+        SupermodelArticle.create :id => 'abc123', :title => 'bar'
 
         SupermodelArticle.index.refresh
         results = SupermodelArticle.search 'foo OR bar^100'

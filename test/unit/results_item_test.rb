@@ -60,6 +60,14 @@ module Tire
         assert_equal 'Test', @document.title
       end
 
+      should "not care about symbols or strings in composite keys" do
+        @document = Results::Item.new :highlight => { 'name.ngrams' => 'abc' }
+
+        assert_not_nil @document.highlight['name.ngrams']
+        assert_equal   'abc', @document.highlight['name.ngrams']
+        assert_equal   @document.highlight['name.ngrams'], @document.highlight['name.ngrams'.to_sym]
+      end
+
       should "allow to retrieve values from nested hashes" do
         assert_not_nil   @document.author.name
         assert_equal 'Kafka', @document.author.name

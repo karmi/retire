@@ -17,7 +17,6 @@ module Tire
     end
 
     context "PersistentModel" do
-
       should "search with simple query" do
         PersistentArticle.create :id => 1, :title => 'One'
         PersistentArticle.index.refresh
@@ -88,6 +87,28 @@ module Tire
           assert_equal 2, results.num_pages
           assert_equal 0, results.offset_value
         end
+
+      end
+
+      context "with namespaced models" do
+        setup do
+          MyNamespace::PersistentArticleInNamespace.create :title => 'Test'
+          MyNamespace::PersistentArticleInNamespace.index.refresh
+        end
+
+        teardown do
+          MyNamespace::PersistentArticleInNamespace.index.delete
+        end
+
+        should "find the document in the index" do
+          results = MyNamespace::PersistentArticleInNamespace.search 'test'
+
+          assert       results.any?, "No results returned: #{results.inspect}"
+          assert_equal 1, results.count
+
+          assert_instance_of MyNamespace::PersistentArticleInNamespace, results.first
+        end
+
       end
 
     end
