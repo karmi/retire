@@ -41,6 +41,20 @@ module Tire
       MultiJson.decode(@response.body)[@name]
     end
 
+    def update_mapping(mapping)
+      mapping.each do |type, value|
+        url, body = "#{Configuration.url}/#{@name}/#{type}/_mapping", MultiJson.encode(type => value)
+        begin
+          @response = Configuration.client.put url, body
+          raise RuntimeError, "#{@response.code} > #{@response.body}" if @response.failure?
+        ensure
+          curl = %Q|curl -X PUT "#{url}" -d '#{body}'|
+          logged('MAPPING', curl)
+        end
+      end
+      true
+    end
+
     def store(*args)
       document, options = args
       type = get_type_from_document(document)
