@@ -78,8 +78,6 @@ module Tire
         #
         def indexes(name, options = {}, &block)
           if block_given?
-            @association_class = options[:class] if options[:class]
-            options.delete(:class)
             mapping[name] ||= { :type => 'object', :properties => {} }.update(options)
             @_nested_mapping = name
             nested = yield

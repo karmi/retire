@@ -38,7 +38,7 @@ module Tire
       mapping do
         indexes :title
         indexes :content
-        indexes :associated_model, :class => AssociatedModel do
+        indexes :associated_model do
           indexes :first_name
         end
       end
