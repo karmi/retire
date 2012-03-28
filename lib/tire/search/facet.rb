@@ -51,6 +51,11 @@ module Tire
         @value = { :query => Query.new(&block).to_hash }
       end
 
+      def filter(field, value, options={})
+        @value = { :filter => { :term => { field => value }}.update(options) }
+        self
+      end
+
       def to_json
         to_hash.to_json
       end

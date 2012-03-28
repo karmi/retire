@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'mongoid'
 
 class MongoidArticle

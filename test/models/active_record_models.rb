@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'active_record'
 
 class ActiveRecordArticle < ActiveRecord::Base
@@ -77,4 +76,47 @@ class ActiveRecordClassWithDynamicIndexName < ActiveRecord::Base
   index_name do
     "dynamic" + '_' + "index"
   end
+end
+
+# Used in test for multiple class instances in one index,
+# and single table inheritance (STI) support.
+
+class ActiveRecordModelOne < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+  self.table_name = 'active_record_model_one'
+  index_name 'active_record_model_one'
+end
+
+class ActiveRecordModelTwo < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+  self.table_name = 'active_record_model_two'
+  index_name 'active_record_model_two'
+end
+
+class ActiveRecordAsset < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+end
+
+class ActiveRecordVideo < ActiveRecordAsset
+  index_name 'active_record_assets'
+end
+
+class ActiveRecordPhoto < ActiveRecordAsset
+  index_name 'active_record_assets'
+end
+
+# Namespaced ActiveRecord models
+
+module ActiveRecordNamespace
+  def self.table_name_prefix
+    'active_record_namespace_'
+  end
+end
+
+class ActiveRecordNamespace::MyModel < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
 end

@@ -1,4 +1,5 @@
 require 'test_helper'
+require File.expand_path('../../models/mongoid_models', __FILE__)
 
 begin
   require "mongo"

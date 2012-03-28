@@ -39,8 +39,8 @@ module Tire
         end
 
         should "call the passed block on every batch, and NOT manipulate the documents array" do
-          Tire::Index.any_instance.expects(:bulk_store).with([1, 2])
-          Tire::Index.any_instance.expects(:bulk_store).with([3, 4])
+          Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [1, 2] }
+          Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [3, 4] }
 
           runs = 0
           ImportModel.import :per_page => 2 do |documents|
@@ -53,8 +53,8 @@ module Tire
         end
 
         should "manipulate the documents in passed block" do
-          Tire::Index.any_instance.expects(:bulk_store).with([2, 3])
-          Tire::Index.any_instance.expects(:bulk_store).with([4, 5])
+          Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [2, 3] }
+          Tire::Index.any_instance.expects(:bulk_store).with { |c,o| c == [4, 5] }
 
           ImportModel.import :per_page => 2 do |documents|
             # Add 1 to every "document" and return them

@@ -1,14 +1,14 @@
 module Tire
   module Search
     class SearchRequestFailed < StandardError; end
-  
+
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options
+      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
 
-      def initialize(indices=nil, options = {}, &block)
+      def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
-        @types   = Array(options.delete(:type))
+        @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @options = options
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
@@ -26,6 +26,10 @@ module Tire
 
       def url
         Configuration.url + @path
+      end
+
+      def params
+        @options.empty? ? '' : '?' + @options.to_param
       end
 
       def query(&block)
@@ -77,12 +81,17 @@ module Tire
         self
       end
 
+      def explain(value)
+        @explain = value
+        self
+      end
+
       def version(value)
         @version = value
       end
 
       def perform
-        @response = Configuration.client.get(self.url, self.to_json)
+        @response = Configuration.client.get(self.url + self.params, self.to_json)
         if @response.failure?
           STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
           raise SearchRequestFailed, @response.to_s
@@ -95,26 +104,31 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{self.url}?pretty=true" -d '#{self.to_json}'|
+        %Q|curl -X GET "#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty=true" -d '#{to_json}'|
       end
 
       def to_hash
-        request = {}
-        request.update( { :query  => @query.to_hash } )    if @query
-        request.update( { :sort   => @sort.to_ary   } )    if @sort
-        request.update( { :facets => @facets.to_hash } )   if @facets
-        request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
-        request.update( { :filter => { :and => @filters.map { |filter| filter.to_hash } } } ) if  @filters && @filters.size > 1
-        request.update( { :highlight => @highlight.to_hash } ) if @highlight
-        request.update( { :size => @size } )               if @size
-        request.update( { :from => @from } )               if @from
-        request.update( { :fields => @fields } )           if @fields
-        request.update( { :version => @version } )         if @version
-        request
+        @options.delete(:payload) || begin
+          request = {}
+          request.update( { :query  => @query.to_hash } )    if @query
+          request.update( { :sort   => @sort.to_ary   } )    if @sort
+          request.update( { :facets => @facets.to_hash } )   if @facets
+          request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
+          request.update( { :filter => { :and => @filters.map {|filter| filter.to_hash} } } ) if  @filters && @filters.size > 1
+          request.update( { :highlight => @highlight.to_hash } ) if @highlight
+          request.update( { :size => @size } )               if @size
+          request.update( { :from => @from } )               if @from
+          request.update( { :fields => @fields } )           if @fields
+          request.update( { :version => @version } )         if @version
+          request.update( { :explain => @explain } )         if @explain
+          request
+        end
       end
 
       def to_json
-        to_hash.to_json
+        payload = to_hash
+        # TODO: Remove when deprecated interface is removed
+        payload.is_a?(String) ? payload : payload.to_json
       end
 
       def logged(error=nil)

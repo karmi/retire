@@ -7,8 +7,9 @@ module Tire
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
 
-      def term(field, value)
-        @value = { :term => { field => value } }
+      def term(field, value, options={})
+        query = { field => { :term => value }.update(options) }
+        @value = { :term => query }
       end
 
       def terms(field, value, options={})
@@ -30,7 +31,6 @@ module Tire
       def string(value, options={})
         @value = { :query_string => { :query => value } }
         @value[:query_string].update(options)
-        # TODO: https://github.com/elasticsearch/elasticsearch/wiki/Query-String-Query
         @value
       end
 
@@ -39,6 +39,11 @@ module Tire
         @value[:custom_score] = options
         @value[:custom_score].update({:query => @custom_score.to_hash})
         @value
+      end
+
+      def fuzzy(field, value, options={})
+        query = { field => { :term => value }.update(options) }
+        @value = { :fuzzy => query }
       end
 
       def boolean(options={}, &block)

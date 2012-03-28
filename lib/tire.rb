@@ -2,9 +2,17 @@ require 'rest_client'
 require 'multi_json'
 require 'active_model'
 require 'hashr'
+require 'cgi'
+
+require 'active_support/core_ext/object/to_param'
+require 'active_support/core_ext/object/to_query'
+
+# Ruby 1.8 compatibility
+require 'tire/rubyext/ruby_1_8' if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 
 require 'tire/rubyext/hash'
 require 'tire/rubyext/symbol'
+require 'tire/utils'
 require 'tire/logger'
 require 'tire/configuration'
 require 'tire/http/response'

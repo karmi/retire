@@ -62,7 +62,7 @@ file ".gitignore", <<-END.gsub(/  /, '')
   tmp/**/*
   config/database.yml
   db/*.sqlite3
-  vendor/elasticsearch-0.17.6/
+  vendor/elasticsearch-0.19.0/
 END
 
 git :init
@@ -71,11 +71,11 @@ git :commit => "-m 'Initial commit: Clean application'"
 
 unless (RestClient.get('http://localhost:9200') rescue false)
   COMMAND = <<-COMMAND.gsub(/^    /, '')
-    curl -k -L -# -o elasticsearch-0.17.6.tar.gz \
-      "http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz"
-    tar -zxf elasticsearch-0.17.6.tar.gz
-    rm  -f    elasticsearch-0.17.6.tar.gz
-    ./elasticsearch-0.17.6/bin/elasticsearch -p #{destination_root}/tmp/pids/elasticsearch.pid
+    curl -k -L -# -o elasticsearch-0.19.0.tar.gz \
+      "http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz"
+    tar -zxf elasticsearch-0.19.0.tar.gz
+    rm  -f   elasticsearch-0.19.0.tar.gz
+    ./elasticsearch-0.19.0/bin/elasticsearch -p #{destination_root}/tmp/pids/elasticsearch.pid
   COMMAND
 
   puts        "\n"

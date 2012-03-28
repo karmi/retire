@@ -210,6 +210,21 @@ module Tire
 
       end
 
+      context "filter" do
+        should "return a filtered facet" do
+          s = Tire.search('articles-test') do
+            query { all }
+            facet 'filtered' do
+              filter :tags, 'ruby'
+            end
+          end
+
+          assert_equal 5, s.results.size, s.results.inspect
+          facets = s.results.facets["filtered"]
+          assert_equal 2, facets["count"], facets.inspect
+        end
+      end
+
     end
 
   end

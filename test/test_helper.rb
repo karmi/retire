@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'bundler/setup'
 
 require 'pathname'
 require 'test/unit'
@@ -7,14 +8,27 @@ require 'yajl/json_gem'
 require 'sqlite3'
 
 require 'shoulda'
-require 'turn/autorun' unless ENV["TM_FILEPATH"] || ENV["CI"]
+require 'turn/autorun' unless ENV["TM_FILEPATH"] || ENV["CI"] || defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 require 'mocha'
 
 require 'active_support/core_ext/hash/indifferent_access'
 
 require 'tire'
 
-Dir[File.dirname(__FILE__) + '/models/**/*.rb'].each { |m| require m }
+# Require basic model files
+#
+require File.dirname(__FILE__) + '/models/active_model_article'
+require File.dirname(__FILE__) + '/models/active_model_article_with_callbacks'
+require File.dirname(__FILE__) + '/models/active_model_article_with_custom_document_type'
+require File.dirname(__FILE__) + '/models/active_model_article_with_custom_index_name'
+require File.dirname(__FILE__) + '/models/active_record_models'
+require File.dirname(__FILE__) + '/models/article'
+require File.dirname(__FILE__) + '/models/persistent_article'
+require File.dirname(__FILE__) + '/models/persistent_article_in_namespace'
+require File.dirname(__FILE__) + '/models/persistent_article_with_casting'
+require File.dirname(__FILE__) + '/models/persistent_article_with_defaults'
+require File.dirname(__FILE__) + '/models/persistent_articles_with_custom_index_name'
+require File.dirname(__FILE__) + '/models/validated_model'
 
 class Test::Unit::TestCase
 

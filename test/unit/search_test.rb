@@ -35,6 +35,48 @@ module Tire
         assert_match %r|index/bar/_search|, s.url
       end
 
+      should "allow to pass search parameters" do
+        s = Search::Search.new('index', :routing => 123, :timeout => 1) { query { string 'foo' } }
+
+        assert  ! s.params.empty?
+
+        assert_match %r|routing=123|, s.params
+        assert_match %r|timeout=1|,   s.params
+      end
+
+      should "encode search parameters in the request" do
+        Configuration.client.expects(:get).with do |url, payload|
+          url.include? 'routing=123&timeout=1'
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        Search::Search.new('index', :routing => 123, :timeout => 1) { query { string 'foo' } }.perform
+      end
+
+      should "encode missing params as an empty string" do
+        Configuration.client.expects(:get).with do |url, payload|
+          (! url.include? '?') && (! url.include? '&')
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        s = Search::Search.new('index') { query { string 'foo' } }
+        s.perform
+
+        assert_equal '', s.params
+      end
+
+      should "properly encode namespaced document type" do
+        Configuration.client.expects(:get).with do |url, payload|
+          url.match %r|index/my_application%2Farticle/_search|
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        s = Search::Search.new('index', :type => 'my_application/article') do
+          query { string 'foo' }
+        end
+        s.perform
+
+        assert_match %r|index/my_application%2Farticle/_search|, s.url
+        assert_match %r|index/my_application%2Farticle/_search|, s.to_curl
+      end
+
       should "allow to pass block to query" do
         Search::Query.any_instance.expects(:instance_eval)
 
@@ -180,7 +222,7 @@ module Tire
           hash = MultiJson.decode( s.to_json )
           assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
         end
-        
+
       end
 
       context "facets" do
@@ -339,6 +381,33 @@ module Tire
           end
           hash = MultiJson.decode( s.to_json )
           assert_equal ['title', 'tags'], hash['fields']
+        end
+
+      end
+
+      context "explain" do
+
+        should "default to false" do
+          s = Search::Search.new('index') do
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_nil hash['explain']
+        end
+
+        should "set the explain field in the request when true" do
+          s = Search::Search.new('index') do
+            explain true
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal true, hash['explain']
+        end
+
+        should "not set the explain field when false" do
+          s = Search::Search.new('index') do
+            explain false
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_nil hash['explain']
         end
 
       end

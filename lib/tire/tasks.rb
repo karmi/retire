@@ -3,22 +3,20 @@ require 'benchmark'
 
 namespace :tire do
 
-  usage = <<-DESC
-          Import data from your model using paginate: rake environment tire:import CLASS='MyModel'
+  full_comment = <<-DESC.gsub(/    /, '')
+    Import data from your model using paginate: rake environment tire:import CLASS='MyModel'.
 
-          Pass params for the `paginate` method:
-            $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}'
+    Pass params for the `paginate` method:
+      $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}'
 
-          Force rebuilding the index (delete and create):
-            $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
+    Force rebuilding the index (delete and create):
+      $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
 
-          Set target index name:
-            $ rake environment tire:import CLASS='Article' INDEX='articles-new'
-    
+    Set target index name:
+      $ rake environment tire:import CLASS='Article' INDEX='articles-new'
   DESC
-
-  desc usage.split("\n").first.to_s
-  task :import do
+  desc full_comment
+  task :import do |t|
 
     def elapsed_to_human(elapsed)
       hour = 60*60
@@ -37,12 +35,14 @@ namespace :tire do
     end
 
     if ENV['CLASS'].to_s == ''
-      puts '='*80, 'USAGE', '='*80, usage.gsub(/          /, '')
+      puts '='*90, 'USAGE', '='*90, full_comment, ""
       exit(1)
     end
 
     klass  = eval(ENV['CLASS'].to_s)
     params = eval(ENV['PARAMS'].to_s) || {}
+
+    params.update :method => 'paginate'
 
     index = Tire::Index.new( ENV['INDEX'] || klass.tire.index.name )
 
@@ -80,7 +80,7 @@ namespace :tire do
 
       # Import the documents
       #
-      index.import(klass, 'paginate', params) do |documents|
+      index.import(klass, params) do |documents|
 
         if total
           done += documents.to_a.size
@@ -97,6 +97,39 @@ namespace :tire do
     end
 
     puts "", '='*80, "Import finished in #{elapsed_to_human(elapsed)}"
+  end
+
+  namespace :index do
+
+    full_comment = <<-DESC.gsub(/      /, '')
+      Delete indices passed in the INDEX environment variable; separate multiple indices by comma.
+
+      Pass name of a single index to drop in the INDEX environmnet variable:
+        $ rake environment tire:index:drop INDEX=articles
+
+      Pass names of multiple indices to drop in the INDEX or INDICES environmnet variable:
+        $ rake environment tire:index:drop INDICES=articles-2011-01,articles-2011-02
+
+    DESC
+    desc full_comment
+    task :drop do
+      index_names = (ENV['INDEX'] || ENV['INDICES']).to_s.split(/,\s*/)
+
+      if index_names.empty?
+        puts '='*90, 'USAGE', '='*90, full_comment, ""
+        exit(1)
+      end
+
+      index_names.each do |name|
+        index = Tire::Index.new(name)
+        print "* Deleting index \e[1m#{index.name}\e[0m... "
+        puts  index.delete ? "\e[32mOK\e[0m" : "\e[31mFAILED\e[0m  | #{index.response.body}"
+      end
+
+      puts ""
+
+    end
 
   end
+
 end

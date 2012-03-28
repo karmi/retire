@@ -1,6 +1,7 @@
 require 'test_helper'
 require 'active_record'
 require 'delayed_job'
+require File.expand_path('../../models/supermodel_article', __FILE__)
 
 module Tire
 
