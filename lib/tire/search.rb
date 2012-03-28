@@ -10,7 +10,8 @@ module Tire
         @indices = Array(indices)
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @payload = options.delete(:payload)
-        @options = options
+        @options = options.slice!(:load, :wrapper)
+        @result_options = options
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
 
@@ -98,7 +99,7 @@ module Tire
           raise SearchRequestFailed, @response.to_s
         end
         @json     = MultiJson.decode(@response.body)
-        @results  = Results::Collection.new(@json, @options)
+        @results  = Results::Collection.new(@json, @result_options)
         return self
       ensure
         logged

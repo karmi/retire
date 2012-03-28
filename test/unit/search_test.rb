@@ -75,6 +75,16 @@ module Tire
         s.perform
       end
 
+      should "pass on result collection arguments without encoding them in the request" do
+        Configuration.client.expects(:get).with do |url, payload|
+          !url.include?('load') && !url.include?('wrapper')
+        end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
+
+        result_options = { :load => true, :wrapper => Hash }
+        s = Search::Search.new('index', result_options) { query { string 'foo' } }.results
+        assert_equal result_options, s.options
+      end
+
       should "properly encode namespaced document type" do
         Configuration.client.expects(:get).with do |url, payload|
           url.match %r|index/my_application%2Farticle/_search|
