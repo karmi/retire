@@ -52,6 +52,36 @@ module Tire
         assert_nothing_raised { assert ! @index.delete }
       end
 
+      should "add an index alias" do
+        Configuration.client.expects(:post).with do |url, payload|
+          assert_equal({'actions' => [{'add' => {'index' => 'dummy', 'alias' => 'foo'}}]}.to_json, payload)
+        end.returns(mock_response('{"ok":true}'))
+
+        @index.add_alias('foo')
+      end
+
+      should "delete an index alias" do
+        Configuration.client.expects(:post).with do |url, payload|
+          assert_equal({'actions' => [{'remove' => {'index' => 'dummy', 'alias' => 'foo'}}]}.to_json, payload)
+        end.returns(mock_response('{"ok":true}'))
+
+        @index.remove_alias('foo')
+      end
+
+      should "list aliases on an index" do
+        json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
+        Configuration.client.expects(:get).returns(mock_response(json))
+
+        assert_equal(['foo'], @index.aliases)
+      end
+
+      should "get the properties of an alias" do
+        json = {'dummy' => {'aliases' => {'foo' => {'some_config' => 'bar'}}}}.to_json
+        Configuration.client.expects(:get).returns(mock_response(json))
+
+        assert_equal({'some_config' => 'bar'}, @index.aliases('foo'))
+      end
+
       should "refresh the index" do
         Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_shards":{}}'))
         assert_nothing_raised { assert @index.refresh }

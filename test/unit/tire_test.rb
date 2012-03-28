@@ -64,6 +64,13 @@ module Tire
 
         end
 
+        should "list all aliases" do
+          json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
+          Configuration.client.expects(:get).returns(mock_response(json))
+
+          assert_equal({'dummy' => ['foo']}, Tire.aliases)
+        end
+
       end
 
       context "utils" do
