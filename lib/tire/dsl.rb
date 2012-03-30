@@ -31,5 +31,9 @@ module Tire
       Index.new(name, &block)
     end
 
+    def scan(names, options={}, &block)
+      Search::Scan.new(names, options, &block)
+    end
+
   end
 end
