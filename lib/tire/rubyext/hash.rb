@@ -1,6 +1,6 @@
 class Hash
 
-  def to_json
+  def to_json(options=nil)
     MultiJson.encode(self)
   end unless respond_to?(:to_json)
 
