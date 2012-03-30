@@ -41,6 +41,11 @@ module Tire
       MultiJson.decode(@response.body)[@name]
     end
 
+    def settings
+      @response = Configuration.client.get("#{Configuration.url}/#{@name}/_settings")
+      MultiJson.decode(@response.body)[@name]['settings']
+    end
+
     def store(*args)
       document, options = args
       type = get_type_from_document(document)
@@ -304,7 +309,8 @@ module Tire
                      "please pass an object which responds to `to_indexed_json` or a plain Hash."
           document
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
-        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
+        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +
+                                  "'#{document.class}' given."
       end
     end
 
