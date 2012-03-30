@@ -141,6 +141,26 @@ module Tire
 
       end
 
+      context "settings" do
+
+        should "return index settings" do
+          json =<<-JSON
+          {
+            "dummy" : {
+              "settings" : {
+                "index.number_of_shards" : "20",
+                "index.number_of_replicas" : "0"
+              }
+            }
+          }
+          JSON
+          Configuration.client.stubs(:get).returns(mock_response(json))
+
+          assert_equal '20', @index.settings['index.number_of_shards']
+        end
+
+      end
+
       context "when storing" do
 
         should "set type from Hash :type property" do

@@ -41,6 +41,12 @@ module Tire
       MultiJson.decode(@response.body)[@name]
     end
 
+    def settings
+      @response = Configuration.client.get("#{Configuration.url}/#{@name}/_settings")
+      MultiJson.decode(@response.body)[@name]['settings']
+    end
+    
+
     def store(*args)
       document, options = args
       type = get_type_from_document(document)
@@ -121,6 +127,16 @@ module Tire
         else
           raise ArgumentError, "Please pass either an Enumerable compatible class, or a collection object" +
                                "with a method for fetching records in batches (such as 'paginate')"
+      end
+    end
+
+    def reindex(name, options={}, &block)
+      new_index = Index.new(name)
+      new_index.create(options) unless Index.new(name).exists?
+      Search::Scan.new(self.name, &block).each do |results|
+        new_index.bulk_store results.map do |d|
+          d.to_hash.except(:type, :_index, :_explanation, :_score, :_version, :highlight, :sort)
+        end
       end
     end
 
@@ -272,12 +288,12 @@ module Tire
       type = case
         when document.respond_to?(:document_type)
           document.document_type
-        when document.is_a?(Hash)
-          document[:_type] || document['_type'] || document[:type] || document['type']
         when document.respond_to?(:_type)
           document._type
         when document.respond_to?(:type) && document.type != document.class
           document.type
+        when document.is_a?(Hash)
+          document[:_type] || document['_type'] || document[:type] || document['type']
         end
       $VERBOSE = old_verbose
 
@@ -304,7 +320,8 @@ module Tire
                      "please pass an object which responds to `to_indexed_json` or a plain Hash."
           document
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
-        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method"
+        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +
+                                  "'#{document.class}' given."
       end
     end
 

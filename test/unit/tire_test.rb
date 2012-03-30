@@ -64,6 +64,28 @@ module Tire
 
         end
 
+        context "when scanning an index" do
+          should "allow to leave out a block" do
+            Search::Scan.expects(:new).with { |index| index == 'dummy' }
+
+            Tire.scan('dummy')
+          end
+
+          should "allow to pass the query as a block" do
+            Search::Scan.expects(:new).with { |index| index == 'dummy' }
+
+            Tire.scan('dummy') { query { string 'foo' } }
+          end
+
+          should "allow to pass the query as a hash" do
+            payload = { :query => { :query_string => { :query => 'foo' } } }
+            Search::Scan.expects(:new).with('dummy', payload)
+
+            Tire.scan 'dummy', payload
+          end
+
+        end
+
       end
 
       context "utils" do
