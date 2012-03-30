@@ -129,6 +129,17 @@ module Tire
       end
     end
 
+    def reindex(name, options={}, &block)
+      new_index = Index.new(name)
+      new_index.create(options) unless new_index.exists?
+
+      Search::Scan.new(self.name, &block).each do |results|
+        new_index.bulk_store results.map do |document|
+          document.to_hash.except(:type, :_index, :_explanation, :_score, :_version, :highlight, :sort)
+        end
+      end
+    end
+
     def remove(*args)
       if args.size > 1
         type, document = args

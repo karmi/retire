@@ -720,6 +720,53 @@ module Tire
 
       end
 
+      context "reindexing" do
+        setup do
+          @results = {
+            "_scroll_id" => "abc123",
+            "took" => 3,
+            "hits" => {
+              "total" => 10,
+              "hits" => [
+                { "_id" => "1", "_source" => { "title" => "Test" } }
+              ]
+            }
+          }
+        end
+
+        should "perform bulk store in the new index" do
+          Index.any_instance.stubs(:exists?).returns(true)
+          Search::Scan.any_instance.stubs(:__perform)
+          Search::Scan.any_instance
+                      .expects(:results)
+                      .returns(Results::Collection.new(@results))
+                      .then
+                      .returns(Results::Collection.new(@results.merge('hits' => {'hits' => []})))
+                      .at_least_once
+
+          Index.any_instance.expects(:bulk_store).once
+
+          @index.reindex 'whammy'
+        end
+
+        should "create the new index if it does not exist" do
+          options = { :settings => { :number_of_shards => 1 } }
+
+          Index.any_instance.stubs(:exists?).returns(false)
+          Search::Scan.any_instance.stubs(:__perform)
+          Search::Scan.any_instance
+                      .expects(:results)
+                      .returns(Results::Collection.new(@results))
+                      .then
+                      .returns(Results::Collection.new(@results.merge('hits' => {'hits' => []})))
+                      .at_least_once
+
+          Index.any_instance.expects(:create).with(options).once
+
+          @index.reindex 'whammy', options
+        end
+
+      end
     end
 
   end
