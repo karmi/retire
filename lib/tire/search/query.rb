@@ -59,6 +59,13 @@ module Tire
         @value[:filtered] = @filtered.to_hash
         @value
       end
+      
+      def dis_max(options={}, &block)
+        @dis_max ||= DisMaxQuery.new(options)
+        block.arity < 1 ? @dis_max.instance_eval(&block) : block.call(@dis_max) if block_given?
+        @value[:dis_max] = @dis_max.to_hash
+        @value
+      end
 
       def all
         @value = { :match_all => {} }
@@ -145,6 +152,24 @@ module Tire
       def to_json
         to_hash.to_json
       end
+    end
+    
+    class DisMaxQuery
+      def initialize(options={}, &block)
+        @options = options
+        @value   = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def query(&block)
+        (@value[:queries] ||= []) << Query.new(&block).to_hash
+        @value
+      end
+
+      def to_hash
+        @value.update(@options)
+      end
+      
     end
 
   end
