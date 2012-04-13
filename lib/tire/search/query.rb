@@ -210,7 +210,9 @@ module Tire
       end
       
       def to_hash
-        @value
+        @value[:filters].present? ? 
+        @value : 
+        @value.merge(:filters => [{ :filter => { :match_all => {}}, :boost => 1.0 }])
       end
       
       def to_json
