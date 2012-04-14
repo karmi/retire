@@ -212,7 +212,7 @@ module Tire
       def to_hash
         @value[:filters].present? ? 
         @value : 
-        @value.merge(:filters => [{ :filter => { :match_all => {}}, :boost => 1.0 }])
+        @value.merge(:filters => [CustomFilter.new{ filter(:match_all); boost(1) }.to_hash]) # Needs at least one filter
       end
       
       def to_json
