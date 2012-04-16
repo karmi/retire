@@ -6,6 +6,7 @@ require 'cgi'
 
 require 'active_support/core_ext/object/to_param'
 require 'active_support/core_ext/object/to_query'
+require 'active_support/core_ext/hash/except.rb'
 
 # Ruby 1.8 compatibility
 require 'tire/rubyext/ruby_1_8' if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
@@ -24,6 +25,7 @@ require 'tire/search/sort'
 require 'tire/search/facet'
 require 'tire/search/filter'
 require 'tire/search/highlight'
+require 'tire/search/scan'
 require 'tire/results/pagination'
 require 'tire/results/collection'
 require 'tire/results/item'
