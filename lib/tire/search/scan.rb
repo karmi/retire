@@ -83,7 +83,7 @@ module Tire
 
       def __perform
         @response  = Configuration.client.get [url, params].join, scroll_id
-        @json      = MultiJson.decode @response.body
+        @json      = MultiJson.load @response.body
         @results   = Results::Collection.new @json, @options
         @total     = @json['hits']['total'].to_i
         @seen     += @results.size

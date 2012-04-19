@@ -312,7 +312,7 @@ module Tire
           should "save the document with generated ID in the database" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                  doc = MultiJson.decode(payload)
+                                  doc = MultiJson.load(payload)
                                   url == "#{Configuration.url}/persistent_articles/persistent_article/" &&
                                   doc['title'] == 'Test' &&
                                   doc['tags']  == ['one', 'two']
@@ -328,7 +328,7 @@ module Tire
           should "save the document with custom ID in the database" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   doc = MultiJson.decode(payload)
+                                   doc = MultiJson.load(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/r2d2" &&
                                    doc['title'] == 'Test' &&
                                    doc['published_on'] == nil
@@ -352,7 +352,7 @@ module Tire
           should "set the id property" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   doc = MultiJson.decode(payload)
+                                   doc = MultiJson.load(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/" &&
                                    doc['title'] == 'Test'
                                  end.
@@ -365,7 +365,7 @@ module Tire
           should "not set the id property if already set" do
             Configuration.client.expects(:post).
                                   with do |url, payload|
-                                    doc = MultiJson.decode(payload)
+                                    doc = MultiJson.load(payload)
                                     url == "#{Configuration.url}/persistent_articles/persistent_article/123" &&
                                     doc['title'] == 'Test' &&
                                     doc['published_on'] == nil
@@ -385,7 +385,7 @@ module Tire
 
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   doc = MultiJson.decode(payload)
+                                   doc = MultiJson.load(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
                                    doc['title'] == 'Test' &&
                                    doc['published_on'] == nil
@@ -397,7 +397,7 @@ module Tire
 
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   doc = MultiJson.decode(payload)
+                                   doc = MultiJson.load(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
                                    doc['title'] == 'Updated'
                                  end.
@@ -428,7 +428,7 @@ module Tire
 
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   doc = MultiJson.decode(payload)
+                                   doc = MultiJson.load(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/456" &&
                                    doc['title'] == 'Test'
                                  end.
@@ -444,7 +444,7 @@ module Tire
           should "delete the document from the database" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   doc = MultiJson.decode(payload)
+                                   doc = MultiJson.load(payload)
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/123" &&
                                    doc['title'] == 'Test'
                                  end.returns(mock_response('{"ok":true,"_id":"123"}'))

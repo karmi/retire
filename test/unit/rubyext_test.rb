@@ -36,13 +36,13 @@ module Tire
 
       should "have to_indexed_json method doing the same as to_json" do
         [{}, { 1 => 2 }, { 3 => 4, 5 => 6 }, { nil => [7,8,9] }].each do |h|
-          assert_equal MultiJson.decode(h.to_json), MultiJson.decode(h.to_indexed_json)
+          assert_equal MultiJson.load(h.to_json), MultiJson.load(h.to_indexed_json)
         end
       end
 
       should "properly serialize Time into JSON" do
         json = { :time => Time.mktime(2011, 01, 01, 11, 00).to_json  }.to_json
-        assert_match /"2011-01-01T11:00:00.*"/, MultiJson.decode(json)['time']
+        assert_match /"2011-01-01T11:00:00.*"/, MultiJson.load(json)['time']
       end
 
     end
