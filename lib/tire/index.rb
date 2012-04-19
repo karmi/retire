@@ -28,11 +28,11 @@ module Tire
 
     def create(options={})
       @options = options
-      @response = Configuration.client.post "#{Configuration.url}/#{@name}", MultiJson.encode(options)
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}", MultiJson.dump(options)
       @response.success? ? @response : false
 
     ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{MultiJson.encode(options)}'|
+      curl = %Q|curl -X POST "#{Configuration.url}/#{@name}" -d '#{MultiJson.dump(options)}'|
       logged('CREATE', curl)
     end
 
@@ -192,7 +192,7 @@ module Tire
 
     def open(options={})
       # TODO: Remove the duplication in the execute > rescue > ensure chain
-      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_open", MultiJson.encode(options)
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_open", MultiJson.dump(options)
       MultiJson.decode(@response.body)['ok']
 
     ensure
@@ -201,7 +201,7 @@ module Tire
     end
 
     def close(options={})
-      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_close", MultiJson.encode(options)
+      @response = Configuration.client.post "#{Configuration.url}/#{@name}/_close", MultiJson.dump(options)
       MultiJson.decode(@response.body)['ok']
 
     ensure
@@ -223,11 +223,11 @@ module Tire
     def register_percolator_query(name, options={}, &block)
       options[:query] = Search::Query.new(&block).to_hash if block_given?
 
-      @response = Configuration.client.put "#{Configuration.url}/_percolator/#{@name}/#{name}", MultiJson.encode(options)
+      @response = Configuration.client.put "#{Configuration.url}/_percolator/#{@name}/#{name}", MultiJson.dump(options)
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
+      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.dump(options)}'|
       logged('_percolator', curl)
     end
 
@@ -251,7 +251,7 @@ module Tire
       payload = { :doc => document }
       payload.update( :query => query ) if query
 
-      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/_percolate", MultiJson.encode(payload)
+      @response = Configuration.client.get "#{Configuration.url}/#{@name}/#{type}/_percolate", MultiJson.dump(payload)
       MultiJson.decode(@response.body)['matches']
 
     ensure
@@ -269,7 +269,7 @@ module Tire
 
         if Configuration.logger.level.to_s == 'debug'
           body = if @response
-            defined?(Yajl) ? Yajl::Encoder.encode(@response.body, :pretty => true) : MultiJson.encode(@response.body)
+            defined?(Yajl) ? Yajl::Encoder.encode(@response.body, :pretty => true) : MultiJson.dump(@response.body)
           else
             error.message rescue ''
           end
