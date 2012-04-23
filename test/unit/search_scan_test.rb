@@ -28,8 +28,8 @@ module Tire
 
         should "fetch the initial scroll ID" do
           s = Scan.new('index1')
-          s.search.expects(:perform)
-                  .returns(stub :json => { '_scroll_id' => 'abc123' })
+          s.search.expects(:perform).
+                   returns(stub :json => { '_scroll_id' => 'abc123' })
 
           assert_equal 'abc123', s.scroll_id
         end
@@ -37,14 +37,14 @@ module Tire
         should "perform the request lazily" do
           s = Scan.new('dummy')
 
-          s.expects(:scroll_id)
-           .returns('abc123')
-           .at_least_once
+          s.expects(:scroll_id).
+            returns('abc123').
+            at_least_once
 
-          Configuration.client.expects(:get)
-                              .with { |url,id| url =~ %r|_search/scroll.*search_type=scan| && id == 'abc123' }
-                              .returns(@default_response)
-                              .once
+          Configuration.client.expects(:get).
+                               with { |url,id| url =~ %r|_search/scroll.*search_type=scan| && id == 'abc123' }.
+                               returns(@default_response).
+                               once
           
           assert_not_nil s.results
           assert_not_nil s.response
@@ -67,11 +67,11 @@ module Tire
           s.expects(:scroll_id).returns('abc123').at_least_once
           Configuration.client.expects(:get).returns(@default_response).at_least_once
 
-          Configuration.logger.expects(:log_request)
-                              .with { |(endpoint, params, curl)| endpoint == 'scroll' }
+          Configuration.logger.expects(:log_request).
+                               with { |(endpoint, params, curl)| endpoint == 'scroll' }
 
-          Configuration.logger.expects(:log_response)
-                              .with { |code, took, body| code == 200 && took == 3 && body == '1/10 (10.0%)' }
+          Configuration.logger.expects(:log_response).
+                               with { |code, took, body| code == 200 && took == 3 && body == '1/10 (10.0%)' }
 
           s.__perform
         end
@@ -79,11 +79,11 @@ module Tire
         context "results" do
           setup do
             @search = Scan.new('dummy')
-            @search.expects(:results)
-                   .returns(Results::Collection.new @results)
-                   .then
-                   .returns(Results::Collection.new @empty_results)
-                   .at_least_once
+            @search.expects(:results).
+                    returns(Results::Collection.new @results).
+                    then.
+                    returns(Results::Collection.new @empty_results).
+                    at_least_once
             @search.results
           end
 
