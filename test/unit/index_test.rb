@@ -737,12 +737,12 @@ module Tire
         should "perform bulk store in the new index" do
           Index.any_instance.stubs(:exists?).returns(true)
           Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance
-                      .expects(:results)
-                      .returns(Results::Collection.new(@results))
-                      .then
-                      .returns(Results::Collection.new(@results.merge('hits' => {'hits' => []})))
-                      .at_least_once
+          Search::Scan.any_instance.
+                       expects(:results).
+                       returns(Results::Collection.new(@results)).
+                       then.
+                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
+                       at_least_once
 
           Index.any_instance.expects(:bulk_store).once
 
@@ -754,12 +754,12 @@ module Tire
 
           Index.any_instance.stubs(:exists?).returns(false)
           Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance
-                      .expects(:results)
-                      .returns(Results::Collection.new(@results))
-                      .then
-                      .returns(Results::Collection.new(@results.merge('hits' => {'hits' => []})))
-                      .at_least_once
+          Search::Scan.any_instance.
+                       expects(:results).
+                       returns(Results::Collection.new(@results)).
+                       then.
+                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
+                       at_least_once
 
           Index.any_instance.expects(:create).with(options).once
 
