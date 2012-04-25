@@ -44,6 +44,24 @@ module Tire
           end
         end
 
+        should "not rescue ECONNREFUSED errors" do
+          Client::RestClient.expects(:get).raises(Errno::ECONNREFUSED)
+
+          assert_raise(Errno::ECONNREFUSED) do
+            Client::RestClient.get 'http://example.com'
+          end
+        end
+
+        should "add connection information to raised errors" do
+          ::RestClient::Request.any_instance.expects(:execute).raises(Errno::ECONNREFUSED)
+
+          exception = assert_raise(Errno::ECONNREFUSED) do
+            Client::RestClient.get 'http://example.com'
+          end
+
+          assert_equal 'Unable to connect to ElasticSearch on http://example.com', exception.message
+        end
+
       end
 
       context "Curb" do
