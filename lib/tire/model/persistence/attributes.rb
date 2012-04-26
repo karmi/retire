@@ -15,7 +15,7 @@ module Tire
           #      include Tire::Model::Persistence
           #
           #      property :title,     :analyzer => 'snowball'
-          #      property :published, :type => 'date'
+          #      property :published, :class => 'date'
           #      property :tags,      :analyzer => 'keywords', :default => []
           #    end
           #
