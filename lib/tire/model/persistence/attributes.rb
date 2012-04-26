@@ -89,12 +89,16 @@ module Tire
               hash
             end
 
-            __update_attributes(property_defaults.merge(attributes))
+            self.attributes = property_defaults.merge(attributes)
           end
 
           def attributes
             self.class.properties.
               inject( self.id ? {'id' => self.id} : {} ) {|attributes, key| attributes[key] = send(key); attributes}
+          end
+
+          def attributes=(attributes)
+            attributes.each { |name, value| send "#{name}=", __cast_value(name, value) }
           end
 
           def attribute_names
@@ -105,10 +109,6 @@ module Tire
             properties.include?(name.to_s)
           end
           alias :has_property? :has_attribute?
-
-          def __update_attributes(attributes)
-            attributes.each { |name, value| send "#{name}=", __cast_value(name, value) }
-          end
 
           # Casts the values according to the <tt>:class</tt> option set when
           # defining the property, cast Hashes as Hashr[http://rubygems.org/gems/hashr]
