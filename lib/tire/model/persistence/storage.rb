@@ -30,12 +30,11 @@ module Tire
         module InstanceMethods
 
           def update_attribute(name, value)
-            __update_attributes name => value
-            save
+            update_attributes name => value
           end
 
           def update_attributes(attributes={})
-            __update_attributes attributes
+            self.attributes = attributes
             save
           end
 
