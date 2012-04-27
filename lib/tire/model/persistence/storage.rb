@@ -77,10 +77,12 @@ module Tire
           end
 
           # TODO: Implement `new_record?` and clean up
+          def new?; _version.nil?; end
+          alias :new_record? :new?
 
           def destroyed?; !!@destroyed; end
 
-          def persisted?; !!id;           end
+          def persisted?; !new?; end
 
         end
 
