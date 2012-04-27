@@ -66,13 +66,15 @@ module Tire
 
         context "when scanning an index" do
           should "initiate the scan" do
-            Search::Scan.expects(:new).with { |index| index == 'dummy' }
+            Search::Scan.expects(:new).with { |index,options| index == 'dummy' }
 
             Tire.scan('dummy')
           end
 
           should "allow to pass the query as a block to scan" do
-            Search::Scan.expects(:new).with { |index| index == 'dummy' }
+            Search::Scan.expects(:new).with do |index,options|
+              index == 'dummy'
+            end
 
             Tire.scan('dummy') { query { string 'foo' } }
           end
