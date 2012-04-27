@@ -54,32 +54,43 @@ module Tire
 
       should "add an index alias" do
         Configuration.client.expects(:post).with do |url, payload|
-          assert_equal({'actions' => [{'add' => {'index' => 'dummy', 'alias' => 'foo'}}]}.to_json, payload)
+          url =~ /_aliases/ &&
+          MultiJson.decode(payload)['actions'][0]['add'] == {'index' => 'dummy', 'alias' => 'foo'}
         end.returns(mock_response('{"ok":true}'))
 
-        @index.add_alias('foo')
+        @index.add_alias 'foo'
+      end
+
+      should "add an index alias with configuration" do
+        Configuration.client.expects(:post).with do |url, payload|
+          url =~ /_aliases/ &&
+          MultiJson.decode(payload)['actions'][0]['add'] == {'index' => 'dummy', 'alias' => 'foo', 'routing' => 1 }
+        end.returns(mock_response('{"ok":true}'))
+
+        @index.add_alias 'foo', :routing => 1
       end
 
       should "delete an index alias" do
         Configuration.client.expects(:post).with do |url, payload|
-          assert_equal({'actions' => [{'remove' => {'index' => 'dummy', 'alias' => 'foo'}}]}.to_json, payload)
+          url =~ /_aliases/ &&
+          MultiJson.decode(payload)['actions'][0]['remove'] == {'index' => 'dummy', 'alias' => 'foo'}
         end.returns(mock_response('{"ok":true}'))
 
-        @index.remove_alias('foo')
+        @index.remove_alias 'foo'
       end
 
-      should "list aliases on an index" do
+      should "list aliases for an index" do
         json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
         Configuration.client.expects(:get).returns(mock_response(json))
 
-        assert_equal(['foo'], @index.aliases)
+        assert_equal ['foo'], @index.aliases
       end
 
-      should "get the properties of an alias" do
-        json = {'dummy' => {'aliases' => {'foo' => {'some_config' => 'bar'}}}}.to_json
+      should "return properties of an alias" do
+        json = {'dummy' => { 'aliases' => {'foo' => { 'filter' => { 'term' => { 'user' => 'john' } }}} }}.to_json
         Configuration.client.expects(:get).returns(mock_response(json))
 
-        assert_equal({'some_config' => 'bar'}, @index.aliases('foo'))
+        assert_equal( { 'filter' => { 'term' => {'user' => 'john'} } }, @index.aliases('foo') )
       end
 
       should "refresh the index" do

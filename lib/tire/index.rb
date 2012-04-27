@@ -36,33 +36,37 @@ module Tire
       logged('CREATE', curl)
     end
 
-    def add_alias(alias_name)
-      operation = {'actions' => [{'add' => {'index' => @name, 'alias' => alias_name}}]}
-      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(operation)
+    def add_alias(alias_name, configuration={})
+      payload = {'actions' => [ {'add' => {'index' => @name, 'alias' => alias_name}.merge(configuration) } ]}
+      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(payload)
       @response.success?
 
     ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/_aliases -d '#{MultiJson.encode(operation)}'"|
+      curl = %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{MultiJson.encode(payload)}'|
       logged('POST', curl)
     end
 
     def remove_alias(alias_name)
-      operation = {'actions' => [{'remove' => {'index' => @name, 'alias' => alias_name}}]}
-      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(operation)
+      payload = {'actions' => [{'remove' => {'index' => @name, 'alias' => alias_name}}]}
+      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(payload)
       @response.success?
 
     ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/_aliases -d '#{MultiJson.encode(operation)}'"|
+      curl = %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{MultiJson.encode(payload)}'|
       logged('POST', curl)
     end
 
     def aliases(alias_name = nil)
       @response = Configuration.client.get "#{Configuration.url}/#{@name}/_aliases"
       if alias_name
-        MultiJson.decode(@response.body)[@name]['aliases'].try(:[], alias_name)
+        MultiJson.decode(@response.body)[@name]['aliases'][alias_name]
       else
         MultiJson.decode(@response.body)[@name]['aliases'].keys
       end
+
+    ensure
+      curl = %Q|curl "#{Configuration.url}/#{@name}/_aliases?pretty"|
+      logged('GET', curl)
     end
 
     def mapping
