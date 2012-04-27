@@ -307,6 +307,17 @@ module Tire
 
         end
 
+        context "when initializing" do
+
+          should "be a new record" do
+            article = PersistentArticle.new :title => 'Test'
+
+            assert   article.new_record?, "#{article.inspect} should be `new_record?`"
+            assert ! article.persisted?,  "#{article.inspect} should NOT be `persisted?`"
+          end
+
+        end
+
         context "when creating" do
 
           should "save the document with generated ID in the database" do
@@ -318,10 +329,11 @@ module Tire
                                   doc['tags']  == ['one', 'two']
                                   doc['published_on'] == nil
                                 end.
-                                returns(mock_response('{"ok":true,"_id":"abc123"}'))
+                                returns(mock_response('{"ok":true,"_id":"abc123","_version":1}'))
             article = PersistentArticle.create :title => 'Test', :tags => [:one, :two]
 
-            assert article.persisted?, "#{article.inspect} should be `persisted?`"
+            assert   article.persisted?,  "#{article.inspect} should be `persisted?`"
+            assert ! article.new_record?, "#{article.inspect} should NOT be `new_record?`"
             assert_equal 'abc123', article.id
           end
 
