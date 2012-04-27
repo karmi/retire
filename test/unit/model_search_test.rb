@@ -254,7 +254,7 @@ module Tire
 
         should "store the record in index on :update_elasticsearch_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
-          Tire::Index.any_instance.expects(:store).returns({})
+          Tire::Index.any_instance.expects(:store).returns({"ok" => true})
 
           @model.save
         end
