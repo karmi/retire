@@ -29,13 +29,31 @@ module Tire
 
         module InstanceMethods
 
+          def update_attribute!(name, value)
+            update_attributes! name => value
+          end
+
           def update_attribute(name, value)
             update_attributes name => value
+          end
+
+          def update_attributes!(attributes={})
+            self.attributes = attributes
+            save!
           end
 
           def update_attributes(attributes={})
             self.attributes = attributes
             save
+          end
+
+          def save!
+            raise Tire::DocumentNotValid.new(self) unless valid?
+            run_callbacks :save do
+              # Document#id is set in the +update_elasticsearch_index+ method,
+              # where we have access to the JSON response
+            end
+            self
           end
 
           def save
