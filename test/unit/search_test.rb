@@ -219,7 +219,7 @@ module Tire
               by :_score
             end
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
         end
 
@@ -319,7 +319,7 @@ module Tire
           s = Search::Search.new('index') do
             version true
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal true, hash['version']
         end
 
@@ -332,7 +332,7 @@ module Tire
             size 5
             from 3
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal 5, hash['size']
           assert_equal 3, hash['from']
         end
@@ -363,7 +363,7 @@ module Tire
           s = Search::Search.new('index') do
             fields :title
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal ['title'], hash['fields']
         end
 
@@ -371,7 +371,7 @@ module Tire
           s = Search::Search.new('index') do
             fields [:title, :tags]
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal ['title', 'tags'], hash['fields']
         end
 
@@ -379,7 +379,7 @@ module Tire
           s = Search::Search.new('index') do
             fields :title, :tags
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal ['title', 'tags'], hash['fields']
         end
 
@@ -390,7 +390,7 @@ module Tire
         should "default to false" do
           s = Search::Search.new('index') do
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_nil hash['explain']
         end
 
@@ -398,7 +398,7 @@ module Tire
           s = Search::Search.new('index') do
             explain true
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_equal true, hash['explain']
         end
 
@@ -406,7 +406,7 @@ module Tire
           s = Search::Search.new('index') do
             explain false
           end
-          hash = MultiJson.decode( s.to_json )
+          hash = MultiJson.load( s.to_json )
           assert_nil hash['explain']
         end
 
@@ -435,7 +435,7 @@ module Tire
             end
           end
 
-          hash  = MultiJson.decode(s.to_json)
+          hash  = MultiJson.load(s.to_json)
           query = hash['query']['bool']
           # p hash
 

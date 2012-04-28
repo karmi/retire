@@ -96,7 +96,7 @@ module Tire
           STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
           raise SearchRequestFailed, @response.to_s
         end
-        @json     = MultiJson.decode(@response.body)
+        @json     = MultiJson.load(@response.body)
         @results  = Results::Collection.new(@json, @options)
         return self
       ensure
@@ -142,7 +142,7 @@ module Tire
           if Configuration.logger.level.to_s == 'debug'
             # FIXME: Depends on RestClient implementation
             body = if @json
-              defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
+              defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.dump(@json)
             else
               @response.body rescue nil
             end

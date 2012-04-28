@@ -528,14 +528,14 @@ module Tire
 
           should "not include the ID property in serialized document (_source)" do
             @model = ActiveModelArticle.new 'id' => 1, 'title' => 'Test'
-            assert_nil MultiJson.decode(@model.to_indexed_json)[:id]
-            assert_nil MultiJson.decode(@model.to_indexed_json)['id']
+            assert_nil MultiJson.load(@model.to_indexed_json)[:id]
+            assert_nil MultiJson.load(@model.to_indexed_json)['id']
           end
 
           should "not include the type property in serialized document (_source)" do
             @model = ActiveModelArticle.new 'type' => 'foo', 'title' => 'Test'
-            assert_nil MultiJson.decode(@model.to_indexed_json)[:type]
-            assert_nil MultiJson.decode(@model.to_indexed_json)['type']
+            assert_nil MultiJson.load(@model.to_indexed_json)[:type]
+            assert_nil MultiJson.load(@model.to_indexed_json)['type']
           end
 
           should "serialize itself with serializable_hash when no mapping is set" do
@@ -621,7 +621,7 @@ module Tire
 
             model    = ::ModelWithMappingProcs.new :one => 1, :two => 1, :three => 1
             hash     = model.serializable_hash
-            document = MultiJson.decode(model.to_indexed_json)
+            document = MultiJson.load(model.to_indexed_json)
 
             assert_equal 1, hash[:one]
             assert_equal 1, hash[:two]
@@ -664,7 +664,7 @@ module Tire
             Tire::Index.any_instance.expects(:store).with do |doc,options|
               # p [doc,options]
               options[:percolate] == true
-            end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+            end.returns(MultiJson.load('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
             @article.update_elasticsearch_index
           end
@@ -673,7 +673,7 @@ module Tire
             Tire::Index.any_instance.expects(:store).with do |doc,options|
               # p [doc,options]
               options[:percolate] == nil
-            end.returns(MultiJson.decode('{"ok":true,"_id":"test"}'))
+            end.returns(MultiJson.load('{"ok":true,"_id":"test"}'))
 
             @article.update_elasticsearch_index
           end
@@ -702,7 +702,7 @@ module Tire
             Tire::Index.any_instance.expects(:store).with do |doc,options|
               # p [doc,options]
               options[:percolate] == true
-            end.returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+            end.returns(MultiJson.load('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
             percolated = ActiveModelArticleWithPercolation.new :title => 'Percolate me!'
             percolated.update_elasticsearch_index
@@ -720,7 +720,7 @@ module Tire
                                        doc == percolated &&
                                        options[:percolate] == true
                                      end.
-                                     returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+                                     returns(MultiJson.load('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
             percolated.update_elasticsearch_index
 
@@ -739,7 +739,7 @@ module Tire
                                        doc == percolated &&
                                        options[:percolate] == 'tags:alert'
                                      end.
-                                     returns(MultiJson.decode('{"ok":true,"_id":"test","matches":["alerts"]}'))
+                                     returns(MultiJson.load('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
             percolated.update_elasticsearch_index
 

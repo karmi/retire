@@ -283,7 +283,7 @@ module Tire
 
           should "store Hash it under its ID property" do
             Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
-                                                     MultiJson.encode({:id => 123, :title => 'Test'})).
+                                                     MultiJson.dump({:id => 123, :title => 'Test'})).
                                                 returns(mock_response('{"ok":true,"_id":"123"}'))
             @index.store :id => 123, :title => 'Test'
           end
@@ -635,7 +635,7 @@ module Tire
         should "register percolator query as a Hash" do
           query = { :query => { :query_string => { :query => 'foo' } } }
           Configuration.client.expects(:put).with do |url, payload|
-                                               payload = MultiJson.decode(payload)
+                                               payload = MultiJson.load(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
                                                payload['query']['query_string']['query'] == 'foo'
                                end.
@@ -652,7 +652,7 @@ module Tire
 
         should "register percolator query as a block" do
           Configuration.client.expects(:put).with do |url, payload|
-                                               payload = MultiJson.decode(payload)
+                                               payload = MultiJson.load(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
                                                payload['query']['query_string']['query'] == 'foo'
                                end.
@@ -674,7 +674,7 @@ module Tire
                     :tags  => ['alert'] }
 
           Configuration.client.expects(:put).with do |url, payload|
-                                               payload = MultiJson.decode(payload)
+                                               payload = MultiJson.load(payload)
                                                url == "#{Configuration.url}/_percolator/dummy/my-query" &&
                                                payload['query']['query_string']['query'] == 'foo' &&
                                                payload['tags'] == ['alert']
@@ -698,7 +698,7 @@ module Tire
 
         should "percolate document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
-                                               payload = MultiJson.decode(payload)
+                                               payload = MultiJson.load(payload)
                                                url == "#{Configuration.url}/dummy/document/_percolate" &&
                                                payload['doc']['title'] == 'Test'
                                               end.
@@ -710,7 +710,7 @@ module Tire
 
         should "percolate a typed document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
-                                               payload = MultiJson.decode(payload)
+                                               payload = MultiJson.load(payload)
                                                url == "#{Configuration.url}/dummy/article/_percolate" &&
                                                payload['doc']['title'] == 'Test'
                                               end.
@@ -722,7 +722,7 @@ module Tire
 
         should "percolate document against specific queries" do
           Configuration.client.expects(:get).with do |url,payload|
-                                               payload = MultiJson.decode(payload)
+                                               payload = MultiJson.load(payload)
                                                # p [url, payload]
                                                url == "#{Configuration.url}/dummy/document/_percolate" &&
                                                payload['doc']['title']                   == 'Test' &&
