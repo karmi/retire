@@ -21,10 +21,10 @@ module Tire
         assert doc.highlight.title.to_s.include?('<em>'), "Highlight does not include default highlight tag"
       end
 
-      should "add 'highlight' with more than one field" do
+      should "highlight multiple fields with custom highlight tag" do
         s = Tire.search('articles-test') do
           query { string 'Two OR ruby' }
-          highlight :tags => {}, :title => {}, :options => { :tag => '<strong>' }
+          highlight :tags, :title, :options => { :tag => '<strong>' }
         end
 
         doc = s.results.first
