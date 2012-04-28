@@ -86,13 +86,20 @@ module Tire
       if options
         percolate = options[:percolate]
         percolate = "*" if percolate === true
+        parent = options[:parent]
       end
 
       id       = get_id_from_document(document)
       document = convert_document_to_json(document)
 
       url  = id ? "#{Configuration.url}/#{@name}/#{type}/#{id}" : "#{Configuration.url}/#{@name}/#{type}/"
-      url += "?percolate=#{percolate}" if percolate
+
+      if percolate || parent
+        query_string = []
+        query_string << "percolate=#{percolate}" if percolate
+        query_string << "parent=#{parent}" if parent
+        url += "?" + query_string.join("&")
+      end
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)

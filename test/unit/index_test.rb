@@ -262,6 +262,15 @@ module Tire
           @index.store :title => 'Test'
         end
 
+        context "with the :parent option" do
+
+          should "set the :parent option in the query string" do
+            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/?parent=1234", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
+            @index.store({:title => 'Test'}, {:parent => 1234})
+          end
+
+        end
+
         should "call #to_indexed_json on non-String documents" do
           document = { :title => 'Test' }
           Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_id":"test"}'))
