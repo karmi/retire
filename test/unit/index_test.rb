@@ -428,7 +428,7 @@ module Tire
 
         should "serialize Hashes" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/_bulk" &&
+            url  == "#{@index.url}/_bulk" &&
             json =~ /"_index":"dummy"/ &&
             json =~ /"_type":"document"/ &&
             json =~ /"_id":"1"/ &&
@@ -444,8 +444,10 @@ module Tire
         end
 
         should "serialize ActiveModel instances" do
+          index = ActiveModelArticle.index
+
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/_bulk" &&
+            url  == "#{index.url}/_bulk" &&
             json =~ /"_index":"active_model_articles"/ &&
             json =~ /"_type":"active_model_article"/ &&
             json =~ /"_id":"1"/ &&
@@ -457,15 +459,16 @@ module Tire
           one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
           two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
 
-          ActiveModelArticle.index.bulk_store [ one, two ]
-
+          index.bulk_store [ one, two ]
         end
 
         context "namespaced models" do
           should "not URL-escape the document_type" do
+            index = Tire.index('my_namespace_my_models')
+
             Configuration.client.expects(:post).with do |url, json|
               puts url, json
-              url  == "#{Configuration.url}/_bulk" &&
+              url  == "#{index.url}/_bulk" &&
               json =~ %r|"_index":"my_namespace_my_models"| &&
               json =~ %r|"_type":"my_namespace/my_model"|
             end.returns(mock_response('{}', 200))
@@ -477,7 +480,7 @@ module Tire
               end
             end
 
-            Tire.index('my_namespace_my_models').bulk_store [ MyNamespace::MyModel.new ]
+            index.bulk_store [ MyNamespace::MyModel.new ]
           end
         end
 
@@ -510,11 +513,13 @@ module Tire
         end
 
         should "display error message when collection item does not have ID" do
-          Configuration.client.expects(:post).with{ |url, json| url  == "#{Configuration.url}/_bulk" }.returns(mock_response('success', 200))
+          index = ActiveModelArticle.index
+
+          Configuration.client.expects(:post).with{ |url, json| url  == "#{index.url}/_bulk" }.returns(mock_response('success', 200))
           STDERR.expects(:puts).once
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
-          ActiveModelArticle.index.bulk_store documents
+          index.bulk_store documents
         end
 
       end
