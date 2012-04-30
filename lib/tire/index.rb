@@ -95,14 +95,14 @@ module Tire
       id       = get_id_from_document(document)
       document = convert_document_to_json(document)
 
-      u  = id ? "#{url}/#{type}/#{id}" : "#{url}/#{type}/"
-      u += "?percolate=#{percolate}" if percolate
+      url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
+      url += "?percolate=#{percolate}" if percolate
 
-      @response = Configuration.client.post(u, document)
+      @response = Configuration.client.post(url, document)
       MultiJson.decode(@response.body)
 
     ensure
-      curl = %Q|curl -X POST "#{u}" -d '#{document}'|
+      curl = %Q|curl -X POST "#{url}" -d '#{document}'|
       logged([type, id].join('/'), curl)
     end
 
@@ -189,12 +189,12 @@ module Tire
       end
       raise ArgumentError, "Please pass a document ID" unless id
 
-      u    = "#{url}/#{type}/#{id}"
-      result = Configuration.client.delete(u)
+      url    = "#{self.url}/#{type}/#{id}"
+      result = Configuration.client.delete(url)
       MultiJson.decode(result.body) if result.success?
 
     ensure
-      curl = %Q|curl -X DELETE "#{u}"|
+      curl = %Q|curl -X DELETE "#{url}"|
       logged(id, curl)
     end
 
@@ -202,8 +202,8 @@ module Tire
       raise ArgumentError, "Please pass a document ID" unless id
 
       type      = Utils.escape(type)
-      u       = "#{url}/#{type}/#{id}"
-      @response = Configuration.client.get(u)
+      url       = "#{self.url}/#{type}/#{id}"
+      @response = Configuration.client.get(url)
 
       h = MultiJson.decode(@response.body)
       if Configuration.wrapper == Hash then h
@@ -215,7 +215,7 @@ module Tire
       end
 
     ensure
-      curl = %Q|curl -X GET "#{u}"|
+      curl = %Q|curl -X GET "#{url}"|
       logged(id, curl)
     end
 
