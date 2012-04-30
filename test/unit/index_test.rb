@@ -14,6 +14,10 @@ module Tire
         assert_equal 'dummy', @index.name
       end
 
+      should "have an URL endpoint" do
+        assert_equal "#{Configuration.url}/#{@index.name}", @index.url
+      end
+
       should "return HTTP response" do
         assert_respond_to @index, :response
 
@@ -115,7 +119,7 @@ module Tire
 
         should "send text to the Analyze API" do
           Configuration.client.expects(:get).
-                               with("#{Configuration.url}/dummy/_analyze?pretty=true", "foo bar").
+                               with("#{@index.url}/_analyze?pretty=true", "foo bar").
                                returns(mock_response(@mock_analyze_response))
 
           response = @index.analyze("foo bar")
@@ -124,19 +128,19 @@ module Tire
 
         should "properly encode parameters" do
           Configuration.client.expects(:get).with do |url, payload|
-                                url == "#{Configuration.url}/dummy/_analyze?analyzer=whitespace&pretty=true"
+                                url == "#{@index.url}/_analyze?analyzer=whitespace&pretty=true"
                                end.returns(mock_response(@mock_analyze_response))
 
           @index.analyze("foo bar", :analyzer => 'whitespace')
 
           Configuration.client.expects(:get).with do |url, payload|
-                                url == "#{Configuration.url}/dummy/_analyze?field=title&pretty=true"
+                                url == "#{@index.url}/_analyze?field=title&pretty=true"
                                end.returns(mock_response(@mock_analyze_response))
 
           @index.analyze("foo bar", :field => 'title')
 
           Configuration.client.expects(:get).with do |url, payload|
-                                url == "#{Configuration.url}/dummy/_analyze?analyzer=keyword&format=text&pretty=true"
+                                url == "#{@index.url}/_analyze?analyzer=keyword&format=text&pretty=true"
                                end.returns(mock_response(@mock_analyze_response))
 
           @index.analyze("foo bar", :analyzer => 'keyword', :format => 'text')
@@ -206,21 +210,21 @@ module Tire
 
         should "set type from Hash :type property" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{Configuration.url}/dummy/article/"
+            url == "#{@index.url}/article/"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :type => 'article', :title => 'Test'
         end
 
         should "set type from Hash :_type property" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{Configuration.url}/dummy/article/"
+            url == "#{@index.url}/article/"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :_type => 'article', :title => 'Test'
         end
 
         should "set type from Object _type method" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{Configuration.url}/dummy/article/"
+            url == "#{@index.url}/article/"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
 
           article = Class.new do
@@ -232,7 +236,7 @@ module Tire
 
         should "set type from Object type method" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{Configuration.url}/dummy/article/"
+            url == "#{@index.url}/article/"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
 
           article = Class.new do
@@ -244,7 +248,7 @@ module Tire
 
         should "properly encode namespaced document types" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{Configuration.url}/dummy/my_namespace%2Fmy_model/"
+            url == "#{@index.url}/my_namespace%2Fmy_model/"
           end.returns(mock_response('{"ok":true,"_id":"123"}'))
 
           module MyNamespace
@@ -258,7 +262,7 @@ module Tire
         end
 
         should "set default type" do
-          Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
+          Configuration.client.expects(:post).with("#{@index.url}/document/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :title => 'Test'
         end
 
@@ -282,14 +286,14 @@ module Tire
         context "document with ID" do
 
           should "store Hash it under its ID property" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
+            Configuration.client.expects(:post).with("#{@index.url}/document/123",
                                                      MultiJson.encode({:id => 123, :title => 'Test'})).
                                                 returns(mock_response('{"ok":true,"_id":"123"}'))
             @index.store :id => 123, :title => 'Test'
           end
 
           should "store a custom class under its ID property" do
-            Configuration.client.expects(:post).with("#{Configuration.url}/dummy/document/123",
+            Configuration.client.expects(:post).with("#{@index.url}/document/123",
                                                      {:id => 123, :title => 'Test', :body => 'Lorem'}.to_json).
                                                 returns(mock_response('{"ok":true,"_id":"123"}'))
             @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
@@ -305,7 +309,7 @@ module Tire
           Configuration.reset :wrapper
 
           Configuration.client.stubs(:post).with do |url, payload|
-                                              url     == "#{Configuration.url}/dummy/article/" &&
+                                              url     == "#{@index.url}/article/" &&
                                               payload =~ /"title":"Test"/
                                             end.
                                             returns(mock_response('{"ok":true,"_id":"id-1"}'))
@@ -313,7 +317,7 @@ module Tire
         end
 
         should "return document in default wrapper" do
-          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Results::Item, article
@@ -324,7 +328,7 @@ module Tire
         should "return document as a hash" do
           Configuration.wrapper Hash
 
-          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Hash, article
@@ -333,7 +337,7 @@ module Tire
         should "return document in custom wrapper" do
           Configuration.wrapper Article
 
-          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve :article, 'id-1'
           assert_instance_of Article, article
@@ -341,7 +345,7 @@ module Tire
         end
 
         should "return nil for missing document" do
-          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/article/id-1").
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('{"_id":"id-1","exists":false}'))
           article = @index.retrieve :article, 'id-1'
           assert_equal nil, article
@@ -354,7 +358,7 @@ module Tire
         end
 
         should "properly encode document type" do
-          Configuration.client.expects(:get).with("#{Configuration.url}/dummy/my_namespace%2Fmy_model/id-1").
+          Configuration.client.expects(:get).with("#{@index.url}/my_namespace%2Fmy_model/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve 'my_namespace/my_model', 'id-1'
         end
@@ -364,40 +368,40 @@ module Tire
       context "when removing" do
 
         should "get type from document" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
+          Configuration.client.expects(:delete).with("#{@index.url}/article/1").
                                                 returns(mock_response('{"ok":true,"_id":"1"}')).twice
           @index.remove :id => 1, :type => 'article', :title => 'Test'
           @index.remove :id => 1, :type => 'article', :title => 'Test'
         end
 
         should "get namespaced type from document" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/articles%2Farticle/1").
+          Configuration.client.expects(:delete).with("#{@index.url}/articles%2Farticle/1").
                                                 returns(mock_response('{"ok":true,"_id":"1"}')).twice
           @index.remove :id => 1, :type => 'articles/article', :title => 'Test'
           @index.remove :id => 1, :type => 'articles/article', :title => 'Test'
         end
 
         should "set default type" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+          Configuration.client.expects(:delete).with("#{@index.url}/document/1").
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove :id => 1, :title => 'Test'
         end
 
         should "get ID from hash" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+          Configuration.client.expects(:delete).with("#{@index.url}/document/1").
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove :id => 1
         end
 
         should "get ID from method" do
           document = stub('document', :id => 1)
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/document/1").
+          Configuration.client.expects(:delete).with("#{@index.url}/document/1").
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove document
         end
 
         should "get type and ID from arguments" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/article/1").
+          Configuration.client.expects(:delete).with("#{@index.url}/article/1").
                                                 returns(mock_response('{"ok":true,"_id":"1"}'))
           @index.remove :article, 1
         end
@@ -409,7 +413,7 @@ module Tire
         end
 
         should "properly encode document type" do
-          Configuration.client.expects(:delete).with("#{Configuration.url}/dummy/my_namespace%2Fmy_model/id-1").
+          Configuration.client.expects(:delete).with("#{@index.url}/my_namespace%2Fmy_model/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.remove 'my_namespace/my_model', 'id-1'
         end
@@ -428,7 +432,7 @@ module Tire
 
         should "serialize Hashes" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/dummy/_bulk" &&
+            url  == "#{@index.url}/_bulk" &&
             json =~ /"_index":"dummy"/ &&
             json =~ /"_type":"document"/ &&
             json =~ /"_id":"1"/ &&
@@ -444,7 +448,7 @@ module Tire
 
         should "serialize ActiveModel instances" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/#{ActiveModelArticle.index.name}/_bulk" &&
+            url  == "#{ActiveModelArticle.index.url}/_bulk" &&
             json =~ /"_index":"active_model_articles"/ &&
             json =~ /"_type":"active_model_article"/ &&
             json =~ /"_id":"1"/ &&
@@ -509,7 +513,7 @@ module Tire
 
         should "display error message when collection item does not have ID" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{Configuration.url}/#{ActiveModelArticle.index.name}/_bulk"
+            url  == "#{ActiveModelArticle.index.url}/_bulk"
           end.returns(mock_response('success', 200))
 
           STDERR.expects(:puts).once
@@ -700,7 +704,7 @@ module Tire
         should "percolate document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{Configuration.url}/dummy/document/_percolate" &&
+                                               url == "#{@index.url}/document/_percolate" &&
                                                payload['doc']['title'] == 'Test'
                                               end.
                                returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -712,7 +716,7 @@ module Tire
         should "percolate a typed document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{Configuration.url}/dummy/article/_percolate" &&
+                                               url == "#{@index.url}/article/_percolate" &&
                                                payload['doc']['title'] == 'Test'
                                               end.
                                returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -725,7 +729,7 @@ module Tire
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
                                                # p [url, payload]
-                                               url == "#{Configuration.url}/dummy/document/_percolate" &&
+                                               url == "#{@index.url}/document/_percolate" &&
                                                payload['doc']['title']                   == 'Test' &&
                                                payload['query']['query_string']['query'] == 'tag:alerts'
                                               end.
@@ -740,7 +744,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{Configuration.url}/dummy/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article/?percolate=*" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -750,7 +754,7 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{Configuration.url}/dummy/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
