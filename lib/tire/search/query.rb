@@ -28,6 +28,11 @@ module Tire
         @value
       end
 
+      def field(field, value, options={})
+        query = { field => { :query => value }.update(options) }
+        @value = { :field => query }
+      end
+
       def string(value, options={})
         @value = { :query_string => { :query => value } }
         @value[:query_string].update(options)
