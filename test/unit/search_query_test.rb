@@ -101,6 +101,23 @@ module Tire::Search
       end
     end
 
+    context "Field query" do
+      should "allow search with a field string" do
+        assert_equal( { :field => { 'title' => { :query => 'foo' } } },
+                      Query.new.field('title', 'foo') )
+      end
+
+      should "allow set default operator when searching with a field string" do
+        assert_equal( { :field => { 'title' => { :query => 'foo', :default_operator => 'AND' } } },
+                      Query.new.field('title', 'foo', :default_operator => 'AND') )
+      end
+
+      should "allow to set options when searching with a field string" do
+        assert_equal( { :field => { 'title' => { :query => 'foo', :boost => 2.0, :use_dis_max => true } } },
+                      Query.new.field('title', 'foo', :boost => 2.0, :use_dis_max => true) )
+      end
+    end
+
     context "All query" do
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
