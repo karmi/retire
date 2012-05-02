@@ -41,36 +41,15 @@ module Tire
     end
 
     def add_alias(alias_name, configuration={})
-      payload = {'actions' => [ {'add' => {'index' => @name, 'alias' => alias_name}.merge(configuration) } ]}
-      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(payload)
-      @response.success?
-
-    ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{MultiJson.encode(payload)}'|
-      logged('POST', curl)
+      Alias.create(configuration.merge( :name => alias_name, :index => @name ) )
     end
 
     def remove_alias(alias_name)
-      payload = {'actions' => [{'remove' => {'index' => @name, 'alias' => alias_name}}]}
-      @response = Configuration.client.post "#{Configuration.url}/_aliases", MultiJson.encode(payload)
-      @response.success?
-
-    ensure
-      curl = %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{MultiJson.encode(payload)}'|
-      logged('POST', curl)
+      Alias.find(alias_name) { |a| a.indices.delete @name }.save
     end
 
-    def aliases(alias_name = nil)
-      @response = Configuration.client.get "#{url}/_aliases"
-      if alias_name
-        MultiJson.decode(@response.body)[@name]['aliases'][alias_name]
-      else
-        MultiJson.decode(@response.body)[@name]['aliases'].keys
-      end
-
-    ensure
-      curl = %Q|curl "#{url}/_aliases?pretty"|
-      logged('GET', curl)
+    def aliases(alias_name=nil)
+      alias_name ? Alias.all(@name).select { |a| a.name == alias_name }.first : Alias.all(@name)
     end
 
     def mapping
