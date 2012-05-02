@@ -75,6 +75,7 @@ module Tire
       end
 
       should "delete an index alias" do
+        Configuration.client.expects(:get).returns(mock_response({'dummy' => {'aliases' => {'foo' => {}}}}.to_json))
         Configuration.client.expects(:post).with do |url, payload|
           url =~ /_aliases/ &&
           MultiJson.decode(payload)['actions'][0]['remove'] == {'index' => 'dummy', 'alias' => 'foo'}
@@ -87,14 +88,14 @@ module Tire
         json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
         Configuration.client.expects(:get).returns(mock_response(json))
 
-        assert_equal ['foo'], @index.aliases
+        assert_equal ['foo'], @index.aliases.map(&:name)
       end
 
       should "return properties of an alias" do
         json = {'dummy' => { 'aliases' => {'foo' => { 'filter' => { 'term' => { 'user' => 'john' } }}} }}.to_json
         Configuration.client.expects(:get).returns(mock_response(json))
 
-        assert_equal( { 'filter' => { 'term' => {'user' => 'john'} } }, @index.aliases('foo') )
+        assert_equal( { 'term' => {'user' => 'john'} }, @index.aliases('foo').filter )
       end
 
       should "refresh the index" do
@@ -466,7 +467,7 @@ module Tire
         context "namespaced models" do
           should "not URL-escape the document_type" do
             Configuration.client.expects(:post).with do |url, json|
-              puts url, json
+              # puts url, json
               url  == "#{Configuration.url}/my_namespace_my_models/_bulk" &&
               json =~ %r|"_index":"my_namespace_my_models"| &&
               json =~ %r|"_type":"my_namespace/my_model"|

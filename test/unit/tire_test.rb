@@ -96,7 +96,10 @@ module Tire
           json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
           Configuration.client.expects(:get).returns(mock_response(json))
 
-          assert_equal({'dummy' => ['foo']}, Tire.aliases)
+          aliases = Tire.aliases
+
+          assert_equal 'foo',     aliases.first.name
+          assert_equal ['dummy'], aliases.first.indices.to_a
         end
 
       end
