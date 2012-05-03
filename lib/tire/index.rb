@@ -120,7 +120,7 @@ module Tire
       count = 0
 
       begin
-        response = Configuration.client.post("#{Configuration.url}/_bulk", payload.join("\n"))
+        response = Configuration.client.post("#{Configuration.url}/#{@name}/_bulk", payload.join("\n"))
         raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
         response
       rescue StandardError => error
@@ -134,7 +134,7 @@ module Tire
         end
 
       ensure
-        curl = %Q|curl -X POST "#{Configuration.url}/_bulk" -d '{... data omitted ...}'|
+        curl = %Q|curl -X POST "#{Configuration.url}/#{@name}/_bulk" -d '{... data omitted ...}'|
         logged('BULK', curl)
       end
     end
