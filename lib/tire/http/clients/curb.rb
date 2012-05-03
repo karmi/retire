@@ -36,8 +36,7 @@ module Tire
 
         def self.put(url, data)
           @client.url = url
-          @client.put_data = data
-          @client.http_put
+          @client.http_put data
           Response.new @client.body_str, @client.response_code
         end
 
