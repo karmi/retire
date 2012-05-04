@@ -296,6 +296,19 @@ module Tire
       logged('_percolate', curl)
     end
 
+    def update(type, id, options)
+      raise ArgumentError, "Please pass a document ID" unless id
+      raise ArgumentError, "Missing script in options hash" unless options[:script]
+
+      type      = Utils.escape(type)
+      url       = "#{self.url}/#{type}/#{id}/_update"
+      @response = Configuration.client.post url, MultiJson.encode(options)
+      MultiJson.decode(@response.body)['ok']
+    ensure
+      curl = %Q|curl -X POST "#{url}"|
+      logged(id, curl)
+    end
+
     def logged(endpoint='/', curl='')
       if Configuration.logger
         error = $!
