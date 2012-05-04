@@ -5,7 +5,7 @@ module Tire
 
     def initialize(name, &block)
       @name = name
-      instance_eval(&block) if block_given?
+      block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
     end
 
     def url

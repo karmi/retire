@@ -813,6 +813,26 @@ module Tire
         end
 
       end
+
+      context "when accessing the variables from outer scope" do
+
+        should "access the variables" do
+          @my_title = 'Title From Outer Space'
+
+          def index_something
+            @tags = ['block', 'scope', 'revenge']
+
+            Index.any_instance.expects(:store).with(title: 'Title From Outer Space', tags: ['block', 'scope', 'revenge'])
+
+            Tire::Index.new 'outer-space' do |index|
+              index.store title: @my_title, tags: @tags
+            end
+          end
+
+          index_something
+        end
+
+      end
     end
 
   end
