@@ -32,7 +32,11 @@ module Tire
       end
 
       def id
-        @attributes[:_id] || @attributes[:id]
+        @attributes[:_id]   || @attributes[:id]
+      end
+
+      def type
+        @attributes[:_type] || @attributes[:type]
       end
 
       def persisted?

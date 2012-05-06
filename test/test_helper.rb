@@ -72,6 +72,17 @@ module Test::Integration
   end
 
   def teardown
-    ::RestClient.delete "#{URL}/articles-test"  rescue nil
+    %w[
+      articles-test
+      active_record_articles
+      active_model_article_with_custom_as_serializations
+      active_record_class_with_tire_methods
+      mongoid_articles
+      mongoid_class_with_tire_methods
+      supermodel_articles
+      dynamic_index
+      model_with_nested_documents ].each do |index|
+        ::RestClient.delete "#{URL}/#{index}" rescue nil
+    end
   end
 end

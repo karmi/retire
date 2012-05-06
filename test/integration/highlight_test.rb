@@ -21,6 +21,19 @@ module Tire
         assert doc.highlight.title.to_s.include?('<em>'), "Highlight does not include default highlight tag"
       end
 
+      should "highlight multiple fields with custom highlight tag" do
+        s = Tire.search('articles-test') do
+          query { string 'Two OR ruby' }
+          highlight :tags, :title, :options => { :tag => '<strong>' }
+        end
+
+        doc = s.results.first
+
+        assert_equal 1, doc.highlight.title.size
+        assert_equal "<strong>Two</strong>", doc.highlight.title.first, "Highlight does not include highlight tag"
+        assert_equal "<strong>ruby</strong>", doc.highlight.tags.first, "Highlight does not include highlight tag"
+      end
+
       should "return entire content with highlighted fragments" do
         # Tire::Configuration.logger STDERR, :level => 'debug'
 

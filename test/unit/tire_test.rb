@@ -64,6 +64,44 @@ module Tire
 
         end
 
+        context "when scanning an index" do
+
+          should "initiate the scan" do
+            Search::Scan.expects(:new).with { |index,options| index == 'dummy' }
+
+            Tire.scan('dummy')
+          end
+
+          should "allow to pass the query as a block to scan" do
+            Search::Scan.expects(:new).with do |index,options|
+              index == 'dummy'
+            end
+
+            Tire.scan('dummy') { query { string 'foo' } }
+          end
+
+          should "allow to pass the query as a hash to scan" do
+            payload = { :query => { :query_string => { :query => 'foo' } } }
+            Search::Scan.expects(:new).with('dummy', payload)
+
+            Tire.scan 'dummy', payload
+          end
+        end
+
+      end
+
+      context "aliases" do
+
+        should "list all aliases" do
+          json = {'dummy' => {'aliases' => {'foo' => {}}}}.to_json
+          Configuration.client.expects(:get).returns(mock_response(json))
+
+          aliases = Tire.aliases
+
+          assert_equal 'foo',     aliases.first.name
+          assert_equal ['dummy'], aliases.first.indices.to_a
+        end
+
       end
 
       context "utils" do
