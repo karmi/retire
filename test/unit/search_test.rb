@@ -81,7 +81,7 @@ module Tire
         end.returns mock_response( { 'hits' => { 'hits' => [ {:_id => 1} ] } }.to_json )
 
         result_options = { :load => true, :wrapper => Hash }
-        s = Search::Search.new('index', result_options) { query { string 'foo' } }.results
+        s = Search::Search.new('index', result_options.dup) { query { string 'foo' } }.results
         assert_equal result_options, s.options
       end
 
