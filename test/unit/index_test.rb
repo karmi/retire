@@ -422,6 +422,15 @@ module Tire
       end
 
       context "when storing in bulk" do
+        setup do
+          @old_logger = Configuration.logger.instance_variable_get :@logger
+          Configuration.logger stub('Logger device', :write => 0)
+        end
+
+        teardown do
+          Configuration.logger.instance_variable_set :@logger, @old_logger
+        end
+
         # The expected JSON looks like this:
         #
         # {"index":{"_index":"dummy","_type":"document","_id":"1"}}
@@ -443,6 +452,7 @@ module Tire
             json =~ /"title":"One"/ &&
             json =~ /"title":"Two"/
           end.returns(mock_response('{}'), 200)
+          Configuration.logger.expects(:log_response).with(200, any_parameters)
 
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
         end
@@ -486,6 +496,7 @@ module Tire
 
         should "try again when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
+          Configuration.logger.expects(:log_response).with(503, any_parameters).at_least(1)
 
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end

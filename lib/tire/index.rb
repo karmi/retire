@@ -103,9 +103,10 @@ module Tire
       count = 0
 
       begin
-        response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
-        raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
-        response
+        @response = nil
+        @response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
+        raise RuntimeError, "#{@response.code} > #{@response.body}" if @response.failure?
+        @response
       rescue StandardError => error
         if count < tries
           count += 1
