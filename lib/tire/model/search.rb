@@ -72,8 +72,8 @@ module Tire
             options ||= {}
           end
 
-          sort      = Array( options[:order] || options[:sort] )
           options   = default_options.update(options)
+          sort      = Array( options.delete(:order) || options.delete(:sort) )
 
           s = Tire::Search::Search.new(options.delete(:index), options)
           s.size( options[:per_page].to_i ) if options[:per_page]
@@ -298,7 +298,6 @@ module Tire
         Results::Item.send :include, Loader
       end
 
-      
     end
 
   end
