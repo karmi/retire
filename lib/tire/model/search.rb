@@ -142,6 +142,16 @@ module Tire
           end
         end
 
+        def mget(*args, &block)
+          default_options = {:type => document_type, :index => index.name}
+
+          ids = args.shift
+          options = args.shift || {}
+          options = default_options.update(options)
+
+          Tire::Search::MultiGet.new(options.delete(:index), options.delete(:type), ids, options, &block)
+        end
+
         # Returns a Tire::Index instance for this model.
         #
         # Example usage: `Article.index.refresh`.

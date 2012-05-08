@@ -44,5 +44,9 @@ module Tire
       Alias.all
     end
 
+    def mget(index=nil, type=nil, &block)
+      Search::MultiGet.new(index, type, &block)
+    end
+
   end
 end
