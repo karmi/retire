@@ -156,6 +156,7 @@ module Tire
         s = Search::Search.new('index')
         assert_not_nil s.results
         assert_not_nil s.response
+        assert_not_nil s.json
       end
 
       should "allow the search criteria to be chained" do

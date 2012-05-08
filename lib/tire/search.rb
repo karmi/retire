@@ -4,7 +4,7 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain, :script_fields
+      attr_reader :indices, :query, :facets, :filters, :options, :explain, :script_fields
 
       def initialize(indices=nil, options={}, &block)
         if indices.is_a?(Hash)
@@ -21,6 +21,7 @@ module Tire
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
 
+
       def set_indices_options(indices)
         indices.each do |index, index_options|
           if index_options[:boost]
@@ -36,6 +37,10 @@ module Tire
 
       def response
         @response || (perform; @response)
+      end
+
+      def json
+        @json     || (perform; @json)
       end
 
       def url
