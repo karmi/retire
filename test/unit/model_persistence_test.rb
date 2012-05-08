@@ -24,16 +24,16 @@ module Tire
           setup do
             Model::Search.index_prefix 'prefix'
           end
-          
+
           teardown do
             Model::Search.index_prefix nil
           end
-          
+
           should "have configured prefix in index_name" do
             assert_equal 'prefix_persistent_articles', PersistentArticle.index_name
             assert_equal 'prefix_persistent_articles', PersistentArticle.new(:title => 'Test').index_name
           end
-          
+
         end
 
         should "have document_type" do
@@ -153,6 +153,15 @@ module Tire
           end
         end
 
+      end
+
+      context "Search" do
+        should "not add the sort to the URL path" do
+          Configuration.client.expects(:get).with do |url, payload|
+            assert_equal false, url.include?('sort')
+          end
+          PersistentArticle.search('index', {:sort => "created_at desc"}).perform
+        end
       end
 
       context "Persistent model" do
