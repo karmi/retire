@@ -4,7 +4,7 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain, :script_fields
+      attr_reader :indices, :query, :facets, :filters, :options, :explain, :script_fields
 
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
@@ -24,6 +24,10 @@ module Tire
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def json
+        @json || (perform; @json)
       end
 
       def results
