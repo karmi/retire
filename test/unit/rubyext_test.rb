@@ -7,10 +7,11 @@ module Tire
     context "Hash" do
 
       context "with no to_json method provided" do
+
         setup do
           @hash = { :one => 1}
           # Undefine the `to_json` method...
-          class Hash; undef_method(:to_json); end
+          ::Hash.class_eval { remove_method(:to_json) rescue nil }
           # ... and reload the extension, so it's added
           load 'tire/rubyext/hash.rb'
         end
@@ -18,6 +19,12 @@ module Tire
         should "have its own to_json method" do
           assert_respond_to( @hash, :to_json )
           assert_equal '{"one":1}', @hash.to_json
+        end
+
+        should "allow to pass options to to_json for compatibility" do
+          assert_nothing_raised do
+            assert_equal '{"one":1}', @hash.to_json({})
+          end
         end
 
       end

@@ -32,6 +32,20 @@ module Tire
         end
       end
 
+      should "have an 'id' method" do
+        a = Results::Item.new(:_id => 1)
+        b = Results::Item.new(:id => 1)
+        assert_equal 1, a.id
+        assert_equal 1, b.id
+      end
+
+      should "have a 'type' method" do
+        a = Results::Item.new(:_type => 'foo')
+        b = Results::Item.new(:type => 'foo')
+        assert_equal 'foo', a.type
+        assert_equal 'foo', b.type
+      end
+
       should "respond to :to_indexed_json" do
         assert_respond_to Results::Item.new, :to_indexed_json
       end

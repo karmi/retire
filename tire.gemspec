@@ -37,12 +37,12 @@ Gem::Specification.new do |s|
   # = Development dependencies
   #
   s.add_development_dependency "bundler",     "~> 1.0"
-  s.add_development_dependency "yajl-ruby",   "~> 0.8.0"
+  s.add_development_dependency "yajl-ruby",   "~> 1.0"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "mocha"
   s.add_development_dependency "activerecord", ">= 3.0"
   s.add_development_dependency "sqlite3"
-  s.add_development_dependency "mongoid",      "~> 2.2.1"
+  s.add_development_dependency "mongoid",      "~> 2.2"
   s.add_development_dependency "bson_ext"
   s.add_development_dependency "redis-persistence"
   s.add_development_dependency "curb"
