@@ -73,7 +73,7 @@ namespace :tire do
       if defined?(Kaminari) && klass.respond_to?(:page)
         klass.instance_eval do
           def paginate(options = {})
-            page(options[:page]).per(options[:per_page]).to_a
+            order("#{klass.table_name}.id").page(options[:page]).per(options[:per_page]).to_a
           end
         end
       end unless klass.respond_to?(:paginate)
