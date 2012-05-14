@@ -27,6 +27,14 @@ module Tire
     ensure
     end
 
+    # Perform a multi-search
+    #
+    # @see http://www.elasticsearch.org/guide/reference/api/multi-search.html
+    def msearch(options = {}, &block)
+      raise ArgumentError.new('block not supplied') unless block_given?
+      Search::Msearch.new(options, &block)
+    end
+
     def index(name, &block)
       Index.new(name, &block)
     end
