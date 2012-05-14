@@ -14,7 +14,7 @@ module Tire
         @parts = []
         @path = '/_msearch'
         @indices = Set.new
-        instance_eval(&block)
+        block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
 
       # The indices which are being queried
