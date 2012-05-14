@@ -37,7 +37,7 @@ module Tire
           private
           def request(method, url, data = nil)
             conn = ::Faraday.new( &(faraday_middleware || DEFAULT_MIDDLEWARE) )
-            response = conn.run_request(method, url, data, {})
+            response = conn.run_request(method, url, data, nil)
             Response.new(response.body, response.status, response.headers)
           end
         end
