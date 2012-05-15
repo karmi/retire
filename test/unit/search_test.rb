@@ -131,6 +131,14 @@ module Tire
         end
       end
 
+      should "not change Hash or curl representation if initialized with payload" do
+        payload = {
+          query: 'my-custom-payload'
+        }
+        s = Search::Search.new('index', payload: payload)
+        assert_equal s.to_hash, s.to_hash
+      end
+
       should "allow chaining" do
         assert_nothing_raised do
           Search::Search.new('index').query { }.
