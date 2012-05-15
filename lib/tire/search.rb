@@ -109,7 +109,7 @@ module Tire
       end
 
       def to_hash
-        (@options[:payload].present? && @options[:payload]) || begin
+        @options.fetch(:payload) do
           request = {}
           request.update( { :query  => @query.to_hash } )    if @query
           request.update( { :sort   => @sort.to_ary   } )    if @sort
