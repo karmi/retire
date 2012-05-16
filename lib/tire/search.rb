@@ -43,7 +43,8 @@ module Tire
       end
 
       def params
-        @options.empty? ? '' : '?' + @options.to_param
+        params = @options.reject { |k,v| k == :payload }
+        params.empty? ? '' : '?' + params.to_param
       end
 
       def query(&block)
@@ -122,7 +123,7 @@ module Tire
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @options[:payload] || begin
           request = {}
           request.update( { :query  => @query.to_hash } )    if @query
           request.update( { :sort   => @sort.to_ary   } )    if @sort
