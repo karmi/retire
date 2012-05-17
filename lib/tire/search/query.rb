@@ -33,7 +33,15 @@ module Tire
         @value[:query_string].update(options)
         @value
       end
-
+      
+      
+      def custom_filters_score(options={}, &block)
+        @custom_filters ||= CustomFiltersScoreQuery.new(options)
+        block.arity < 1 ? @custom_filters.instance_eval(&block) : block.call(@custom_filters) if block_given?
+        @value[:custom_filters_score] = @custom_filters.to_hash
+        @value
+      end
+      
       def custom_score(options={}, &block)
         @custom_score ||= Query.new(&block)
         @value[:custom_score] = options
@@ -118,6 +126,31 @@ module Tire
         @value.update(@options)
       end
     end
+
+
+    
+    class CustomFiltersScoreQuery
+      def initialize(options={},&block)
+        @value = options
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def query(options={}, &block)
+        @value[:query] = Query.new(&block).to_hash
+        @value
+      end
+
+      def filter(filter_options, type, *options)
+        @value[:filters] ||= []
+        @value[:filters] << {:filter => Filter.new(type, *options).to_hash}.merge(filter_options)
+        @value
+      end
+    
+      def to_hash
+        @value
+      end
+    end
+        
 
 
     class FilteredQuery
