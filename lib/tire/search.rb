@@ -76,6 +76,16 @@ module Tire
         self
       end
 
+      def min_score(value)
+        @min_score = value
+        self
+      end
+
+      def track_scores(value)
+        @track_scores = value
+        self
+      end
+      
       def fields(*fields)
         @fields = Array(fields.flatten)
         self
@@ -117,6 +127,7 @@ module Tire
           request.update( { :filter => { :and => @filters.map {|filter| filter.to_hash} } } ) if  @filters && @filters.size > 1
           request.update( { :highlight => @highlight.to_hash } ) if @highlight
           request.update( { :size => @size } )               if @size
+          request.update( { :min_score => @min_score } )     if @min_score
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
           request.update( { :version => @version } )         if @version
