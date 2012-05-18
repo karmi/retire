@@ -1,27 +1,22 @@
 module Tire
-  VERSION   = "0.4.0"
+  VERSION   = "0.4.2"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Persistence supports property defaults and casting model properties as Ruby objects
-    * Added Hashr (http://rubygems.org/gems/hashr) as dependency
-    * Search in persistence models returns model instances, not Items
-    * Fixed errors in the Curb client
-    * Re-raise the RestClient::RequestTimeout and RestClient::ServerBrokeConnection exceptions
-    * Index#bulk_store and Index#import support the `:raise` option to re-raise exceptions
-    * Prefer ELASTICSEARCH_URL environment variable as the default URL, if present
-    * Added the "text" search query
-    * Deprecated the support for passing JSON strings to `Index#store`
-    * ActiveModel mapping has the `:as` option dynamically set property value for serialization
-    * ActiveModel supports any level of mappings in `mapping`
-    * ActiveModel search can eagerly load records of multiple types/classes
-    * ActiveModel integration now properly supports namespaced models
-    * Added support for passing search params (`search_type`, `timeout`, etc.) to search requests
-    * Added the "tire:index:drop" Rake task
-    * Added the "Filter" facet type
-    * Added the "Fuzzy" search query type
-    * Various test suite refactorings and changes
-    * Relaxed gem dependencies
+    Version 0.4.1
+    -------------
+    * Added a Index#settings method to retrieve index settings as a Hash
+    * Added support for the "scan" search in the Ruby API
+    * Added support for reindexing the index documents into new index
+    * Added basic support for index aliases
+    * Changed, that Index#bulk_store runs against an index endpoint, not against `/_bulk`
+    * Refactorings, fixes, Ruby 1.8 compatibility
+
+    Version 0.4.2
+    -------------
+    * Fixed incorrect handling of PUT requests in the Curb client
+    * Fixed, that blocks passed to `Tire::Index.new` or `Tire.index` losed the scope
+    * Added `Tire::Alias`, interface and DSL to manage aliases as resources
   END
 end
