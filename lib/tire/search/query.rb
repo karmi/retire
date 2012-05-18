@@ -39,7 +39,7 @@ module Tire
         @custom_filters ||= CustomFiltersScoreQuery.new(options)
         block.arity < 1 ? @custom_filters.instance_eval(&block) : block.call(@custom_filters) if block_given?
         @value[:custom_filters_score] = @custom_filters.to_hash
-        @value
+        @custom_filters
       end
       
       def custom_score(options={}, &block)
