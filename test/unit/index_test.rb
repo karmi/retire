@@ -447,23 +447,6 @@ module Tire
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
         end
 
-        should "serialize ActiveModel instances" do
-          Configuration.client.expects(:post).with do |url, json|
-            url  == "#{ActiveModelArticle.index.url}/_bulk" &&
-            json =~ /"_index":"active_model_articles"/ &&
-            json =~ /"_type":"active_model_article"/ &&
-            json =~ /"_id":"1"/ &&
-            json =~ /"_id":"2"/ &&
-            json =~ /"title":"One"/ &&
-            json =~ /"title":"Two"/
-          end.returns(mock_response('{}', 200))
-
-          one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
-          two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
-
-          ActiveModelArticle.index.bulk_store [ one, two ]
-        end
-
         context "namespaced models" do
           should "not URL-escape the document_type" do
             Configuration.client.expects(:post).with do |url, json|
@@ -514,13 +497,13 @@ module Tire
 
         should "display error message when collection item does not have ID" do
           Configuration.client.expects(:post).with do |url, json|
-            url  == "#{ActiveModelArticle.index.url}/_bulk"
+            url  == "#{@index.url}/_bulk"
           end.returns(mock_response('success', 200))
 
           STDERR.expects(:puts).once
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
-          ActiveModelArticle.index.bulk_store documents
+          @index.bulk_store documents
         end
 
       end

@@ -187,7 +187,7 @@ module Tire
     # Return alias serialized in JSON for _ElasticSearch_
     #
     def to_json(options=nil)
-      as_json.to_json
+      MultiJson.encode(as_json)
     end
 
     def inspect

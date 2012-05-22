@@ -1,18 +1,13 @@
 require 'rest_client'
 require 'multi_json'
-require 'active_model'
 require 'hashr'
 require 'cgi'
 
-require 'active_support/core_ext/object/to_param'
-require 'active_support/core_ext/object/to_query'
-require 'active_support/core_ext/hash/except.rb'
+require 'active_support/core_ext'
 
 # Ruby 1.8 compatibility
 require 'tire/rubyext/ruby_1_8' if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
-
-require 'tire/rubyext/hash'
-require 'tire/rubyext/symbol'
+require 'tire/rubyext/to_json'
 require 'tire/utils'
 require 'tire/logger'
 require 'tire/configuration'
@@ -31,16 +26,6 @@ require 'tire/results/item'
 require 'tire/index'
 require 'tire/alias'
 require 'tire/dsl'
-require 'tire/model/naming'
-require 'tire/model/callbacks'
-require 'tire/model/percolate'
-require 'tire/model/indexing'
-require 'tire/model/import'
-require 'tire/model/search'
-require 'tire/model/persistence/finders'
-require 'tire/model/persistence/attributes'
-require 'tire/model/persistence/storage'
-require 'tire/model/persistence'
 require 'tire/tasks'
 
 module Tire

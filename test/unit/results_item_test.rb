@@ -10,7 +10,6 @@ module Tire
       begin; Object.send(:remove_const, :Rails); rescue; end
       @model = Results::Item.new :title => 'Test'
     end
-    include ActiveModel::Lint::Tests
 
     context "Item" do
 
@@ -110,42 +109,6 @@ module Tire
 
       should "be inspectable" do
         assert_match /<Item title|Item author/, @document.inspect
-      end
-
-      context "within Rails" do
-
-        setup do
-          module ::Rails
-          end
-
-          class ::FakeRailsModel
-            extend  ActiveModel::Naming
-            include ActiveModel::Conversion
-            def self.find(id, options); new; end
-          end
-
-          @document = Results::Item.new :id => 1, :_type => 'fake_rails_model', :title => 'Test'
-        end
-
-        should "be an instance of model, based on _type" do
-          assert_equal FakeRailsModel, @document.class
-        end
-
-        should "be inspectable with masquerade" do
-          assert_match /<Item \(FakeRailsModel\)/, @document.inspect
-        end
-
-        should "return proper singular and plural forms" do
-          assert_equal 'fake_rails_model',  ActiveModel::Naming.singular(@document)
-          assert_equal 'fake_rails_models', ActiveModel::Naming.plural(@document)
-        end
-
-        should "instantiate itself for deep hashes, not a Ruby class corresponding to type" do
-          document = Results::Item.new :_type => 'my_model', :title => 'Test', :author => { :name => 'John' }
-
-          assert_equal Tire::Results::Item, document.class
-        end
-
       end
 
     end

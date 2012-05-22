@@ -17,7 +17,7 @@ module Tire
       end
 
       def to_json
-        @value.to_json
+        MultiJson.encode(@value)
       end
     end
 

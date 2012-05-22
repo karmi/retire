@@ -4,31 +4,14 @@ require 'bundler/setup'
 require 'pathname'
 require 'test/unit'
 
-require 'yajl/json_gem'
-require 'sqlite3'
+require 'yajl'
+#require 'yajl/json_gem'
 
 require 'shoulda'
 require 'turn/autorun' unless ENV["TM_FILEPATH"] || ENV["CI"] || defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 require 'mocha'
 
-require 'active_support/core_ext/hash/indifferent_access'
-
 require 'tire'
-
-# Require basic model files
-#
-require File.dirname(__FILE__) + '/models/active_model_article'
-require File.dirname(__FILE__) + '/models/active_model_article_with_callbacks'
-require File.dirname(__FILE__) + '/models/active_model_article_with_custom_document_type'
-require File.dirname(__FILE__) + '/models/active_model_article_with_custom_index_name'
-require File.dirname(__FILE__) + '/models/active_record_models'
-require File.dirname(__FILE__) + '/models/article'
-require File.dirname(__FILE__) + '/models/persistent_article'
-require File.dirname(__FILE__) + '/models/persistent_article_in_namespace'
-require File.dirname(__FILE__) + '/models/persistent_article_with_casting'
-require File.dirname(__FILE__) + '/models/persistent_article_with_defaults'
-require File.dirname(__FILE__) + '/models/persistent_articles_with_custom_index_name'
-require File.dirname(__FILE__) + '/models/validated_model'
 
 class Test::Unit::TestCase
 
@@ -74,14 +57,7 @@ module Test::Integration
   def teardown
     %w[
       articles-test
-      active_record_articles
-      active_model_article_with_custom_as_serializations
-      active_record_class_with_tire_methods
-      mongoid_articles
-      mongoid_class_with_tire_methods
-      supermodel_articles
-      dynamic_index
-      model_with_nested_documents ].each do |index|
+      dynamic_index ].each do |index|
         ::RestClient.delete "#{URL}/#{index}" rescue nil
     end
   end

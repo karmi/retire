@@ -13,7 +13,7 @@ module Tire
           # Undefine the `to_json` method...
           ::Hash.class_eval { remove_method(:to_json) rescue nil }
           # ... and reload the extension, so it's added
-          load 'tire/rubyext/hash.rb'
+          load 'tire/rubyext/to_json.rb'
         end
 
         should "have its own to_json method" do
@@ -41,8 +41,8 @@ module Tire
       end
 
       should "properly serialize Time into JSON" do
-        json = { :time => Time.mktime(2011, 01, 01, 11, 00).to_json  }.to_json
-        assert_match /"2011-01-01T11:00:00.*"/, MultiJson.decode(json)['time']
+        json = { :time => Time.mktime(2011, 01, 01, 11, 00) }.to_json
+        assert_match %r/{\s*"time"\s*:\s*"2011-01-01T11:00:00.*?"}/, json
       end
 
     end
