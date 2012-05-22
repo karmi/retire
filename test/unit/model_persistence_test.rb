@@ -196,7 +196,11 @@ module Tire
           end
 
           should "return default value for attribute" do
+            time = Time.at(0)
+            Time.expects(:now).returns(time)
+
             article = PersistentArticleWithDefaults.new :title => 'Test'
+            assert_equal time,  article.published_on
             assert_equal [],    article.tags
             assert_equal false, article.hidden
           end

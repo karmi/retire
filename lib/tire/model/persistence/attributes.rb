@@ -85,7 +85,12 @@ module Tire
             # Make a copy of objects in the property defaults hash, so default values such as `[]` or `{ foo: [] }` are left intact
             property_defaults = self.class.property_defaults.inject({}) do |hash, item|
               key, value = item
-              hash[key.to_s] = value.class.respond_to?(:new) ? value.clone : value
+              if value.respond_to?(:call)
+                value = value.call
+              elsif value.class.respond_to?(:new)
+                value = value.clone
+              end
+              hash[key.to_s] = value
               hash
             end
 
