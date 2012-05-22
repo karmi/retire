@@ -1,21 +1,21 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+$:.unshift File.expand_path("../lib", __FILE__)
 require "tire/version"
 
 Gem::Specification.new do |s|
   s.name        = "tire"
   s.version     = Tire::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.summary       = "Ruby client for ElasticSearch"
-  s.homepage      = "http://github.com/karmi/tire"
-  s.authors       = [ 'Karel Minarik' ]
-  s.email         = 'karmi@karmi.cz'
+  s.summary     = "Ruby client for ElasticSearch"
+  s.homepage    = "http://github.com/karmi/tire"
+  s.authors     = [ 'Karel Minarik' ]
+  s.email       = 'karmi@karmi.cz'
 
   s.rubyforge_project = "tire"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files       = `git ls-files`.split("\n")
+  s.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
 
   s.require_paths = ["lib"]
 

@@ -1,5 +1,5 @@
 module Tire
-  VERSION = "0.4.2.1".freeze
+  VERSION = "0.4.2.1"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
