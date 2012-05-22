@@ -115,13 +115,46 @@ module Tire
           # instances and automatically convert UTC formatted strings to Time.
           #
           def __cast_value(name, value)
+            def cast_value_to(value, klass)
+              if klass == Integer
+                if value.respond_to?(:to_i)
+                  begin
+                    return value.to_i
+                  rescue FloatDomainError
+                    value
+                  end
+                else
+                  value
+                end
+
+              elsif klass == Time
+                case value
+                when Time
+                  value
+                when String
+                  Time.parse(value)
+                when Integer
+                  Time.at(value)
+                else
+                  Time.new(value)
+                end
+
+              else
+                klass.new(value)
+              end
+            end
+
             case
+              when value.nil?
+                nil
 
               when klass = self.class.property_types[name.to_sym]
                 if klass.is_a?(Array) && value.is_a?(Array)
-                  value.map { |v| klass.first.new(v) }
+                  value.map do |v|
+                    cast_value_to(v, klass.first)
+                  end
                 else
-                  klass.new(value)
+                  cast_value_to(value, klass)
                 end
 
               when value.is_a?(Hash)
