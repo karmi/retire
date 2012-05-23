@@ -33,6 +33,11 @@ module Tire
         assert_equal 2, Results::Collection.new(@default_response)[1][:id]
       end
 
+      should "allow slicing" do
+        assert_equal [2,3], Results::Collection.new(@default_response)[1,2].map  {|res| res[:id]}
+        assert_equal [3],   Results::Collection.new(@default_response)[-1,1].map {|res| res[:id]}
+      end
+
       should "be initialized with parsed json" do
         assert_nothing_raised do
           collection = Results::Collection.new( @default_response )
