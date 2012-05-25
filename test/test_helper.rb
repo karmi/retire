@@ -73,15 +73,23 @@ module Test::Integration
 
   def teardown
     %w[
-      articles-test
-      active_record_articles
+      _percolator
+      active_model_article_with_callbacks
       active_model_article_with_custom_as_serializations
+      active_record_articles
+      active_record_assets
       active_record_class_with_tire_methods
+      active_record_model_one
+      active_record_model_two
+      active_record_namespace_my_models
+      articles-test
+      dynamic_index
+      model_with_nested_documents
       mongoid_articles
       mongoid_class_with_tire_methods
       supermodel_articles
-      dynamic_index
-      model_with_nested_documents ].each do |index|
+      whammy
+    ].each do |index|
         ::RestClient.delete "#{URL}/#{index}" rescue nil
     end
   end
