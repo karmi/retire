@@ -31,8 +31,13 @@ module Tire
       Index.new(name, &block)
     end
 
-    def scan(names, options={}, &block)
-      Search::Scan.new(names, options, &block)
+    def scroll(names, options={}, &block)
+      search = Search::Search.new(names, {:scroll => '10m'}.merge(options), &block)
+      Search::Scroll.new(search)
+    end
+
+    def scan(indices=nil, options={}, &block)
+      scroll(indices, options.merge(:search_type => 'scan'), &block)
     end
 
     def aliases

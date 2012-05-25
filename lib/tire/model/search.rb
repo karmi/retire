@@ -97,6 +97,51 @@ module Tire
           s.results
         end
 
+        def scroll(*args, &block)
+          default_options = {:type => document_type, :index => index.name, :scroll => '10m'}
+
+          if block_given?
+            options = args.shift || {}
+          else
+            query, options = args
+            options ||= {}
+          end
+
+          sort      = Array( options[:order] || options[:sort] )
+          options   = default_options.update(options)
+
+          s = Tire::Search::Scroll.new(Tire::Search::Search.new(options.delete(:index), options))
+          s.search.size( options[:per_page].to_i ) if options[:per_page]
+          s.search.sort do
+            sort.each do |t|
+              field_name, direction = t.split(' ')
+              by field_name, direction
+            end
+          end unless sort.empty?
+
+          if block_given?
+            block.arity < 1 ? s.search.instance_eval(&block) : block.call(s.search)
+          else
+            s.search.query { string query }
+            # TODO: Actualy, allow passing all the valid options from
+            # <http://www.elasticsearch.org/guide/reference/api/search/uri-request.html>
+            s.search.fields Array(options[:fields]) if options[:fields]
+          end
+
+          s
+        end
+
+        def scan(*args, &block)
+          if block_given?
+            options = args.shift || {}
+            scroll(options.merge(:search_type => 'scan'), &block)
+          else
+            query, options = args
+            options ||= {}
+            scroll(query, options.merge(:search_type => 'scan'))
+          end
+        end
+
         # Returns a Tire::Index instance for this model.
         #
         # Example usage: `Article.index.refresh`.
