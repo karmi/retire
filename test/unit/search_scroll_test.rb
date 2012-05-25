@@ -2,9 +2,9 @@ require 'test_helper'
 
 module Tire
   module Search
-    class ScanTest < Test::Unit::TestCase
+    class ScrollTest < Test::Unit::TestCase
 
-      context "Scan" do
+      context "Scroll" do
         setup do
           Configuration.reset
           @results = {
@@ -22,12 +22,12 @@ module Tire
         end
 
         should "initialize the search object with the indices" do
-          s = Scan.new(['index1', 'index2'])
+          s = Scroll.new(Search.new(['index1', 'index2'], :scroll => '10m'))
           assert_instance_of Tire::Search::Search, s.search
         end
 
         should "fetch the initial scroll ID" do
-          s = Scan.new('index1')
+          s = Scroll.new(Search.new('index1', :scroll => '10m'))
           s.search.expects(:perform).
                    returns(stub :json => { '_scroll_id' => 'abc123' })
 
@@ -35,24 +35,24 @@ module Tire
         end
 
         should "perform the request lazily" do
-          s = Scan.new('dummy')
+          s = Scroll.new(Search.new('dummy', :scroll => '10m'))
 
           s.expects(:scroll_id).
             returns('abc123').
             at_least_once
 
-          Configuration.client.expects(:get).
-                               with { |url,id| url =~ %r|_search/scroll.*search_type=scan| && id == 'abc123' }.
-                               returns(@default_response).
-                               once
-          
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc123' }
+                              .returns(@default_response)
+                              .once
+
           assert_not_nil s.results
           assert_not_nil s.response
           assert_not_nil s.json
         end
 
         should "set the total and seen variables" do
-          s = Scan.new('dummy')
+          s = Scroll.new(Search.new('dummy', :scroll => '10m'))
           s.expects(:scroll_id).returns('abc123').at_least_once
           Configuration.client.expects(:get).returns(@default_response).at_least_once
 
@@ -63,7 +63,7 @@ module Tire
         should "log the request and response" do
           Tire.configure { logger STDERR }
 
-          s = Scan.new('dummy')
+          s = Scroll.new(Search.new('dummy', :scroll => '10m'))
           s.expects(:scroll_id).returns('abc123').at_least_once
           Configuration.client.expects(:get).returns(@default_response).at_least_once
 
@@ -78,13 +78,13 @@ module Tire
 
         context "results" do
           setup do
-            @search = Scan.new('dummy')
+            @search = Scroll.new(Search.new('dummy', :scroll => '10m'))
+            @search.search.expects(:results).
+                           returns(Results::Collection.new @results).
+                           once
             @search.expects(:results).
-                    returns(Results::Collection.new @results).
-                    then.
                     returns(Results::Collection.new @empty_results).
-                    at_least_once
-            @search.results
+                    once
           end
 
           should "be iterable" do
@@ -92,7 +92,7 @@ module Tire
             assert_respond_to @search, :size
 
             assert_nothing_raised do
-              @search.each { |batch| p batch; assert_equal 'Test', batch.first.title }
+              @search.each { |batch| assert_equal 'Test', batch.first.title }
             end
           end
 
