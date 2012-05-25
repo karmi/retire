@@ -11,7 +11,11 @@ class SupermodelArticle
 
   property :title
 
-  mapping do
-    indexes :title,      :type => 'string', :boost => 15, :analyzer => 'czech'
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+
+    mapping do
+      indexes :title,      :type => 'string', :boost => 15, :analyzer => 'czech'
+    end
   end
 end
