@@ -729,7 +729,6 @@ module Tire
         should "percolate document against specific queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               # p [url, payload]
                                                url == "#{@index.url}/document/_percolate" &&
                                                payload['doc']['title']                   == 'Test' &&
                                                payload['query']['query_string']['query'] == 'tag:alerts'
@@ -745,7 +744,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article/?percolate=%2A" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -755,7 +754,7 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article/?percolate=tag%3Aalerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
