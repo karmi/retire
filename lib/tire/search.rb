@@ -4,16 +4,30 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
+      attr_reader :indices, :query, :facets, :filters, :options, :explain
 
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @options = options
 
+        if @options[:payload]
+          if @options[:payload][:search_type]
+            @options[:search_type] = @options[:payload].delete(:search_type)
+          end
+
+          if @options[:payload][:scroll]
+            @options[:scroll] = @options[:payload].delete(:scroll)
+          end
+        end
+
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def json
+        @json || (perform; @json)
       end
 
       def results
@@ -29,7 +43,8 @@ module Tire
       end
 
       def params
-        @options.empty? ? '' : '?' + @options.to_param
+        params = @options.reject { |k,v| k == :payload }
+        params.empty? ? '' : '?' + params.to_param
       end
 
       def query(&block)
@@ -108,7 +123,7 @@ module Tire
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @options[:payload] || begin
           request = {}
           request.update( { :query  => @query.to_hash } )    if @query
           request.update( { :sort   => @sort.to_ary   } )    if @sort

@@ -1,53 +1,51 @@
 module Tire
   module Results
 
-    class Collection
+    class MultiGetCollection
       include Enumerable
-      include Pagination
 
-      attr_reader :time, :total, :options, :facets
+      attr_reader :options
 
       def initialize(response, options={})
         @response = response
         @options  = options
-        @time     = response['took'].to_i
-        @total    = response['hits']['total'].to_i
-        @facets   = response['facets']
         @wrapper  = options[:wrapper] || Configuration.wrapper
       end
 
       def results
         @results ||= begin
-          hits = @response['hits']['hits'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
+          docs = @response['docs'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
 
           unless @options[:load]
             if @wrapper == Hash
-              hits
+              docs
             else
-              hits.map do |h|
-                document = {}
+              docs.map do |h|
+                if h['exists']
+                  document = {}
 
-                # Update the document with content and ID
-                document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
-                document.update( {'id' => h['_id']} )
+                  # Update the document with content and ID
+                  document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
+                  document.update( {'id' => h['_id']} )
 
-                # Update the document with meta information
-                ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
+                  # Update the document with meta information
+                  ['_type', '_index', '_version'].each { |key| document.update( {key => h[key]} || {} ) }
 
-                # Return an instance of the "wrapper" class
-                if @wrapper.respond_to?(:call)
-                  @wrapper.call(document)
-                else
-                  @wrapper.new(document)
+                  # Return an instance of the "wrapper" class
+                  if @wrapper.respond_to?(:call)
+                    @wrapper.call(document)
+                  else
+                    @wrapper.new(document)
+                  end
                 end
               end
             end
 
           else
-            return [] if hits.empty?
+            return [] if docs.empty?
 
             records = {}
-            @response['hits']['hits'].group_by { |item| item['_type'] }.each do |type, items|
+            @response['docs'].group_by { |item| item['_type'] }.each do |type, items|
               raise NoMethodError, "You have tried to eager load the model instances, " +
                                    "but Tire cannot find the model class because " +
                                    "document has no _type property." unless type
@@ -64,7 +62,7 @@ module Tire
             end
 
             # Reorder records to preserve order from search results
-            @response['hits']['hits'].map { |item| records[item['_type']].detect { |record| record.id.to_s == item['_id'].to_s } }
+            @response['docs'].map { |item| records[item['_type']].detect { |record| record.id.to_s == item['_id'].to_s } }
           end
         end
       end
@@ -99,14 +97,15 @@ module Tire
           keys = key.to_s.split('.').reject { |n| n == '_source' }
           fields.delete(key)
 
+          result = {}
           path = []
 
           keys.each do |name|
             path << name
-
-            eval "fields[:#{path.join('][:')}] ||= {}"
-            eval "fields[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
+            eval "result[:#{path.join('][:')}] ||= {}"
+            eval "result[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
           end
+          fields.update result
         end
         fields
       end

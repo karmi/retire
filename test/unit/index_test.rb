@@ -729,7 +729,6 @@ module Tire
         should "percolate document against specific queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               # p [url, payload]
                                                url == "#{@index.url}/document/_percolate" &&
                                                payload['doc']['title']                   == 'Test' &&
                                                payload['query']['query_string']['query'] == 'tag:alerts'
@@ -745,7 +744,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article/?percolate=%2A" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -755,7 +754,7 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article/?percolate=tag%3Aalerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -779,17 +778,21 @@ module Tire
               ]
             }
           }
+          @empty_results = @results.merge('hits' => {'hits' => []})
         end
 
         should "perform bulk store in the new index" do
           Index.any_instance.stubs(:exists?).returns(true)
-          Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance.
-                       expects(:results).
-                       returns(Results::Collection.new(@results)).
-                       then.
-                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
-                       at_least_once
+          Search::Search.any_instance.stubs(:perform)
+          Search::Search.any_instance.
+                         expects(:results).
+                         returns(Results::Collection.new(@results)).
+                         once
+          Search::Scroll.any_instance.stubs(:__perform)
+          Search::Scroll.any_instance.
+                         expects(:results).
+                         returns(Results::Collection.new(@empty_results)).
+                         once
 
           Index.any_instance.expects(:bulk_store).once
 
@@ -800,13 +803,16 @@ module Tire
           options = { :settings => { :number_of_shards => 1 } }
 
           Index.any_instance.stubs(:exists?).returns(false)
-          Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance.
-                       expects(:results).
-                       returns(Results::Collection.new(@results)).
-                       then.
-                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
-                       at_least_once
+          Search::Search.any_instance.stubs(:perform)
+          Search::Search.any_instance.
+                         expects(:results).
+                         returns(Results::Collection.new(@results)).
+                         once
+          Search::Scroll.any_instance.stubs(:__perform)
+          Search::Scroll.any_instance.
+                         expects(:results).
+                         returns(Results::Collection.new(@empty_results)).
+                         once
 
           Index.any_instance.expects(:create).with(options).once
 

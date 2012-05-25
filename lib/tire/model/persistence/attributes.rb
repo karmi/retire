@@ -15,7 +15,7 @@ module Tire
           #      include Tire::Model::Persistence
           #
           #      property :title,     :analyzer => 'snowball'
-          #      property :published, :type => 'date'
+          #      property :published, :class => 'date'
           #      property :tags,      :analyzer => 'keywords', :default => []
           #    end
           #
@@ -85,16 +85,25 @@ module Tire
             # Make a copy of objects in the property defaults hash, so default values such as `[]` or `{ foo: [] }` are left intact
             property_defaults = self.class.property_defaults.inject({}) do |hash, item|
               key, value = item
-              hash[key.to_s] = value.class.respond_to?(:new) ? value.clone : value
+              if value.respond_to?(:call)
+                value = value.call
+              elsif value.class.respond_to?(:new)
+                value = value.clone
+              end
+              hash[key.to_s] = value
               hash
             end
 
-            __update_attributes(property_defaults.merge(attributes))
+            self.attributes = property_defaults.merge(attributes)
           end
 
           def attributes
             self.class.properties.
               inject( self.id ? {'id' => self.id} : {} ) {|attributes, key| attributes[key] = send(key); attributes}
+          end
+
+          def attributes=(attributes)
+            attributes.each { |name, value| send "#{name}=", __cast_value(name, value) }
           end
 
           def attribute_names
@@ -106,22 +115,51 @@ module Tire
           end
           alias :has_property? :has_attribute?
 
-          def __update_attributes(attributes)
-            attributes.each { |name, value| send "#{name}=", __cast_value(name, value) }
-          end
-
           # Casts the values according to the <tt>:class</tt> option set when
           # defining the property, cast Hashes as Hashr[http://rubygems.org/gems/hashr]
           # instances and automatically convert UTC formatted strings to Time.
           #
           def __cast_value(name, value)
+            def cast_value_to(value, klass)
+              if klass == Integer
+                if value.respond_to?(:to_i)
+                  begin
+                    return value.to_i
+                  rescue FloatDomainError
+                    value
+                  end
+                else
+                  value
+                end
+
+              elsif klass == Time
+                case value
+                when Time
+                  value
+                when String
+                  Time.parse(value)
+                when Integer
+                  Time.at(value)
+                else
+                  Time.new(value)
+                end
+
+              else
+                klass.new(value)
+              end
+            end
+
             case
+              when value.nil?
+                nil
 
               when klass = self.class.property_types[name.to_sym]
                 if klass.is_a?(Array) && value.is_a?(Array)
-                  value.map { |v| klass.first.new(v) }
+                  value.map do |v|
+                    cast_value_to(v, klass.first)
+                  end
                 else
-                  klass.new(value)
+                  cast_value_to(value, klass)
                 end
 
               when value.is_a?(Hash)
