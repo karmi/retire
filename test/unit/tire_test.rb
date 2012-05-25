@@ -79,11 +79,11 @@ module Tire
           should "allow to pass the query as a block to scroll" do
             search = stub
             Search::Search.expects(:new).
-                           returns(search).
                            with do |index,options|
-              index == 'dummy'
-              options == { :scroll => '10m' }
-            end
+                             index == 'dummy'
+                             options == { :scroll => '10m' }
+                           end.
+                           returns(search)
             Search::Scroll.expects(:new).with(search)
 
             Tire.scroll('dummy') { query { string 'foo' } }
@@ -117,11 +117,12 @@ module Tire
           should "allow to pass the query as a block to scan" do
             search = stub
             Search::Search.expects(:new).
-                           returns(search).
                            with do |index,options|
-              index == 'dummy'
-              options == { :scroll => '10m', :search_type => 'scan' }
-            end
+                             index == 'dummy'
+                             options == { :scroll => '10m', :search_type => 'scan' }
+                           end.
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
 
             Tire.scan('dummy') { query { string 'foo' } }
           end
