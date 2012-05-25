@@ -17,6 +17,11 @@ class ActiveModelArticleWithCallbacks
   include Tire::Model::Search
   include Tire::Model::Callbacks
 
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+    create_elasticsearch_index
+  end
+
   attr_reader :attributes
 
   def initialize(attributes = {})

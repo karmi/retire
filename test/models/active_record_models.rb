@@ -8,6 +8,8 @@ class ActiveRecordArticle < ActiveRecord::Base
   include Tire::Model::Callbacks
 
   tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+
     mapping do
       indexes :title,      :type => 'string', :boost => 10, :analyzer => 'snowball'
       indexes :created_at, :type => 'date'
@@ -63,6 +65,8 @@ class ActiveRecordClassWithTireMethods < ActiveRecord::Base
   include Tire::Model::Callbacks
 
   tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+
     mapping do
       indexes :title, :type => 'string', :analyzer => 'snowball'
     end
@@ -76,6 +80,11 @@ class ActiveRecordClassWithDynamicIndexName < ActiveRecord::Base
   index_name do
     "dynamic" + '_' + "index"
   end
+
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+    create_elasticsearch_index
+  end
 end
 
 # Used in test for multiple class instances in one index,
@@ -86,6 +95,11 @@ class ActiveRecordModelOne < ActiveRecord::Base
   include Tire::Model::Callbacks
   self.table_name = 'active_record_model_one'
   index_name 'active_record_model_one'
+
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+    create_elasticsearch_index
+  end
 end
 
 class ActiveRecordModelTwo < ActiveRecord::Base
@@ -93,11 +107,21 @@ class ActiveRecordModelTwo < ActiveRecord::Base
   include Tire::Model::Callbacks
   self.table_name = 'active_record_model_two'
   index_name 'active_record_model_two'
+
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+    create_elasticsearch_index
+  end
 end
 
 class ActiveRecordAsset < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
+
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+    create_elasticsearch_index
+  end
 end
 
 class ActiveRecordVideo < ActiveRecordAsset
@@ -119,4 +143,9 @@ end
 class ActiveRecordNamespace::MyModel < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
+
+  tire do
+    settings :number_of_shards => 1, :number_of_replicas => 0
+    create_elasticsearch_index
+  end
 end
