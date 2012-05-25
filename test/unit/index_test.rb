@@ -779,29 +779,70 @@ module Tire
 
       context "reindexing" do
         setup do
-          @results = {
+          @results1 = {
             "_scroll_id" => "abc123",
             "took" => 3,
             "hits" => {
               "total" => 10,
-              "hits" => [
-                { "_id" => "1", "_source" => { "title" => "Test" } }
-              ]
+              "hits" => []
             }
           }
+
+          @results2 = @results1.merge(
+            "_scroll_id" => "abc124",
+            "hits" => {
+              "total" => 2,
+              "hits" => [
+                { "_id" => "1", "_source" => { "title" => "Test1" } }
+              ]
+            }
+          )
+
+          @results3 = @results1.merge(
+            "_scroll_id" => "abc125",
+            "hits" => {
+              "total" => 2,
+              "hits" => [
+                { "_id" => "2", "_source" => { "title" => "Test2" } }
+              ]
+            }
+          )
+
+          @results4 = @results1.merge(
+            "_scroll_id" => "abc126",
+            "hits" => {
+              "total" => 2,
+              "hits" => []
+            }
+          )
+
+          @response1 = mock_response @results1.to_json, 200
+          @response2 = mock_response @results2.to_json, 200
+          @response3 = mock_response @results3.to_json, 200
+          @response4 = mock_response @results4.to_json, 200
         end
 
         should "perform bulk store in the new index" do
           Index.any_instance.stubs(:exists?).returns(true)
-          Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance.
-                       expects(:results).
-                       returns(Results::Collection.new(@results)).
-                       then.
-                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
-                       at_least_once
 
-          Index.any_instance.expects(:bulk_store).once
+          Configuration.client.expects(:get).returns(@response1).once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc123' }
+                              .returns(@response2)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc124' }
+                              .returns(@response3)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc125' }
+                              .returns(@response4)
+                              .once
+
+          Index.any_instance.expects(:bulk_store).twice
 
           @index.reindex 'whammy'
         end
@@ -810,15 +851,26 @@ module Tire
           options = { :settings => { :number_of_shards => 1 } }
 
           Index.any_instance.stubs(:exists?).returns(false)
-          Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance.
-                       expects(:results).
-                       returns(Results::Collection.new(@results)).
-                       then.
-                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
-                       at_least_once
+
+          Configuration.client.expects(:get).returns(@response1).once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc123' }
+                              .returns(@response2)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc124' }
+                              .returns(@response3)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc125' }
+                              .returns(@response4)
+                              .once
 
           Index.any_instance.expects(:create).with(options).once
+          Index.any_instance.expects(:bulk_store).twice
 
           @index.reindex 'whammy', options
         end

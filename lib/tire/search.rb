@@ -16,6 +16,16 @@ module Tire
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @options = options
 
+        if @options[:payload]
+          if @options[:payload][:search_type]
+            @options[:search_type] = @options[:payload].delete(:search_type)
+          end
+
+          if @options[:payload][:scroll]
+            @options[:scroll] = @options[:payload].delete(:scroll)
+          end
+        end
+
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?

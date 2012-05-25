@@ -149,7 +149,8 @@ module Tire
       new_index = Index.new(name)
       new_index.create(options) unless new_index.exists?
 
-      Search::Scan.new(self.name, &block).each do |results|
+      search = Search::Search.new(self.name, :scroll => '10m', :search_type => 'scan', &block)
+      Search::Scroll.new(search).each do |results|
         new_index.bulk_store results.map do |document|
           document.to_hash.except(:type, :_index, :_explanation, :_score, :_version, :highlight, :sort)
         end
