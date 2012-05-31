@@ -112,6 +112,10 @@ module Tire
                       "(The original exception was: #{e.inspect})"
         end
 
+        def update_mapping
+          index.update_mapping self
+        end
+
         def mapping_options
           @mapping_options || {}
         end

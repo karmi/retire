@@ -39,6 +39,15 @@ module Tire
       curl = %Q|curl -X POST #{url} -d '#{MultiJson.encode(options)}'|
       logged('CREATE', curl)
     end
+    
+    def update_mapping(cls)
+      put_url = "#{url}/#{cls.document_type}/_mapping"
+      @response = Configuration.client.put put_url, MultiJson.encode(cls.mapping_to_hash)
+      @response.success? ? @response : false
+    ensure
+      curl = %Q|curl -X PUT #{put_url} -d '#{MultiJson.encode(cls.mapping_to_hash)}'|
+      logged('PUT_MAPPING', curl)
+    end
 
     def add_alias(alias_name, configuration={})
       Alias.create(configuration.merge( :name => alias_name, :index => @name ) )
