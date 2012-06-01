@@ -1,7 +1,7 @@
 require 'time'
 
 class Array
-  def to_json
+  def to_json(options=nil)
     MultiJson.encode(self)
   end unless method_defined? :to_json
 end
@@ -15,7 +15,7 @@ class Hash
 end
 
 class Time
-  def to_json
+  def to_json(options=nil)
     %Q/"#{self.iso8601}"/
   end
 end
