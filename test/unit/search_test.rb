@@ -450,6 +450,40 @@ module Tire
 
     end
 
+    context "script field" do
+
+      should "allow to specify script field" do
+        s = Search::Search.new('index') do
+          script_field :test1, :script => "doc['my_field_name'].value * 2"
+        end
+
+        assert_equal 1, s.script_fields.size
+
+        assert_not_nil s.script_fields
+        assert_not_nil s.script_fields[:test1]
+
+        assert_equal( {:test1 => { :script => "doc['my_field_name'].value * 2" }}.to_json,
+                     s.to_hash[:script_fields].to_json )
+      end
+
+      should "allow to add multiple script fields" do
+        s = Search::Search.new('index') do
+          script_field :field1, :script => "doc['my_field_name'].value * 2"
+          script_field :field2, :script => "doc['other_field_name'].value * 3"
+        end
+
+        assert_equal 2, s.script_fields.size
+
+        assert_not_nil  s.script_fields[:field1]
+        assert_not_nil  s.script_fields[:field2]
+
+        assert_equal( { :field1 => { :script => "doc['my_field_name'].value * 2" }, :field2 => { :script => "doc['other_field_name'].value * 3" } }.to_json,
+                     s.to_hash[:script_fields].to_json )
+      end
+
+    end
+
+
   end
 
 end
