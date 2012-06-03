@@ -4,7 +4,7 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
+      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain, :script_fields
 
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
@@ -52,6 +52,12 @@ module Tire
       def filter(type, *options)
         @filters ||= []
         @filters << Filter.new(type, *options).to_hash
+        self
+      end
+
+      def script_field(name, options={})
+        @script_fields ||= {}
+        @script_fields.merge! ScriptField.new(name, options).to_hash
         self
       end
 
@@ -119,6 +125,7 @@ module Tire
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
+          request.update( { :script_fields => @script_fields } ) if @script_fields
           request.update( { :version => @version } )         if @version
           request.update( { :explain => @explain } )         if @explain
           request
