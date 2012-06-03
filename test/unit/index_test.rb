@@ -267,6 +267,33 @@ module Tire
           @index.store :title => 'Test'
         end
 
+        should "set parent from Hash :parent property" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{@index.url}/article/?parent=1"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+          @index.store :type => 'article', :title => 'Test', :parent => '1'
+        end
+
+        should "set parent from Hash :_parent property" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{@index.url}/article/?parent=1"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+          @index.store :type => 'article', :title => 'Test', :_parent => '1'
+        end
+
+        should "set parent from Object parent method" do
+          Configuration.client.expects(:post).with do |url,document|
+            url == "#{@index.url}/article/?parent=1"
+          end.returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          article = Class.new do
+            def type; 'article'; end
+            def parent; '1'; end
+            def to_indexed_json; "{}"; end
+          end.new
+          @index.store article
+        end
+
         should "call #to_indexed_json on non-String documents" do
           document = { :title => 'Test' }
           Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_id":"test"}'))
@@ -300,6 +327,18 @@ module Tire
             @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
           end
 
+        end
+        
+        should "allow options to be specified" do
+          Configuration.client.expects(:post).
+                               with do |url, payload|
+                                 url     == "#{@index.url}/article/?routing=123&timestamp=2009-11-15T14%3A12%3A12&ttl=86400000&version=1" &&
+                                 payload =~ /"title":"Test"/
+                               end.
+                               returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+          response = @index.store( {:type => 'article', :title => 'Test'}, 
+                                  {:version => 1, :timestamp => Time.utc(2009,11,15,14,12,12), :ttl => 86400000, :routing=>123} )
+          assert_equal response['matches'], ['alerts']
         end
 
       end
@@ -441,10 +480,31 @@ module Tire
             json =~ /"id":"1"/ &&
             json =~ /"id":"2"/ &&
             json =~ /"title":"One"/ &&
-            json =~ /"title":"Two"/
+            json =~ /"title":"Two"/ &&
+            json =~ /"_parent":"1111"/
           end.returns(mock_response('{}'), 200)
 
-          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
+          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two', :parent => '1111'} ]
+        end
+
+        should "pass options" do
+          Configuration.client.expects(:post).with do |url, json|
+            url  == "#{@index.url}/_bulk" &&
+            json =~ /"_index":"dummy"/ &&
+            json =~ /"_type":"document"/ &&
+            json =~ /"_id":"1"/ &&
+            json =~ /"_id":"2"/ &&
+            json =~ /"id":"1"/ &&
+            json =~ /"id":"2"/ &&
+            json =~ /"title":"One"/ &&
+            json =~ /"title":"Two"/ &&
+            json =~ /"version":"1"/ &&
+            json =~ /"routing":"123"/ &&
+            json =~ /"ttl":86400000/
+            
+          end.returns(mock_response('{}'), 200)
+
+          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], :version => "1", :routing => "123", :ttl => 86400000
         end
 
         should "serialize ActiveModel instances" do
@@ -745,7 +805,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article/?percolate=%2A" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -755,16 +815,15 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article/?percolate=tag%3Aalerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => 'tag:alerts'} )
             assert_equal response['matches'], ['alerts']
           end
-
+          
         end
-
       end
 
       context "reindexing" do

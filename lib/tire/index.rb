@@ -66,17 +66,16 @@ module Tire
       document, options = args
       type = get_type_from_document(document)
 
-      if options
-        percolate = options[:percolate]
-        percolate = "*" if percolate === true
-      end
-
+      options ||= {}
+      
       id       = get_id_from_document(document)
+      options[:parent] = get_parent_from_document(document)
+      options = sanitize_index_options(options)
+      
       document = convert_document_to_json(document)
-
       url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
-      url += "?percolate=#{percolate}" if percolate
-
+      url += "?#{options.to_query}" if options.any?
+      
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
 
@@ -86,14 +85,20 @@ module Tire
     end
 
     def bulk_store(documents, options={})
+      indexing_options = sanitize_index_options(options.slice(:version, :routing, :percolate, :timestamp, :ttl))
       payload = documents.map do |document|
-        type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
-        id   = get_id_from_document(document)
+        type    = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
+        id      = get_id_from_document(document)
+        parent  = get_parent_from_document(document)
+
+        action_and_meta_data = {:index => {:_index => @name, :_type => type, :_id => id}.merge(indexing_options)}
+        action_and_meta_data[:index][:_parent] = parent if parent
 
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
-        output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+
+        output << action_and_meta_data.to_json
         output << convert_document_to_json(document)
         output.join("\n")
       end
@@ -328,6 +333,19 @@ module Tire
       $VERBOSE = old_verbose
       id
     end
+    
+    def get_parent_from_document(document)
+      old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
+      parent = case
+        when document.is_a?(Hash)
+          document[:_parent] || document['_parent'] || document[:parent] || document['parent']
+        when document.respond_to?(:parent)
+          document.parent
+      end
+      $VERBOSE = old_verbose
+      parent
+    end
+    
 
     def convert_document_to_json(document)
       document = case
@@ -341,5 +359,14 @@ module Tire
       end
     end
 
+    def sanitize_index_options options
+      if options[:timestamp]
+        options[:timestamp] = options[:timestamp].strftime('%Y-%m-%dT%H:%M:%S')
+      end
+      if options[:percolate] === true
+        options[:percolate] = '*'
+      end
+      options.select {|key, value| value }
+    end
   end
 end
