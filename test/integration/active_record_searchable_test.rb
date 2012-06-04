@@ -95,7 +95,7 @@ module Tire
           results = ActiveRecordArticle.search '"Test 1"', :load => true
       
           assert       results.any?
-          assert_equal ActiveRecordArticle.find(1), results.first
+          assert_equal ActiveRecordArticle.find(1), results.first.model
         end
       
         should "load records on block search" do
@@ -103,13 +103,13 @@ module Tire
             query { string '"Test 1"' }
           end
       
-          assert_equal ActiveRecordArticle.find(1), results.first
+          assert_equal ActiveRecordArticle.find(1), results.first.model
         end
       
         should "load records with options on query search" do
           assert_equal ActiveRecordArticle.find(['1'], :include => 'comments').first,
                        ActiveRecordArticle.search('"Test 1"',
-                                                  :load => { :include => 'comments' }).results.first
+                                                  :load => { :include => 'comments' }).results.first.model
         end
       
         should "return empty collection for nonmatching query" do
@@ -392,8 +392,8 @@ module Tire
            # puts s.results[0].inspect
 
            assert_equal 2, s.results.length
-           assert_instance_of ActiveRecordModelOne, s.results[0]
-           assert_instance_of ActiveRecordModelTwo, s.results[1]
+           assert_instance_of ActiveRecordModelOne, s.results[0].model
+           assert_instance_of ActiveRecordModelTwo, s.results[1].model
          end
 
          should "eagerly load all STI descendant records" do
@@ -403,8 +403,8 @@ module Tire
            end
 
            assert_equal 2, s.results.length
-           assert_instance_of ActiveRecordVideo,  s.results[0]
-           assert_instance_of ActiveRecordPhoto,  s.results[1]
+           assert_instance_of ActiveRecordVideo,  s.results[0].model
+           assert_instance_of ActiveRecordPhoto,  s.results[1].model
          end
       end
 
@@ -434,8 +434,8 @@ module Tire
           results = ActiveRecordNamespace::MyModel.search 'test', :load => true
 
           assert             results.any?, "No results returned: #{results.inspect}"
-          assert_instance_of ActiveRecordNamespace::MyModel, results.first
-          assert_equal       ActiveRecordNamespace::MyModel.find(1), results.first
+          assert_instance_of ActiveRecordNamespace::MyModel, results.first.model
+          assert_equal       ActiveRecordNamespace::MyModel.find(1), results.first.model
         end
 
       end
