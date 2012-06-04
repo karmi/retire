@@ -1,5 +1,6 @@
 module Tire
-  class UnknownModel < Exception
+  class Exception < ::Exception; end
+  class UnknownModel < Tire::Exception
     def initialize(type)
       @type = type
     end
@@ -11,7 +12,7 @@ module Tire
     end
   end
 
-  class UnknownType < Exception
+  class UnknownType < Tire::Exception
     def message
       "You have tried to eager load the model instances, " +
       "but Tire cannot find the model class because " +
@@ -44,14 +45,21 @@ module Tire
         @hits ||= @response['hits']['hits'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
       end
 
-      def load_results(type, items)
-        klass = get_klass(type)
-        ids = items.map { |h| h['_id'] }
-
-        @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+      def load_records(type, items, options)
+        records = {}
+        if !options.nil?
+          klass = get_class(type)
+          ids = items.map { |h| h['_id'] }
+          (options === true ? klass.find(ids) : klass.find(ids, options)).each do |item|
+            records["#{type}-#{item.id}"] = item
+          end
+        end
+          
+        records
       end
 
       def parse_results(type, items)
+        records = load_records(type, items, @options[:load])
         items.map do |h|
           document = {}
 
@@ -63,6 +71,9 @@ module Tire
           ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
 
           document.update( {'_type' => Utils.unescape(document['_type'])} )
+
+          document['_model'] = records["#{type}-#{h['_id']}"] if @wrapper == Results::Item
+
           # Return an instance of the "wrapper" class
           @wrapper.new(document)
         end
@@ -72,19 +83,18 @@ module Tire
         return hits if @wrapper == Hash
         records = {}
         hits.group_by { |item| item['_type'] }.each do |type, items|
-          records[type] = @options[:load] ? load_results(type, items) : parse_results(type, items)
+          records[type] = parse_results(type, items)
         end
 
         hits.map { |item| records[item['_type']].detect { |record| record.id.to_s == item['_id'].to_s } }
       end
 
-      def get_klass(type)
+      def get_class(type)
         raise Tire::UnknownType if type.nil? || type.strip.empty?
         klass = type.camelize.constantize
       rescue NameError
         raise Tire::UnknownModel.new(type)
       end
-
 
       def each(&block)
         results.each(&block)
