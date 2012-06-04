@@ -121,8 +121,19 @@ module Tire
             assert ! results.any?
           end
         end
+
+        should "wrap loaded document with returned record" do
+          results = ActiveRecordArticle.search :load => true do
+            query { string '"Test 1"' }
+            fields :title
+          end
+
+          assert_equal "Test 1", results.first.title
+          assert_equal 6, results.first.length
+        end
+
       end
-      
+
       should "remove document from index on destroy" do
         a = ActiveRecordArticle.new :title => 'Test remove...'
         a.save!

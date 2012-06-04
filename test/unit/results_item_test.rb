@@ -122,9 +122,10 @@ module Tire
             extend  ActiveModel::Naming
             include ActiveModel::Conversion
             def self.find(id, options); new; end
+            def foo; :bar; end
           end
 
-          @document = Results::Item.new :id => 1, :_type => 'fake_rails_model', :title => 'Test'
+          @document = Results::Item.new :id => 1, :_type => 'fake_rails_model', :title => 'Test', :_model => FakeRailsModel.new, :_model => FakeRailsModel.new
         end
 
         should "be an instance of model, based on _type" do
@@ -144,6 +145,10 @@ module Tire
           document = Results::Item.new :_type => 'my_model', :title => 'Test', :author => { :name => 'John' }
 
           assert_equal Tire::Results::Item, document.class
+        end
+
+        should "delegate methods to model" do
+          assert_equal :bar, @document.foo
         end
 
       end
