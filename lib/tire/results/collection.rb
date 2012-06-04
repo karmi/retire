@@ -1,5 +1,5 @@
 module Tire
-  class Exception < ::Exception; end
+  class Exception < ::StandardError; end
   class UnknownModel < Tire::Exception
     def initialize(type)
       @type = type
