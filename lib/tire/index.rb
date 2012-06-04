@@ -85,15 +85,16 @@ module Tire
     end
 
     def bulk_store(documents, options={})
-      indexing_options = sanitize_index_options(options.slice(:version, :routing, :percolate, :timestamp, :ttl))
+      item_level_options = sanitize_index_options(options.slice(:version, :routing, :percolate, :timestamp, :ttl))
+      top_level_options = options.slice(:refresh, :consistency)
       payload = documents.map do |document|
         type    = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
         id      = get_id_from_document(document)
         parent  = get_parent_from_document(document)
 
-        action_and_meta_data = {:index => {:_index => @name, :_type => type, :_id => id}.merge(indexing_options)}
+        action_and_meta_data = {:index => {:_index => @name, :_type => type, :_id => id}.merge(item_level_options)}
         action_and_meta_data[:index][:_parent] = parent if parent
-
+        
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
@@ -108,7 +109,9 @@ module Tire
       count = 0
 
       begin
-        response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
+        url ="#{self.url}/_bulk"
+        url += "?" + top_level_options.to_query if top_level_options.any?        
+        response = Configuration.client.post(url, payload.join("\n"))
         raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
         response
       rescue StandardError => error

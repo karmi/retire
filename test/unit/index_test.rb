@@ -487,7 +487,7 @@ module Tire
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two', :parent => '1111'} ]
         end
 
-        should "pass options" do
+        should "pass item level options" do
           Configuration.client.expects(:post).with do |url, json|
             url  == "#{@index.url}/_bulk" &&
             json =~ /"_index":"dummy"/ &&
@@ -506,7 +506,14 @@ module Tire
 
           @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], :version => "1", :routing => "123", :ttl => 86400000
         end
-
+        
+        should "pass top level options" do
+          Configuration.client.expects(:post).with do |url, json|
+            url  == "#{@index.url}/_bulk?consistency=all&refresh=true"
+          end.returns(mock_response('success', 200))
+          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], :refresh => true , :consistency => 'all'
+        end
+        
         should "serialize ActiveModel instances" do
           Configuration.client.expects(:post).with do |url, json|
             url  == "#{ActiveModelArticle.index.url}/_bulk" &&
