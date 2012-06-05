@@ -41,6 +41,50 @@ module Tire
         @results ||= fetch_results
       end
 
+      def each(&block)
+        results.each(&block)
+      end
+
+      def empty?
+        results.empty?
+      end
+
+      def size
+        results.size
+      end
+      alias :length :size
+
+      def [](index)
+        results[index]
+      end
+
+      def to_ary
+        self
+      end
+
+      private
+      # Handles _source prefixed fields properly: strips the prefix and converts fields to nested Hashes
+      #
+      def __parse_fields__(fields={})
+        ( fields ||= {} ).clone.each_pair do |key,value|
+          next unless key.to_s =~ /_source/                 # Skip regular JSON immediately
+
+          keys = key.to_s.split('.').reject { |n| n == '_source' }
+          fields.delete(key)
+
+          result = {}
+          path = []
+
+          keys.each do |name|
+            path << name
+            eval "result[:#{path.join('][:')}] ||= {}"
+            eval "result[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
+          end
+          fields.update result
+        end
+        fields
+      end
+
       def hits
         @hits ||= @response['hits']['hits'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
       end
@@ -72,7 +116,7 @@ module Tire
 
           document.update( {'_type' => Utils.unescape(document['_type'])} )
 
-          document['_model'] = records["#{type}-#{h['_id']}"] if @wrapper == Results::Item
+          document['_model'] = records["#{type}-#{h['_id']}"] if @options[:load]
 
           # Return an instance of the "wrapper" class
           @wrapper.new(document)
@@ -86,7 +130,7 @@ module Tire
           records[type] = parse_results(type, items)
         end
 
-        hits.map { |item| records[item['_type']].detect { |record| record.id.to_s == item['_id'].to_s } }
+        sort(records)
       end
 
       def get_class(type)
@@ -96,47 +140,8 @@ module Tire
         raise Tire::UnknownModel.new(type)
       end
 
-      def each(&block)
-        results.each(&block)
-      end
-
-      def empty?
-        results.empty?
-      end
-
-      def size
-        results.size
-      end
-      alias :length :size
-
-      def [](index)
-        results[index]
-      end
-
-      def to_ary
-        self
-      end
-
-      # Handles _source prefixed fields properly: strips the prefix and converts fields to nested Hashes
-      #
-      def __parse_fields__(fields={})
-        ( fields ||= {} ).clone.each_pair do |key,value|
-          next unless key.to_s =~ /_source/                 # Skip regular JSON immediately
-
-          keys = key.to_s.split('.').reject { |n| n == '_source' }
-          fields.delete(key)
-
-          result = {}
-          path = []
-
-          keys.each do |name|
-            path << name
-            eval "result[:#{path.join('][:')}] ||= {}"
-            eval "result[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
-          end
-          fields.update result
-        end
-        fields
+      def sort(records)
+        hits.map { |item| records[item['_type']].detect { |record| record.id.to_s == item['_id'].to_s } }
       end
 
     end
