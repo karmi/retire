@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json",     "~> 1.0"
   s.add_dependency "hashr",          "~> 0.0.19"
   s.add_dependency "activesupport",  ">= 2.3"
+  s.add_dependency "escape_utils",   "~> 0.2.4"
 
   # = Development dependencies
   #

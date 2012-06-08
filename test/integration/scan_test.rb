@@ -7,7 +7,7 @@ module Tire
 
     context "Scan" do
       setup do
-        documents = (1..100).map { |i| { id: i, type: 'test', title: "Document #{i}" } }
+        documents = (1..100).map { |i| { :id => i, :type => 'test', :title => "Document #{i}" } }
 
         Tire.index 'scantest' do
           delete

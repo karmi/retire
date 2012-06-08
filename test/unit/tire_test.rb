@@ -104,21 +104,6 @@ module Tire
 
       end
 
-      context "utils" do
-
-        should "encode a string for URL" do
-          assert_equal 'foo+bar',   Utils.escape('foo bar')
-          assert_equal 'foo%2Fbar', Utils.escape('foo/bar')
-          assert_equal 'foo%21',    Utils.escape('foo!')
-        end
-
-        should "encode a string from URL" do
-          assert_equal 'foo bar', Utils.unescape('foo+bar')
-          assert_equal 'foo/bar', Utils.unescape('foo%2Fbar')
-          assert_equal 'foo!',    Utils.unescape('foo%21')
-        end
-
-      end
     end
 
   end

@@ -18,7 +18,7 @@ module Tire
 
       def results
         @results ||= begin
-          hits = @response['hits']['hits'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
+          hits = @response['hits']['hits'].map { |d| d.update '_type' => EscapeUtils.unescape_url(d['_type']) }
 
           if @wrapper == Hash
             hits

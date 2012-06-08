@@ -9,7 +9,7 @@ module Tire
       setup do
         Tire.index('reindex-test-new').delete
 
-        documents = (1..100).map { |i| { id: i, type: 'test', title: "Document #{i}" } }
+        documents = (1..100).map { |i| { :id => i, :type => 'test', :title => "Document #{i}" } }
 
         Tire.index 'reindex-test' do
           delete
@@ -25,7 +25,7 @@ module Tire
       end
 
       should "reindex the index into a new index with different settings" do
-        Tire.index('reindex-test').reindex 'reindex-test-new', settings: { number_of_shards: 3 }
+        Tire.index('reindex-test').reindex 'reindex-test-new', :settings => { :number_of_shards => 3 }
 
         Tire.index('reindex-test-new').refresh
         assert_equal 100, Tire.search('reindex-test-new').results.total

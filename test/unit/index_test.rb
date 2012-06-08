@@ -806,10 +806,10 @@ module Tire
           def index_something
             @tags = ['block', 'scope', 'revenge']
 
-            Index.any_instance.expects(:store).with(title: 'Title From Outer Space', tags: ['block', 'scope', 'revenge'])
+            Index.any_instance.expects(:store).with(:title => 'Title From Outer Space', :tags => ['block', 'scope', 'revenge'])
 
             Tire::Index.new 'outer-space' do |index|
-              index.store title: @my_title, tags: @tags
+              index.store(:title => @my_title, :tags => @tags)
             end
           end
 

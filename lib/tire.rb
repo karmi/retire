@@ -2,11 +2,11 @@ require 'rest_client'
 require 'multi_json'
 require 'hashr'
 require 'cgi'
+require 'escape_utils'
 
 require 'active_support/core_ext'
 
 require 'tire/rubyext/to_json'
-require 'tire/utils'
 require 'tire/logger'
 require 'tire/configuration'
 require 'tire/http/response'

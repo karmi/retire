@@ -42,7 +42,7 @@ module Tire
 
       should "properly serialize Time into JSON" do
         json = { :time => Time.mktime(2011, 01, 01, 11, 00) }.to_json
-        assert_match %r/{\s*"time"\s*:\s*"2011-01-01T11:00:00.*?"}/, json
+        assert_match %r/\{\s*"time"\s*:\s*"2011-01-01T11:00:00.*?"\}/, json
       end
 
     end
