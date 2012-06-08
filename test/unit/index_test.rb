@@ -6,9 +6,8 @@ module Tire
 
     context "Index" do
 
-      setup do
-        @index = Tire::Index.new 'dummy'
-      end
+      setup    do @index = Tire::Index.new 'dummy' end
+      teardown do Tire.configure { reset }         end
 
       should "have a name" do
         assert_equal 'dummy', @index.name
@@ -521,6 +520,17 @@ module Tire
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
           ActiveModelArticle.index.bulk_store documents
+        end
+
+        should "log the response code" do
+          Tire.configure { logger STDERR }
+          Configuration.client.expects(:post).returns(mock_response('{}'), 200)
+
+          Configuration.logger.expects(:log_response).with do |status, took, body|
+            status == 200
+          end
+
+          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
         end
 
       end
