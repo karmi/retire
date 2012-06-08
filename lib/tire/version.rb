@@ -8,6 +8,8 @@ module Tire
     ---------------
     * Removed all depedence on ActiveModel
     * Fixed tests to work with any version of ActiveSupport
+    * Removed wonky 1.9 backports for URL encoding
+    * Fixed tests to work under 1.8.7
 
     Version 0.4.2
     -------------

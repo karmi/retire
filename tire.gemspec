@@ -65,17 +65,4 @@ Gem::Specification.new do |s|
 
    Please check the documentation at <http://karmi.github.com/tire/>.
   DESC
-
-  s.post_install_message =<<-CHANGELOG.gsub(/^  /, '')
-  ================================================================================
-
-    Please check the documentation at <http://karmi.github.com/tire/>.
-
-  --------------------------------------------------------------------------------
-
-#{Tire::CHANGELOG}
-    See the full changelog at <http://github.com/karmi/tire/commits/v#{Tire::VERSION}>.
-
-  --------------------------------------------------------------------------------
-  CHANGELOG
 end
