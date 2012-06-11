@@ -305,7 +305,7 @@ module Tire
         when document.respond_to?(:document_type)
           document.document_type
         when document.is_a?(Hash)
-          document[:_type] || document['_type'] || document[:type] || document['type']
+          document.delete(:_type) || document.delete('_type') || document.delete(:type) || document.delete('type')
         when document.respond_to?(:_type)
           document._type
         when document.respond_to?(:type) && document.type != document.class

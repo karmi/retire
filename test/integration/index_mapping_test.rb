@@ -19,6 +19,7 @@ module Tire
 
         assert_equal 'string', index.mapping['article']['properties']['title']['type'],  index.mapping.inspect
         assert_nil             index.mapping['article']['properties']['title']['boost'], index.mapping.inspect
+        assert_nil             index.mapping['article']['properties']['type'], index.mapping.inspect
       end
     end
 
