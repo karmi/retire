@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Tire
 
-  class QueryStringIntegrationTest < Test::Unit::TestCase
+  class TextQueryIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
     context "Text query" do
