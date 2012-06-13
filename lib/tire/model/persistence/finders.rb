@@ -11,10 +11,14 @@ module Tire
 
           def find *args
             # TODO: Options like `sort`
-            options = args.pop if args.last.is_a?(Hash)
+            default_options = {:wrapper => self}
+
+            options = args.last.is_a?(Hash) ? args.pop : {}
+            options = default_options.update(options)
+
             args.flatten!
             if args.size > 1
-              Tire::Search::Search.new(index.name, :wrapper => self) do |search|
+              Tire::Search::Search.new(index.name, options) do |search|
                 search.query do |query|
                   query.ids(args, document_type)
                 end
@@ -23,7 +27,7 @@ module Tire
             else
               case args = args.pop
                 when Fixnum, String
-                  index.retrieve document_type, args, :wrapper => self
+                  index.retrieve document_type, args, options
                 when :all, :first
                   send(args)
                 else
@@ -32,15 +36,21 @@ module Tire
             end
           end
 
-          def all
+          def all options={}
             # TODO: Options like `sort`; Possibly `filters`
-            s = Tire::Search::Search.new(index.name, :wrapper => self).query { all }
+            default_options = {:wrapper => self}
+            options = default_options.update(options)
+
+            s = Tire::Search::Search.new(index.name, options).query { all }
             s.results
           end
 
-          def first
+          def first options={}
             # TODO: Options like `sort`; Possibly `filters`
-            s = Tire::Search::Search.new(index.name, :wrapper => self).query { all }.size(1)
+            default_options = {:wrapper => self}
+            options = default_options.update(options)
+
+            s = Tire::Search::Search.new(index.name, options).query { all }.size(1)
             s.results.first
           end
 

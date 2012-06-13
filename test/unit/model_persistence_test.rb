@@ -128,17 +128,45 @@ module Tire
         should "find all documents" do
           Configuration.client.stubs(:get).returns(mock_response(@find_all.to_json))
           documents = PersistentArticle.all
-
+          assert_instance_of Results::Collection, documents
           assert_equal 3, documents.count
-          assert_equal 'First', documents.first.attributes['title']
+
+          document = documents.first
+          assert_instance_of PersistentArticle, document
+          assert_equal 1,       document.id
+          assert_equal 'First', document.title
+
           assert_equal PersistentArticle.find(:all).map { |e| e.id }, PersistentArticle.all.map { |e| e.id }
+        end
+
+        should "find all documents with a custom wrapper" do
+          Configuration.client.stubs(:get).returns(mock_response(@find_all.to_json))
+          documents = PersistentArticle.all :wrapper => Hash
+          assert_instance_of Results::Collection, documents
+          assert_equal 3, documents.count
+
+          document = documents.first
+          assert_instance_of Hash, document
+          assert_equal 1,       document['_id']
+          assert_equal 'First', document['_source']['title']
         end
 
         should "find first document" do
           Configuration.client.expects(:get).returns(mock_response(@find_first.to_json))
           document = PersistentArticle.first
 
-          assert_equal 'First', document.attributes['title']
+          assert_instance_of PersistentArticle, document
+          assert_equal 1,       document.id
+          assert_equal 'First', document.title
+        end
+
+        should "find first document with a custom wrapper" do
+          Configuration.client.expects(:get).returns(mock_response(@find_first.to_json))
+          document = PersistentArticle.first :wrapper => Hash
+
+          assert_instance_of Hash, document
+          assert_equal 1,       document['_id']
+          assert_equal 'First', document['_source']['title']
         end
 
         should "raise error when passing incorrect argument" do
