@@ -180,11 +180,12 @@ module Tire
       logged(id, curl)
     end
 
-    def retrieve(type, id)
+    def retrieve(type, id, options={})
       raise ArgumentError, "Please pass a document ID" unless id
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{id}"
+      url      += "?" + options.to_param if options && !options.empty?
       @response = Configuration.client.get url
 
       h = MultiJson.decode(@response.body)
