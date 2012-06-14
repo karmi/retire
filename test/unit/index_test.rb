@@ -301,6 +301,17 @@ module Tire
 
         end
 
+        should "pass custom arguments" do
+          Configuration.client.expects(:post).
+                               with do |url, payload|
+                                 url     == "#{@index.url}/article/?routing=route" &&
+                                 payload =~ /"title":"Test"/
+                               end.
+                               returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+          response = @index.store( {:type => 'article', :title => 'Test'}, {:routing => 'route'} )
+          assert_equal response['matches'], ['alerts']
+        end
+
       end
 
       context "when retrieving" do
@@ -754,7 +765,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article/?percolate=%2A" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -764,11 +775,22 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article/?percolate=tag%3Aalerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => 'tag:alerts'} )
+            assert_equal response['matches'], ['alerts']
+          end
+
+          should "percolate document with custom arguments" do
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   url     == "#{@index.url}/article/?percolate=%2A&routing=route" &&
+                                   payload =~ /"title":"Test"/
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+            response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => true, :routing => 'route'} )
             assert_equal response['matches'], ['alerts']
           end
 

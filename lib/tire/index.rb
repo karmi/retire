@@ -67,15 +67,17 @@ module Tire
       type = get_type_from_document(document)
 
       if options
-        percolate = options[:percolate]
-        percolate = "*" if percolate === true
+        if options[:percolate] === true
+          options = options.dup
+          options[:percolate] = "*"
+        end
       end
 
       id       = get_id_from_document(document)
       document = convert_document_to_json(document)
 
       url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
-      url += "?percolate=#{percolate}" if percolate
+      url += "?" + options.to_param if options && !options.empty?
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)

@@ -176,7 +176,10 @@ module Tire
             if instance.destroyed?
               index.remove instance
             else
-              response  = index.store( instance, {:percolate => percolator} )
+              options = {}
+              options[:percolate] = percolator if percolator
+
+              response  = index.store( instance, options )
               instance.id     ||= response['_id']      if instance.respond_to?(:id=)
               instance._index   = response['_index']   if instance.respond_to?(:_index=)
               instance._type    = response['_type']    if instance.respond_to?(:_type=)
