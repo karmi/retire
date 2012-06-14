@@ -46,6 +46,7 @@ module Tire
         # 4.json > Has 250 words
 
         s = Tire.search('articles-test') do
+          sort { by 'title' }
           query do
             filtered do
               query { all }
