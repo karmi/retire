@@ -62,6 +62,15 @@ module Tire
         assert_equal [], results.first.tags
       end
 
+      should "update the _version property when saving" do
+        article = PersistentArticle.create :id => 1, :title => 'One'
+        assert_equal 1, article._version
+
+        assert article.save
+
+        assert_equal 2, article._version
+      end
+
       context "with pagination" do
 
         setup do
