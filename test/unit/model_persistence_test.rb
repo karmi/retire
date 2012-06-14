@@ -390,8 +390,9 @@ module Tire
                                    doc['title'] == 'Test' &&
                                    doc['published_on'] == nil
                                  end.
-                                 returns(mock_response('{"ok":true,"_id":"1"}'))
+                                 returns(mock_response('{"ok":true,"_id":"1","_version":1}'))
             assert article.save
+            assert_equal 1, article._version
 
             article.title = 'Updated'
 
@@ -401,8 +402,9 @@ module Tire
                                    url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
                                    doc['title'] == 'Updated'
                                  end.
-                                 returns(mock_response('{"ok":true,"_id":"1"}'))
+                                 returns(mock_response('{"ok":true,"_id":"1","_version":2}'))
             assert article.save
+            assert_equal 2, article._version
           end
 
           should "perform validations" do
