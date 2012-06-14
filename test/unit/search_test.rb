@@ -399,6 +399,34 @@ module Tire
           assert_equal ['title', 'tags'], hash['fields']
         end
 
+        should "take multiple _source subfields" do
+          Configuration.client.expects(:get).with do |url, payload|
+            url.match %r|index/my_application%2Farticle/_search|
+          end.returns mock_response( {
+            'hits' => {
+              'total' => 1,
+              'hits' => [
+                {
+                  :_index => 'index',
+                  :_type => 'my_application/article',
+                  :_id => 1,
+                  :fields => {
+                    '_source.a.b.c' => 1,
+                    '_source.a.b.d' => 2,
+                  }
+                }
+              ]
+            }
+          }.to_json )
+
+          s = Search::Search.new('index', :type => 'my_application/article') do
+            fields '_source.a.b.c', '_source.a.b.d'
+          end
+
+          document = s.results.first
+          assert_equal 1, document.a.b.c
+          assert_equal 2, document.a.b.d
+        end
       end
 
       context "explain" do
