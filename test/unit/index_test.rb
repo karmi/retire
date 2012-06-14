@@ -374,6 +374,15 @@ module Tire
           article = @index.retrieve 'my_namespace/my_model', 'id-1'
         end
 
+        should "pass custom arguments" do
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1?preference=primary&routing=test").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.retrieve 'article', 'id-1', :preference => 'primary', :routing => 'test'
+          assert_instance_of Results::Item, article
+          assert_equal 'Test', article.title
+          assert_equal 'Test', article[:title]
+        end
+
       end
 
       context "when removing" do
