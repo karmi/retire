@@ -351,10 +351,16 @@ module Tire
             assert_equal 'r2d2', article.id
           end
 
-          should "perform model validations" do
+          should "perform model validations with create" do
             Configuration.client.expects(:post).never
 
             assert ! ValidatedModel.create(:name => nil)
+          end
+
+          should "perform model validations create!" do
+            Configuration.client.expects(:post).never
+
+            assert_raise(Tire::DocumentNotValid) { ValidatedModel.create!(:name => nil) }
           end
 
         end
@@ -419,9 +425,14 @@ module Tire
             assert_equal 2, article._version
           end
 
-          should "perform validations" do
+          should "perform validations with save" do
             article = ValidatedModel.new :name => nil
             assert ! article.save
+          end
+
+          should "perform validations with save!" do
+            article = ValidatedModel.new :name => nil
+            assert_raise(Tire::DocumentNotValid) { article.save! }
           end
 
           should "set the id property itself" do
