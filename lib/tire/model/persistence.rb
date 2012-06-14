@@ -47,7 +47,7 @@ module Tire
 
           ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches', '_explanation'].each do |attr|
             define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
-            define_method("#{attr}")  { @attributes[attr] }
+            define_method("#{attr}")  { @attributes ||= {}; @attributes[attr] }
           end
 
           def self.search(*args, &block)
