@@ -71,16 +71,25 @@ module Tire
         assert_equal 2, article._version
       end
 
-      should "not update if there is a version conflict" do
+      should "not update with save if there is a version conflict" do
         article = PersistentArticle.create :id => 1, :title => 'One'
         assert article.save
         assert_equal 2, article._version
 
         article._version = 1
 
-        assert_raise(Tire::RequestError) { article.save }
+        assert !article.save
       end
 
+      should "not update with save! if there is a version conflict" do
+        article = PersistentArticle.create :id => 1, :title => 'One'
+        assert article.save
+        assert_equal 2, article._version
+
+        article._version = 1
+
+        assert_raise(Tire::RequestError) { article.save! }
+      end
       context "with pagination" do
 
         setup do
