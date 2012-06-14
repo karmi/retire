@@ -739,7 +739,6 @@ module Tire
         should "percolate document against specific queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               # p [url, payload]
                                                url == "#{@index.url}/document/_percolate" &&
                                                payload['doc']['title']                   == 'Test' &&
                                                payload['query']['query_string']['query'] == 'tag:alerts'
