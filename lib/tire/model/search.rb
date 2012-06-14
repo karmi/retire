@@ -185,13 +185,18 @@ module Tire
                 options[:version] = instance._version unless instance._version.nil?
               end
 
-              response  = index.store( instance, options )
-              instance.id     ||= response['_id']      if instance.respond_to?(:id=)
-              instance._index   = response['_index']   if instance.respond_to?(:_index=)
-              instance._type    = response['_type']    if instance.respond_to?(:_type=)
-              instance._version = response['_version'] if instance.respond_to?(:_version=)
-              instance.matches  = response['matches']  if instance.respond_to?(:matches=)
-              self
+              response = index.store( instance, options )
+
+              if response['ok']
+                instance.id     ||= response['_id']      if instance.respond_to?(:id=)
+                instance._index   = response['_index']   if instance.respond_to?(:_index=)
+                instance._type    = response['_type']    if instance.respond_to?(:_type=)
+                instance._version = response['_version'] if instance.respond_to?(:_version=)
+                instance.matches  = response['matches']  if instance.respond_to?(:matches=)
+                self
+              else
+                raise Tire::RequestError.new(response)
+              end
             end
           end
         end
