@@ -279,10 +279,20 @@ module Tire
         context "with casting" do
 
           should "cast the value as custom class" do
+            time = Time.at(0)
+
             article = PersistentArticleWithCastedItem.new :title => 'Test',
-                                                          :author => { :first_name => 'John', :last_name => 'Smith' }
+                                                          :author => { :first_name => 'John', :last_name => 'Smith' },
+                                                          :count => '1',
+                                                          :boost => '1.5',
+                                                          :created_at => time.to_s,
+                                                          :updated_at => 0
             assert_instance_of Author, article.author
             assert_equal 'John', article.author.first_name
+            assert_equal 1, article.count
+            assert_equal 1.5, article.boost
+            assert_equal time, article.created_at
+            assert_equal time, article.updated_at
           end
 
           should "cast the value as collection of custom classes" do
