@@ -196,7 +196,11 @@ module Tire
         return nil if h['exists'] == false
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
-        wrapper.new(document)
+        if wrapper.respond_to?(:call)
+          wrapper.call(document)
+        else
+          wrapper.new(document)
+        end
       end
 
     ensure

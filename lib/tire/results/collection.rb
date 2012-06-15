@@ -35,7 +35,11 @@ module Tire
                 ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
 
                 # Return an instance of the "wrapper" class
-                @wrapper.new(document)
+                if @wrapper.respond_to?(:call)
+                  @wrapper.call(document)
+                else
+                  @wrapper.new(document)
+                end
               end
             end
 
