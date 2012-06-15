@@ -179,6 +179,12 @@ module Tire
               options = {}
               options[:percolate] = percolator if percolator
 
+              # If instances don't derive from Tire::Model::Persistence, they
+              # may not actually have a version.
+              if instance.respond_to?(:_version) && !instance._version.nil?
+                options[:version] = instance._version unless instance._version.nil?
+              end
+
               response  = index.store( instance, options )
               instance.id     ||= response['_id']      if instance.respond_to?(:id=)
               instance._index   = response['_index']   if instance.respond_to?(:_index=)
