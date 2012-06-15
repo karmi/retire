@@ -399,7 +399,7 @@ module Tire
             Configuration.client.expects(:post).
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
-                                   url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/1?version=1" &&
                                    doc['title'] == 'Updated'
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"1","_version":2}'))
