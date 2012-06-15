@@ -188,13 +188,15 @@ module Tire
       url      += "?" + options.to_param if options && !options.empty?
       @response = Configuration.client.get url
 
+      wrapper = options[:wrapper] || Configuration.wrapper
+
       h = MultiJson.decode(@response.body)
-      if Configuration.wrapper == Hash then h
+      if wrapper == Hash then h
       else
         return nil if h['exists'] == false
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
-        Configuration.wrapper.new(document)
+        wrapper.new(document)
       end
 
     ensure
