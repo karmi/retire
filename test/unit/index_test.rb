@@ -355,6 +355,16 @@ module Tire
           assert_equal 'Test', article.title
         end
 
+        should "return document with a callable wrapper" do
+          Configuration.wrapper(proc { |doc| { :doc => doc } })
+
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.retrieve :article, 'id-1'
+          assert_instance_of Hash, article
+          assert_equal 'Test', article[:doc]['title']
+        end
+
         should "return nil for missing document" do
           Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('{"_id":"id-1","exists":false}'))
