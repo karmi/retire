@@ -16,13 +16,13 @@ module Tire
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @options = options
 
-        if @options[:payload]
-          if @options[:payload][:search_type]
-            @options[:search_type] = @options[:payload].delete(:search_type)
+        if @payload = @options.delete(:payload)
+          if @payload[:search_type]
+            @options[:search_type] = @payload.delete(:search_type)
           end
 
-          if @options[:payload][:scroll]
-            @options[:scroll] = @options[:payload].delete(:scroll)
+          if @payload[:scroll]
+            @options[:scroll] = @payload.delete(:scroll)
           end
         end
 
@@ -151,7 +151,7 @@ module Tire
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @payload || begin
           request = {}
           request.update( { :indices_boost => @indices_boost } ) if @indices_boost
           request.update( { :query  => @query.to_hash } )    if @query

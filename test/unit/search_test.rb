@@ -51,6 +51,14 @@ module Tire
         assert_match %r|timeout=1|,   s.params
       end
 
+      should "allow to pass search query with a payload" do
+        payload = { :query => { :query_string => { :query => 'foo' } } }
+        s = Search::Search.new('index', :payload => payload)
+
+        assert s.params.empty?
+        assert_equal payload.to_json, s.to_json
+      end
+
       should "encode search parameters in the request" do
         Configuration.client.expects(:get).with do |url, payload|
           url.include? 'routing=123&timeout=1'
