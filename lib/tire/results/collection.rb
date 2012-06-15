@@ -25,17 +25,21 @@ module Tire
               hits
             else
               hits.map do |h|
-                 document = {}
+                document = {}
 
-                 # Update the document with content and ID
-                 document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
-                 document.update( {'id' => h['_id']} )
+                # Update the document with content and ID
+                document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
+                document.update( {'id' => h['_id']} )
 
-                 # Update the document with meta information
-                 ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
+                # Update the document with meta information
+                ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
 
-                 # Return an instance of the "wrapper" class
-                 @wrapper.new(document)
+                # Return an instance of the "wrapper" class
+                if @wrapper.respond_to?(:call)
+                  @wrapper.call(document)
+                else
+                  @wrapper.new(document)
+                end
               end
             end
 
@@ -95,15 +99,14 @@ module Tire
           keys = key.to_s.split('.').reject { |n| n == '_source' }
           fields.delete(key)
 
-          result = {}
           path = []
 
           keys.each do |name|
             path << name
-            eval "result[:#{path.join('][:')}] ||= {}"
-            eval "result[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
+
+            eval "fields[:#{path.join('][:')}] ||= {}"
+            eval "fields[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
           end
-          fields.update result
         end
         fields
       end

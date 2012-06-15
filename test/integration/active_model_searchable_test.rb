@@ -57,6 +57,26 @@ module Tire
         assert_equal       'Test', results.first.title
         assert_not_nil     results.first._score
         assert_equal       id.to_s, results.first.id.to_s
+
+        results = SupermodelArticle.scroll('test').to_enum(:each_document).to_a
+
+        # The model should find only 1 document
+        assert_equal 1, results.count
+
+        assert_instance_of Results::Item, results.first
+        assert_equal       'Test', results.first.title
+        assert_not_nil     results.first._score
+        assert_equal       id.to_s, results.first.id.to_s
+
+        results = SupermodelArticle.scan('test').to_enum(:each_document).to_a
+
+        # The model should find only 1 document
+        assert_equal 1, results.count
+
+        assert_instance_of Results::Item, results.first
+        assert_equal       'Test', results.first.title
+        assert_not_nil     results.first._score
+        assert_equal       id.to_s, results.first.id.to_s
       end
 
       should "remove document from index on destroy" do

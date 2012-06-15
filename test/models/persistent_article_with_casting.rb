@@ -18,6 +18,10 @@ class PersistentArticleWithCastedItem
   property :title
   property :author, :class => Author
   property :stats
+  property :count, :class => Integer
+  property :boost, :class => Float
+  property :created_at, :class => Time
+  property :updated_at, :class => Time
 end
 
 class PersistentArticleWithCastedCollection

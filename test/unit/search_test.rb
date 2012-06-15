@@ -44,6 +44,14 @@ module Tire
         assert_match %r|timeout=1|,   s.params
       end
 
+      should "allow to pass search query with a payload" do
+        payload = { :query => { :query_string => { :query => 'foo' } } }
+        s = Search::Search.new('index', :payload => payload)
+
+        assert s.params.empty?
+        assert_equal payload.to_json, s.to_json
+      end
+
       should "encode search parameters in the request" do
         Configuration.client.expects(:get).with do |url, payload|
           url.include? 'routing=123&timeout=1'
@@ -383,6 +391,34 @@ module Tire
           assert_equal ['title', 'tags'], hash['fields']
         end
 
+        should "take multiple _source subfields" do
+          Configuration.client.expects(:get).with do |url, payload|
+            url.match %r|index/my_application%2Farticle/_search|
+          end.returns mock_response( {
+            'hits' => {
+              'total' => 1,
+              'hits' => [
+                {
+                  :_index => 'index',
+                  :_type => 'my_application/article',
+                  :_id => 1,
+                  :fields => {
+                    '_source.a.b.c' => 1,
+                    '_source.a.b.d' => 2,
+                  }
+                }
+              ]
+            }
+          }.to_json )
+
+          s = Search::Search.new('index', :type => 'my_application/article') do
+            fields '_source.a.b.c', '_source.a.b.d'
+          end
+
+          document = s.results.first
+          assert_equal 1, document.a.b.c
+          assert_equal 2, document.a.b.d
+        end
       end
 
       context "explain" do

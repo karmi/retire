@@ -106,7 +106,7 @@ module Tire
           ActiveModelArticle.index.refresh
         end
 
-        should "wrap results in instances of the wrapper class" do
+        should "wrap results in instances of the wrapper class by default" do
           response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 0.8, '_source' => { 'title' => 'Article' }}] } }
           Configuration.client.expects(:get).returns(mock_response(response.to_json))
 
@@ -119,6 +119,21 @@ module Tire
           assert_not_nil     document._score
           assert_equal 1,    document.id
           assert_equal 'Article', document.title
+        end
+
+        should "wrap results in custom wrappers" do
+          response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 0.8, '_source' => { 'title' => 'Article' }}] } }
+          Configuration.client.expects(:get).returns(mock_response(response.to_json))
+
+          collection = ActiveModelArticle.search 'foo', :wrapper => Hash
+          assert_instance_of Results::Collection, collection
+
+          document = collection.first
+
+          assert_instance_of Hash, document
+          assert_not_nil     document['_score']
+          assert_equal 1,    document['_id']
+          assert_equal 'Article', document['_source']['title']
         end
 
         context "searching with a block" do
@@ -254,7 +269,7 @@ module Tire
 
         should "store the record in index on :update_elasticsearch_index when saved" do
           @model = ActiveModelArticleWithCallbacks.new
-          Tire::Index.any_instance.expects(:store).returns({})
+          Tire::Index.any_instance.expects(:store).returns({"ok" => true})
 
           @model.save
         end

@@ -11,12 +11,14 @@ module Tire
 
           def find *args
             # TODO: Options like `sort`
-            old_wrapper = Tire::Configuration.wrapper
-            Tire::Configuration.wrapper self
-            options = args.pop if args.last.is_a?(Hash)
+            default_options = {:wrapper => self}
+
+            options = args.last.is_a?(Hash) ? args.pop : {}
+            options = default_options.update(options)
+
             args.flatten!
             if args.size > 1
-              Tire::Search::Search.new(index.name) do |search|
+              Tire::Search::Search.new(index.name, options) do |search|
                 search.query do |query|
                   query.ids(args, document_type)
                 end
@@ -25,35 +27,31 @@ module Tire
             else
               case args = args.pop
                 when Fixnum, String
-                  index.retrieve document_type, args
+                  index.retrieve document_type, args, options
                 when :all, :first
                   send(args)
                 else
                   raise ArgumentError, "Please pass either ID as Fixnum or String, or :all, :first as an argument"
               end
             end
-          ensure
-            Tire::Configuration.wrapper old_wrapper
           end
 
-          def all
+          def all options={}
             # TODO: Options like `sort`; Possibly `filters`
-            old_wrapper = Tire::Configuration.wrapper
-            Tire::Configuration.wrapper self
-            s = Tire::Search::Search.new(index.name).query { all }
+            default_options = {:wrapper => self}
+            options = default_options.update(options)
+
+            s = Tire::Search::Search.new(index.name, options).query { all }
             s.results
-          ensure
-            Tire::Configuration.wrapper old_wrapper
           end
 
-          def first
+          def first options={}
             # TODO: Options like `sort`; Possibly `filters`
-            old_wrapper = Tire::Configuration.wrapper
-            Tire::Configuration.wrapper self
-            s = Tire::Search::Search.new(index.name).query { all }.size(1)
+            default_options = {:wrapper => self}
+            options = default_options.update(options)
+
+            s = Tire::Search::Search.new(index.name, options).query { all }.size(1)
             s.results.first
-          ensure
-            Tire::Configuration.wrapper old_wrapper
           end
 
         end

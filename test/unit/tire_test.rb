@@ -64,28 +64,80 @@ module Tire
 
         end
 
+        context "when scrolling an index" do
+
+          should "initiate the scroll" do
+            search = stub
+            Search::Search.expects(:new).
+                           with('dummy', :scroll => '10m').
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
+
+            Tire.scroll('dummy')
+          end
+
+          should "allow to pass the query as a block to scroll" do
+            search = stub
+            Search::Search.expects(:new).
+                           with do |index,options|
+                             index == 'dummy'
+                             options == { :scroll => '10m' }
+                           end.
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
+
+            Tire.scroll('dummy') { query { string 'foo' } }
+          end
+
+          should "allow to pass the query as a hash to scroll" do
+            payload = { :query => { :query_string => { :query => 'foo' } } }
+            search = stub
+            Search::Search.expects(:new).
+                           with('dummy', payload.merge(:scroll => '10m')).
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
+
+            Tire.scroll 'dummy', payload
+          end
+
+        end
+
         context "when scanning an index" do
 
           should "initiate the scan" do
-            Search::Scan.expects(:new).with { |index,options| index == 'dummy' }
+            search = stub
+            Search::Search.expects(:new).
+                           with('dummy', :scroll => '10m', :search_type => 'scan').
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
 
             Tire.scan('dummy')
           end
 
           should "allow to pass the query as a block to scan" do
-            Search::Scan.expects(:new).with do |index,options|
-              index == 'dummy'
-            end
+            search = stub
+            Search::Search.expects(:new).
+                           with do |index,options|
+                             index == 'dummy'
+                             options == { :scroll => '10m', :search_type => 'scan' }
+                           end.
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
 
             Tire.scan('dummy') { query { string 'foo' } }
           end
 
           should "allow to pass the query as a hash to scan" do
             payload = { :query => { :query_string => { :query => 'foo' } } }
-            Search::Scan.expects(:new).with('dummy', payload)
+            search = stub
+            Search::Search.expects(:new).
+                           with('dummy', payload.merge(:scroll => '10m', :search_type => 'scan')).
+                           returns(search)
+            Search::Scroll.expects(:new).with(search)
 
             Tire.scan 'dummy', payload
           end
+
         end
 
       end
