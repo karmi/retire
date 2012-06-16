@@ -17,6 +17,13 @@ module Tire
         assert_match %r|/index1,index2/_search|, s.url
       end
 
+      should "be initialized with multiple indices with options" do
+        indices = {'index1' => {:boost => 1},'index2' => {:boost => 2}}
+        s = Search::Search.new(indices) { query { string 'foo' } }
+        assert_match %r|/index1,index2/_search|, s.url
+        assert_equal({'index1' => 1, 'index2' => 2}, s.to_hash[:indices_boost])
+      end
+
       should "be initialized with multiple indices as string" do
         s = Search::Search.new(['index1,index2,index3']) { query { string 'foo' } }
         assert_match %r|/index1,index2,index3/_search|, s.url
