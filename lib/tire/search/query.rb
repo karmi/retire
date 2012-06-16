@@ -34,6 +34,14 @@ module Tire
         @value
       end
 
+      def prefix(field, value, options={})
+        if options[:boost]
+          @value = { :prefix => { field => { :prefix => value, :boost => options[:boost] } } }
+        else
+          @value = { :prefix => { field => value } }
+        end
+      end
+
       def custom_score(options={}, &block)
         @custom_score ||= Query.new(&block)
         @value[:custom_score] = options

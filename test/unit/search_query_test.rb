@@ -236,6 +236,17 @@ module Tire::Search
         end
       end
 
+      context "Prefix query" do
+        should "allow search for a prefix" do
+          assert_equal( { :prefix => { :user => "foo" } }, Query.new.prefix(:user, "foo") )
+        end
+
+        should "allow setting boost for prefix" do
+          assert_equal( { :prefix => {:user => {:prefix => "foo", :boost => 2.0 } } },
+                        Query.new.prefix(:user, "foo", :boost => 2.0) )
+        end
+      end
+
     end
     
     context "DisMaxQuery" do
