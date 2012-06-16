@@ -305,6 +305,12 @@ module Tire
             assert_equal 'A', article.stats.meta.tags
           end
 
+          should "cast to classes that don't respond to :new e.g. Integer" do
+            article = PersistentArticleWithCastedNumber.new :title => 'Test', :count => 4
+            assert_equal 4, article.count
+            assert_instance_of Fixnum, article.count
+          end
+
         end
 
         context "when initializing" do

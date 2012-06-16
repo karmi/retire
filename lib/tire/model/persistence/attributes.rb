@@ -120,8 +120,10 @@ module Tire
               when klass = self.class.property_types[name.to_sym]
                 if klass.is_a?(Array) && value.is_a?(Array)
                   value.map { |v| klass.first.new(v) }
-                else
+                elsif klass.respond_to? :new
                   klass.new(value)
+                else
+                  method(klass.name).call(value)
                 end
 
               when value.is_a?(Hash)

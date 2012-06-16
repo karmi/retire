@@ -26,3 +26,11 @@ class PersistentArticleWithCastedCollection
   property :title
   property :comments, :class => [Comment]
 end
+
+class PersistentArticleWithCastedNumber
+  include Tire::Model::Persistence
+
+  property :title
+  property :count, :class => Integer
+  property :stats
+end
