@@ -745,9 +745,12 @@ module Tire
             payload = MultiJson.decode(payload)
             # p [url, payload]
             url == "#{@index.url}/document/42/_update" &&
-            payload['script'] != nil
+            payload['script'] != nil &&
+            payload['params'] != nil &&
+            payload['params']['x'] == '21' &&
+            payload['params']['y'] == [2,4,6]
           end.returns(mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
-          assert @index.update('document', '42', {:script => "ctx._source.test = 'youpi';"})
+          assert @index.update('document', '42', {:script => "ctx._source.test = 'youpi';", :params => { :x => '21', :y => [2,4,6] }})
         end
 
         should "raise error when running update without a script or an id" do
