@@ -24,7 +24,11 @@ module Tire
       # otherwise return +nil+.
       #
       def method_missing(method_name, *arguments)
-        @attributes.has_key?(method_name.to_sym) ? @attributes[method_name.to_sym] : nil
+        if @attributes.has_key?(method_name.to_sym)
+          @attributes[method_name.to_sym]
+        elsif !model.nil?
+          model.send(method_name, *arguments)
+        end
       end
 
       def [](key)
@@ -37,6 +41,10 @@ module Tire
 
       def type
         @attributes[:_type] || @attributes[:type]
+      end
+
+      def model
+        @attributes[:_model]
       end
 
       def persisted?

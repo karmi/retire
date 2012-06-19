@@ -247,14 +247,14 @@ module Tire
         end
 
         should "raise error when model class cannot be inferred from _type" do
-          assert_raise(NameError) do
+          assert_raise(Tire::UnknownModel) do
             response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'hic_sunt_leones'}] } }
             Results::Collection.new(response, :load => true).results
           end
         end
 
         should "raise error when _type is missing" do
-          assert_raise(NoMethodError) do
+          assert_raise(Tire::UnknownType) do
             response = { 'hits' => { 'hits' => [ {'_id' => 1}] } }
             Results::Collection.new(response, :load => true).results
           end
