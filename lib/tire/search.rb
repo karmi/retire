@@ -43,6 +43,10 @@ module Tire
         @json     || (perform; @json)
       end
 
+      def total
+        results.total
+      end
+
       def url
         Configuration.url + @path
       end
