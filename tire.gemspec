@@ -31,7 +31,6 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json",  "~> 1.0"
   s.add_dependency "activemodel", ">= 3.0"
   s.add_dependency "hashr",       "~> 0.0.19"
-  s.add_dependency "rack",        ">= 1.4" if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 
   # = Development dependencies
   #
