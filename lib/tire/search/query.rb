@@ -68,6 +68,20 @@ module Tire
         @value
       end
 
+      def span_near(options={}, &block)
+        @span_near = SpanNearOrQuery.new(options)
+        block.arity < 1 ? @span_near.instance_eval(&block) : block.call(@span_near) if block_given?
+        @value[:span_near] = @span_near.to_hash
+        @value
+      end
+
+      def span_or(options={}, &block)
+        @span_or = SpanNearOrQuery.new(options)
+        block.arity < 1 ? @span_or.instance_eval(&block) : block.call(@span_or) if block_given?
+        @value[:span_or] = @span_or.to_hash
+        @value
+      end
+
       def all
         @value = { :match_all => {} }
         @value
@@ -148,6 +162,28 @@ module Tire
 
       def to_hash
         @value
+      end
+
+      def to_json
+        to_hash.to_json
+      end
+    end
+
+
+    class SpanNearOrQuery
+      def initialize(options={}, &block)
+        @options = options
+        @value   = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def span_term(field, value, options={})
+        @value[:clauses] ||= []
+        @value[:clauses] << { :span_term => { field => { :term => value }.update(options) } }
+      end
+
+      def to_hash
+        @value.update(@options)
       end
 
       def to_json
