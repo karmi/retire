@@ -77,6 +77,7 @@ module Tire
         # the first request. If it has any results, it's a traditional scroll,
         # and yield the results. Otherwise, skip the empty results and move
         # onto the next batch.
+        perform
         if results.size != 0
           yield results.results
         end
