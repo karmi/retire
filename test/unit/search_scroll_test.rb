@@ -139,8 +139,7 @@ module Tire
 
             Configuration.client.expects(:get)
                                 .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc124' }
-                                .returns(@response3)
-                                .once
+                                .never
           end
 
           should "be iterable" do

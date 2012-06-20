@@ -81,12 +81,8 @@ module Tire
           yield results.results
         end
 
-        # don't bother fetching the next batch if we have received everything
-        # in the first batch.
-        return if results.total == results.size
-
         # loop until there are no results left.
-        loop do
+        until results.total == @seen do
           perform
           break if results.empty?
           yield results.results

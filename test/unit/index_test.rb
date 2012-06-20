@@ -848,18 +848,9 @@ module Tire
             }
           )
 
-          @results4 = @results1.merge(
-            "_scroll_id" => "abc126",
-            "hits" => {
-              "total" => 2,
-              "hits" => []
-            }
-          )
-
           @response1 = mock_response @results1.to_json, 200
           @response2 = mock_response @results2.to_json, 200
           @response3 = mock_response @results3.to_json, 200
-          @response4 = mock_response @results4.to_json, 200
         end
 
         should "perform bulk store in the new index" do
@@ -879,8 +870,7 @@ module Tire
 
           Configuration.client.expects(:get)
                               .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc125' }
-                              .returns(@response4)
-                              .once
+                              .never
 
           Index.any_instance.expects(:bulk_store).twice
 
@@ -906,8 +896,7 @@ module Tire
 
           Configuration.client.expects(:get)
                               .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc125' }
-                              .returns(@response4)
-                              .once
+                              .never
 
           Index.any_instance.expects(:create).with(options).once
           Index.any_instance.expects(:bulk_store).twice
