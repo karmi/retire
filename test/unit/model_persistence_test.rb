@@ -128,17 +128,45 @@ module Tire
         should "find all documents" do
           Configuration.client.stubs(:get).returns(mock_response(@find_all.to_json))
           documents = PersistentArticle.all
-
+          assert_instance_of Results::Collection, documents
           assert_equal 3, documents.count
-          assert_equal 'First', documents.first.attributes['title']
+
+          document = documents.first
+          assert_instance_of PersistentArticle, document
+          assert_equal 1,       document.id
+          assert_equal 'First', document.title
+
           assert_equal PersistentArticle.find(:all).map { |e| e.id }, PersistentArticle.all.map { |e| e.id }
+        end
+
+        should "find all documents with a custom wrapper" do
+          Configuration.client.stubs(:get).returns(mock_response(@find_all.to_json))
+          documents = PersistentArticle.all :wrapper => Hash
+          assert_instance_of Results::Collection, documents
+          assert_equal 3, documents.count
+
+          document = documents.first
+          assert_instance_of Hash, document
+          assert_equal 1,       document['_id']
+          assert_equal 'First', document['_source']['title']
         end
 
         should "find first document" do
           Configuration.client.expects(:get).returns(mock_response(@find_first.to_json))
           document = PersistentArticle.first
 
-          assert_equal 'First', document.attributes['title']
+          assert_instance_of PersistentArticle, document
+          assert_equal 1,       document.id
+          assert_equal 'First', document.title
+        end
+
+        should "find first document with a custom wrapper" do
+          Configuration.client.expects(:get).returns(mock_response(@find_first.to_json))
+          document = PersistentArticle.first :wrapper => Hash
+
+          assert_instance_of Hash, document
+          assert_equal 1,       document['_id']
+          assert_equal 'First', document['_source']['title']
         end
 
         should "raise error when passing incorrect argument" do
@@ -196,7 +224,11 @@ module Tire
           end
 
           should "return default value for attribute" do
+            time = Time.at(0)
+            Time.expects(:now).returns(time)
+
             article = PersistentArticleWithDefaults.new :title => 'Test'
+            assert_equal time,  article.published_on
             assert_equal [],    article.tags
             assert_equal false, article.hidden
           end
@@ -279,10 +311,20 @@ module Tire
         context "with casting" do
 
           should "cast the value as custom class" do
+            time = Time.at(0)
+
             article = PersistentArticleWithCastedItem.new :title => 'Test',
-                                                          :author => { :first_name => 'John', :last_name => 'Smith' }
+                                                          :author => { :first_name => 'John', :last_name => 'Smith' },
+                                                          :count => '1',
+                                                          :boost => '1.5',
+                                                          :created_at => time.to_s,
+                                                          :updated_at => 0
             assert_instance_of Author, article.author
             assert_equal 'John', article.author.first_name
+            assert_equal 1, article.count
+            assert_equal 1.5, article.boost
+            assert_equal time, article.created_at
+            assert_equal time, article.updated_at
           end
 
           should "cast the value as collection of custom classes" do
@@ -351,10 +393,16 @@ module Tire
             assert_equal 'r2d2', article.id
           end
 
-          should "perform model validations" do
+          should "perform model validations with create" do
             Configuration.client.expects(:post).never
 
             assert ! ValidatedModel.create(:name => nil)
+          end
+
+          should "perform model validations create!" do
+            Configuration.client.expects(:post).never
+
+            assert_raise(Tire::DocumentNotValid) { ValidatedModel.create!(:name => nil) }
           end
 
         end
@@ -402,24 +450,31 @@ module Tire
                                    doc['title'] == 'Test' &&
                                    doc['published_on'] == nil
                                  end.
-                                 returns(mock_response('{"ok":true,"_id":"1"}'))
+                                 returns(mock_response('{"ok":true,"_id":"1","_version":1}'))
             assert article.save
+            assert_equal 1, article._version
 
             article.title = 'Updated'
 
             Configuration.client.expects(:post).
                                  with do |url, payload|
                                    doc = MultiJson.decode(payload)
-                                   url == "#{Configuration.url}/persistent_articles/persistent_article/1" &&
+                                   url == "#{Configuration.url}/persistent_articles/persistent_article/1?version=1" &&
                                    doc['title'] == 'Updated'
                                  end.
-                                 returns(mock_response('{"ok":true,"_id":"1"}'))
+                                 returns(mock_response('{"ok":true,"_id":"1","_version":2}'))
             assert article.save
+            assert_equal 2, article._version
           end
 
-          should "perform validations" do
+          should "perform validations with save" do
             article = ValidatedModel.new :name => nil
             assert ! article.save
+          end
+
+          should "perform validations with save!" do
+            article = ValidatedModel.new :name => nil
+            assert_raise(Tire::DocumentNotValid) { article.save! }
           end
 
           should "set the id property itself" do

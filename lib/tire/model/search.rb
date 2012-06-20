@@ -97,6 +97,51 @@ module Tire
           s.results
         end
 
+        def scroll(*args, &block)
+          default_options = {:type => document_type, :index => index.name, :scroll => '10m'}
+
+          if block_given?
+            options = args.shift || {}
+          else
+            query, options = args
+            options ||= {}
+          end
+
+          sort      = Array( options[:order] || options[:sort] )
+          options   = default_options.update(options)
+
+          s = Tire::Search::Scroll.new(Tire::Search::Search.new(options.delete(:index), options))
+          s.search.size( options[:per_page].to_i ) if options[:per_page]
+          s.search.sort do
+            sort.each do |t|
+              field_name, direction = t.split(' ')
+              by field_name, direction
+            end
+          end unless sort.empty?
+
+          if block_given?
+            block.arity < 1 ? s.search.instance_eval(&block) : block.call(s.search)
+          else
+            s.search.query { string query }
+            # TODO: Actualy, allow passing all the valid options from
+            # <http://www.elasticsearch.org/guide/reference/api/search/uri-request.html>
+            s.search.fields Array(options[:fields]) if options[:fields]
+          end
+
+          s
+        end
+
+        def scan(*args, &block)
+          if block_given?
+            options = args.shift || {}
+            scroll(options.merge(:search_type => 'scan'), &block)
+          else
+            query, options = args
+            options ||= {}
+            scroll(query, options.merge(:search_type => 'scan'))
+          end
+        end
+
         # Returns a Tire::Index instance for this model.
         #
         # Example usage: `Article.index.refresh`.
@@ -131,13 +176,27 @@ module Tire
             if instance.destroyed?
               index.remove instance
             else
-              response  = index.store( instance, {:percolate => percolator} )
-              instance.id     ||= response['_id']      if instance.respond_to?(:id=)
-              instance._index   = response['_index']   if instance.respond_to?(:_index=)
-              instance._type    = response['_type']    if instance.respond_to?(:_type=)
-              instance._version = response['_version'] if instance.respond_to?(:_version=)
-              instance.matches  = response['matches']  if instance.respond_to?(:matches=)
-              self
+              options = {}
+              options[:percolate] = percolator if percolator
+
+              # If instances don't derive from Tire::Model::Persistence, they
+              # may not actually have a version.
+              if instance.respond_to?(:_version) && !instance._version.nil?
+                options[:version] = instance._version unless instance._version.nil?
+              end
+
+              response = index.store( instance, options )
+
+              if response['ok']
+                instance.id     ||= response['_id']      if instance.respond_to?(:id=)
+                instance._index   = response['_index']   if instance.respond_to?(:_index=)
+                instance._type    = response['_type']    if instance.respond_to?(:_type=)
+                instance._version = response['_version'] if instance.respond_to?(:_version=)
+                instance.matches  = response['matches']  if instance.respond_to?(:matches=)
+                self
+              else
+                raise Tire::RequestError.new(response)
+              end
             end
           end
         end

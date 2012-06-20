@@ -17,6 +17,28 @@ module Tire
     end
 
     context "PersistentModel" do
+      should "cast results returned from ElasticSearch" do
+        time = Time.at(0)
+
+        article1 = PersistentArticleWithCastedItem.create :id => 1,
+                                                          :title => 'One',
+                                                          :count => '1',
+                                                          :boost => '1.5',
+                                                          :created_at => time.to_s,
+                                                          :updated_at => 0
+        article2 = PersistentArticleWithCastedItem.find 1
+
+        assert_equal 'persistent_article_with_casted_items', article2._index
+        assert_equal 'persistent_article_with_casted_item', article2._type
+        assert_equal article1._version, article2._version
+        assert_equal '1', article2.id
+        assert_equal 'One', article2.title
+        assert_equal 1, article2.count
+        assert_equal 1.5, article2.boost
+        assert_equal time, article2.created_at
+        assert_equal time, article2.updated_at
+      end
+
       should "search with simple query" do
         PersistentArticle.create :id => 1, :title => 'One'
         PersistentArticle.index.refresh
@@ -62,6 +84,34 @@ module Tire
         assert_equal [], results.first.tags
       end
 
+      should "update the _version property when saving" do
+        article = PersistentArticle.create :id => 1, :title => 'One'
+        assert_equal 1, article._version
+
+        assert article.save
+
+        assert_equal 2, article._version
+      end
+
+      should "not update with save if there is a version conflict" do
+        article = PersistentArticle.create :id => 1, :title => 'One'
+        assert article.save
+        assert_equal 2, article._version
+
+        article._version = 1
+
+        assert !article.save
+      end
+
+      should "not update with save! if there is a version conflict" do
+        article = PersistentArticle.create :id => 1, :title => 'One'
+        assert article.save
+        assert_equal 2, article._version
+
+        article._version = 1
+
+        assert_raise(Tire::RequestError) { article.save! }
+      end
       context "with pagination" do
 
         setup do

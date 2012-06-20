@@ -67,15 +67,17 @@ module Tire
       type = get_type_from_document(document)
 
       if options
-        percolate = options[:percolate]
-        percolate = "*" if percolate === true
+        if options[:percolate] === true
+          options = options.dup
+          options[:percolate] = "*"
+        end
       end
 
       id       = get_id_from_document(document)
       document = convert_document_to_json(document)
 
       url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
-      url += "?percolate=#{percolate}" if percolate
+      url += "?" + options.to_param if options && !options.empty?
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
@@ -149,7 +151,8 @@ module Tire
       new_index = Index.new(name)
       new_index.create(options) unless new_index.exists?
 
-      Search::Scan.new(self.name, &block).each do |results|
+      search = Search::Search.new(self.name, :scroll => '10m', :search_type => 'scan', &block)
+      Search::Scroll.new(search).each do |results|
         new_index.bulk_store results.map do |document|
           document.to_hash.except(:type, :_index, :_explanation, :_score, :_version, :highlight, :sort)
         end
@@ -177,20 +180,27 @@ module Tire
       logged(id, curl)
     end
 
-    def retrieve(type, id)
+    def retrieve(type, id, options={})
       raise ArgumentError, "Please pass a document ID" unless id
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{id}"
+      url      += "?" + options.to_param if options && !options.empty?
       @response = Configuration.client.get url
 
+      wrapper = options[:wrapper] || Configuration.wrapper
+
       h = MultiJson.decode(@response.body)
-      if Configuration.wrapper == Hash then h
+      if wrapper == Hash then h
       else
         return nil if h['exists'] == false
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
-        Configuration.wrapper.new(document)
+        if wrapper.respond_to?(:call)
+          wrapper.call(document)
+        else
+          wrapper.new(document)
+        end
       end
 
     ensure

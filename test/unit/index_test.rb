@@ -301,6 +301,17 @@ module Tire
 
         end
 
+        should "pass custom arguments" do
+          Configuration.client.expects(:post).
+                               with do |url, payload|
+                                 url     == "#{@index.url}/article/?routing=route" &&
+                                 payload =~ /"title":"Test"/
+                               end.
+                               returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+          response = @index.store( {:type => 'article', :title => 'Test'}, {:routing => 'route'} )
+          assert_equal response['matches'], ['alerts']
+        end
+
       end
 
       context "when retrieving" do
@@ -344,6 +355,16 @@ module Tire
           assert_equal 'Test', article.title
         end
 
+        should "return document with a callable wrapper" do
+          Configuration.wrapper(proc { |doc| { :doc => doc } })
+
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.retrieve :article, 'id-1'
+          assert_instance_of Hash, article
+          assert_equal 'Test', article[:doc]['title']
+        end
+
         should "return nil for missing document" do
           Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('{"_id":"id-1","exists":false}'))
@@ -361,6 +382,15 @@ module Tire
           Configuration.client.expects(:get).with("#{@index.url}/my_namespace%2Fmy_model/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
           article = @index.retrieve 'my_namespace/my_model', 'id-1'
+        end
+
+        should "pass custom arguments" do
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1?preference=primary&routing=test").
+                                             returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
+          article = @index.retrieve 'article', 'id-1', :preference => 'primary', :routing => 'test'
+          assert_instance_of Results::Item, article
+          assert_equal 'Test', article.title
+          assert_equal 'Test', article[:title]
         end
 
       end
@@ -739,7 +769,6 @@ module Tire
         should "percolate document against specific queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               # p [url, payload]
                                                url == "#{@index.url}/document/_percolate" &&
                                                payload['doc']['title']                   == 'Test' &&
                                                payload['query']['query_string']['query'] == 'tag:alerts'
@@ -755,7 +784,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article/?percolate=%2A" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -765,11 +794,22 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article/?percolate=tag%3Aalerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => 'tag:alerts'} )
+            assert_equal response['matches'], ['alerts']
+          end
+
+          should "percolate document with custom arguments" do
+            Configuration.client.expects(:post).
+                                 with do |url, payload|
+                                   url     == "#{@index.url}/article/?percolate=%2A&routing=route" &&
+                                   payload =~ /"title":"Test"/
+                                 end.
+                                 returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
+            response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => true, :routing => 'route'} )
             assert_equal response['matches'], ['alerts']
           end
 
@@ -779,29 +819,60 @@ module Tire
 
       context "reindexing" do
         setup do
-          @results = {
+          @results1 = {
             "_scroll_id" => "abc123",
             "took" => 3,
             "hits" => {
               "total" => 10,
-              "hits" => [
-                { "_id" => "1", "_source" => { "title" => "Test" } }
-              ]
+              "hits" => []
             }
           }
+
+          @results2 = @results1.merge(
+            "_scroll_id" => "abc124",
+            "hits" => {
+              "total" => 2,
+              "hits" => [
+                { "_id" => "1", "_source" => { "title" => "Test1" } }
+              ]
+            }
+          )
+
+          @results3 = @results1.merge(
+            "_scroll_id" => "abc125",
+            "hits" => {
+              "total" => 2,
+              "hits" => [
+                { "_id" => "2", "_source" => { "title" => "Test2" } }
+              ]
+            }
+          )
+
+          @response1 = mock_response @results1.to_json, 200
+          @response2 = mock_response @results2.to_json, 200
+          @response3 = mock_response @results3.to_json, 200
         end
 
         should "perform bulk store in the new index" do
           Index.any_instance.stubs(:exists?).returns(true)
-          Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance.
-                       expects(:results).
-                       returns(Results::Collection.new(@results)).
-                       then.
-                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
-                       at_least_once
 
-          Index.any_instance.expects(:bulk_store).once
+          Configuration.client.expects(:get).returns(@response1).once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc123' }
+                              .returns(@response2)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc124' }
+                              .returns(@response3)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc125' }
+                              .never
+
+          Index.any_instance.expects(:bulk_store).twice
 
           @index.reindex 'whammy'
         end
@@ -810,15 +881,25 @@ module Tire
           options = { :settings => { :number_of_shards => 1 } }
 
           Index.any_instance.stubs(:exists?).returns(false)
-          Search::Scan.any_instance.stubs(:__perform)
-          Search::Scan.any_instance.
-                       expects(:results).
-                       returns(Results::Collection.new(@results)).
-                       then.
-                       returns(Results::Collection.new(@results.merge('hits' => {'hits' => []}))).
-                       at_least_once
+
+          Configuration.client.expects(:get).returns(@response1).once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc123' }
+                              .returns(@response2)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc124' }
+                              .returns(@response3)
+                              .once
+
+          Configuration.client.expects(:get)
+                              .with { |url,id| url =~ %r|_search/scroll\?scroll=10m| && id == 'abc125' }
+                              .never
 
           Index.any_instance.expects(:create).with(options).once
+          Index.any_instance.expects(:bulk_store).twice
 
           @index.reindex 'whammy', options
         end

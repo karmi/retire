@@ -35,7 +35,11 @@ module Tire
                 ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
 
                 # Return an instance of the "wrapper" class
-                @wrapper.new(document)
+                if @wrapper.respond_to?(:call)
+                  @wrapper.call(document)
+                else
+                  @wrapper.new(document)
+                end
               end
             end
 
@@ -95,15 +99,14 @@ module Tire
           keys = key.to_s.split('.').reject { |n| n == '_source' }
           fields.delete(key)
 
-          result = {}
           path = []
 
           keys.each do |name|
             path << name
-            eval "result[:#{path.join('][:')}] ||= {}"
-            eval "result[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
+
+            eval "fields[:#{path.join('][:')}] ||= {}"
+            eval "fields[:#{path.join('][:')}] = #{value.inspect}" if keys.last == name
           end
-          fields.update result
         end
         fields
       end
