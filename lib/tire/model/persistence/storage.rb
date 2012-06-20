@@ -78,7 +78,8 @@ module Tire
 
           def destroyed?   ;  !!@destroyed;       end
           def persisted?   ;  !!id && !!_version; end
-          def new_record?  ;  !persisted?;        end
+          def new?         ;  !persisted?;        end
+          alias :new_record? :new?
 
         end
 
