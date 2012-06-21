@@ -119,7 +119,7 @@ module Tire
 
               when klass = self.class.property_types[name.to_sym]
                 if klass.is_a?(Array) && value.is_a?(Array)
-                  value.map { |v| klass.first.new(v) }
+                  value.map { |v| klass.first.respond_to?(:new) ? klass.first.new(v) : method(klass.first.name).call(v)}
                 elsif klass.respond_to? :new
                   klass.new(value)
                 else

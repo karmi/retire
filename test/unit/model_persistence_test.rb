@@ -24,16 +24,16 @@ module Tire
           setup do
             Model::Search.index_prefix 'prefix'
           end
-          
+
           teardown do
             Model::Search.index_prefix nil
           end
-          
+
           should "have configured prefix in index_name" do
             assert_equal 'prefix_persistent_articles', PersistentArticle.index_name
             assert_equal 'prefix_persistent_articles', PersistentArticle.new(:title => 'Test').index_name
           end
-          
+
         end
 
         should "have document_type" do
@@ -306,9 +306,11 @@ module Tire
           end
 
           should "cast to classes that don't respond to :new e.g. Integer" do
-            article = PersistentArticleWithCastedNumber.new :title => 'Test', :count => 4
-            assert_equal 4, article.count
-            assert_instance_of Fixnum, article.count
+            article = PersistentArticleWithCastedNumber.new :title => 'Test', :price => 4.1, :sizes => [6,8,10,12]
+            assert_equal 4, article.price.floor
+            assert_instance_of Float, article.price
+            assert_equal [6,8,10,12], article.sizes
+            assert_instance_of Fixnum, article.sizes.first
           end
 
         end

@@ -31,6 +31,7 @@ class PersistentArticleWithCastedNumber
   include Tire::Model::Persistence
 
   property :title
-  property :count, :class => Integer
+  property :price, :class => Float
+  property :sizes, :class => [Integer]
   property :stats
 end
