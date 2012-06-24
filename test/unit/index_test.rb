@@ -420,6 +420,48 @@ module Tire
 
       end
 
+      context "when updating" do
+
+        should "send payload" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                payload = MultiJson.decode(payload)
+                                # p [url, payload]
+                                assert_equal( "#{@index.url}/document/42/_update", url ) &&
+                                assert_not_nil( payload['script'] ) &&
+                                assert_not_nil( payload['params'] ) &&
+                                assert_equal( '21', payload['params']['bar'] )
+                              end.
+                              returns(
+                                mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
+
+          assert @index.update('document', '42', {:script => "ctx._source.foo = bar;", :params => { :bar => '21' }})
+        end
+
+        should "send options" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                payload = MultiJson.decode(payload)
+                                # p [url, payload]
+                                assert_equal( "#{@index.url}/document/42/_update?timeout=1000", url ) &&
+                                assert_nil( payload['timeout'] )
+                              end.
+                              returns(
+                                mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
+          assert @index.update('document', '42', {:script => "ctx._source.foo = 'bar'"}, {:timeout => 1000})
+        end
+
+        should "raise error when no type or ID is passed" do
+          assert_raise(ArgumentError) { @index.update('article', nil, :script => 'foobar') }
+          assert_raise(ArgumentError) { @index.update(nil, '123', :script => 'foobar') }
+        end
+
+        should "raise an error when no script is passed" do
+          assert_raise ArgumentError do
+            @index.update('article', "42", {:params => {"foo" => "bar"}})
+          end
+        end
+
+      end
+
       context "when storing in bulk" do
         # The expected JSON looks like this:
         #
@@ -750,24 +792,6 @@ module Tire
           assert_equal ["alerts"], matches
         end
 
-        should "run update script against a given document" do
-          Configuration.client.expects(:post).with do |url,payload|
-            payload = MultiJson.decode(payload)
-            # p [url, payload]
-            url == "#{@index.url}/document/42/_update" &&
-            payload['script'] != nil &&
-            payload['params'] != nil &&
-            payload['params']['x'] == '21' &&
-            payload['params']['y'] == [2,4,6]
-          end.returns(mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
-          assert @index.update('document', '42', {:script => "ctx._source.test = 'youpi';", :params => { :x => '21', :y => [2,4,6] }})
-        end
-
-        should "raise error when running update without a script or an id" do
-          assert_raise(ArgumentError) { @index.update('lol', "42", {:params => {"foo" => "bar"}}) }
-          assert_raise(ArgumentError) { @index.update('lol', nil, {:script => "ctx._source.test = 'test';"}) }
-        end
-
         context "while storing document" do
 
           should "percolate document against all registered queries" do
@@ -862,6 +886,7 @@ module Tire
         end
 
       end
+
     end
 
   end

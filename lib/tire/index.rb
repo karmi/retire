@@ -198,6 +198,22 @@ module Tire
       logged(id, curl)
     end
 
+    def update(type, id, payload={}, options={})
+      raise ArgumentError, "Please pass a document type" unless type
+      raise ArgumentError, "Please pass a document ID"   unless id
+      raise ArgumentError, "Please pass a script in the payload hash" unless payload[:script]
+
+      type      = Utils.escape(type)
+      url       = "#{self.url}/#{type}/#{id}/_update"
+      url      += "?#{options.to_param}" unless options.keys.empty?
+      @response = Configuration.client.post url, MultiJson.encode(payload)
+      MultiJson.decode(@response.body)
+
+    ensure
+      curl = %Q|curl -X POST "#{url}" -d '#{MultiJson.encode(payload)}'|
+      logged(id, curl)
+    end
+
     def refresh
       @response = Configuration.client.post "#{url}/_refresh", ''
 
@@ -273,19 +289,6 @@ module Tire
     ensure
       curl = %Q|curl -X GET "#{url}/#{type}/_percolate?pretty=1" -d '#{payload.to_json}'|
       logged('_percolate', curl)
-    end
-
-    def update(type, id, options)
-      raise ArgumentError, "Please pass a document ID" unless id
-      raise ArgumentError, "Missing script in options hash" unless options[:script]
-
-      type      = Utils.escape(type)
-      url       = "#{self.url}/#{type}/#{id}/_update"
-      @response = Configuration.client.post url, MultiJson.encode(options)
-      MultiJson.decode(@response.body)['ok']
-    ensure
-      curl = %Q|curl -X POST "#{url}"|
-      logged(id, curl)
     end
 
     def logged(endpoint='/', curl='')
