@@ -14,5 +14,10 @@ script: "bundle exec rake test"
 before_install:
   - sudo service elasticsearch start
 
+matrix:
+  allow_failures:
+    - rvm: 1.8.7
+    - rvm: ree
+
 notifications:
   disable: true
