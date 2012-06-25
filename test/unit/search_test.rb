@@ -20,7 +20,8 @@ module Tire
       should "be initialized with multiple indices with options" do
         indices = {'index1' => {:boost => 1},'index2' => {:boost => 2}}
         s = Search::Search.new(indices) { query { string 'foo' } }
-        assert_match %r|/index1,index2/_search|, s.url
+        assert_match /index1/, s.url
+        assert_match /index2/, s.url
         assert_equal({'index1' => 1, 'index2' => 2}, s.to_hash[:indices_boost])
       end
 
