@@ -9,7 +9,10 @@ rvm:
   - 1.9.3
   - ree
 
-script: "bundle exec rake test:unit"
+script: "bundle exec rake test"
+
+before_install:
+  - sudo service elasticsearch start
 
 notifications:
   disable: true
