@@ -5,19 +5,25 @@
 language: ruby
 
 rvm:
-  - 1.8.7
   - 1.9.3
+  - 1.8.7
   - ree
 
-script: "bundle exec rake test"
+env:
+  - TEST_COMMAND="rake test:unit"
+  - TEST_COMMAND="rake test:integration"
+
+script: "bundle exec $TEST_COMMAND"
 
 before_install:
   - sudo service elasticsearch start
 
 matrix:
-  allow_failures:
+  exclude:
     - rvm: 1.8.7
+      env: TEST_COMMAND="rake test:integration"
     - rvm: ree
+      env: TEST_COMMAND="rake test:integration"
 
 notifications:
   disable: true
