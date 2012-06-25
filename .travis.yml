@@ -2,12 +2,28 @@
 # Configuration file for http://travis-ci.org/#!/karmi/tire
 # ---------------------------------------------------------
 
-script: "bundle exec rake test:unit"
+language: ruby
 
 rvm:
-  - 1.8.7
   - 1.9.3
+  - 1.8.7
   - ree
+
+env:
+  - TEST_COMMAND="rake test:unit"
+  - TEST_COMMAND="rake test:integration"
+
+script: "bundle exec $TEST_COMMAND"
+
+before_install:
+  - sudo service elasticsearch start
+
+matrix:
+  exclude:
+    - rvm: 1.8.7
+      env: TEST_COMMAND="rake test:integration"
+    - rvm: ree
+      env: TEST_COMMAND="rake test:integration"
 
 notifications:
   disable: true
