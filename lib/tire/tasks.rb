@@ -61,7 +61,7 @@ namespace :tire do
     STDOUT.sync = true
     puts "[IMPORT] Starting import for the '#{ENV['CLASS']}' class"
     tty_cols = 80
-    total    = klass.count rescue nil
+    total    = klass.all.count rescue nil
     offset   = (total.to_s.size*2)+8
     done     = 0
 

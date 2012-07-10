@@ -32,6 +32,11 @@ require File.dirname(__FILE__) + '/models/validated_model'
 
 class Test::Unit::TestCase
 
+  def assert_block(message=nil)
+    raise Test::Unit::AssertionFailedError.new(message.to_s) if (! yield)
+    return true
+  end if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
+
   def mock_response(body, code=200, headers={})
     Tire::HTTP::Response.new(body, code, headers)
   end

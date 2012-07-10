@@ -6,9 +6,8 @@ module Tire
 
     context "Index" do
 
-      setup do
-        @index = Tire::Index.new 'dummy'
-      end
+      setup    do @index = Tire::Index.new 'dummy' end
+      teardown do Tire.configure { reset }         end
 
       should "have a name" do
         assert_equal 'dummy', @index.name
@@ -421,6 +420,48 @@ module Tire
 
       end
 
+      context "when updating" do
+
+        should "send payload" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                payload = MultiJson.decode(payload)
+                                # p [url, payload]
+                                assert_equal( "#{@index.url}/document/42/_update", url ) &&
+                                assert_not_nil( payload['script'] ) &&
+                                assert_not_nil( payload['params'] ) &&
+                                assert_equal( '21', payload['params']['bar'] )
+                              end.
+                              returns(
+                                mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
+
+          assert @index.update('document', '42', {:script => "ctx._source.foo = bar;", :params => { :bar => '21' }})
+        end
+
+        should "send options" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                payload = MultiJson.decode(payload)
+                                # p [url, payload]
+                                assert_equal( "#{@index.url}/document/42/_update?timeout=1000", url ) &&
+                                assert_nil( payload['timeout'] )
+                              end.
+                              returns(
+                                mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
+          assert @index.update('document', '42', {:script => "ctx._source.foo = 'bar'"}, {:timeout => 1000})
+        end
+
+        should "raise error when no type or ID is passed" do
+          assert_raise(ArgumentError) { @index.update('article', nil, :script => 'foobar') }
+          assert_raise(ArgumentError) { @index.update(nil, '123', :script => 'foobar') }
+        end
+
+        should "raise an error when no script is passed" do
+          assert_raise ArgumentError do
+            @index.update('article', "42", {:params => {"foo" => "bar"}})
+          end
+        end
+
+      end
+
       context "when storing in bulk" do
         # The expected JSON looks like this:
         #
@@ -521,6 +562,17 @@ module Tire
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
           ActiveModelArticle.index.bulk_store documents
+        end
+
+        should "log the response code" do
+          Tire.configure { logger STDERR }
+          Configuration.client.expects(:post).returns(mock_response('{}'), 200)
+
+          Configuration.logger.expects(:log_response).with do |status, took, body|
+            status == 200
+          end
+
+          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
         end
 
       end
@@ -823,10 +875,10 @@ module Tire
           def index_something
             @tags = ['block', 'scope', 'revenge']
 
-            Index.any_instance.expects(:store).with(title: 'Title From Outer Space', tags: ['block', 'scope', 'revenge'])
+            Index.any_instance.expects(:store).with(:title => 'Title From Outer Space', :tags => ['block', 'scope', 'revenge'])
 
             Tire::Index.new 'outer-space' do |index|
-              index.store title: @my_title, tags: @tags
+              index.store :title => @my_title, :tags => @tags
             end
           end
 
@@ -834,6 +886,7 @@ module Tire
         end
 
       end
+
     end
 
   end
