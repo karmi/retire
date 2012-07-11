@@ -15,7 +15,9 @@ module Tire
     context "Item" do
 
       setup do
-        @document = Results::Item.new :title => 'Test', :author => { :name => 'Kafka' }
+        @document = Results::Item.new :title  => 'Test',
+                                      :author => { :name => 'Kafka' },
+                                      :awards => { :best_fiction => { :year => '1925' } }
       end
 
       should "be initialized with a Hash or Hash like object" do
@@ -106,6 +108,11 @@ module Tire
 
       should "be convertible to hash" do
         assert_instance_of Hash, @document.to_hash
+        assert_instance_of Hash, @document.to_hash[:author]
+        assert_instance_of Hash, @document.to_hash[:awards][:best_fiction]
+
+        assert_equal 'Kafka', @document.to_hash[:author][:name]
+        assert_equal '1925',  @document.to_hash[:awards][:best_fiction][:year]
       end
 
       should "be inspectable" do

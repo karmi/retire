@@ -112,9 +112,9 @@ module Tire
       count = 0
 
       begin
-        response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
-        raise RuntimeError, "#{response.code} > #{response.body}" if response.failure?
-        response
+        @response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
+        raise RuntimeError, "#{@response.code} > #{@response.body}" if @response && @response.failure?
+        @response
       rescue StandardError => error
         if count < tries
           count += 1
@@ -207,6 +207,22 @@ module Tire
       logged(id, curl)
     end
 
+    def update(type, id, payload={}, options={})
+      raise ArgumentError, "Please pass a document type" unless type
+      raise ArgumentError, "Please pass a document ID"   unless id
+      raise ArgumentError, "Please pass a script in the payload hash" unless payload[:script]
+
+      type      = Utils.escape(type)
+      url       = "#{self.url}/#{type}/#{id}/_update"
+      url      += "?#{options.to_param}" unless options.keys.empty?
+      @response = Configuration.client.post url, MultiJson.encode(payload)
+      MultiJson.decode(@response.body)
+
+    ensure
+      curl = %Q|curl -X POST "#{url}" -d '#{MultiJson.encode(payload)}'|
+      logged(id, curl)
+    end
+
     def refresh
       @response = Configuration.client.post "#{url}/_refresh", ''
 
@@ -290,7 +306,7 @@ module Tire
 
         Configuration.logger.log_request endpoint, @name, curl
 
-        code = @response ? @response.code : error.class rescue 200
+        code = @response ? @response.code : error.class rescue 'N/A'
 
         if Configuration.logger.level.to_s == 'debug'
           body = if @response

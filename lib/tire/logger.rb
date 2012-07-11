@@ -9,7 +9,7 @@ module Tire
       end
       @device.sync = true if @device.respond_to?(:sync)
       @options = options
-      at_exit { @device.close unless @device.closed? } if @device.respond_to?(:closed?) && @device.respond_to?(:close)
+      # at_exit { @device.close unless @device.closed? } if @device.respond_to?(:closed?) && @device.respond_to?(:close)
     end
 
     def level
