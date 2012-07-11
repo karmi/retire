@@ -56,7 +56,10 @@ module Tire
       end
 
       def to_hash
-        @attributes
+        @attributes.reduce({}) do |sum, item|
+          sum[ item.first ] = item.last.respond_to?(:to_hash) ? item.last.to_hash : item.last
+          sum
+        end
       end
 
       # Let's pretend we're someone else in Rails
