@@ -259,7 +259,7 @@ module Tire
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
+      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/#{name}?pretty=1" -d '#{MultiJson.encode(options)}'|
       logged('_percolator', curl)
     end
 
