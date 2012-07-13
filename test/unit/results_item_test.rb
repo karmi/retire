@@ -116,7 +116,7 @@ module Tire
       end
 
       should "be inspectable" do
-        assert_match /<Item title|Item author/, @document.inspect
+        assert_match /<Item .* title|Item .* author/, @document.inspect
       end
 
       context "within Rails" do

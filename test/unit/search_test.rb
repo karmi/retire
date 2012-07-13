@@ -145,8 +145,8 @@ module Tire
                                       sort { by :title, 'desc' }.
                                       size(5).
                                       sort { by :name, 'asc' }.
-                                      from(1)
-                                      .version(true)
+                                      from(1).
+                                      version(true)
         end
       end
 
