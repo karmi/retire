@@ -113,6 +113,7 @@ module Tire
 
       def version(value)
         @version = value
+        self
       end
 
       def perform

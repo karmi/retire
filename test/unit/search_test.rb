@@ -146,6 +146,7 @@ module Tire
                                       size(5).
                                       sort { by :name, 'asc' }.
                                       from(1)
+                                      .version(true)
         end
       end
 
@@ -324,7 +325,7 @@ module Tire
 
       context "with version" do
 
-        should "set the version value in options" do
+        should "set the version" do
           s = Search::Search.new('index') do
             version true
           end
