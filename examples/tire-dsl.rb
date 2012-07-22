@@ -12,7 +12,7 @@
 # from <https://github.com/karmi/tire>.
 #
 # By following these instructions you should have the search running
-# on a sane operation system in less then 10 minutes.
+# on a sane operating system in less then 10 minutes.
 
 # Note, that this file can be executed directly:
 #
