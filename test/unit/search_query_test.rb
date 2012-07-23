@@ -268,18 +268,7 @@ module Tire::Search
                       Query.new.dis_max { query { string 'foo' } } )
       end
 
-      should "wrap multiple queries for the same condition" do
-        query = Query.new.boolean do
-          must { string 'foo' }
-          must { string 'bar' }
-        end
-
-        assert_equal( 2, query[:bool][:must].size, query[:bool][:must].inspect )
-        assert_equal( { :query_string => {:query => 'foo'} }, query[:bool][:must].first )
-        assert_equal( { :query_string => {:query => 'bar'} }, query[:bool][:must].last )
-      end
-
-      should "wrap queries for multiple conditions" do
+      should "wrap multiple queries" do
         query = Query.new.dis_max do
           query   { string 'foo' }
           query   { string 'bar' }
