@@ -248,6 +248,54 @@ module Tire::Search
       end
 
     end
-  end
+    
+    context "DisMaxQuery" do
 
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.dis_max }
+      end
+
+      should "encode options" do
+        query = Query.new.dis_max(:tie_breaker => 0.7) do
+          query { string 'foo' }
+        end
+
+        assert_equal 0.7, query[:dis_max][:tie_breaker]
+      end
+
+      should "wrap single query" do
+        assert_equal( { :dis_max => {:queries => [{ :query_string => { :query => 'foo' } }] }},
+                      Query.new.dis_max { query { string 'foo' } } )
+      end
+
+      should "wrap multiple queries" do
+        query = Query.new.dis_max do
+          query   { string 'foo' }
+          query   { string 'bar' }
+          query   { string 'baz' }
+        end
+
+        assert_equal 3, query[:dis_max][:queries].size
+
+        assert_equal( { :query_string => {:query => 'foo'} }, query[:dis_max][:queries][0] )
+        assert_equal( { :query_string => {:query => 'bar'} }, query[:dis_max][:queries][1] )
+        assert_equal( { :query_string => {:query => 'baz'} }, query[:dis_max][:queries][2] )
+      end
+
+      should "allow passing variables from outer scope" do
+        @q1 = 'foo'
+        @q2 = 'bar'
+        query = Query.new.dis_max do |dis_max|
+          dis_max.query { |query| query.string @q1 }
+          dis_max.query { |query| query.string @q2 }
+        end
+
+        assert_equal( 2, query[:dis_max][:queries].size, query[:dis_max][:queries].inspect )
+        assert_equal( { :query_string => {:query => 'foo'} }, query[:dis_max][:queries].first )
+        assert_equal( { :query_string => {:query => 'bar'} }, query[:dis_max][:queries].last )
+      end
+
+    end
+    
+  end
 end
