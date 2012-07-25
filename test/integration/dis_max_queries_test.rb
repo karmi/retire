@@ -6,8 +6,47 @@ module Tire
     include Test::Integration
 
     context "Dis Max queries" do
+      setup do
+        Tire.index 'dis_max_test' do
+          delete
+          create
 
-      should "allow to set multiple conditions" do
+          store title: "It's an Albino, Albino, Albino thing!", text: "Albino, albino, albino! Wanna know about albino? ..."
+          store title: "Albino Vampire Monkey Attacks!",        text: "The night was just setting in when ..."
+          store title: "Pinky Elephant",                        text: "An albino walks into a ZOO and ..."
+          refresh
+        end
+      end
+
+      teardown do
+        Tire.index('dis_max_test').delete
+      end
+
+      should "boost matches in both fields" do
+        dis_max = Tire.search 'dis_max_test' do
+          query do
+            dis_max do
+              query { string "albino elephant", fields: ['title', 'text'] }
+            end
+          end
+        end
+        # p "DisMax:", dis_max.results.map(&:title)
+
+        assert_equal 'Pinky Elephant', dis_max.results.first.title
+
+        # NOTE: This gives exactly the same result as a boolean query:
+        # boolean = Tire.search 'dis_max_test' do
+        #   query do
+        #     boolean do
+        #       should { string "albino",   fields: ['title', 'text'] }
+        #       should { string "elephant", fields: ['title', 'text'] }
+        #     end
+        #   end
+        # end
+        # p "Boolean:", boolean.results.map(&:title)
+      end
+
+      should "allow to set multiple queries" do
         s = Tire.search('articles-test') do
           query do
             dis_max do
@@ -22,19 +61,6 @@ module Tire
         assert_equal 'One', s.results[1].title
       end
 
-      should "order results by score" do
-        s = Tire.search('articles-test') do
-          query do
-            dis_max do
-              query { term :tags, 'ruby' }
-              query { term :tags, 'python' }
-            end
-          end
-        end
-
-        assert_equal 2, s.results.size
-        assert s.results[0]._score > s.results[1]._score
-      end
     end
 
   end
