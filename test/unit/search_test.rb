@@ -458,6 +458,29 @@ module Tire
 
       end
 
+      context "dis_max queries" do
+
+        should "wrap other queries" do
+          s = Search::Search.new('index') do
+            query do
+              dis_max do
+                query { string 'foo' }
+                query { terms :tags, ['baz'] }
+              end
+            end
+          end
+
+          hash  = MultiJson.decode(s.to_json)
+          query = hash['query']['dis_max']
+
+          assert_equal 2, query['queries'].size
+
+          assert_equal( { 'query_string' => { 'query' => 'foo' } }, query['queries'].first)
+          assert_equal( { 'terms' => { 'tags' => ['baz'] } }, query['queries'].last)
+        end
+
+      end
+
     end
 
     context "script field" do
