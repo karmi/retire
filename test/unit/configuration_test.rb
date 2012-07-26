@@ -67,6 +67,15 @@ module Tire
         assert_equal          'http://localhost:9200', Configuration.url
         assert_equal          HTTP::Client::RestClient, Configuration.client
       end
+
+      should "return 10 seconds at default timeout" do
+        assert_equal Configuration.timeout, 10
+      end
+
+      should "set and return timeout" do
+        Configuration.timeout 30
+        assert_equal Configuration.timeout, 30
+      end
     end
 
   end

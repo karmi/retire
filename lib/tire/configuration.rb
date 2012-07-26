@@ -19,6 +19,10 @@ module Tire
       @logger || nil
     end
 
+    def self.timeout(seconds=nil)
+      @timeout = seconds || @timeout || 10
+    end
+
     def self.reset(*properties)
       reset_variables = properties.empty? ? instance_variables : instance_variables.map { |p| p.to_s} & \
                                                                  properties.map         { |p| "@#{p}" }
@@ -26,5 +30,4 @@ module Tire
     end
 
   end
-
 end
