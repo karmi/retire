@@ -48,7 +48,8 @@ module Tire
       end
 
       def params
-        @options.empty? ? '' : '?' + @options.to_param
+        options = @options.except(:payload)
+        options.empty? ? '' : '?' + options.to_param
       end
 
       def query(&block)
@@ -134,7 +135,7 @@ module Tire
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @options.fetch(:payload) do
           request = {}
           request.update( { :indices_boost => @indices_boost } ) if @indices_boost
           request.update( { :query  => @query.to_hash } )    if @query

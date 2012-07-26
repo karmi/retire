@@ -1,15 +1,13 @@
 module Tire
   class Logger
 
-    def initialize(device, options={})
-      @device = if device.respond_to?(:write)
-        device
+    def initialize(logger, options={})
+      @logger = if logger.is_a?(::Logger)
+        logger
       else
-        File.open(device, 'a')
+        ::Logger.new(logger)
       end
-      @device.sync = true if @device.respond_to?(:sync)
       @options = options
-      # at_exit { @device.close unless @device.closed? } if @device.respond_to?(:closed?) && @device.respond_to?(:close)
     end
 
     def level
@@ -17,7 +15,7 @@ module Tire
     end
 
     def write(message)
-      @device.write message
+      @logger.send(level.to_sym, message)
     end
 
     def log_request(endpoint, params=nil, curl='')
