@@ -34,7 +34,13 @@ module Tire
         @value
       end
       
-      
+      def nested(options={},&block) 
+        @nested ||= Query.new(&block)
+        @value[:nested] = options
+        @value[:nested].update({:query => @nested.to_hash})
+        @value        
+      end
+            
       def custom_filters_score(options={}, &block)
         @custom_filters ||= CustomFiltersScoreQuery.new(options)
         block.arity < 1 ? @custom_filters.instance_eval(&block) : block.call(@custom_filters) if block_given?
