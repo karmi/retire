@@ -77,7 +77,7 @@ module Tire
       @attributes = { :indices => IndexCollection.new([]) }
 
       attributes.each_pair do |key, value|
-        if key.to_s =~ /index|indices/
+        if ['index','indices'].include? key.to_s
           @attributes[:indices] = IndexCollection.new(value)
         else
           @attributes[key.to_sym] = value
