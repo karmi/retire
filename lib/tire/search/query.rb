@@ -79,8 +79,8 @@ module Tire
         @value
       end
 
-      def all
-        @value = { :match_all => {} }
+      def all(options = {})
+        @value = { :match_all => options }
         @value
       end
 
