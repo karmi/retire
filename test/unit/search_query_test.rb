@@ -105,6 +105,10 @@ module Tire::Search
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
       end
+
+      should "pass arguments through to match_all" do
+        assert_equal( { :match_all => {'norms_field' => 'name'} }, Query.new.all('norms_field' => 'name') )
+      end
     end
 
     context "IDs query" do

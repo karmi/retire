@@ -75,8 +75,8 @@ module Tire
         @value
       end
 
-      def all
-        @value = { :match_all => {} }
+      def all(match_all_args = {})
+        @value = { :match_all => match_all_args }
         @value
       end
 
