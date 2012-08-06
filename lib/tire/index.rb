@@ -84,8 +84,8 @@ module Tire
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
       logged([type, id].join('/'), curl)
     end
-
-    def bulk_store(documents, options={})
+    
+    def bulk_api_action(action, documents, options={})
       payload = documents.map do |document|
         type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
         id   = get_id_from_document(document)
@@ -93,8 +93,10 @@ module Tire
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
         output = []
-        output << %Q|{"index":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
-        output << convert_document_to_json(document)
+        output << %Q|{"#{action}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        unless action == 'delete' # delete does not require a document, just an _id
+          output << convert_document_to_json(document)
+        end
         output.join("\n")
       end
       payload << ""
@@ -120,6 +122,19 @@ module Tire
         curl = %Q|curl -X POST "#{url}/_bulk" -d '{... data omitted ...}'|
         logged('BULK', curl)
       end
+      
+    end
+    
+    def bulk_create(documents, options={})
+      bulk_api_action("create", documents, options)
+    end
+
+    def bulk_store(documents, options={})
+      bulk_api_action("index", documents, options)
+    end
+
+    def bulk_delete(documents, options={})
+      bulk_api_action("delete", documents, options)
     end
 
     def import(klass_or_collection, options={})
