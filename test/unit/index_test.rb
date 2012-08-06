@@ -490,49 +490,69 @@ module Tire
 
       end
 
-      context "when storing in bulk" do
+      context "when performing a bulk api action" do
+        # Possible api actions are index, create, delete
         # The expected JSON looks like this:
         #
         # {"index":{"_index":"dummy","_type":"document","_id":"1"}}
         # {"id":"1","title":"One"}
-        # {"index":{"_index":"dummy","_type":"document","_id":"2"}}
+        # {"create":{"_index":"dummy","_type":"document","_id":"2"}}
         # {"id":"2","title":"Two"}
+        # {"delete":{"_index":"dummy","_type":"document","_id":"2"}}
         #
         # See http://www.elasticsearch.org/guide/reference/api/bulk.html
+        
+        # test json with each type of action
+        ["index","create","delete"].each do |action|
+          should "serialize Hashes for #{action}" do
+            Configuration.client.expects(:post).with do |url, json|
+              
+              url  == "#{@index.url}/_bulk" &&
+              json =~ /"#{action}"/ &&
+              json =~ /"_index":"dummy"/ &&
+              json =~ /"_type":"document"/ &&
+              json =~ /"_id":"1"/ &&
+              json =~ /"_id":"2"/ &&
+              if action == 'delete'
+                # delete should not contain the document contents
+                true
+              else              
+                json =~ /"id":"1"/ &&
+                json =~ /"id":"2"/ &&
+                json =~ /"title":"One"/ &&
+                json =~ /"title":"Two"/
+              end
+            end.returns(mock_response('{}'), 200)
+          
+            @index.bulk_api_action action,  [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
+          end
 
-        should "serialize Hashes" do
-          Configuration.client.expects(:post).with do |url, json|
-            url  == "#{@index.url}/_bulk" &&
-            json =~ /"_index":"dummy"/ &&
-            json =~ /"_type":"document"/ &&
-            json =~ /"_id":"1"/ &&
-            json =~ /"_id":"2"/ &&
-            json =~ /"id":"1"/ &&
-            json =~ /"id":"2"/ &&
-            json =~ /"title":"One"/ &&
-            json =~ /"title":"Two"/
-          end.returns(mock_response('{}'), 200)
-
-          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
+          should "serialize ActiveModel instances for #{action}" do
+            Configuration.client.expects(:post).with do |url, json|
+              url  == "#{ActiveModelArticle.index.url}/_bulk" &&
+              json =~ /"#{action}"/ &&
+              json =~ /"_index":"active_model_articles"/ &&
+              json =~ /"_type":"active_model_article"/ &&
+              json =~ /"_id":"1"/ &&
+              json =~ /"_id":"2"/ &&
+              if action == 'delete'
+                # delete should not contain the document contents
+                true
+              else              
+                json =~ /"title":"One"/ &&
+                json =~ /"title":"Two"/
+              end
+              
+            end.returns(mock_response('{}', 200))
+          
+            one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
+            two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
+          
+            ActiveModelArticle.index.bulk_api_action action, [ one, two ]
+          end
+          
         end
-
-        should "serialize ActiveModel instances" do
-          Configuration.client.expects(:post).with do |url, json|
-            url  == "#{ActiveModelArticle.index.url}/_bulk" &&
-            json =~ /"_index":"active_model_articles"/ &&
-            json =~ /"_type":"active_model_article"/ &&
-            json =~ /"_id":"1"/ &&
-            json =~ /"_id":"2"/ &&
-            json =~ /"title":"One"/ &&
-            json =~ /"title":"Two"/
-          end.returns(mock_response('{}', 200))
-
-          one = ActiveModelArticle.new 'title' => 'One'; one.id = '1'
-          two = ActiveModelArticle.new 'title' => 'Two'; two.id = '2'
-
-          ActiveModelArticle.index.bulk_store [ one, two ]
-        end
-
+        # use the index action to test common features of the bulk api
         context "namespaced models" do
           should "not URL-escape the document_type" do
             Configuration.client.expects(:post).with do |url, json|
@@ -541,43 +561,42 @@ module Tire
               json =~ %r|"_index":"my_namespace_my_models"| &&
               json =~ %r|"_type":"my_namespace/my_model"|
             end.returns(mock_response('{}', 200))
-
+        
             module MyNamespace
               class MyModel
                 def document_type;   "my_namespace/my_model"; end
                 def to_indexed_json; "{}";                    end
               end
             end
-
-            Tire.index('my_namespace_my_models').bulk_store [ MyNamespace::MyModel.new ]
+        
+            Tire.index('my_namespace_my_models').bulk_api_action "index", [ MyNamespace::MyModel.new ]
           end
         end
-
         should "try again when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
 
-          assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+          assert !@index.bulk_api_action("index", [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
 
         should "try again and the raise when an exception occurs" do
           Configuration.client.expects(:post).returns(mock_response('Server error', 503)).at_least(2)
 
           assert_raise(RuntimeError) do
-            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], {:raise => true})
+            @index.bulk_api_action("index", [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ], {:raise => true})
           end
         end
 
         should "try again when a connection error occurs" do
           Configuration.client.expects(:post).raises(Errno::ECONNREFUSED, "Connection refused - connect(2)").at_least(2)
 
-          assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+          assert !@index.bulk_api_action("index", [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
 
         should "retry on SIGINT type of exceptions" do
           Configuration.client.expects(:post).raises(Interrupt, "abort then interrupt!")
 
           assert_raise Interrupt do
-            @index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
+            @index.bulk_api_action("index", [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
           end
         end
 
@@ -589,7 +608,7 @@ module Tire
           STDERR.expects(:puts).once
 
           documents = [ { :title => 'Bogus' }, { :title => 'Real', :id => 1 } ]
-          ActiveModelArticle.index.bulk_store documents
+          ActiveModelArticle.index.bulk_api_action("index", documents)
         end
 
         should "log the response code" do
@@ -600,7 +619,7 @@ module Tire
             status == 200
           end
 
-          @index.bulk_store [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
+          @index.bulk_api_action("index",  [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
 
       end
