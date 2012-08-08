@@ -36,7 +36,7 @@ module Tire
       @response.success? ? @response : false
 
     ensure
-      curl = %Q|curl -X POST #{url} -d '#{MultiJson.encode(options)}'|
+      curl = %Q|curl -X POST #{url} -d '#{MultiJson.encode(options, :pretty => Configuration.pretty)}'|
       logged('CREATE', curl)
     end
 
@@ -217,7 +217,7 @@ module Tire
       MultiJson.decode(@response.body)
 
     ensure
-      curl = %Q|curl -X POST "#{url}" -d '#{MultiJson.encode(payload)}'|
+      curl = %Q|curl -X POST "#{url}" -d '#{MultiJson.encode(payload, :pretty => Configuration.pretty)}'|
       logged(id, curl)
     end
 
@@ -266,7 +266,7 @@ module Tire
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/#{name}?pretty=1" -d '#{MultiJson.encode(options)}'|
+      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/#{name}?pretty" -d '#{MultiJson.encode(options, :pretty => Configuration.pretty)}'|
       logged('_percolator', curl)
     end
 
@@ -294,7 +294,7 @@ module Tire
       MultiJson.decode(@response.body)['matches']
 
     ensure
-      curl = %Q|curl -X GET "#{url}/#{type}/_percolate?pretty=1" -d '#{payload.to_json}'|
+      curl = %Q|curl -X GET "#{url}/#{type}/_percolate?pretty" -d '#{MultiJson.encode(payload, :pretty => Configuration.pretty)}'|
       logged('_percolate', curl)
     end
 
@@ -308,9 +308,9 @@ module Tire
 
         if Configuration.logger.level.to_s == 'debug'
           body = if @response
-            defined?(Yajl) ? Yajl::Encoder.encode(@response.body, :pretty => true) : MultiJson.encode(@response.body)
+            MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty)
           else
-            error.message rescue ''
+            MultiJson.encode( MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
           end
         else
           body = ''

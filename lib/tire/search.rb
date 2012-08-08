@@ -156,7 +156,11 @@ module Tire
       def to_json
         payload = to_hash
         # TODO: Remove when deprecated interface is removed
-        payload.is_a?(String) ? payload : payload.to_json
+        if payload.is_a?(String)
+          payload
+        else
+          MultiJson.encode(payload, :pretty => Configuration.pretty)
+        end
       end
 
       def logged(error=nil)
@@ -168,11 +172,10 @@ module Tire
           code = @response.code rescue nil
 
           if Configuration.logger.level.to_s == 'debug'
-            # FIXME: Depends on RestClient implementation
             body = if @json
-              defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
+              MultiJson.encode( @json, :pretty => Configuration.pretty)
             else
-              @response.body rescue nil
+              MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty) rescue ''
             end
           else
             body = ''
