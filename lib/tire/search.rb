@@ -13,6 +13,7 @@ module Tire
         else
           @indices = Array(indices)
         end
+        @indices = @indices.map { |i| i.respond_to?(:index_name) ? i.index_name : i }
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @options = options
 

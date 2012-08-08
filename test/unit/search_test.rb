@@ -17,6 +17,16 @@ module Tire
         assert_match %r|/index1,index2/_search|, s.url
       end
 
+      should "be initialized with single index from class" do
+        s = Search::Search.new(ActiveModelArticle) { query { string 'foo' } }
+        assert_match %r|/active_model_articles/_search|, s.url
+      end
+
+      should "be initialized with multiple indices mixed from string and classes" do
+        s = Search::Search.new([ 'index', ActiveModelArticle]) { query { string 'foo' } }
+        assert_match %r|/index,active_model_articles/_search|, s.url
+      end
+
       should "be initialized with multiple indices with options" do
         indices = {'index1' => {:boost => 1},'index2' => {:boost => 2}}
         s = Search::Search.new(indices) { query { string 'foo' } }
