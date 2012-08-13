@@ -297,5 +297,30 @@ module Tire::Search
 
     end
 
+    context "Has child query" do
+
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.has_child }
+      end
+
+      should "allow search for documents with children" do
+        query = Query.new.has_child do
+          string 'foo'
+        end
+
+        assert_equal( { :has_child => { :query => { :query_string => { :query => 'foo' } } } },
+                      query.to_hash )
+      end
+
+      should "encode options" do
+        query = Query.new.has_child('_scope' => 'foo', :type => 'bar') do
+          string 'baz'
+        end
+
+        assert_equal('foo', query.to_hash[:has_child]['_scope'])
+        assert_equal('bar', query.to_hash[:has_child][:type])
+      end
+    end
+
   end
 end
