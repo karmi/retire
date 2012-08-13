@@ -75,6 +75,13 @@ module Tire
         @value
       end
 
+      def has_child(options={}, &block)
+        @has_child = Query.new(&block)
+        @value[:has_child] = options
+        @value[:has_child].update({ :query => @has_child.to_hash })
+        @value
+      end
+
       def all
         @value = { :match_all => {} }
         @value
