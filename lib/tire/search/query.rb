@@ -42,6 +42,13 @@ module Tire
         end
       end
 
+      def custom_boost_factor(options={}, &block)
+        @custom_boost_factor ||= Query.new(&block)
+        @value[:custom_boost_factor] = options
+        @value[:custom_boost_factor].update({:query => @custom_boost_factor.to_hash})
+        @value
+      end
+
       def custom_score(options={}, &block)
         @custom_score ||= Query.new(&block)
         @value[:custom_score] = options
@@ -65,6 +72,13 @@ module Tire
         @filtered = FilteredQuery.new
         block.arity < 1 ? @filtered.instance_eval(&block) : block.call(@filtered) if block_given?
         @value[:filtered] = @filtered.to_hash
+        @value
+      end
+
+      def span_first(options={}, &block)
+        @span_first = SpanFirstQuery.new(options)
+        block.arity < 1 ? @span_first.instance_eval(&block) : block.call(@span_first) if block_given?
+        @value[:span_first] = @span_first.to_hash
         @value
       end
 
@@ -179,7 +193,28 @@ module Tire
 
       def span_term(field, value, options={})
         @value[:clauses] ||= []
-        @value[:clauses] << { :span_term => { field => { :term => value }.update(options) } }
+        @value[:clauses] << { :span_term => { field => value }.update(options) }
+      end
+
+      def to_hash
+        @value.update(@options)
+      end
+
+      def to_json
+        to_hash.to_json
+      end
+    end
+
+
+    class SpanFirstQuery
+      def initialize(options={}, &block)
+        @options = { :end => 1 }.update(options)
+        @value   = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def span_term(field, value, options={})
+        @value[:match] = { :span_term => { field => value }.update(options) }
       end
 
       def to_hash
