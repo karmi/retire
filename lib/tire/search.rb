@@ -116,6 +116,14 @@ module Tire
         self
       end
 
+      def partial_fields(name, include_fields, exclude_fields =[])
+        @partial_fields ||= {} 
+        @partial_fields[name] = {}
+        @partial_fields[name]['include'] = include_fields unless include_fields.empty?
+        @partial_fields[name]['exclude'] = exclude_fields unless exclude_fields.empty?
+        self
+      end
+
       def perform
         @response = Configuration.client.get(self.url + self.params, self.to_json)
         if @response.failure?
@@ -149,6 +157,7 @@ module Tire
           request.update( { :script_fields => @script_fields } ) if @script_fields
           request.update( { :version => @version } )         if @version
           request.update( { :explain => @explain } )         if @explain
+          request.update( { :partial_fields => @partial_fields} ) if @partial_fields
           request
         end
       end
