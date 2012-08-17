@@ -59,6 +59,33 @@ module Tire
         assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
       end
 
+      context "terms" do
+        setup do
+          @s = Tire.search('articles-test') do
+            query { string 'tags:ruby' }
+          end
+        end
+
+        should "return results ordered by term" do
+          @s.facet('tags')              { terms :tags                }
+          @s.facet('term-ordered-tags') { terms :tags, order: 'term' }
+
+          facets = @s.results.facets
+          # p facets
+          assert_equal 'ruby',   facets['tags']['terms']             .first['term']
+          assert_equal 'python', facets['term-ordered-tags']['terms'].first['term']
+        end
+
+        should "return results aggregated over multiple fields" do
+          @s.facet('multiple-fields') { terms ['tags', 'words'] }
+
+          facets = @s.results.facets
+          # p facets
+          assert_equal 4, facets['multiple-fields']['terms'].size
+        end
+
+      end
+
       context "date histogram" do
 
         should "return aggregated values for all results" do

@@ -153,6 +153,14 @@ module Tire
             end
           end
 
+          should "allow to pass :version option" do
+            Tire::Search::Search.any_instance.expects(:version).with(true)
+
+            ActiveModelArticle.search :version => true do
+              query { all }
+            end
+          end
+
         end
 
         context "searching with query string" do
@@ -219,6 +227,12 @@ module Tire
 
             Tire::Search::Search.any_instance.expects(:fields).with(["id", "title"])
             ActiveModelArticle.search @q, :fields => ['id', 'title']
+          end
+
+          should "allow to pass :version option" do
+            Tire::Search::Search.any_instance.expects(:version).with(true)
+
+            ActiveModelArticle.search @q, :version => true
           end
 
         end

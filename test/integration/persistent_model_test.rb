@@ -50,7 +50,20 @@ module Tire
         results = PersistentArticle.find [1, 2]
 
         assert_equal 2, results.size
+      end
 
+      should "be persisted" do
+        one = PersistentArticle.create :id => 1, :title => 'One'
+        PersistentArticle.index.refresh
+
+        a = PersistentArticle.all.first
+        assert a.persisted?, a.inspect
+
+        b = PersistentArticle.first
+        assert b.persisted?, b.inspect
+
+        c = PersistentArticle.search { query { string 'one' } }.first
+        assert c.persisted?, c.inspect
       end
 
       should "return default values for properties without value" do

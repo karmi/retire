@@ -55,11 +55,9 @@ module Tire
             self.freeze
           end
 
-          # TODO: Implement `new_record?` and clean up
-
-          def destroyed?; !!@destroyed; end
-
-          def persisted?; !!id;           end
+          def destroyed?   ;  !!@destroyed;       end
+          def persisted?   ;  !!id && !!_version; end
+          def new_record?  ;  !persisted?;        end
 
         end
 

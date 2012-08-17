@@ -55,6 +55,12 @@ module Tire
 
     end
 
+    context "Ruby Test::Unit" do
+      should "actually return true from assert..." do
+        assert_equal true, assert(true)
+      end
+    end
+
   end
 
 end

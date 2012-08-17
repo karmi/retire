@@ -85,6 +85,8 @@ module Tire
             end
           end unless sort.empty?
 
+          if version = options.delete(:version); s.version(version); end
+
           if block_given?
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
           else

@@ -41,7 +41,7 @@ module Tire
             old_wrapper = Tire::Configuration.wrapper
             Tire::Configuration.wrapper self
             s = Tire::Search::Search.new(index.name).query { all }
-            s.results
+            s.version(true).results
           ensure
             Tire::Configuration.wrapper old_wrapper
           end
@@ -51,7 +51,7 @@ module Tire
             old_wrapper = Tire::Configuration.wrapper
             Tire::Configuration.wrapper self
             s = Tire::Search::Search.new(index.name).query { all }.size(1)
-            s.results.first
+            s.version(true).results.first
           ensure
             Tire::Configuration.wrapper old_wrapper
           end

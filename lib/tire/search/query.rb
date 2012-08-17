@@ -96,6 +96,13 @@ module Tire
         @value
       end
 
+      def dis_max(options={}, &block)
+        @dis_max ||= DisMaxQuery.new(options)
+        block.arity < 1 ? @dis_max.instance_eval(&block) : block.call(@dis_max) if block_given?
+        @value[:dis_max] = @dis_max.to_hash
+        @value
+      end
+
       def all
         @value = { :match_all => {} }
         @value
@@ -155,7 +162,6 @@ module Tire
       end
     end
 
-
     class FilteredQuery
       def initialize(&block)
         @value = {}
@@ -183,7 +189,6 @@ module Tire
       end
     end
 
-
     class SpanNearOrQuery
       def initialize(options={}, &block)
         @options = options
@@ -205,7 +210,6 @@ module Tire
       end
     end
 
-
     class SpanFirstQuery
       def initialize(options={}, &block)
         @options = { :end => 1 }.update(options)
@@ -226,5 +230,25 @@ module Tire
       end
     end
 
+    class DisMaxQuery
+      def initialize(options={}, &block)
+        @options = options
+        @value   = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def query(&block)
+        (@value[:queries] ||= []) << Query.new(&block).to_hash
+        @value
+      end
+
+      def to_hash
+        @value.update(@options)
+      end
+
+      def to_json
+        to_hash.to_json
+      end
+    end
   end
 end
