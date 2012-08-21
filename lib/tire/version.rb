@@ -1,8 +1,12 @@
 module Tire
-  VERSION = "0.4.2.1"
+  VERSION = "0.4.2.2"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
+
+    Version 0.4.2.2
+    ---------------
+    * Tire::Index now removes _id/_type keys from document hashes.
 
     Version 0.4.2.1
     ---------------
