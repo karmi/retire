@@ -39,6 +39,16 @@ module Tire
         assert_equal 2, Tire.search('reindex-test-new').results.total
       end
 
+      should "transform documents with a passed lambda" do
+        Tire.index('reindex-test').reindex 'reindex-test-new', transform: lambda { |document|
+                                                                            document[:title] += 'UPDATED'
+                                                                            document
+                                                                          }
+
+        Tire.index('reindex-test-new').refresh
+        assert_match /UPDATED/, Tire.search('reindex-test-new').results.first.title
+      end
+
     end
 
   end
