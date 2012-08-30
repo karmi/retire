@@ -84,6 +84,13 @@ module Tire
         @value = { :ids => { :values => values, :type => type }  }
       end
 
+      def boosting(options={}, &block)
+        @boosting ||= BoostingQuery.new(options)
+        block.arity < 1 ? @boosting.instance_eval(&block) : block.call(@boosting) if block_given?
+        @value[:boosting] = @boosting.to_hash
+        @value
+      end
+
       def to_hash
         @value
       end
@@ -179,6 +186,28 @@ module Tire
 
       def to_json
         to_hash.to_json
+      end
+    end
+
+    class BoostingQuery
+      def initialize(options={}, &block)
+        @options = options
+        @value   = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def positive(&block)
+        (@value[:positive] ||= []) << Query.new(&block).to_hash
+        @value
+      end
+
+      def negative(&block)
+        (@value[:negative] ||= []) << Query.new(&block).to_hash
+        @value
+      end
+
+      def to_hash
+        @value.update(@options)
       end
     end
 

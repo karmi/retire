@@ -297,5 +297,54 @@ module Tire::Search
 
     end
 
+    context "BoostingQuery" do
+
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.boosting }
+      end
+
+      should "encode options" do
+        query = Query.new.boosting(:negative_boost => 0.2) do
+          positive { string 'foo' }
+        end
+
+        assert_equal 0.2, query[:boosting][:negative_boost]
+      end
+
+      should "wrap positive query" do
+        assert_equal( { :boosting => {:positive => [{ :query_string => { :query => 'foo' } }] }},
+                      Query.new.boosting { positive { string 'foo' } } )
+      end
+
+      should "wrap negative query" do
+        assert_equal( { :boosting => {:negative => [{ :query_string => { :query => 'foo' } }] }},
+                      Query.new.boosting { negative { string 'foo' } } )
+      end
+
+      should "wrap multiple queries for the same condition" do
+        query = Query.new.boosting do
+          positive { string 'foo' }
+          positive { term('bar', 'baz') }
+        end
+
+        assert_equal( 2, query[:boosting][:positive].size, query[:boosting][:positive].inspect )
+        assert_equal( { :query_string => {:query => 'foo'} }, query[:boosting][:positive].first )
+        assert_equal( { :term => { "bar" => { :term => "baz" } } }, query[:boosting][:positive].last )
+      end
+
+      should "allow passing variables from outer scope" do
+        @q1 = 'foo'
+        @q2 = 'bar'
+        query = Query.new.boosting do |boosting|
+          boosting.positive { |query| query.string @q1 }
+          boosting.negative { |query| query.string @q2 }
+        end
+
+        assert_equal( { :query_string => {:query => 'foo'} }, query[:boosting][:positive].first )
+        assert_equal( { :query_string => {:query => 'bar'} }, query[:boosting][:negative].last )
+      end
+
+    end
+
   end
 end
