@@ -108,6 +108,52 @@ class ActiveRecordPhoto < ActiveRecordAsset
   index_name 'active_record_assets'
 end
 
+class ActiveRecordNewsStory < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+
+  index_name 'active_record_news_stories'
+
+  tire do
+    mapping do
+      indexes :id, :index => :not_analysed
+      indexes :title
+      indexes :content
+      indexes :author_name, :as => :author_name
+      indexes :category_name, :as => :category_name
+      indexes :block_category_name, :as => proc { category.name }
+      indexes :string_author_name,  :as => 'author.name'
+      indexes :lambda_category_name, :as => lambda {|news_story| news_story.category_name }
+    end
+  end
+
+  belongs_to :category, :class_name => 'ActiveRecordCategory'
+  belongs_to :author, :class_name => 'ActiveRecordAuthor'
+
+  attr_accessible :category_id, :author_id, :title, :content
+
+  def author_name
+    self.author.name
+  end
+
+  def category_name
+    self.category.name
+  end
+
+end
+
+class ActiveRecordCategory < ActiveRecord::Base
+  has_many :news_stories, :class_name => 'ActiveRecordNewsStory'
+
+  attr_accessible :name
+end
+
+class ActiveRecordAuthor < ActiveRecord::Base
+  has_many :news_stories, :class_name => 'ActiveRecordNewsStory'
+
+  attr_accessible :name
+end
+
 # Namespaced ActiveRecord models
 
 module ActiveRecordNamespace

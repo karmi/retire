@@ -440,7 +440,37 @@ You can define different [_analyzers_](http://www.elasticsearch.org/guide/refere
 or any other configuration for _elasticsearch_.
 
 You're not limited to 1:1 mapping between your model properties and the serialized document. With the `:as` option,
-you can pass a string or a _Proc_ object which is evaluated in the instance context (see the `content_size` property).
+you can pass a symbol, string, _lambda_ or a _Proc_ object to generate the value. The evaluation is done as follows:
+
+If `String` the text given is evaluated at the current instance (using `instance_eval`), look at the `content.size` property above.
+
+If `Symbol` a method with the same name as the symbol is called at the current instance, as in:
+
+```ruby
+    mapping do 
+     indexes :id, :as => :some_other_id
+    end
+    
+    def some_other_id
+      self.component.id
+    end    
+```
+
+If `Proc`, the proc is evaluated against the current instance (using `instance_eval`), as in:
+
+```ruby
+    mapping do 
+     indexes :author_name, :as => proc { author.name }
+    end
+```
+
+If `lambda`, the lambda is evaluated passing the current object as a parameter:
+
+```ruby
+    mapping do 
+     indexes :author_name, :as => lambda { |article| article.author.name }
+    end
+```
 
 Chances are, you want to declare also a custom _settings_ for the index, such as set the number of shards,
 replicas, or create elaborate analyzer chains, such as the hipster's choice: [_ngrams_](https://gist.github.com/1160430).

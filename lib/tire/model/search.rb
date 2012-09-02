@@ -1,3 +1,5 @@
+require 'tire/invalid_as_option_exception'
+
 module Tire
   module Model
 
@@ -146,6 +148,31 @@ module Tire
         alias :update_elasticsearch_index  :update_index
         alias :update_elastic_search_index :update_index
 
+        def to_indexed_hash
+          if instance.class.tire.mapping.empty?
+            # Reject the id and type keys
+            instance.to_hash.reject {|key,_| key.to_s == 'id' || key.to_s == 'type' }
+          else
+            mapping = instance.class.tire.mapping
+            # Reject keys not declared in mapping
+            hash = instance.to_hash.reject { |key, value| ! mapping.keys.map(&:to_s).include?(key.to_s) }
+
+            # Evalute the `:as` options
+            mapping.each do |key, options|
+              case options[:as]
+                when Symbol
+                  hash[key] = instance.send(options[:as])
+                when String
+                  hash[key] = instance.instance_eval(options[:as])
+                when Proc
+                  hash[key] = instance.instance_eval(&options[:as])
+              end
+            end
+
+            hash
+          end
+        end
+
         # The default JSON serialization of the model, based on its `#to_hash` representation.
         #
         # If you don't define any mapping, the model is serialized as-is.
@@ -157,26 +184,7 @@ module Tire
         # is evaluated in the instance context.
         #
         def to_indexed_json
-          if instance.class.tire.mapping.empty?
-            # Reject the id and type keys
-            instance.to_hash.reject {|key,_| key.to_s == 'id' || key.to_s == 'type' }.to_json
-          else
-            mapping = instance.class.tire.mapping
-            # Reject keys not declared in mapping
-            hash = instance.to_hash.reject { |key, value| ! mapping.keys.map(&:to_s).include?(key.to_s) }
-
-            # Evalute the `:as` options
-            mapping.each do |key, options|
-              case options[:as]
-                when String
-                  hash[key] = instance.instance_eval(options[:as])
-                when Proc
-                  hash[key] = instance.instance_eval(&options[:as])
-              end
-            end
-
-            hash.to_json
-          end
+          self.to_indexed_hash.to_json
         end
 
         def matches

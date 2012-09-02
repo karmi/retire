@@ -361,14 +361,14 @@ module Tire
              create_table(:active_record_model_two) { |t| t.string :title, :timestamp }
            end
 
-           ActiveRecordModelOne.create :title => 'Title One', timestamp: Time.now.to_i
-           ActiveRecordModelTwo.create :title => 'Title Two', timestamp: Time.now.to_i
+           ActiveRecordModelOne.create :title => 'Title One', :timestamp => Time.now.to_i
+           ActiveRecordModelTwo.create :title => 'Title Two', :timestamp => Time.now.to_i
            ActiveRecordModelOne.tire.index.refresh
            ActiveRecordModelTwo.tire.index.refresh
 
 
-           ActiveRecordVideo.create! :title => 'Title One', timestamp: Time.now.to_i
-           ActiveRecordPhoto.create! :title => 'Title Two', timestamp: Time.now.to_i
+           ActiveRecordVideo.create! :title => 'Title One', :timestamp => Time.now.to_i
+           ActiveRecordPhoto.create! :title => 'Title Two', :timestamp => Time.now.to_i
            ActiveRecordAsset.tire.index.refresh
          end
 
