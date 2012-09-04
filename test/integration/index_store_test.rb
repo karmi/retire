@@ -22,7 +22,10 @@ module Tire
         end
       end
 
-      teardown { Tire.index('articles-test-ids').delete }
+      teardown do
+        Tire.index('articles-test-ids').delete
+        Tire.index('articles-test-types').delete
+      end
 
       should "happen in existing index" do
         assert   Tire.index("articles-test-ids").exists?
@@ -38,6 +41,19 @@ module Tire
         assert_equal 'Four', document.title
         assert_equal 2,      document._version.to_i
 
+      end
+
+      should "store documents as proper types" do
+        Tire.index 'articles-test-types' do
+          delete
+          create
+          store :type => 'my_type', :title => 'One'
+          refresh
+        end
+
+        s = Tire.search('articles-test-types/my_type') { query { all } }
+        assert_equal 1, s.results.count
+        assert_equal 'my_type', s.results.first.type
       end
 
     end
