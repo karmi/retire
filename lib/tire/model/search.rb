@@ -298,9 +298,15 @@ module Tire
         # Include the `load` functionality in Results::Item
         #
         Results::Item.send :include, Loader
+
+        @models = (models << base)
       end
 
-      
+      def self.models
+        @models ||= []
+      end
+
+
     end
 
   end

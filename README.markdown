@@ -736,6 +736,57 @@ lightweight associations between the models.
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
 for examples of the API and _ActiveModel_ integration usage.
 
+Integration with test frameworks
+--------------------------------
+
+Out the box tire support two frameworks - Test::Unit/MiniTest and [RSpec](https://www.relishapp.com/rspec)
+
+Test::Unit example:
+
+```ruby
+    require 'tire/test/unit'
+
+    class ArticleTest < Test::Unit::TestCase
+
+      def setup
+        reset_tire_indexes
+      end
+
+    end
+```
+
+RSpec example even simplier thanks to built-in metadata functionality:
+
+```ruby
+    require 'tire/test/rspec'
+
+    describe Article do
+
+      it 'clean elasticsearch by hands' do
+        reset_tire_indexes
+        ....
+      end
+
+      it 'clean elasticsearch via metadata', :tire => true do
+        ...
+      end
+
+    end
+```
+
+For another test frameworks next example:
+
+```ruby
+    require 'tire/test/base'
+
+    Tire::Model::Search.reset_model_indexes #clearing elasticsearch
+```
+
+Don't forgot change tire prefix for test environment. In Rails case you can add tire.rb to config/initializers with content:
+
+```ruby
+  Tire::Model::Search.index_prefix "#{Rails.application.class.parent_name}_#{Rails.env}".downcase
+```
 
 Extensions and Additions
 ------------------------
