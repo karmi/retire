@@ -116,7 +116,7 @@ class ActiveRecordNewsStory < ActiveRecord::Base
 
   tire do
     mapping do
-      indexes :id, :index => :not_analysed
+      indexes :id
       indexes :title
       indexes :content
       indexes :author_name, :as => :author_name

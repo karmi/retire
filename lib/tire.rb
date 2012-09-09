@@ -11,6 +11,7 @@ require 'active_support/core_ext/hash/except.rb'
 # Ruby 1.8 compatibility
 require 'tire/rubyext/ruby_1_8' if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
 
+require 'tire/errors'
 require 'tire/rubyext/hash'
 require 'tire/rubyext/symbol'
 require 'tire/utils'

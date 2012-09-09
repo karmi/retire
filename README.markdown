@@ -447,13 +447,13 @@ If `String` the text given is evaluated at the current instance (using `instance
 If `Symbol` a method with the same name as the symbol is called at the current instance, as in:
 
 ```ruby
-    mapping do 
-     indexes :id, :as => :some_other_id
+    mapping do
+      indexes :category, :as => :category_name
     end
-    
-    def some_other_id
-      self.component.id
-    end    
+
+    def category_name
+      self.category.name
+    end
 ```
 
 If `Proc`, the proc is evaluated against the current instance (using `instance_eval`), as in:

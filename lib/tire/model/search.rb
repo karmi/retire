@@ -1,5 +1,3 @@
-require 'tire/invalid_as_option_exception'
-
 module Tire
   module Model
 
