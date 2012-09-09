@@ -873,6 +873,10 @@ module Tire
 
         end
 
+        should "track classes included this module" do
+          assert Tire::Model::Search.models.include?(ModelWithIndexCallbacks)
+        end
+
       end
 
       context "Results::Item" do
