@@ -117,7 +117,7 @@ module Tire
         end
 
       ensure
-        curl = %Q|curl -X POST "#{url}/_bulk" -d '{... data omitted ...}'|
+        curl = %Q|curl -X POST "#{url}/_bulk" --data-binary '{... data omitted: #{documents.size} documents ...}'|
         logged('BULK', curl)
       end
     end
