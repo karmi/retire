@@ -16,7 +16,19 @@ module Tire
     def message
       "You have tried to eager load the model instances, " +
       "but Tire cannot find the model class because " +
-      "document has no _type property." 
+      "document has no _type property."
+    end
+  end
+
+  class RecordNotFound < Tire::Exception
+    attr_reader :klass, :ids
+
+    def initialize(klass, ids)
+      @klass, @ids = klass, ids
+    end
+
+    def message
+      "Couldn't find all #{klass.name.pluralize} with IDs (#{ids.join(', ')})."
     end
   end
 
@@ -98,8 +110,10 @@ module Tire
             records["#{type}-#{item.id}"] = item
           end
         end
-          
+
         records
+      rescue ActiveRecord::RecordNotFound
+        raise Tire::RecordNotFound.new(klass, ids)
       end
 
       def parse_results(type, items)
