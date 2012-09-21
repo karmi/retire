@@ -675,7 +675,7 @@ OK. All this time we have been talking about `ActiveRecord` models, since
 it is a reasonable _Rails_' default for the storage layer.
 
 But what if you use another database such as [MongoDB](http://www.mongodb.org/),
-another object mapping library, such as [Mongoid](http://mongoid.org/)?
+another object mapping library, such as [Mongoid](http://mongoid.org/) or [MongoMapper](http://mongomapper.com/)?
 
 Well, things stay mostly the same:
 
@@ -691,7 +691,7 @@ Well, things stay mostly the same:
       # These Mongo guys sure do get funky with their IDs in +serializable_hash+, let's fix it.
       #
       def to_indexed_json
-        self.as_json
+        self.to_json
       end
 
     end
