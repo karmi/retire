@@ -48,6 +48,15 @@ module Tire
       alias :num_pages    :total_pages
       alias :offset_value :offset
 
+      def first_page?
+        current_page == 1
+      end
+
+      def last_page?
+        current_page == total_pages
+      end
+
+
     end
 
   end

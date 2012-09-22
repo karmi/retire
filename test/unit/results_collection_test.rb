@@ -65,7 +65,7 @@ module Tire
 
       should "be kaminari compatible" do
         collection = Results::Collection.new(@default_response)
-        %w(limit_value total_count num_pages offset_value).each do |method|
+        %w(limit_value total_count num_pages offset_value first_page? last_page?).each do |method|
           assert_respond_to collection, method
         end
       end
