@@ -19,6 +19,14 @@ module Tire
       @logger || nil
     end
 
+    def self.pretty(value=nil, options={})
+      if value === false
+        return @pretty = false
+      else
+        @pretty.nil? ? true : @pretty
+      end
+    end
+
     def self.reset(*properties)
       reset_variables = properties.empty? ? instance_variables : instance_variables.map { |p| p.to_s} & \
                                                                  properties.map         { |p| "@#{p}" }

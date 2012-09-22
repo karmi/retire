@@ -52,6 +52,16 @@ module Tire
         assert_instance_of Tire::Logger, Configuration.logger
       end
 
+      should "set pretty option to true by default" do
+        assert_not_nil Configuration.pretty
+        assert Configuration.pretty, "Should be true, but is: #{Configuration.pretty.inspect}"
+      end
+
+      should "set the pretty option to false" do
+        Configuration.pretty(false)
+        assert ! Configuration.pretty, "Should be falsy, but is: #{Configuration.pretty.inspect}"
+      end
+
       should "allow to reset the configuration for specific property" do
         Configuration.url 'http://example.com'
         assert_equal      'http://example.com', Configuration.url
