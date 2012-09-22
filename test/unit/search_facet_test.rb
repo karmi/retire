@@ -13,13 +13,13 @@ module Tire::Search
       context "generally" do
 
         should "encode facets with defaults for current query" do
-          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false} } }.to_json,
-                        Facet.new('foo').terms(:bar).to_json )
+          assert_equal( MultiJson.load({ :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false} } }.to_json),
+                        MultiJson.load(Facet.new('foo').terms(:bar).to_json) )
         end
 
         should "encode facets as global" do
-          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false}, :global => true } }.to_json,
-                        Facet.new('foo', :global => true).terms(:bar).to_json )
+          assert_equal( MultiJson.load({ :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false}, :global => true } }.to_json),
+                        MultiJson.load(Facet.new('foo', :global => true).terms(:bar).to_json) )
         end
 
         should "pass options to facets" do
@@ -31,15 +31,16 @@ module Tire::Search
         end
 
         should "encode facet options" do
-          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>5,:all_terms=>false} } }.to_json,
-                        Facet.new('foo').terms(:bar, :size => 5).to_json )
+          assert_equal( MultiJson.load( { :foo => { :terms => {:field=>'bar',:size=>5,:all_terms=>false} } }.to_json ),
+                        MultiJson.load( Facet.new('foo').terms(:bar, :size => 5).to_json ) )
         end
 
         should "encode facets when passed as a block" do
           f = Facet.new('foo') do
             terms :bar
           end
-          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false} } }.to_json, f.to_json )
+          assert_equal( MultiJson.load({ :foo => { :terms => {:field=>'bar',:size=>10,:all_terms=>false} } }.to_json),
+                        MultiJson.load(f.to_json) )
         end
 
         should "encode facets when passed as a block, using variables from outer scope" do
@@ -48,7 +49,8 @@ module Tire::Search
           f = Facet.new('foo') do |facet|
             facet.terms foo, :size => 20
           end
-          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>20,:all_terms=>false} } }.to_json, f.to_json )
+          assert_equal( MultiJson.load({ :foo => { :terms => {:field=>'bar',:size=>20,:all_terms=>false} } }.to_json),
+                        MultiJson.load(f.to_json) )
         end
 
       end
@@ -64,8 +66,8 @@ module Tire::Search
         end
 
         should "encode custom options" do
-          assert_equal( { :foo => { :terms => {:field=>'bar',:size=>5,:all_terms=>false,:exclude=>['moo']} } }.to_json,
-                        Facet.new('foo').terms(:bar, :size => 5, :exclude => ['moo']).to_json )
+          assert_equal( MultiJson.load({ :foo => { :terms => {:field=>'bar',:size=>5,:all_terms=>false,:exclude=>['moo']} } }.to_json),
+                        MultiJson.load(Facet.new('foo').terms(:bar, :size => 5, :exclude => ['moo']).to_json) )
         end
 
       end
