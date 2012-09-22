@@ -41,6 +41,10 @@ module Tire
         current_page > total_pages
       end
 
+      def last_page?
+        current_page == total_pages
+      end
+
       # Kaminari support
       #
       alias :limit_value  :per_page
