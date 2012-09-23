@@ -155,15 +155,6 @@ module Tire
 
       end
 
-      context "Search" do
-        should "not add the sort to the URL path" do
-          Configuration.client.expects(:get).with do |url, payload|
-            assert_equal false, url.include?('sort')
-          end
-          PersistentArticle.search('index', {:sort => "created_at desc"}).perform
-        end
-      end
-
       context "Persistent model" do
 
         setup { @article = PersistentArticle.new :title => 'Test', :tags => [:one, :two] }

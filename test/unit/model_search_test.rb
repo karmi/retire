@@ -121,6 +121,16 @@ module Tire
           assert_equal 'Article', document.title
         end
 
+        should "not pass the search option as URL parameter" do
+          Configuration.client.
+            expects(:get).with do |url, payload|
+              assert ! url.include?('sort')
+            end.
+            returns( mock_response({ 'hits' => { 'hits' => [] } }.to_json) )
+
+          ActiveModelArticle.search(@q, :sort => 'title DESC').results
+        end
+
         context "searching with a block" do
           setup do
             Tire::Search::Search.any_instance.expects(:perform).returns(@stub)
