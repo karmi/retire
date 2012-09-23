@@ -24,16 +24,16 @@ module Tire
           setup do
             Model::Search.index_prefix 'prefix'
           end
-          
+
           teardown do
             Model::Search.index_prefix nil
           end
-          
+
           should "have configured prefix in index_name" do
             assert_equal 'prefix_persistent_articles', PersistentArticle.index_name
             assert_equal 'prefix_persistent_articles', PersistentArticle.new(:title => 'Test').index_name
           end
-          
+
         end
 
         should "have document_type" do
