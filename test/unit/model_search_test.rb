@@ -917,6 +917,28 @@ module Tire
 
       end
 
+      context 'trying to index with invalid :as option' do
+
+        should 'raise a Tire::InvalidAsOptionException if :as is of an invalid type' do
+
+          assert_raise ::Tire::InvalidAsOptionException do
+
+            class SomeFakeModel
+              include Tire::Model::Search
+              include Tire::Model::Callbacks
+
+              mapping do
+                indexes :name, :as => Time.now
+              end
+
+            end
+
+          end
+
+        end
+
+      end
+
     end
 
   end

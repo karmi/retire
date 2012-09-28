@@ -78,6 +78,9 @@ module Tire
         # * Use the `:as` option to dynamically define the serialized property value, eg:
         #
         #       :as => 'content.split(/\W/).length'
+        #       :as => :author_name                        # calls the author_name method
+        #       :as => proc { category.name }              # evaluates the proc at the current instance
+        #       :as => lambda { |item| item.product.name } # evaluates the lambda passing the current instance as a parameter
         #
         # Please refer to the
         # [_mapping_ documentation](http://www.elasticsearch.org/guide/reference/mapping/index.html)
@@ -85,6 +88,15 @@ module Tire
         #
         def indexes(name, options = {}, &block)
           mapping[name] = options
+
+          unless options[:as].nil?
+            case options[:as]
+              when String, Symbol, Proc
+                true # ok, don't do anything
+              else
+                raise Tire::InvalidAsOptionException.new( options[:as] )
+            end
+          end
 
           if block_given?
             mapping[name][:type]       ||= 'object'
