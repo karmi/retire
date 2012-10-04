@@ -409,7 +409,7 @@ advanced facet aggregation, highlighting, etc:
     Article.search do
       query             { string 'love' }
       facet('timeline') { date   :published_on, :interval => 'month' }
-      sort              { by     :published_on, 'desc' }
+      sort              { by [{:published_on => 'desc'}, {:_score => 'asc'}] } # multi-sort criteria is permissable
     end
 ```
 
