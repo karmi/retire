@@ -74,6 +74,13 @@ module Tire
         @value[:dis_max] = @dis_max.to_hash
         @value
       end
+      
+      def nested(&block)
+        @nested = NestedQuery.new
+        block.arity < 1 ? @nested.instance_eval(&block) : block.call(@nested) if block_given?
+        @value[:nested] = @nested.to_hash
+        @value
+      end
 
       def all
         @value = { :match_all => {} }
@@ -175,6 +182,36 @@ module Tire
 
       def to_hash
         @value.update(@options)
+      end
+
+      def to_json
+        to_hash.to_json
+      end
+    end
+    
+    class NestedQuery
+      def initialize(&block)
+        @value = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+      
+      def path(value)
+        @value[:path] = value
+        @value
+      end
+      
+      def score_mode(value)
+        @value[:score_mode] = value
+        @value
+      end
+
+      def query(&block)
+        @value[:query] = Query.new(&block).to_hash
+        @value
+      end
+
+      def to_hash
+        @value
       end
 
       def to_json
