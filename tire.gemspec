@@ -38,13 +38,13 @@ Gem::Specification.new do |s|
   s.add_development_dependency "yajl-ruby",   "~> 1.0"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "mocha"
+  s.add_development_dependency "minitest",     "~> 2.12"
   s.add_development_dependency "activerecord", ">= 3.0"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "mongoid",      "~> 2.2"
   s.add_development_dependency "bson_ext"
   s.add_development_dependency "redis-persistence"
   s.add_development_dependency "curb"
-  s.add_development_dependency "minitest"
   s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
 
   s.description = <<-DESC
