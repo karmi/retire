@@ -414,6 +414,19 @@ module Tire
         end
       end
 
+      context "with partial fields" do
+
+        should "add partial_fields config" do
+          s = Search::Search.new('index') do
+            partial_field 'name', :include => 'name_*'
+          end
+
+          hash = MultiJson.decode( s.to_json )
+          assert_equal({'name' => { 'include' => 'name_*'} }, hash['partial_fields'])
+        end
+
+      end
+
       context "explain" do
 
         should "default to false" do
