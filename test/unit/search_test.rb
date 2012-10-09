@@ -394,6 +394,26 @@ module Tire
 
       end
 
+      context "when using partial fields" do
+
+        should "not set partial fields if not called" do
+          s = Search::Search.new('index') do
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal nil, hash['partial_fields']
+        end
+
+        should "add partial field when called" do
+          s = Search::Search.new('index') do
+            partial_field 'name', include: 'name_*'
+          end
+          hash = MultiJson.decode( s.to_json )
+          assert_equal({'name' => { 'include' => 'name_*'} }, hash['partial_fields'])
+        end
+
+
+      end
+
       context "explain" do
 
         should "default to false" do

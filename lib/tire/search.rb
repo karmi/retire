@@ -105,6 +105,11 @@ module Tire
         @fields = Array(fields.flatten)
         self
       end
+  
+      def partial_field(name, options)
+        @partial_fields ||= {}
+        @partial_fields[name] = options
+      end
 
       def explain(value)
         @explain = value
@@ -146,6 +151,7 @@ module Tire
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
+          request.update( { :partial_fields => @partial_fields } ) if @partial_fields
           request.update( { :script_fields => @script_fields } ) if @script_fields
           request.update( { :version => @version } )         if @version
           request.update( { :explain => @explain } )         if @explain
