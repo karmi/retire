@@ -152,6 +152,11 @@ module Tire
         @value
       end
 
+      def query(options={}, &block)
+        @value[:query] = Query.new(&block).to_hash
+        @value
+      end
+
       def filter(type, *options)
         @value[:filter] ||= {}
         @value[:filter][:and] ||= []
