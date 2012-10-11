@@ -75,8 +75,8 @@ module Tire
         @value
       end
       
-      def nested(&block)
-        @nested = NestedQuery.new
+      def nested(options={}, &block)
+        @nested = NestedQuery.new(options)
         block.arity < 1 ? @nested.instance_eval(&block) : block.call(@nested) if block_given?
         @value[:nested] = @nested.to_hash
         @value
@@ -190,28 +190,19 @@ module Tire
     end
     
     class NestedQuery
-      def initialize(&block)
+      def initialize(options={}, &block)
+        @options = options
         @value = {}
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
       
-      def path(value)
-        @value[:path] = value
-        @value
-      end
-      
-      def score_mode(value)
-        @value[:score_mode] = value
-        @value
-      end
-
       def query(&block)
         @value[:query] = Query.new(&block).to_hash
         @value
       end
 
       def to_hash
-        @value
+        @value.update(@options)
       end
 
       def to_json
