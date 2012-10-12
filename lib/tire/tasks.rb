@@ -52,7 +52,7 @@ namespace :tire do
     end
 
     unless index.exists?
-      mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Configuration.pretty)
+      mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
       puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
       index.create :mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings
     end
