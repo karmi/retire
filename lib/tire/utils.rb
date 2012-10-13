@@ -12,6 +12,26 @@ module Tire
       URI.decode_www_form_component(s)
     end
 
+    def elapsed_to_human(elapsed)
+      hour = 60*60
+      day  = hour*24
+
+      seconds = sprintf("%1.5f", (elapsed % 60))
+      minutes = ((elapsed/60) % 60).to_i
+      hours   = (elapsed/hour).to_i
+
+      case elapsed
+      when 0..59
+        "#{seconds} seconds"
+      when 60..hour-1
+        "#{minutes} minutes and #{seconds} seconds"
+      when hour..day
+        "#{hours} hours and #{minutes} minutes"
+      else
+        "#{hours} hours"
+      end
+    end
+
     extend self
   end
 end

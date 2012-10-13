@@ -118,6 +118,13 @@ module Tire
           assert_equal 'foo!',    Utils.unescape('foo%21')
         end
 
+        should "format time to print" do
+          assert_equal '30.51235 seconds'              , Utils.elapsed_to_human(30.5123478)
+          assert_equal '1 minutes and 10.51235 seconds', Utils.elapsed_to_human(70.5123478)
+          assert_equal '1 hours and 10 minutes'        , Utils.elapsed_to_human(4200.5123478)
+          assert_equal '25 hours'                      , Utils.elapsed_to_human(90600.5123478)
+        end
+
       end
     end
 
