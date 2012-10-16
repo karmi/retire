@@ -17,23 +17,6 @@ namespace :tire do
   DESC
   desc full_comment_import
   task :import do |t|
-
-    def elapsed_to_human(elapsed)
-      hour = 60*60
-      day  = hour*24
-
-      case elapsed
-      when 0..59
-        "#{sprintf("%1.5f", elapsed)} seconds"
-      when 60..hour-1
-        "#{elapsed/60} minutes and #{elapsed % 60} seconds"
-      when hour..day
-        "#{elapsed/hour} hours and #{elapsed % hour} minutes"
-      else
-        "#{elapsed/hour} hours"
-      end
-    end
-
     if ENV['CLASS'].to_s == ''
       puts '='*90, 'USAGE', '='*90, full_comment_import, ""
       exit(1)
@@ -95,7 +78,7 @@ namespace :tire do
       end
     end
 
-    puts "", '='*80, "Import finished in #{elapsed_to_human(elapsed)}"
+    puts "", '='*80, "Import finished in #{Tire::Utils.elapsed_to_human(elapsed)}"
   end
 
   namespace :index do
