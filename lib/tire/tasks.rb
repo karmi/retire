@@ -24,13 +24,13 @@ namespace :tire do
 
       case elapsed
       when 0..59
-        "#{sprintf("%1.5f", elapsed)} seconds"
+        "#{sprintf("%1.2f", elapsed)} seconds"
       when 60..hour-1
-        "#{elapsed/60} minutes and #{elapsed % 60} seconds"
+        "#{(elapsed/60).floor} minutes and #{(elapsed % 60).floor} seconds"
       when hour..day
-        "#{elapsed/hour} hours and #{elapsed % hour} minutes"
+        "#{(elapsed/hour).floor} hours and #{(elapsed/60 % hour).floor} minutes"
       else
-        "#{elapsed/hour} hours"
+        "#{(elapsed/hour).round} hours"
       end
     end
 
