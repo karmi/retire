@@ -11,12 +11,10 @@ module Tire
 
           def find *args
             # TODO: Options like `sort`
-            old_wrapper = Tire::Configuration.wrapper
-            Tire::Configuration.wrapper self
             options = args.pop if args.last.is_a?(Hash)
             args.flatten!
             if args.size > 1
-              Tire::Search::Search.new(index.name) do |search|
+              Tire::Search::Search.new(index.name, wrapper: self) do |search|
                 search.query do |query|
                   query.ids(args, document_type)
                 end
@@ -25,35 +23,25 @@ module Tire
             else
               case args = args.pop
                 when Fixnum, String
-                  index.retrieve document_type, args
+                  index.retrieve document_type, args, wrapper: self
                 when :all, :first
                   send(args)
                 else
                   raise ArgumentError, "Please pass either ID as Fixnum or String, or :all, :first as an argument"
               end
             end
-          ensure
-            Tire::Configuration.wrapper old_wrapper
           end
 
           def all
             # TODO: Options like `sort`; Possibly `filters`
-            old_wrapper = Tire::Configuration.wrapper
-            Tire::Configuration.wrapper self
-            s = Tire::Search::Search.new(index.name).query { all }
+            s = Tire::Search::Search.new(index.name, wrapper: self).query { all }
             s.version(true).results
-          ensure
-            Tire::Configuration.wrapper old_wrapper
           end
 
           def first
             # TODO: Options like `sort`; Possibly `filters`
-            old_wrapper = Tire::Configuration.wrapper
-            Tire::Configuration.wrapper self
-            s = Tire::Search::Search.new(index.name).query { all }.size(1)
+            s = Tire::Search::Search.new(index.name, wrapper: self).query { all }.size(1)
             s.version(true).results.first
-          ensure
-            Tire::Configuration.wrapper old_wrapper
           end
 
         end
