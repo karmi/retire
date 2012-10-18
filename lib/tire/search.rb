@@ -134,7 +134,7 @@ module Tire
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @options[:payload] || begin
           request = {}
           request.update( { :indices_boost => @indices_boost } ) if @indices_boost
           request.update( { :query  => @query.to_hash } )    if @query
