@@ -201,6 +201,11 @@ module Tire
             assert_equal false, article.hidden
           end
 
+          should "evaluate lambdas as default values" do
+            article = PersistentArticleWithDefaults.new
+            assert_equal Time.now.year, article.created_at.year
+          end
+
           should "not affect default value" do
             article = PersistentArticleWithDefaults.new :title => 'Test'
             article.tags << "ruby"
