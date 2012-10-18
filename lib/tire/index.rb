@@ -184,7 +184,7 @@ module Tire
       logged(id, curl)
     end
 
-    def retrieve(type, id)
+    def retrieve(type, id, options={})
       raise ArgumentError, "Please pass a document ID" unless id
 
       type      = Utils.escape(type)
@@ -192,12 +192,13 @@ module Tire
       @response = Configuration.client.get url
 
       h = MultiJson.decode(@response.body)
-      if Configuration.wrapper == Hash then h
+      wrapper = options[:wrapper] || Configuration.wrapper
+      if wrapper == Hash then h
       else
         return nil if h['exists'] == false
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
-        Configuration.wrapper.new(document)
+        wrapper.new(document)
       end
 
     ensure
