@@ -10,7 +10,8 @@ module Tire
         Configuration.reset
         @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
                                                      {'_id' => 2},
-                                                     {'_id' => 3}] } }
+                                                     {'_id' => 3}],
+                                          'max_score' => 1.0 } }
       end
 
       should "be iterable" do
@@ -62,6 +63,11 @@ module Tire
         %w(limit_value total_count num_pages offset_value).each do |method|
           assert_respond_to collection, method
         end
+      end
+
+      should "have max_score" do
+        collection = Results::Collection.new(@default_response)
+        assert_equal 1.0, collection.max_score
       end
 
       context "wrapping results" do
