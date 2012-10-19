@@ -142,7 +142,7 @@ module Tire::Search
       context "filter facet" do
         should "encode facet options" do
           f = Facet.new('filter_facet') do
-            filter :tags, 'ruby'
+            filter :term, :tags => 'ruby'
           end
           assert_equal({ :filter_facet => { :filter => { :term => { :tags => 'ruby' } } } }.to_json, f.to_json)
         end
