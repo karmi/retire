@@ -29,6 +29,10 @@ module Tire::Search
       should "allow search for single term passing an options hash" do
         assert_equal( { :term => { :foo => { :term => 'bar', :boost => 2.0 } } }, Query.new.term(:foo, 'bar', :boost => 2.0) )
       end
+
+      should "allow complex term queries" do
+        assert_equal( { :term => { :foo => { :field => 'bar', :boost => 2.0 } } }, Query.new.term(:foo, {field: 'bar', :boost => 2.0}) )
+      end
     end
 
     context "Terms query" do
