@@ -60,7 +60,7 @@ module Tire
         self
       end
 
-      def to_json
+      def to_json(options={})
         to_hash.to_json
       end
 

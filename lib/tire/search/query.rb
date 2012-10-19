@@ -88,7 +88,7 @@ module Tire
         @value
       end
 
-      def to_json
+      def to_json(options={})
         to_hash.to_json
       end
 
@@ -156,7 +156,7 @@ module Tire
         @value
       end
 
-      def to_json
+      def to_json(options={})
         to_hash.to_json
       end
     end
@@ -177,7 +177,7 @@ module Tire
         @value.update(@options)
       end
 
-      def to_json
+      def to_json(options={})
         to_hash.to_json
       end
     end

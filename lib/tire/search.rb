@@ -153,7 +153,7 @@ module Tire
         end
       end
 
-      def to_json
+      def to_json(options={})
         payload = to_hash
         # TODO: Remove when deprecated interface is removed
         if payload.is_a?(String)
