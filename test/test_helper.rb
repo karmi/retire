@@ -86,7 +86,8 @@ module Test::Integration
       mongoid_class_with_tire_methods
       supermodel_articles
       dynamic_index
-      model_with_nested_documents ].each do |index|
+      model_with_nested_documents
+      model_with_incorrect_mappings ].each do |index|
         ::RestClient.delete "#{URL}/#{index}" rescue nil
     end
   end
