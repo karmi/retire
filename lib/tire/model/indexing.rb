@@ -54,6 +54,7 @@ module Tire
         #     end
         #
         def mapping(*args)
+          @root_class = Kernel.const_get(document_type.camelize) rescue nil
           @mapping ||= {}
           if block_given?
             @mapping_options = args.pop

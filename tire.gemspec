@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency "activemodel", ">= 3.0"
   s.add_dependency "hashr",       "~> 0.0.19"
 
+
   # = Development dependencies
   #
   s.add_development_dependency "bundler",     "~> 1.0"
@@ -44,6 +45,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bson_ext"
   s.add_development_dependency "redis-persistence"
   s.add_development_dependency "curb"
+  s.add_development_dependency "delayed_job", "~> 3.0"
+  s.add_development_dependency "delayed_job_active_record"
   s.add_development_dependency "minitest"
   s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
 
