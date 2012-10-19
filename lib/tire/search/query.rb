@@ -9,7 +9,7 @@ module Tire
 
       def term(field, value, options={})
         query = if value.is_a?(Hash)
-          { field => value }
+          { field => value.to_hash }
         else
           { field => { :term => value }.update(options) }
         end

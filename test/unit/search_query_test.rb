@@ -33,6 +33,13 @@ module Tire::Search
       should "allow complex term queries" do
         assert_equal( { :term => { :foo => { :field => 'bar', :boost => 2.0 } } }, Query.new.term(:foo, {:field => 'bar', :boost => 2.0}) )
       end
+
+      should "allow complex term queries with Hash-like objects" do
+        assert_equal(
+          { :term => { :foo => { :field => 'bar', :boost => 2.0 } } },
+          Query.new.term(:foo, Hashr.new( :field => 'bar', :boost => 2.0 ))
+        )
+      end
     end
 
     context "Terms query" do
