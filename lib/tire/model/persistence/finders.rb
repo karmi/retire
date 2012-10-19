@@ -14,7 +14,7 @@ module Tire
             options = args.pop if args.last.is_a?(Hash)
             args.flatten!
             if args.size > 1
-              Tire::Search::Search.new(index.name, wrapper: self) do |search|
+              Tire::Search::Search.new(index.name, :wrapper => self) do |search|
                 search.query do |query|
                   query.ids(args, document_type)
                 end
@@ -23,7 +23,7 @@ module Tire
             else
               case args = args.pop
                 when Fixnum, String
-                  index.retrieve document_type, args, wrapper: self
+                  index.retrieve document_type, args, :wrapper => self
                 when :all, :first
                   send(args)
                 else
@@ -34,13 +34,13 @@ module Tire
 
           def all
             # TODO: Options like `sort`; Possibly `filters`
-            s = Tire::Search::Search.new(index.name, wrapper: self).query { all }
+            s = Tire::Search::Search.new(index.name, :wrapper => self).query { all }
             s.version(true).results
           end
 
           def first
             # TODO: Options like `sort`; Possibly `filters`
-            s = Tire::Search::Search.new(index.name, wrapper: self).query { all }.size(1)
+            s = Tire::Search::Search.new(index.name, :wrapper => self).query { all }.size(1)
             s.version(true).results.first
           end
 
