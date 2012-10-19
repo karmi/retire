@@ -105,7 +105,7 @@ puts
 say_status  "Rubygems", "Adding Rubygems into Gemfile...\n", :yellow
 puts        '-'*80, ''; sleep 1
 
-gem 'tire'
+gem 'tire', :git => 'git://github.com/karmi/tire.git'
 gem 'will_paginate', '~> 3.0'
 
 git :add => '.'
