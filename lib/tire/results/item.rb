@@ -20,11 +20,10 @@ module Tire
         end
       end
 
-      # Delegate method to a key in underlying hash, if present,
-      # otherwise return +nil+.
+      # Delegate method to a key in underlying hash, if present, otherwise return +nil+.
       #
       def method_missing(method_name, *arguments)
-        @attributes.has_key?(method_name.to_sym) ? @attributes[method_name.to_sym] : nil
+        @attributes[method_name.to_sym]
       end
 
       def respond_to?(method_name)
