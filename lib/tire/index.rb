@@ -194,7 +194,14 @@ module Tire
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{id}"
-      @response = Configuration.client.get url
+
+      params    = {}
+      params[:routing]    = options[:routing] if options[:routing]
+      params[:fields]     = options[:fields]  if options[:fields]
+      params[:preference] = options[:preference] if options[:preference]
+      params_encoded      = params.empty? ? '' : "?#{params.to_param}"
+
+      @response = Configuration.client.get "#{url}#{params_encoded}"
 
       h = MultiJson.decode(@response.body)
       wrapper = options[:wrapper] || Configuration.wrapper
