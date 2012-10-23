@@ -167,6 +167,7 @@ puts        '-'*80, ''; sleep 1
 run "rm -f app/models/article.rb"
 file 'app/models/article.rb', <<-CODE
 class Article < ActiveRecord::Base
+  attr_accessible :title, :content, :published_on
   include Tire::Model::Search
   include Tire::Model::Callbacks
 end
