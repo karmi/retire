@@ -59,6 +59,21 @@ module Tire
         assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
       end
 
+      should "allow to define the facet filter with DSL" do
+          s = Tire.search('articles-test', :search_type => 'count') do
+            facet 'tags' do
+              terms :tags
+              facet_filter :range, { :published_on => { :from => '2011-01-01', :to => '2011-01-01' } }
+            end
+          end
+
+          assert_equal 1,      s.results.facets.size
+          assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
+          assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
+        end
+
+      end
+
       context "terms" do
         setup do
           @s = Tire.search('articles-test') do
@@ -238,6 +253,7 @@ module Tire
       end
 
       context "filter" do
+
         should "return a filter facet" do
           s = Tire.search('articles-test', :search_type => 'count') do
             facet 'filtered' do
@@ -248,7 +264,6 @@ module Tire
           facets = s.results.facets["filtered"]
           assert_equal 2, facets["count"], facets.inspect
         end
-      end
 
     end
 
