@@ -124,6 +124,32 @@ module Tire
 
       end
 
+      context "with many types in index" do
+
+        setup do
+          1.upto(3) { |number| PersistentArticleInIndex.create :title => "TestInIndex#{number}", :tags => ['in_index'] }
+          1.upto(3) { |number| PersistentArticle.create :title => "Test#{number}", :tags => [] }
+          PersistentArticle.index.refresh
+        end
+
+        should "returns all well typed documents" do
+          results = PersistentArticle.all
+
+          assert_equal 3, results.size
+          assert_equal [], results.first.tags
+
+          results = PersistentArticleInIndex.all
+
+          assert_equal 3, results.size
+          assert_equal ['in_index'], results.first.tags
+        end
+
+        should "returns first well typed documents" do
+          assert_equal [], PersistentArticle.first.tags
+          assert_equal ['in_index'], PersistentArticleInIndex.first.tags
+        end
+      end
+
     end
 
   end
