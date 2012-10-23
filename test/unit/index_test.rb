@@ -126,21 +126,26 @@ module Tire
           assert_equal 1, response['tokens'].size
         end
 
-        should "properly encode parameters" do
+        should "properly encode parameters for analyzer" do
           Configuration.client.expects(:get).with do |url, payload|
-                                url == "#{@index.url}/_analyze?analyzer=whitespace&pretty=true"
+                                assert_equal "#{@index.url}/_analyze?analyzer=whitespace&pretty=true", url
                                end.returns(mock_response(@mock_analyze_response))
 
           @index.analyze("foo bar", :analyzer => 'whitespace')
 
+        end
+
+        should "properly encode parameters for field" do
           Configuration.client.expects(:get).with do |url, payload|
-                                url == "#{@index.url}/_analyze?field=title&pretty=true"
+                                assert_equal "#{@index.url}/_analyze?field=title&pretty=true", url
                                end.returns(mock_response(@mock_analyze_response))
 
           @index.analyze("foo bar", :field => 'title')
+        end
 
+        should "properly encode format parameter" do
           Configuration.client.expects(:get).with do |url, payload|
-                                url == "#{@index.url}/_analyze?analyzer=keyword&format=text&pretty=true"
+                                assert_equal "#{@index.url}/_analyze?analyzer=keyword&format=text&pretty=true", url
                                end.returns(mock_response(@mock_analyze_response))
 
           @index.analyze("foo bar", :analyzer => 'keyword', :format => 'text')
@@ -210,21 +215,21 @@ module Tire
 
         should "set type from Hash :type property" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            assert_equal "#{@index.url}/article/", url
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :type => 'article', :title => 'Test'
         end
 
         should "set type from Hash :_type property" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            assert_equal "#{@index.url}/article/", url
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :_type => 'article', :title => 'Test'
         end
 
         should "set type from Object _type method" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            assert_equal "#{@index.url}/article/", url
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
 
           article = Class.new do
@@ -236,7 +241,7 @@ module Tire
 
         should "set type from Object type method" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            assert_equal "#{@index.url}/article/", url
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
 
           article = Class.new do
@@ -248,7 +253,7 @@ module Tire
 
         should "properly encode namespaced document types" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/my_namespace%2Fmy_model/"
+            assert_equal "#{@index.url}/my_namespace%2Fmy_model/", url
           end.returns(mock_response('{"ok":true,"_id":"123"}'))
 
           module MyNamespace
@@ -694,8 +699,9 @@ module Tire
           query = { :query => { :query_string => { :query => 'foo' } } }
           Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{Configuration.url}/_percolator/dummy/my-query" &&
-                                               payload['query']['query_string']['query'] == 'foo'
+                                               assert_equal "#{Configuration.url}/_percolator/dummy/my-query",
+                                                            url
+                                               assert_equal 'foo', payload['query']['query_string']['query']
                                end.
                                returns(mock_response('{
                                                         "ok" : true,
@@ -711,8 +717,9 @@ module Tire
         should "register percolator query as a block" do
           Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{Configuration.url}/_percolator/dummy/my-query" &&
-                                               payload['query']['query_string']['query'] == 'foo'
+                                               assert_equal "#{Configuration.url}/_percolator/dummy/my-query",
+                                                            url
+                                               assert_equal 'foo', payload['query']['query_string']['query']
                                end.
                                returns(mock_response('{
                                                         "ok" : true,
@@ -733,9 +740,10 @@ module Tire
 
           Configuration.client.expects(:put).with do |url, payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{Configuration.url}/_percolator/dummy/my-query" &&
-                                               payload['query']['query_string']['query'] == 'foo' &&
-                                               payload['tags'] == ['alert']
+                                               assert_equal "#{Configuration.url}/_percolator/dummy/my-query",
+                                                            url
+                                               assert_equal 'foo',     payload['query']['query_string']['query']
+                                               assert_equal ['alert'], payload['tags']
                                            end.
                                returns(mock_response('{
                                                         "ok" : true,
@@ -757,8 +765,8 @@ module Tire
         should "percolate document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{@index.url}/document/_percolate" &&
-                                               payload['doc']['title'] == 'Test'
+                                               assert_equal "#{@index.url}/document/_percolate", url
+                                               assert_equal 'Test', payload['doc']['title']
                                               end.
                                returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
@@ -769,8 +777,8 @@ module Tire
         should "percolate a typed document against all registered queries" do
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
-                                               url == "#{@index.url}/article/_percolate" &&
-                                               payload['doc']['title'] == 'Test'
+                                               assert_equal "#{@index.url}/article/_percolate", url
+                                               assert_equal 'Test', payload['doc']['title']
                                               end.
                                returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
@@ -782,9 +790,9 @@ module Tire
           Configuration.client.expects(:get).with do |url,payload|
                                                payload = MultiJson.decode(payload)
                                                # p [url, payload]
-                                               url == "#{@index.url}/document/_percolate" &&
-                                               payload['doc']['title']                   == 'Test' &&
-                                               payload['query']['query_string']['query'] == 'tag:alerts'
+                                               assert_equal "#{@index.url}/document/_percolate", url
+                                               assert_equal 'Test', payload['doc']['title']
+                                               assert_equal 'tag:alerts', payload['query']['query_string']['query']
                                               end.
                                returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
 
