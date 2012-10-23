@@ -79,9 +79,10 @@ module Tire
       end
       alias :length :size
 
-      def [](index)
-        results[index]
+      def slice(*args)
+        results.slice(*args)
       end
+      alias :[] :slice
 
       def to_ary
         self
