@@ -64,22 +64,24 @@ module Tire
 
     def store(*args)
       document, options = args
-      type = get_type_from_document(document)
-
-      if options
-        percolate = options[:percolate]
-        percolate = "*" if percolate === true
-      end
 
       id       = get_id_from_document(document)
+      type     = get_type_from_document(document)
       document = convert_document_to_json(document)
 
+      options ||= {}
+      params    = {}
+
+      if options[:percolate]
+        params[:percolate] = options[:percolate]
+        params[:percolate] = "*" if params[:percolate] === true
+      end
+
       url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
-      url += "?percolate=#{percolate}" if percolate
+      url += "?percolate=#{params[:percolate]}" if params[:percolate]
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
-
     ensure
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
       logged([type, id].join('/'), curl)
