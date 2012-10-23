@@ -394,6 +394,17 @@ module Tire
 
       end
 
+      context "with min_score" do
+        should "allow to specify minimum score for returned documents" do
+          s = Search::Search.new('index') do
+            query { string 'foo' }
+            min_score 0.5
+          end
+
+          assert_equal( '0.5', s.to_hash[:min_score].to_json )
+        end
+      end
+
       context "explain" do
 
         should "default to false" do
