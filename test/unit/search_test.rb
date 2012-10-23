@@ -490,6 +490,31 @@ module Tire
 
       end
 
+      context "boosting queries" do
+
+        should "wrap other queries" do
+         s = Search::Search.new('index') do
+            query do
+              boosting do
+                positive { string 'foo' }
+                positive { term('bar', 'baz') }
+                negative { term('bar', 'moo') }
+              end
+            end
+          end
+
+          hash  = MultiJson.decode(s.to_json)
+          query = hash['query']['boosting']
+
+          assert_equal 2, query['positive'].size
+          assert_equal 1, query['negative'].size
+
+          assert_equal( { 'query_string' => { 'query' => 'foo' } }, query['positive'].first)
+          assert_equal( { 'term' => { 'bar' => {'term' => 'moo' } } }, query['negative'].first)
+        end
+
+      end
+
     end
 
     context "script field" do
