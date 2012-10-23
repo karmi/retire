@@ -154,7 +154,7 @@ module Tire
         # declared in the mapping are serialized.
         #
         # For properties declared with the `:as` option, the passed String or Proc
-        # is evaluated in the instance context.
+        # is evaluated in the instance context. Other objects are indexed "as is".
         #
         def to_indexed_json
           if instance.class.tire.mapping.empty?
@@ -172,7 +172,9 @@ module Tire
                   hash[key] = instance.instance_eval(options[:as])
                 when Proc
                   hash[key] = instance.instance_eval(&options[:as])
-              end
+                else
+                  hash[key] = options[:as]
+              end if options[:as]
             end
 
             hash.to_json

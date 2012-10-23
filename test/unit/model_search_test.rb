@@ -620,7 +620,7 @@ module Tire
 
           end
 
-          should "serialize mapped properties when mapping procs are set" do
+          should "evaluate :as mapping options passed as strings or procs" do
             class ::ModelWithMappingProcs
               extend  ActiveModel::Naming
               extend  ActiveModel::Callbacks
@@ -654,6 +654,28 @@ module Tire
             assert_equal 1, document['one']
             assert_equal 2, document['two']
             assert_equal 3, document['three']
+          end
+
+          should "index :as mapping options passed as arbitrary objects" do
+            class ::ModelWithMappingOptionAsObject
+              extend  ActiveModel::Naming
+              extend  ActiveModel::Callbacks
+              include ActiveModel::Serialization
+              include Tire::Model::Search
+
+              mapping do
+                indexes :one,   :as => [1, 2, 3]
+              end
+
+              attr_reader :attributes
+
+              def initialize(attributes = {}); @attributes = attributes; end
+            end
+
+            model    = ::ModelWithMappingOptionAsObject.new
+            document = MultiJson.decode(model.to_indexed_json)
+
+            assert_equal [1, 2, 3], document['one']
           end
 
         end
