@@ -60,6 +60,11 @@ module Tire
         self
       end
 
+      def facet_filter(type, *options)
+        @value[:facet_filter] = Filter.new(type, *options).to_hash
+        self
+      end
+
       def to_json(options={})
         to_hash.to_json
       end
