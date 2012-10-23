@@ -656,6 +656,18 @@ module Tire
             assert_equal 3, document['three']
           end
 
+          should "raise an exception when invalid :as option is set" do
+            assert_raise ArgumentError do
+              class ::ModelWithInvalidAsOption
+                include Tire::Model::Search
+
+                mapping do
+                  indexes :three, :type => 'string', :analyzer => 'keyword', :as => Time.now
+                end
+              end
+            end
+          end
+
         end
 
         context "with percolation" do

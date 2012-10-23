@@ -5,6 +5,8 @@ module Tire
     #
     module Indexing
 
+      VALID_AS_OPTIONS = [Symbol, String, Proc]
+
       module ClassMethods
 
         # Define [_settings_](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
@@ -85,6 +87,11 @@ module Tire
         #
         def indexes(name, options = {}, &block)
           mapping[name] = options
+          if as_option = options[:as]
+            raise ArgumentError,
+                  "Invalid `:as` option: #{as_option.inspect}. Please use on of: #{VALID_AS_OPTIONS}" \
+              unless VALID_AS_OPTIONS.include?(as_option.class)
+          end
 
           if block_given?
             mapping[name][:type]       ||= 'object'
