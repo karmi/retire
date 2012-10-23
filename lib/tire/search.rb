@@ -121,6 +121,11 @@ module Tire
         self
       end
 
+      def track_scores(value)
+        @track_scores = value
+        self
+      end
+
       def perform
         @response = Configuration.client.get(self.url + self.params, self.to_json)
         if @response.failure?
@@ -155,6 +160,7 @@ module Tire
           request.update( { :version => @version } )         if @version
           request.update( { :explain => @explain } )         if @explain
           request.update( { :min_score => @min_score } )     if @min_score
+          request.update( { :track_scores => @track_scores } ) if @track_scores
           request
         end
       end

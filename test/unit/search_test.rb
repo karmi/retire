@@ -232,6 +232,15 @@ module Tire
           assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
         end
 
+        should "allow to track scores" do
+          s = Search::Search.new('index') do
+            sort { by :title }
+            track_scores true
+          end
+
+          assert_equal 'true', s.to_hash[:track_scores].to_json
+        end
+
       end
 
       context "facets" do
