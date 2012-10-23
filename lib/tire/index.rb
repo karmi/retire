@@ -77,8 +77,11 @@ module Tire
         params[:percolate] = "*" if params[:percolate] === true
       end
 
-      url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
-      url += "?percolate=#{params[:percolate]}" if params[:percolate]
+      params[:parent] = options[:parent] if options[:parent]
+
+      params_encoded = params.empty? ? '' : "?#{params.to_param}"
+
+      url  = id ? "#{self.url}/#{type}/#{id}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)

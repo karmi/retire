@@ -797,8 +797,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
-                                   payload =~ /"title":"Test"/
+                                   assert_equal "#{@index.url}/article/?percolate=%2A", url
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             @index.store( {:type => 'article', :title => 'Test'}, {:percolate => true} )
@@ -807,8 +806,7 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
-                                   payload =~ /"title":"Test"/
+                                   assert_equal "#{@index.url}/article/?percolate=tag%3Aalerts", url
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
             response = @index.store( {:type => 'article', :title => 'Test'}, {:percolate => 'tag:alerts'} )
@@ -817,6 +815,19 @@ module Tire
 
         end
 
+      end
+
+      context "when passing parent document ID" do
+
+        should "set the :parent option in the request parameters" do
+          Configuration.client.expects(:post).
+            with do |url, payload|
+              assert_equal "#{Configuration.url}/dummy/document/?parent=1234", url
+            end.
+            returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          @index.store({:title => 'Test'}, {:parent => 1234})
+        end
       end
 
       context "reindexing" do
