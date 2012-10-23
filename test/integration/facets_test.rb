@@ -238,6 +238,7 @@ module Tire
       end
 
       context "filter" do
+
         should "return a filter facet" do
           s = Tire.search('articles-test', :search_type => 'count') do
             facet 'filtered' do
@@ -248,6 +249,19 @@ module Tire
           facets = s.results.facets["filtered"]
           assert_equal 2, facets["count"], facets.inspect
         end
+
+        should "allow to define the facet filter with DSL" do
+          s = Tire.search('articles-test', :search_type => 'count') do
+            facet 'filtered' do
+              terms :published_on
+              facet_filter :term, :words => 250
+            end
+          end
+
+          facets = s.results.facets["filtered"]
+          assert_equal 2, facets["total"], facets.inspect
+        end
+
       end
 
     end
