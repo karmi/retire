@@ -34,13 +34,13 @@ module Tire
 
           def all
             # TODO: Options like `sort`; Possibly `filters`
-            s = Tire::Search::Search.new(index.name, :wrapper => self).query { all }
+            s = Tire::Search::Search.new(index.name, :type => document_type, :wrapper => self).query { all }
             s.version(true).results
           end
 
           def first
             # TODO: Options like `sort`; Possibly `filters`
-            s = Tire::Search::Search.new(index.name, :wrapper => self).query { all }.size(1)
+            s = Tire::Search::Search.new(index.name, :type => document_type, :wrapper => self).query { all }.size(1)
             s.version(true).results.first
           end
 

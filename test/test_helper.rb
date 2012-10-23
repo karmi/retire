@@ -24,6 +24,7 @@ require File.dirname(__FILE__) + '/models/active_model_article_with_custom_index
 require File.dirname(__FILE__) + '/models/active_record_models'
 require File.dirname(__FILE__) + '/models/article'
 require File.dirname(__FILE__) + '/models/persistent_article'
+require File.dirname(__FILE__) + '/models/persistent_article_in_index'
 require File.dirname(__FILE__) + '/models/persistent_article_in_namespace'
 require File.dirname(__FILE__) + '/models/persistent_article_with_casting'
 require File.dirname(__FILE__) + '/models/persistent_article_with_defaults'
