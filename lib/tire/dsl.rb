@@ -39,5 +39,12 @@ module Tire
       Alias.all
     end
 
+    # Return the list of all indices
+    # @return [Array<String>] the list
+    def indices
+      status = MultiJson.decode(Configuration.client.get("#{Configuration.url}/_status").body)
+      status["indices"].keys
+    end
+
   end
 end
