@@ -46,5 +46,9 @@ module Tire
       status["indices"].keys
     end
 
+    def total_storage
+      status = MultiJson.decode(Configuration.client.get("#{Configuration.url}/_status").body)
+      status["indices"].inject(0) { |size, (k,v)| size + v["index"]["size_in_bytes"].to_i }
+    end
   end
 end

@@ -5,6 +5,14 @@ module Tire
   class DslIndicesIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
+    context "When calling the total_storage method" do
+
+      should "report the total used storage" do
+        assert_kind_of Integer, Tire.total_storage
+      end
+
+    end
+
     context "When calling the indices method" do
 
       setup do
