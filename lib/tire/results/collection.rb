@@ -58,6 +58,9 @@ module Tire
               end
               ids = items.map { |h| h['_id'] }
               records[type] = @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+              res = @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+              res = [ res ] unless res.respond_to?(:detect)
+              records[type] = res
             end
 
             # Reorder records to preserve order from search results
