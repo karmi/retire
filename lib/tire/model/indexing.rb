@@ -118,6 +118,10 @@ module Tire
           false
         end
 
+        def update_mapping
+          index.update_mapping self
+        end
+
         def mapping_options
           @mapping_options || {}
         end
