@@ -10,6 +10,8 @@ module Tire
         Search::Search.new(indices, options, &block)
       else
         payload = case options
+          when {}      then
+            nil
           when Hash    then
             options
           when String  then
