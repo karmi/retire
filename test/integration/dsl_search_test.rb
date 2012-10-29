@@ -10,9 +10,17 @@ module Tire
       should "allow passing search payload as a Hash" do
         s = Tire.search 'articles-test', :query  => { :query_string => { :query => 'ruby' } },
                                          :facets => { 'tags' => { :filter => { :term => {:tags => 'ruby' } } } }
-        # p s.results
+
         assert_equal 2, s.results.count
         assert_equal 2, s.results.facets['tags']['count']
+      end
+
+      should "allow building search query iteratively" do
+        s = Tire.search 'articles-test'
+        s.query { string 'T*' }
+        s.filter :terms, :tags => ['java']
+
+        assert_equal 1, s.results.count
       end
 
     end
