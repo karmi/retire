@@ -15,6 +15,14 @@ module Tire
         assert_equal 2, s.results.facets['tags']['count']
       end
 
+      should "allow step-by-step query building" do
+        s = Tire.search('articles-test') { query { string 'ruby' } }
+        s.facet('tags') { filter :term, :tags => ['ruby'] }
+
+        assert_equal 2, s.results.count
+        assert_equal 2, s.results.facets['tags']['count']
+      end
+
       should "allow setting search payload later on" do
         s = Tire.search 'articles-test'
         s.query { string 'ruby' }
