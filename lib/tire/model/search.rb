@@ -76,8 +76,13 @@ module Tire
           sort      = Array( options.delete(:order) || options.delete(:sort) )
 
           s = Tire::Search::Search.new(options.delete(:index), options)
-          s.size( options[:per_page].to_i ) if options[:per_page]
-          s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
+
+          page     = options.delete(:page)
+          per_page = options.delete(:per_page)
+
+          s.size( per_page.to_i ) if per_page
+          s.from( page.to_i <= 1 ? 0 : (per_page.to_i * (page.to_i-1)) ) if page && per_page
+
           s.sort do
             sort.each do |t|
               field_name, direction = t.split(' ')
@@ -85,7 +90,8 @@ module Tire
             end
           end unless sort.empty?
 
-          if version = options.delete(:version); s.version(version); end
+          version = options.delete(:version)
+          s.version(version) if version
 
           if block_given?
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
