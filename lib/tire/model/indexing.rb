@@ -118,6 +118,13 @@ module Tire
           false
         end
 
+        # Deletes and creates the corresponding index.
+        #
+        def recreate_elasticsearch_index
+          index.delete if index.exists?
+          create_elasticsearch_index
+        end
+
         def mapping_options
           @mapping_options || {}
         end
