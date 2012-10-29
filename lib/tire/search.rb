@@ -48,7 +48,8 @@ module Tire
       end
 
       def params
-        @options.empty? ? '' : '?' + @options.to_param
+        options = @options.except(:wrapper)
+        options.empty? ? '' : '?' + options.to_param
       end
 
       def query(&block)
@@ -105,7 +106,7 @@ module Tire
         @fields = Array(fields.flatten)
         self
       end
-  
+
       def partial_field(name, options)
         @partial_fields ||= {}
         @partial_fields[name] = options

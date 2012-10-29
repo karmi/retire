@@ -128,7 +128,7 @@ module Tire
         should "find all documents with correct type" do
           Configuration.client.expects(:get).
                                with do |url,payload|
-                                 assert_equal "#{Configuration.url}/persistent_articles/persistent_article/_search?wrapper=PersistentArticle", url
+                                 assert_equal "#{Configuration.url}/persistent_articles/persistent_article/_search", url
                                end.
                                times(3).
                                returns(mock_response(@find_all.to_json))
@@ -142,7 +142,7 @@ module Tire
         should "find first document with correct type" do
           Configuration.client.expects(:get).
                                with do |url,payload|
-                                 assert_equal "#{Configuration.url}/persistent_articles/persistent_article/_search?size=1&wrapper=PersistentArticle", url
+                                 assert_equal "#{Configuration.url}/persistent_articles/persistent_article/_search?size=1", url
                                end.
                                returns(mock_response(@find_first.to_json))
           document = PersistentArticle.first
