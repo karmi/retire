@@ -128,7 +128,7 @@ module Tire
             end.
             returns( mock_response({ 'hits' => { 'hits' => [] } }.to_json) )
 
-          ActiveModelArticle.search(@q, :sort => 'title DESC').results
+          ActiveModelArticle.search(@q, :sort => 'title:DESC').results
         end
 
         context "searching with a block" do
@@ -201,14 +201,14 @@ module Tire
           should "allow to specify sort direction" do
             Tire::Search::Sort.any_instance.expects(:by).with('title', 'DESC')
 
-            ActiveModelArticle.search @q, :order => 'title DESC'
+            ActiveModelArticle.search @q, :order => 'title:DESC'
           end
 
           should "allow to specify more fields to sort on" do
             Tire::Search::Sort.any_instance.expects(:by).with('title', 'DESC')
             Tire::Search::Sort.any_instance.expects(:by).with('author.name', nil)
 
-            ActiveModelArticle.search @q, :order => ['title DESC', 'author.name']
+            ActiveModelArticle.search @q, :order => ['title:DESC', 'author.name']
           end
 
           should "allow to specify number of results per page" do

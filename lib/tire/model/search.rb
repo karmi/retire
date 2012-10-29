@@ -85,7 +85,7 @@ module Tire
 
           s.sort do
             sort.each do |t|
-              field_name, direction = t.split(' ')
+              field_name, direction = t.split(':')
               by field_name, direction
             end
           end unless sort.empty?
