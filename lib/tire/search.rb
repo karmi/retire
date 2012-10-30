@@ -146,7 +146,7 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET '#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty=true' -d '#{to_json}'|
+        %Q|curl -X GET '#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty' -d '#{to_json}'|
       end
 
       def to_hash
