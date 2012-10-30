@@ -94,7 +94,7 @@ module Tire
       end
 
       def to_a;        results; end; alias :to_ary :to_a
-      def to_curl;     %Q|curl -X GET "#{url}?pretty=true" -d '#{@scroll_id}'|; end
+      def to_curl;     %Q|curl -X GET '#{url}?pretty=true' -d '#{@scroll_id}'|; end
 
       def __logged(error=nil)
         if Configuration.logger

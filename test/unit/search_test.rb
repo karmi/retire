@@ -117,7 +117,7 @@ module Tire
         s = Search::Search.new('index') do
           query { string 'title:foo' }
         end
-        assert_match %r|curl \-X GET "http://localhost:9200/index/_search\?pretty=true" -d |, s.to_curl
+        assert_match %r|curl \-X GET 'http://localhost:9200/index/_search\?pretty=true' -d |, s.to_curl
         assert_match %r|\s*{\s*"query"\s*:\s*"title:foo"\s*}\s*|, s.to_curl
       end
 
