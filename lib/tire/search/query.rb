@@ -2,6 +2,8 @@ module Tire
   module Search
 
     class Query
+      attr_accessor :value
+
       def initialize(&block)
         @value = {}
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?

@@ -19,6 +19,10 @@ module Tire::Search
           term(:foo, 'bar')
         end.to_json)
       end
+
+      should "have accessor for value" do
+        assert_equal( {}, Query.new.value )
+      end
     end
 
     context "Term query" do
