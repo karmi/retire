@@ -11,9 +11,9 @@ module Tire
         @response  = response
         @options   = options
         @time      = response['took'].to_i
-        @total     = response['hits']['total'].to_i
+        @total     = response['hits']['total'].to_i rescue nil
         @facets    = response['facets']
-        @max_score = response['hits']['max_score'].to_f
+        @max_score = response['hits']['max_score'].to_f rescue nil
         @wrapper   = options[:wrapper] || Configuration.wrapper
       end
 

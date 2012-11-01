@@ -4,7 +4,7 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :query, :facets, :filters, :options, :explain, :script_fields
+      attr_reader :indices, :types, :query, :facets, :filters, :options, :explain, :script_fields
 
       def initialize(indices=nil, options={}, &block)
         if indices.is_a?(Hash)
@@ -182,10 +182,10 @@ module Tire
         end
       end
 
-      def logged(error=nil)
+      def logged(endpoint='_search')
         if Configuration.logger
 
-          Configuration.logger.log_request '_search', indices, to_curl
+          Configuration.logger.log_request endpoint, indices, to_curl
 
           took = @json['took']  rescue nil
           code = @response.code rescue nil
