@@ -365,5 +365,33 @@ module Tire::Search
 
     end
 
+    context "MatchQuery" do
+
+      should "allow searching in single field" do
+        assert_equal( { :match => { :foo => { :query => 'bar' } } },
+                      Query.new.match(:foo, 'bar') )
+      end
+
+      should "allow searching in multiple fields with multi_match" do
+        assert_equal( { :multi_match => { :query => 'bar', :fields => [:foo, :moo] } },
+                        Query.new.match([:foo, :moo], 'bar') )
+      end
+
+      should "encode options" do
+        query = Query.new.match(:foo, 'bar', :type => 'phrase_prefix')
+        assert_equal 'phrase_prefix', query[:match][:foo][:type]
+      end
+
+      should "automatically construct a boolean query" do
+        query = Query.new
+        query.match(:foo, 'bar')
+        query.match(:moo, 'bar')
+
+        assert_not_nil  query.to_hash[:bool]
+        assert_equal 2, query.to_hash[:bool][:must].size
+      end
+
+    end
+
   end
 end
