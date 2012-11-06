@@ -78,7 +78,7 @@ module Tire
           s = Tire::Search::Search.new(options.delete(:index), options)
 
           page     = options.delete(:page)
-          per_page = options.delete(:per_page)
+          per_page = options.delete(:per_page) || Tire::Results::Pagination::default_per_page
 
           s.size( per_page.to_i ) if per_page
           s.from( page.to_i <= 1 ? 0 : (per_page.to_i * (page.to_i-1)) ) if page && per_page
