@@ -39,7 +39,7 @@ module Tire
         should "limit searching in index for documents matching the model 'document_type'" do
           Tire::Search::Search.
             expects(:new).
-            with(ActiveModelArticle.index_name, { :type => ActiveModelArticle.document_type }).
+            with('active_model_articles', { :type => 'active_model_article' }).
             returns(@stub).
             twice
 
