@@ -212,6 +212,24 @@ module Tire
             assert_nil results.first
           end
 
+          context "without an explicit per_page" do
+
+            should "not find a missing (second) page" do
+              results = ActiveRecordArticle.search 'test*', :sort => 'title', :page => 2
+              assert_equal 0, results.size
+
+              # WillPaginate
+              #
+              assert_equal 1, results.total_pages
+              assert_equal 2, results.current_page
+              assert_equal 1, results.previous_page
+              assert_equal nil, results.next_page
+
+              assert_nil results.first
+            end
+
+          end
+
         end
 
         context "and block searches" do
