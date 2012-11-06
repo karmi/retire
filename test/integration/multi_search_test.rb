@@ -27,8 +27,8 @@ module Tire
       end
 
       teardown do
-        # Tire.index('multi-search-test-1').delete
-        # Tire.index('multi-search-test-2').delete
+        Tire.index('multi-search-test-1').delete
+        Tire.index('multi-search-test-2').delete
       end
 
       should "return multiple results" do

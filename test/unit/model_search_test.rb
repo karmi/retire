@@ -247,6 +247,25 @@ module Tire
 
         end
 
+        context "multi search" do
+
+          should "perform search request within corresponding index and type" do
+            Tire::Search::Multi::Search.
+              expects(:new).
+              with do |index, options, block|
+                assert_equal 'active_model_articles', index
+                assert_equal 'active_model_article',  options[:type]
+              end.
+              returns( mock(:results => []) )
+
+            ActiveModelArticle.multi_search do
+              search 'foo'
+              search 'xoo'
+            end
+          end
+
+        end
+
         should "not set callback when hooks are missing" do
           @model = ActiveModelArticle.new
           @model.expects(:update_elasticsearch_index).never

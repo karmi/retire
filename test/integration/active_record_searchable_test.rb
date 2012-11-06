@@ -38,14 +38,14 @@ module Tire
     context "ActiveRecord integration" do
 
       setup do
-        ActiveRecordArticle.destroy_all
+        ActiveRecordArticle.delete_all
         Tire.index('active_record_articles').delete
 
         load File.expand_path('../../models/active_record_models.rb', __FILE__)
       end
 
       teardown do
-        ActiveRecordArticle.destroy_all
+        ActiveRecordArticle.delete_all
         Tire.index('active_record_articles').delete
       end
 
@@ -507,6 +507,54 @@ module Tire
           assert             results.any?, "No results returned: #{results.inspect}"
           assert_instance_of ActiveRecordNamespace::MyModel, results.first
           assert_equal       ActiveRecordNamespace::MyModel.find(1), results.first
+        end
+
+      end
+
+      context "multi search" do
+        setup do
+          # Tire.configure { logger STDERR }
+          ActiveRecordArticle.create! :title => 'Test'
+          ActiveRecordArticle.create! :title => 'Pest'
+          ActiveRecordArticle.index.refresh
+        end
+
+        should "return multiple result sets" do
+          results = ActiveRecordArticle.multi_search do
+            search do
+              query { match :title, 'test' }
+            end
+            search search_type: 'count' do
+              query { match :title, 'pest' }
+            end
+            search :articles, index: 'articles-test', type: 'article' do
+              query { all }
+            end
+          end
+
+          assert_equal 3, results.size
+
+          assert_equal 1, results[0].size
+          assert_equal 1, results[0].total
+
+          assert_equal 0, results[1].size
+          assert_equal 1, results[1].total
+
+          assert_equal 5, results[:articles].size
+        end
+
+        should "return model instances with the :load option" do
+          results = ActiveRecordArticle.multi_search do
+            search :items do
+              query { match :title, 'test' }
+            end
+            search :models, :load => true do
+              query { match :title, 'test' }
+            end
+          end
+
+          assert_instance_of Tire::Results::Item, results[:items].first
+          assert_instance_of ActiveRecordArticle, results[:models].first
         end
 
       end

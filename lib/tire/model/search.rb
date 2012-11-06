@@ -105,6 +105,12 @@ module Tire
           s.results
         end
 
+        def multi_search(options={}, &block)
+          default_options = {:type => document_type}
+          options         = default_options.update(options)
+          Tire::Search::Multi::Search.new(index.name, options, &block).results
+        end
+
         # Returns a Tire::Index instance for this model.
         #
         # Example usage: `Article.index.refresh`.
