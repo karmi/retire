@@ -223,6 +223,13 @@ module Tire
           assert_equal 3, @collection.next_page
         end
 
+        should "have default per_page" do
+          assert_equal 10, Tire::Results::Pagination::default_per_page
+
+          collection = Results::Collection.new @default_response
+          assert_equal 10, collection.per_page
+        end
+
       end
 
       context "with eager loading" do
