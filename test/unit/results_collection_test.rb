@@ -45,6 +45,10 @@ module Tire
         end
       end
 
+      should "return success/failure state" do
+        assert Results::Collection.new( @default_response ).success?
+      end
+
       should "be populated lazily" do
         collection = Results::Collection.new(@default_response)
         assert_nil collection.instance_variable_get(:@results)
@@ -73,6 +77,24 @@ module Tire
       should "have max_score" do
         collection = Results::Collection.new(@default_response)
         assert_equal 1.0, collection.max_score
+      end
+
+      context "with error response" do
+        setup do
+          @collection = Results::Collection.new({'error' => 'SearchPhaseExecutionException...'})
+        end
+
+        should "return the error" do
+          assert_equal 'SearchPhaseExecutionException...', @collection.error
+        end
+
+        should "return the success/failure state" do
+          assert @collection.failure?
+        end
+
+        should "return empty results" do
+          assert @collection.empty?
+        end
       end
 
       context "wrapping results" do

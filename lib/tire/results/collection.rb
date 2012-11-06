@@ -18,6 +18,7 @@ module Tire
       end
 
       def results
+        return [] if failure?
         @results ||= begin
           hits = @response['hits']['hits'].map { |d| d.update '_type' => Utils.unescape(d['_type']) }
           unless @options[:load]
@@ -45,6 +46,18 @@ module Tire
         results.slice(*args)
       end
       alias :[] :slice
+
+      def error
+        @response['error']
+      end
+
+      def success?
+        error.to_s.empty?
+      end
+
+      def failure?
+        ! success?
+      end
 
       def to_ary
         self
