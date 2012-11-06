@@ -49,6 +49,19 @@ module Tire
           end
         end
 
+        should "allow to perform multiple searches" do
+          Tire::Search::Multi::Search.expects(:new).returns( stub(:perform => true) )
+
+          Tire.multi_search 'dummy' do
+            search 'foo'
+          end
+        end
+
+        should "allow to call multi_search" do
+          assert_respond_to Tire, :multi_search
+          assert_respond_to Tire, :msearch
+        end
+
         context "when retrieving results" do
 
           should "not call the #perform method immediately" do
@@ -119,6 +132,7 @@ module Tire
         end
 
       end
+
     end
 
   end

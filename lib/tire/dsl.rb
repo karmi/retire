@@ -30,6 +30,16 @@ module Tire
     ensure
     end
 
+    def multi_search(indices=nil, options={}, &block)
+      Search::Multi::Search.new(indices, options, &block)
+    rescue Exception => error
+      STDERR.puts "[REQUEST FAILED] #{error.class} #{error.message rescue nil}\n"
+      raise
+    ensure
+    end
+    alias :multisearch :multi_search
+    alias :msearch     :multi_search
+
     def index(name, &block)
       Index.new(name, &block)
     end

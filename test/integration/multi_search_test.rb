@@ -32,7 +32,7 @@ module Tire
       end
 
       should "return multiple results" do
-        s = Tire::Search::Multi::Search.new 'multi-search-test-1' do
+        s = Tire.multi_search 'multi-search-test-1' do
           search :johns do
             query { match :_all, 'john' }
           end
@@ -54,7 +54,7 @@ module Tire
       end
 
       should "mix named and numbered searches" do
-        s = Tire::Search::Multi::Search.new 'multi-search-test-1' do
+        s = Tire.multi_search 'multi-search-test-1' do
           search(:johns) { query { match :_all, 'john' }  }
           search         { query { match :_all, 'mary' }  }
         end
@@ -66,10 +66,13 @@ module Tire
       end
 
       should "iterate over mixed searches" do
-        s = Tire::Search::Multi::Search.new 'multi-search-test-1' do
+        s = Tire.multi_search 'multi-search-test-1' do
           search(:johns) { query { match :_all, 'john' }  }
           search         { query { match :_all, 'mary' }  }
         end
+
+        assert_equal [:johns, 1], s.searches.names
+        assert_equal [:johns, 1], s.results.to_hash.keys
 
         s.results.each_with_index do |results, i|
           assert_equal 2, results.size if i == 0
@@ -83,7 +86,7 @@ module Tire
       end
 
       should "return results from different indices" do
-        s = Tire::Search::Multi::Search.new do
+        s = Tire.multi_search do
           search( index: 'multi-search-test-1' ) { query { match :_all, 'john' }  }
           search( index: 'multi-search-test-2' ) { query { match :_all, 'john' }  }
         end
@@ -93,7 +96,7 @@ module Tire
       end
 
       should "return error for failed searches" do
-        s = Tire::Search::Multi::Search.new 'multi-search-test-1' do
+        s = Tire.multi_search 'multi-search-test-1' do
           search() { query { match :_all, 'john' }  }
           search() { query { string '[x' }  }
         end
