@@ -76,6 +76,30 @@ module Tire
         assert_equal   'Test', results.first.title
       end
 
+      should "remove document from index on destroy" do
+        a = ActiveRecordArticle.new :title => 'Test remove...'
+        a.save!
+        assert_equal 1, ActiveRecordArticle.count
+
+        a.destroy
+        assert_equal 0, ActiveRecordArticle.all.size
+
+        a.index.refresh
+        results = ActiveRecordArticle.search 'test'
+        assert_equal 0, results.count
+      end
+
+      should "return documents with scores" do
+        ActiveRecordArticle.create! :title => 'foo'
+        ActiveRecordArticle.create! :title => 'bar'
+
+        ActiveRecordArticle.index.refresh
+        results = ActiveRecordArticle.search 'foo OR bar^100'
+        assert_equal 2, results.count
+
+        assert_equal 'bar', results.first.title
+      end
+
       should "raise exception on invalid query" do
         ActiveRecordArticle.create! :title => 'Test'
 
@@ -121,30 +145,6 @@ module Tire
             assert ! results.any?
           end
         end
-      end
-
-      should "remove document from index on destroy" do
-        a = ActiveRecordArticle.new :title => 'Test remove...'
-        a.save!
-        assert_equal 1, ActiveRecordArticle.count
-
-        a.destroy
-        assert_equal 0, ActiveRecordArticle.all.size
-
-        a.index.refresh
-        results = ActiveRecordArticle.search 'test'
-        assert_equal 0, results.count
-      end
-
-      should "return documents with scores" do
-        ActiveRecordArticle.create! :title => 'foo'
-        ActiveRecordArticle.create! :title => 'bar'
-
-        ActiveRecordArticle.index.refresh
-        results = ActiveRecordArticle.search 'foo OR bar^100'
-        assert_equal 2, results.count
-
-        assert_equal 'bar', results.first.title
       end
 
       context "with pagination" do
