@@ -57,6 +57,13 @@ module Tire
             self.tire.search(*args, &block)
           end
 
+          def self.multi_search(*args, &block)
+            args.last.update(:wrapper => self, :version => true) if args.last.is_a? Hash
+            args << { :wrapper => self, :version => true } unless args.any? { |a| a.is_a? Hash }
+
+            self.tire.multi_search(*args, &block)
+          end
+
         end
 
       end
