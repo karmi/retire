@@ -11,7 +11,7 @@ module Tire
     #
     #     class Article
     #       include Tire::Model::Persistence
-    #     
+    #
     #       property :title
     #     end
     #
@@ -54,10 +54,6 @@ module Tire
             args.last.update(:wrapper => self, :version => true) if args.last.is_a? Hash
             args << { :wrapper => self, :version => true } unless args.any? { |a| a.is_a? Hash }
 
-            self.__search_without_persistence(*args, &block)
-          end
-
-          def self.__search_without_persistence(*args, &block)
             self.tire.search(*args, &block)
           end
 
