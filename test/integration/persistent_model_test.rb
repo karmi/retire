@@ -128,24 +128,27 @@ module Tire
 
         setup do
           # Create documents of two types within single index
-          1.upto(3) { |number| PersistentArticleInIndex.create :title => "TestInIndex#{number}", :tags => ['in_index'] }
-          1.upto(3) { |number| PersistentArticle.create :title => "Test#{number}", :tags => [] }
+          PersistentArticleInIndex.create :title => "TestInIndex", :tags => ['in_index']
+          PersistentArticle.create :title => "Test", :tags => []
           PersistentArticle.index.refresh
         end
 
         should "returns all documents with proper type" do
           results = PersistentArticle.all
 
-          assert_equal 3, results.size
-          assert results.all? { |r| r.tags == [] }, "Incorrect results:" + results.to_a.inspect
+          assert_equal 1, results.size
+          assert results.all? { |r| r.tags == [] }, "Incorrect results? " + results.to_a.inspect
 
           results = PersistentArticleInIndex.all
 
-          assert_equal 3, results.size
-          assert_equal ['in_index'], results.first.tags
+          assert_equal 1, results.size
+          assert results.all? { |r| r.tags == ['in_index'] }, "Incorrect results? " + results.to_a.inspect
         end
 
         should "returns first document with proper type" do
+          assert_instance_of PersistentArticle, PersistentArticle.first
+          assert_instance_of PersistentArticleInIndex, PersistentArticleInIndex.first
+
           assert_equal [], PersistentArticle.first.tags
           assert_equal ['in_index'], PersistentArticleInIndex.first.tags
         end
