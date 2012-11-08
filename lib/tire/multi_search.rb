@@ -3,6 +3,8 @@ module Tire
 
     module Multi
 
+      # Wraps the search definitions for Tire::Multi::Search
+      #
       class SearchDefinitions
         include Enumerable
 
@@ -35,6 +37,8 @@ module Tire
         end
       end
 
+      # Wraps the search result sets for Tire::Multi::Search
+      #
       class Results
         include Enumerable
 
@@ -46,6 +50,7 @@ module Tire
           end
         end
 
+        # Return a specific result sets
         def [] name
           if index = @searches.names.index(name)
             @collection[ index ]
@@ -64,6 +69,9 @@ module Tire
           @results.size
         end
 
+        # Returns the multi-search result sets as a Hash with the search name
+        # as key and the results as value.
+        #
         def to_hash
           result = {}
           each_pair { |name,results| result[name] = results }
@@ -71,6 +79,27 @@ module Tire
         end
       end
 
+      # Build and perform a [multi-search](http://elasticsearch.org/guide/reference/api/multi-search.html)
+      # request.
+      #
+      #     s = Tire::Search::Multi::Search.new 'my-index' do
+      #           search :names do
+      #             query { match :name, 'john' }
+      #           end
+      #           search :counts, search_type: 'count' do
+      #             query { match :_all, 'john' }
+      #           end
+      #           search :other, index: 'other-index' do
+      #             query { string "first_name:john" }
+      #           end
+      #         end
+      #
+      # You can optionally pass an index and type to the constructor, using them as defaults
+      # for searches which don't define them.
+      #
+      # Use the {#search} method to add a search definition to the request, passing it search options
+      # as a Hash and the search definition itself using Tire's DSL.
+      #
       class Search
 
         attr_reader :indices, :types, :path
@@ -85,6 +114,11 @@ module Tire
           block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
         end
 
+        # Add a search definition to the multi-search request.
+        #
+        # The usual search options such as `search_type`, `routing`, etc. can be passed as a Hash,
+        # and the search definition itself should be passed as a block using the Tire DSL.
+        #
         def search(*args, &block)
           name_or_options = args.pop
 
@@ -102,14 +136,21 @@ module Tire
           @searches << { :name => name, :search => Tire::Search::Search.new(indices, options, &block) }
         end
 
+        # Without argument, returns the collection of search definitions.
+        # With argument, returns a search definition by name or order.
+        #
         def searches(name=nil)
           name ? @searches[ name ] : @searches
         end
 
+        # Returns and array of search definition names
+        #
         def names
           @searches.names
         end
 
+        # Serializes the search definitions as an array of JSON definitions
+        #
         def to_array
           @searches.map do |search|
             header = {}
@@ -123,27 +164,55 @@ module Tire
           end.flatten
         end
 
+        # Serializes the search definitions as a multi-line string payload
+        #
         def to_payload
           to_array.map { |line| MultiJson.encode(line) }.join("\n") + "\n"
         end
 
+        # Returns the request URL
+        #
         def url
           [ Configuration.url, @path ].join
         end
 
+        # Serializes the request URL parameters
+        #
         def params
           options = @options.dup
           options.empty? ? '' : '?' + options.to_param
         end
 
+        # Returns an enumerable collection of result sets.
+        #
+        # You can simply iterate over them:
+        #
+        #     search.results.each do |results|
+        #       puts results.each.map(&:name)
+        #     end
+        #
+        # To iterate over named result sets, use the `each_pair` method:
+        #
+        #     search.results.each_pair do |name,results|
+        #       puts "Search #{name} got #{results.size} results"
+        #     end
+        #
+        # To get a specific result set:
+        #
+        #     search.results[:myname]
+        #
         def results
           @results  || perform and @results
         end
 
+        # Returns the HTTP response
+        #
         def response
           @response || perform and @response
         end
 
+        # Returns the raw JSON as a Hash
+        #
         def json
           @json     || perform and @json
         end
