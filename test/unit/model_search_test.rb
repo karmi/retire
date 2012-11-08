@@ -19,7 +19,7 @@ module Tire
       context "Model::Search" do
 
         setup do
-          @stub = stub('search') { stubs(:query).returns(self); stubs(:perform).returns(self); stubs(:results).returns([]) }
+          @stub = stub('search') { stubs(:query).returns(self); stubs(:perform).returns(self); stubs(:results).returns([]); stubs(:size).returns(true) }
           Tire::Index.any_instance.stubs(:exists?).returns(false)
         end
 
