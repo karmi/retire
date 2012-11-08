@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Tire::Model::Search::ClassMethods
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../../../';
+  framesUrl = "../../../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Tire.html" title="Tire (module)">Tire</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Model.html" title="Tire::Model (module)">Model</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Search.html" title="Tire::Model::Search (module)">Search</a></span></span>
+     &raquo; 
+    <span class="title">ClassMethods</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../../../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../../../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Tire::Model::Search::ClassMethods
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+    <dt class="r1">Included in:</dt>
+    <dd class="r1"><span class='object_link'><a href="ClassMethodsProxy.html" title="Tire::Model::Search::ClassMethodsProxy (class)">ClassMethodsProxy</a></span></dd>
+    
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/tire/model/search.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#index-instance_method" title="#index (instance method)">- (Object) <strong>index</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns a Tire::Index instance for this model.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#multi_search-instance_method" title="#multi_search (instance method)">- (Object) <strong>multi_search</strong>(options = {}, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#search-instance_method" title="#search (instance method)">- (Object) <strong>search</strong>(*args, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns search results for a given query.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="index-instance_method">
+  
+    - (<tt>Object</tt>) <strong>index</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a Tire::Index instance for this model.</p>
+
+<p>Example usage: <code>Article.index.refresh</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/search.rb', line 118</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_index'>index</span>
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_index_name'>index_name</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:to_proc</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_klass'>klass</span><span class='period'>.</span><span class='id identifier rubyid_instance_eval'>instance_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_index_name'>index_name</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_index_name'>index_name</span>
+  <span class='ivar'>@index</span> <span class='op'>=</span> <span class='const'>Index</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="multi_search-instance_method">
+  
+    - (<tt>Object</tt>) <strong>multi_search</strong>(options = {}, &amp;block) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110
+111
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/search.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_multi_search'>multi_search</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='op'>=</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_default_options'>default_options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_document_type'>document_type</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_options'>options</span>         <span class='op'>=</span> <span class='id identifier rubyid_default_options'>default_options</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Search</span><span class='op'>::</span><span class='const'>Multi</span><span class='op'>::</span><span class='const'>Search</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="search-instance_method">
+  
+    - (<tt>Object</tt>) <strong>search</strong>(*args, &amp;block) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns search results for a given query.</p>
+
+<p>Query can be passed simply as a String:</p>
+
+<pre class="code ruby"><code><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>Any options, such as pagination or sorting, can be passed as a second argument:</p>
+
+<pre class="code ruby"><code><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:per_page</span> <span class='op'>=&gt;</span> <span class='int'>25</span><span class='comma'>,</span> <span class='symbol'>:page</span> <span class='op'>=&gt;</span> <span class='int'>2</span>
+<span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:sort</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>title</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>For more powerful query definition, use the query DSL passed as a block:</p>
+
+<pre class="code ruby"><code>Article.search do
+  query { terms :tags, ['ruby', 'python'] }
+  facet 'tags' { terms :tags }
+end
+</code></pre>
+
+<p>You can pass options as the first argument, in this case:</p>
+
+<pre class="code ruby"><code><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='symbol'>:per_page</span> <span class='op'>=&gt;</span> <span class='int'>25</span><span class='comma'>,</span> <span class='symbol'>:page</span> <span class='op'>=&gt;</span> <span class='int'>2</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_query'>query</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>This methods returns a Tire::Results::Collection instance, containing instances
+of Tire::Results::Item, populated by the data available in _ElasticSearch, by default.</p>
+
+<p>If you&#39;d like to load the &quot;real&quot; models from the database, you may use the <code>:load</code> option:</p>
+
+<pre class="code ruby"><code><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:load</span> <span class='op'>=&gt;</span> <span class='kw'>true</span>
+</code></pre>
+
+<p>You can pass options as a Hash to the model&#39;s <code>find</code> method:</p>
+
+<pre class="code ruby"><code>Article.search :load =&gt; { :include =&gt; 'comments' } do ... end
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/search.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_default_options'>default_options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_document_type'>document_type</span><span class='comma'>,</span> <span class='symbol'>:index</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbrace'>}</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span>
+    <span class='id identifier rubyid_options'>options</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_options'>options</span>   <span class='op'>=</span> <span class='id identifier rubyid_default_options'>default_options</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_sort'>sort</span>      <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:order</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:sort</span><span class='rparen'>)</span> <span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Search</span><span class='op'>::</span><span class='const'>Search</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:index</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_page'>page</span>     <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:page</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_per_page'>per_page</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:per_page</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Results</span><span class='op'>::</span><span class='const'>Pagination</span><span class='op'>::</span><span class='id identifier rubyid_default_per_page'>default_per_page</span>
+
+  <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='lparen'>(</span> <span class='id identifier rubyid_per_page'>per_page</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_per_page'>per_page</span>
+  <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_from'>from</span><span class='lparen'>(</span> <span class='id identifier rubyid_page'>page</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&lt;=</span> <span class='int'>1</span> <span class='op'>?</span> <span class='int'>0</span> <span class='op'>:</span> <span class='lparen'>(</span><span class='id identifier rubyid_per_page'>per_page</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_page'>page</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_page'>page</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_per_page'>per_page</span>
+
+  <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span>
+      <span class='id identifier rubyid_field_name'>field_name</span><span class='comma'>,</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>=</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>:</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_by'>by</span> <span class='id identifier rubyid_field_name'>field_name</span><span class='comma'>,</span> <span class='id identifier rubyid_direction'>direction</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span> <span class='kw'>unless</span> <span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_version'>version</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:version</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_version'>version</span><span class='lparen'>(</span><span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_version'>version</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_arity'>arity</span> <span class='op'>&lt;</span> <span class='int'>1</span> <span class='op'>?</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_instance_eval'>instance_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_query'>query</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='id identifier rubyid_query'>query</span> <span class='rbrace'>}</span>
+    <span class='comment'># TODO: Actualy, allow passing all the valid options from
+</span>    <span class='comment'># &lt;http://www.elasticsearch.org/guide/reference/api/search/uri-request.html&gt;
+</span>    <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_fields'>fields</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:fields</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:fields</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:04 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

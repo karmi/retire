@@ -1,0 +1,1282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Tire::Search::Scan
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../../';
+  framesUrl = "../../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Tire.html" title="Tire (module)">Tire</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Search.html" title="Tire::Search (module)">Search</a></span></span>
+     &raquo; 
+    <span class="title">Scan</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Tire::Search::Scan
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Tire::Search::Scan</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2">Enumerable</dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">lib/tire/search/scan.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Performs a &quot;scan/scroll&quot; search request, which obtains a <code>scroll_id</code>
+and keeps returning documents matching the passed query (or all documents) in batches.</p>
+
+<p>You may want to iterate over the batches being returned:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_search'>search</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Search</span><span class='op'>::</span><span class='const'>Scan</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_results'>results</span><span class='op'>|</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:title</span><span class='rparen'>)</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>The scan object has a fully Enumerable-compatible interface, so you may
+call methods like <code>map</code> or <code>each_with_index</code> on it.</p>
+
+<p>To iterate over individual documents, use the <code>each_document</code> method:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_each_document'>each_document</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_document'>document</span><span class='op'>|</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_document'>document</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>You may limit the result set being returned by a regular Tire DSL query
+(or a hash, if you prefer), passed as a second argument:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_search'>search</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Search</span><span class='op'>::</span><span class='const'>Scan</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_query'>query</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_term'>term</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>author.exact</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>John Smith</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>The feature is also exposed in the Tire top-level DSL:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_search'>search</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_query'>query</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_term'>term</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>author.exact</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>John Smith</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>See ElasticSearch documentation for further reference:</p>
+
+<ul>
+<li><a href="http://www.elasticsearch.org/guide/reference/api/search/search-type.html">http://www.elasticsearch.org/guide/reference/api/search/search-type.html</a></li>
+<li><a href="http://www.elasticsearch.org/guide/reference/api/search/scroll.html">http://www.elasticsearch.org/guide/reference/api/search/scroll.html</a></li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#indices-instance_method" title="#indices (instance method)">- (Object) <strong>indices</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute indices.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#options-instance_method" title="#options (instance method)">- (Object) <strong>options</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute options.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#search-instance_method" title="#search (instance method)">- (Object) <strong>search</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute search.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#__logged-instance_method" title="#__logged (instance method)">- (Object) <strong>__logged</strong>(error = nil) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#__perform-instance_method" title="#__perform (instance method)">- (Object) <strong>__perform</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each-instance_method" title="#each (instance method)">- (Object) <strong>each</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_document-instance_method" title="#each_document (instance method)">- (Object) <strong>each_document</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Scan) <strong>initialize</strong>(indices = nil, options = {}, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of Scan.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#json-instance_method" title="#json (instance method)">- (Object) <strong>json</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#params-instance_method" title="#params (instance method)">- (Object) <strong>params</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#response-instance_method" title="#response (instance method)">- (Object) <strong>response</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#results-instance_method" title="#results (instance method)">- (Object) <strong>results</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#scroll_id-instance_method" title="#scroll_id (instance method)">- (Object) <strong>scroll_id</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#seen-instance_method" title="#seen (instance method)">- (Object) <strong>seen</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#size-instance_method" title="#size (instance method)">- (Object) <strong>size</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_a-instance_method" title="#to_a (instance method)">- (Object) <strong>to_a</strong> </a>
+    
+
+    
+      (also: #to_ary)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_curl-instance_method" title="#to_curl (instance method)">- (Object) <strong>to_curl</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#total-instance_method" title="#total (instance method)">- (Object) <strong>total</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#url-instance_method" title="#url (instance method)">- (Object) <strong>url</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Tire::Search::Scan (class)">Scan</a></span></tt>) <strong>initialize</strong>(indices = nil, options = {}, &amp;block) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A new instance of Scan</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_indices'>indices</span><span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='op'>=</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@indices</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_indices'>indices</span><span class='rparen'>)</span>
+  <span class='ivar'>@options</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='symbol'>:search_type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>scan</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:scroll</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>10m</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+  <span class='ivar'>@seen</span>    <span class='op'>=</span> <span class='int'>0</span>
+  <span class='ivar'>@search</span>  <span class='op'>=</span> <span class='const'>Search</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@indices</span><span class='comma'>,</span> <span class='ivar'>@options</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="indices-instance_method">
+  
+    - (<tt>Object</tt>) <strong>indices</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute indices</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_indices'>indices</span>
+  <span class='ivar'>@indices</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="options-instance_method">
+  
+    - (<tt>Object</tt>) <strong>options</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute options</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_options'>options</span>
+  <span class='ivar'>@options</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="search-instance_method">
+  
+    - (<tt>Object</tt>) <strong>search</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute search</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span>
+  <span class='ivar'>@search</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="__logged-instance_method">
+  
+    - (<tt>Object</tt>) <strong>__logged</strong>(error = nil) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 99</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid___logged'>__logged</span><span class='lparen'>(</span><span class='id identifier rubyid_error'>error</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='const'>Configuration</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span>
+    <span class='const'>Configuration</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_request'>log_request</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>scroll</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_to_curl'>to_curl</span>
+
+    <span class='id identifier rubyid_took'>took</span> <span class='op'>=</span> <span class='ivar'>@json</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>took</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>        <span class='kw'>rescue</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_code'>code</span> <span class='op'>=</span> <span class='ivar'>@response</span><span class='period'>.</span><span class='id identifier rubyid_code'>code</span>       <span class='kw'>rescue</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_body'>body</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@seen</span><span class='rbrace'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@total</span><span class='rbrace'>}</span><span class='tstring_content'> (</span><span class='embexpr_beg'>#{</span><span class='ivar'>@seen</span><span class='op'>/</span><span class='ivar'>@total</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='op'>*</span><span class='int'>100</span><span class='rbrace'>}</span><span class='tstring_content'>%)</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>rescue</span> <span class='kw'>nil</span>
+
+    <span class='const'>Configuration</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_log_response'>log_response</span> <span class='id identifier rubyid_code'>code</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>N/A</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_took'>took</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>N/A</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='id identifier rubyid_body'>body</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="__perform-instance_method">
+  
+    - (<tt>Object</tt>) <strong>__perform</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 84</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid___perform'>__perform</span>
+  <span class='ivar'>@response</span>  <span class='op'>=</span> <span class='const'>Configuration</span><span class='period'>.</span><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span> <span class='lbracket'>[</span><span class='id identifier rubyid_url'>url</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='comma'>,</span> <span class='id identifier rubyid_scroll_id'>scroll_id</span>
+  <span class='ivar'>@json</span>      <span class='op'>=</span> <span class='const'>MultiJson</span><span class='period'>.</span><span class='id identifier rubyid_decode'>decode</span> <span class='ivar'>@response</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span>
+  <span class='ivar'>@results</span>   <span class='op'>=</span> <span class='const'>Results</span><span class='op'>::</span><span class='const'>Collection</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='ivar'>@json</span><span class='comma'>,</span> <span class='ivar'>@options</span>
+  <span class='ivar'>@total</span>     <span class='op'>=</span> <span class='ivar'>@json</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>hits</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>total</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+  <span class='ivar'>@seen</span>     <span class='op'>+=</span> <span class='ivar'>@results</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+  <span class='ivar'>@scroll_id</span> <span class='op'>=</span> <span class='ivar'>@json</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_scroll_id</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>self</span>
+<span class='kw'>ensure</span>
+  <span class='id identifier rubyid___logged'>__logged</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each-instance_method">
+  
+    - (<tt>Object</tt>) <strong>each</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66
+67
+68
+69
+70
+71</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each'>each</span>
+  <span class='kw'>until</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='kw'>yield</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span>
+    <span class='id identifier rubyid___perform'>__perform</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_document-instance_method">
+  
+    - (<tt>Object</tt>) <strong>each_document</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_document'>each_document</span>
+  <span class='kw'>until</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span> <span class='kw'>yield</span> <span class='id identifier rubyid_item'>item</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid___perform'>__perform</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="json-instance_method">
+  
+    - (<tt>Object</tt>) <strong>json</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_json'>json</span><span class='semicolon'>;</span>               <span class='ivar'>@json</span>     <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid___perform'>__perform</span><span class='semicolon'>;</span> <span class='ivar'>@json</span><span class='rparen'>)</span><span class='semicolon'>;</span>                                 <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="params-instance_method">
+  
+    - (<tt>Object</tt>) <strong>params</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_params'>params</span><span class='semicolon'>;</span>             <span class='ivar'>@options</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>?</span><span class='tstring_end'>'</span></span> <span class='op'>+</span> <span class='ivar'>@options</span><span class='period'>.</span><span class='id identifier rubyid_to_param'>to_param</span><span class='semicolon'>;</span>                  <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="response-instance_method">
+  
+    - (<tt>Object</tt>) <strong>response</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 57</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_response'>response</span><span class='semicolon'>;</span>           <span class='ivar'>@response</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid___perform'>__perform</span><span class='semicolon'>;</span> <span class='ivar'>@response</span><span class='rparen'>)</span><span class='semicolon'>;</span>                             <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="results-instance_method">
+  
+    - (<tt>Object</tt>) <strong>results</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_results'>results</span><span class='semicolon'>;</span>            <span class='ivar'>@results</span>  <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid___perform'>__perform</span><span class='semicolon'>;</span> <span class='ivar'>@results</span><span class='rparen'>)</span><span class='semicolon'>;</span>                              <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="scroll_id-instance_method">
+  
+    - (<tt>Object</tt>) <strong>scroll_id</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 62</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_scroll_id'>scroll_id</span>
+  <span class='ivar'>@scroll_id</span> <span class='op'>||=</span> <span class='ivar'>@search</span><span class='period'>.</span><span class='id identifier rubyid_perform'>perform</span><span class='period'>.</span><span class='id identifier rubyid_json'>json</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_scroll_id</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="seen-instance_method">
+  
+    - (<tt>Object</tt>) <strong>seen</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_seen'>seen</span><span class='semicolon'>;</span>               <span class='ivar'>@seen</span>     <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid___perform'>__perform</span><span class='semicolon'>;</span> <span class='ivar'>@seen</span><span class='rparen'>)</span><span class='semicolon'>;</span>                                 <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="size-instance_method">
+  
+    - (<tt>Object</tt>) <strong>size</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 80</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_size'>size</span>
+  <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_a-instance_method">
+  
+    - (<tt>Object</tt>) <strong>to_a</strong> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='to_ary-instance_method'>to_ary</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+96</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 96</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_a'>to_a</span><span class='semicolon'>;</span>        <span class='id identifier rubyid_results'>results</span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_curl-instance_method">
+  
+    - (<tt>Object</tt>) <strong>to_curl</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_curl'>to_curl</span><span class='semicolon'>;</span>     <span class='tstring'><span class='tstring_beg'>%Q|</span><span class='tstring_content'>curl -X GET '</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_url'>url</span><span class='rbrace'>}</span><span class='tstring_content'>?pretty' -d '</span><span class='embexpr_beg'>#{</span><span class='ivar'>@scroll_id</span><span class='rbrace'>}</span><span class='tstring_content'>'</span><span class='tstring_end'>|</span></span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="total-instance_method">
+  
+    - (<tt>Object</tt>) <strong>total</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_total'>total</span><span class='semicolon'>;</span>              <span class='ivar'>@total</span>    <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid___perform'>__perform</span><span class='semicolon'>;</span> <span class='ivar'>@total</span><span class='rparen'>)</span><span class='semicolon'>;</span>                                <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="url-instance_method">
+  
+    - (<tt>Object</tt>) <strong>url</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+54</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/search/scan.rb', line 54</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_url'>url</span><span class='semicolon'>;</span>                <span class='const'>Configuration</span><span class='period'>.</span><span class='id identifier rubyid_url'>url</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/_search/scroll</span><span class='tstring_end'>&quot;</span></span><span class='semicolon'>;</span>                           <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:05 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

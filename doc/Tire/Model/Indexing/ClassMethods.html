@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Tire::Model::Indexing::ClassMethods
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../../../';
+  framesUrl = "../../../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Tire.html" title="Tire (module)">Tire</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Model.html" title="Tire::Model (module)">Model</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Indexing.html" title="Tire::Model::Indexing (module)">Indexing</a></span></span>
+     &raquo; 
+    <span class="title">ClassMethods</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../../../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../../../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Tire::Model::Indexing::ClassMethods
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+    <dt class="r1">Included in:</dt>
+    <dd class="r1"><span class='object_link'><a href="../Search/ClassMethodsProxy.html" title="Tire::Model::Search::ClassMethodsProxy (class)">Search::ClassMethodsProxy</a></span></dd>
+    
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/tire/model/indexing.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#create_elasticsearch_index-instance_method" title="#create_elasticsearch_index (instance method)">- (Object) <strong>create_elasticsearch_index</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates the corresponding index with desired settings and mappings, when it does not exists yet.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#indexes-instance_method" title="#indexes (instance method)">- (Object) <strong>indexes</strong>(name, options = {}, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Define mapping for the property passed as the first argument (<code>name</code>)
+using definition from the second argument (<code>options</code>).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mapping-instance_method" title="#mapping (instance method)">- (Object) <strong>mapping</strong>(*args) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Define the <a href="http://www.elasticsearch.org/guide/reference/mapping/index.html"><em>mapping</em></a>
+for the corresponding index, telling <em>ElasticSearch</em> how to understand your documents:
+what type is which property, whether it is analyzed or no, which analyzer to use, etc.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mapping_options-instance_method" title="#mapping_options (instance method)">- (Object) <strong>mapping_options</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mapping_to_hash-instance_method" title="#mapping_to_hash (instance method)">- (Object) <strong>mapping_to_hash</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#settings-instance_method" title="#settings (instance method)">- (Object) <strong>settings</strong>(*args) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Define <a href="http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html"><em>settings</em></a>
+for the corresponding index, such as number of shards and replicas, custom analyzers, etc.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="create_elasticsearch_index-instance_method">
+  
+    - (<tt>Object</tt>) <strong>create_elasticsearch_index</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates the corresponding index with desired settings and mappings, when it does not exists yet.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/indexing.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_create_elasticsearch_index'>create_elasticsearch_index</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_exists?'>exists?</span>
+    <span class='id identifier rubyid_new_index'>new_index</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span>
+    <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_new_index'>new_index</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='symbol'>:mappings</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_mapping_to_hash'>mapping_to_hash</span><span class='comma'>,</span> <span class='symbol'>:settings</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_settings'>settings</span><span class='rparen'>)</span>
+      <span class='const'>STDERR</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[ERROR] There has been an error when creating the index -- elasticsearch returned:</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                  <span class='id identifier rubyid_new_index'>new_index</span><span class='period'>.</span><span class='id identifier rubyid_response'>response</span>
+      <span class='id identifier rubyid_result'>result</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>rescue</span> <span class='const'>Errno</span><span class='op'>::</span><span class='const'>ECONNREFUSED</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='const'>STDERR</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Skipping index creation, cannot connect to ElasticSearch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+              <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(The original exception was: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='rbrace'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="indexes-instance_method">
+  
+    - (<tt>Object</tt>) <strong>indexes</strong>(name, options = {}, &amp;block) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Define mapping for the property passed as the first argument (<code>name</code>)
+using definition from the second argument (<code>options</code>).</p>
+
+<p><code>:type</code> is optional and defaults to <code>&#39;string&#39;</code>.</p>
+
+<p>Usage:</p>
+
+<ul>
+<li><p>Index property but do not analyze it: <code>indexes :id, :index    =&gt; :not_analyzed</code></p></li>
+<li><p>Use different analyzer for indexing a property: <code>indexes :title, :analyzer =&gt; &#39;snowball&#39;</code></p></li>
+<li><p>Use the <code>:as</code> option to dynamically define the serialized property value, eg:</p>
+
+<p>:as =&gt; &#39;content.split(/\W/).length&#39;</p></li>
+</ul>
+
+<p>Please refer to the
+<a href="http://www.elasticsearch.org/guide/reference/mapping/index.html"><em>mapping</em> documentation</a>
+for more information.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/indexing.rb', line 86</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_indexes'>indexes</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_mapping'>mapping</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='id identifier rubyid_mapping'>mapping</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span>       <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>object</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_mapping'>mapping</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:properties</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_previous'>previous</span> <span class='op'>=</span> <span class='ivar'>@mapping</span>
+    <span class='ivar'>@mapping</span> <span class='op'>=</span> <span class='id identifier rubyid_mapping'>mapping</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:properties</span><span class='rbracket'>]</span>
+    <span class='kw'>yield</span>
+    <span class='ivar'>@mapping</span> <span class='op'>=</span> <span class='id identifier rubyid_previous'>previous</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_mapping'>mapping</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span>
+
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mapping-instance_method">
+  
+    - (<tt>Object</tt>) <strong>mapping</strong>(*args) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Define the <a href="http://www.elasticsearch.org/guide/reference/mapping/index.html"><em>mapping</em></a>
+for the corresponding index, telling <em>ElasticSearch</em> how to understand your documents:
+what type is which property, whether it is analyzed or no, which analyzer to use, etc.</p>
+
+<p>You may pass the top level mapping properties (such as <code>_source</code> or <code>_all</code>) as a Hash.</p>
+
+<p>Usage:</p>
+
+<pre class="code ruby"><code><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='comment'># ...
+</span>  <span class='id identifier rubyid_mapping'>mapping</span> <span class='symbol'>:_source</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:compress</span> <span class='op'>=&gt;</span> <span class='kw'>true</span> <span class='rbrace'>}</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:id</span><span class='comma'>,</span>    <span class='symbol'>:index</span>    <span class='op'>=&gt;</span> <span class='symbol'>:not_analyzed</span>
+    <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:title</span><span class='comma'>,</span> <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>snowball</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:boost</span> <span class='op'>=&gt;</span> <span class='int'>100</span>
+    <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:words</span><span class='comma'>,</span> <span class='symbol'>:as</span>       <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>content.split(/\W/).length</span><span class='tstring_end'>'</span></span>
+
+    <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:comments</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:body</span>
+      <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:author</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:name</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># ...
+</span>  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/indexing.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mapping'>mapping</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+  <span class='ivar'>@mapping</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='ivar'>@mapping_options</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span>
+    <span class='kw'>yield</span>
+    <span class='id identifier rubyid_create_elasticsearch_index'>create_elasticsearch_index</span>
+  <span class='kw'>else</span>
+    <span class='ivar'>@mapping</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mapping_options-instance_method">
+  
+    - (<tt>Object</tt>) <strong>mapping_options</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/indexing.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mapping_options'>mapping_options</span>
+  <span class='ivar'>@mapping_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mapping_to_hash-instance_method">
+  
+    - (<tt>Object</tt>) <strong>mapping_to_hash</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+125
+126
+127</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/indexing.rb', line 125</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mapping_to_hash'>mapping_to_hash</span>
+  <span class='lbrace'>{</span> <span class='id identifier rubyid_document_type'>document_type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_mapping_options'>mapping_options</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='symbol'>:properties</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_mapping'>mapping</span> <span class='rbrace'>}</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="settings-instance_method">
+  
+    - (<tt>Object</tt>) <strong>settings</strong>(*args) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Define <a href="http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html"><em>settings</em></a>
+for the corresponding index, such as number of shards and replicas, custom analyzers, etc.</p>
+
+<p>Usage:</p>
+
+<pre class="code ruby"><code><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='comment'># ...
+</span>  <span class='id identifier rubyid_settings'>settings</span> <span class='symbol'>:number_of_shards</span> <span class='op'>=&gt;</span> <span class='int'>1</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_mapping'>mapping</span> <span class='kw'>do</span>
+      <span class='comment'># ...
+</span>    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+24
+25
+26
+27
+28</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/indexing.rb', line 24</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_settings'>settings</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+  <span class='ivar'>@settings</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>  <span class='op'>?</span> <span class='lparen'>(</span><span class='kw'>return</span> <span class='ivar'>@settings</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='ivar'>@settings</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span>
+  <span class='kw'>yield</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:04 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

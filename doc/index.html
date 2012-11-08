@@ -1,0 +1,778 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1>Tire</h1>
+
+<p><em>Tire</em> is a Ruby (1.8 or 1.9) client for the <a href="http://www.elasticsearch.org/">ElasticSearch</a>
+search engine/database.</p>
+
+<p><em>ElasticSearch</em> is a scalable, distributed, cloud-ready, highly-available,
+full-text search engine and database with
+<a href="http://www.elasticsearch.org/guide/reference/api/search/facets/">powerfull aggregation features</a>,
+communicating by JSON over RESTful HTTP, based on <a href="http://lucene.apache.org/">Lucene</a>, written in Java.</p>
+
+<p>This Readme provides a brief overview of <em>Tire&#39;s</em> features. The more detailed documentation is at <a href="http://karmi.github.com/tire/">http://karmi.github.com/tire/</a>.</p>
+
+<p>Both of these documents contain a lot of information. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it <strong>won&#39;t work</strong> for you. For more information, please refer to the <a href="https://github.com/karmi/tire/tree/master/test/integration">integration test suite</a>
+and <a href="https://github.com/karmi/tire/issues">issues</a>.</p>
+
+<h2>Installation</h2>
+
+<p>OK. First, you need a running <em>ElasticSearch</em> server. Thankfully, it&#39;s easy. Let&#39;s define easy:</p>
+
+<pre class="code ruby"><code>$ curl -k -L -o elasticsearch-0.19.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz
+$ tar -zxvf elasticsearch-0.19.0.tar.gz
+$ ./elasticsearch-0.19.0/bin/elasticsearch -f
+</code></pre>
+
+<p>See, easy. On a Mac, you can also use <em>Homebrew</em>:</p>
+
+<pre class="code ruby"><code>$ brew install elasticsearch
+</code></pre>
+
+<p>Now, let&#39;s install the gem via Rubygems:</p>
+
+<pre class="code ruby"><code>$ gem install tire
+</code></pre>
+
+<p>Of course, you can install it from the source as well:</p>
+
+<pre class="code ruby"><code>$ git clone git://github.com/karmi/tire.git
+$ cd tire
+$ rake install
+</code></pre>
+
+<h2>Usage</h2>
+
+<p><em>Tire</em> exposes easy-to-use domain specific language for fluent communication with <em>ElasticSearch</em>.</p>
+
+<p>It easily blends with your <em>ActiveModel</em>/<em>ActiveRecord</em> classes for convenient usage in <em>Rails</em> applications.</p>
+
+<p>To test-drive the core <em>ElasticSearch</em> functionality, let&#39;s require the gem:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>rubygems</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tire</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>Please note that you can copy these snippets from the much more extensive and heavily annotated file
+in <a href="http://karmi.github.com/tire/">examples/tire-dsl.rb</a>.</p>
+
+<p>Also, note that we&#39;re doing some heavy JSON lifting here. <em>Tire</em> uses the
+<a href="https://github.com/intridea/multi_json"><em>multi_json</em></a> gem as a generic JSON wrapper,
+which allows you to use your preferred JSON library. We&#39;ll use the
+<a href="https://github.com/brianmario/yajl-ruby"><em>yajl-ruby</em></a> gem in the full on mode here:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>yajl/json_gem</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>Let&#39;s create an index named <code>articles</code> and store/index some documents:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_delete'>delete</span>
+      <span class='id identifier rubyid_create'>create</span>
+
+      <span class='id identifier rubyid_store'>store</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>One</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>   <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_store'>store</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Two</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>   <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>python</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_store'>store</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Three</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>java</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_store'>store</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Four</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>  <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>php</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+
+      <span class='id identifier rubyid_refresh'>refresh</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>We can also create the index with custom
+<a href="http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html">mapping</a>
+for a specific document type:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_delete'>delete</span>
+
+      <span class='id identifier rubyid_create'>create</span> <span class='symbol'>:mappings</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:article</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+          <span class='symbol'>:properties</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+            <span class='symbol'>:id</span>       <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:index</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>not_analyzed</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:include_in_all</span> <span class='op'>=&gt;</span> <span class='kw'>false</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+            <span class='symbol'>:title</span>    <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:boost</span> <span class='op'>=&gt;</span> <span class='float'>2.0</span><span class='comma'>,</span>            <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>snowball</span><span class='tstring_end'>'</span></span>  <span class='rbrace'>}</span><span class='comma'>,</span>
+            <span class='symbol'>:tags</span>     <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>keyword</span><span class='tstring_end'>'</span></span>                             <span class='rbrace'>}</span><span class='comma'>,</span>
+            <span class='symbol'>:content</span>  <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>snowball</span><span class='tstring_end'>'</span></span>                            <span class='rbrace'>}</span>
+          <span class='rbrace'>}</span>
+        <span class='rbrace'>}</span>
+      <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Of course, we may have large amounts of data, and it may be impossible or impractical to add them to the index
+one by one. We can use <em>ElasticSearch&#39;s</em>
+<a href="http://www.elasticsearch.org/guide/reference/api/bulk.html">bulk storage</a>.
+Notice, that collection items must have an <code>id</code> property or method,
+and should have a <code>type</code> property, if you&#39;ve set any specific mapping for the index.</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_articles'>articles</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+      <span class='lbrace'>{</span> <span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>1</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>article</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>one</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>   <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>           <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span> <span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>2</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>article</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>two</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>   <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>python</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span> <span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>3</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>article</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>three</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>java</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>           <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='lbrace'>{</span> <span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>4</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>article</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>four</span><span class='tstring_end'>'</span></span><span class='comma'>,</span>  <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>php</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>    <span class='rbrace'>}</span>
+    <span class='rbracket'>]</span>
+
+    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_import'>import</span> <span class='id identifier rubyid_articles'>articles</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>We can easily manipulate the documents before storing them in the index, by passing a block to the
+<code>import</code> method, like this:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_import'>import</span> <span class='id identifier rubyid_articles'>articles</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_documents'>documents</span><span class='op'>|</span>
+
+        <span class='id identifier rubyid_documents'>documents</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_document'>document</span><span class='op'>|</span> <span class='id identifier rubyid_document'>document</span><span class='lbracket'>[</span><span class='symbol'>:title</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_capitalize!'>capitalize!</span> <span class='rbrace'>}</span>
+      <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_refresh'>refresh</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>If this <em>declarative</em> notation does not fit well in your context,
+you can use <em>Tire&#39;s</em> classes directly, in a more imperative manner:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_index'>index</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Index</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>oldskool</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span>
+    <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span>
+    <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_store'>store</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Let's do it the old way!</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_refresh'>refresh</span>
+</code></pre>
+
+<p>OK. Now, let&#39;s go search all the data.</p>
+
+<p>We will be searching for articles whose <code>title</code> begins with letter “T”, sorted by <code>title</code> in <code>descending</code> order,
+filtering them for ones tagged “ruby”, and also retrieving some <a href="http://www.elasticsearch.org/guide/reference/api/search/facets/"><em>facets</em></a>
+from the database:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_query'>query</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>title:T*</span><span class='tstring_end'>'</span></span>
+      <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_filter'>filter</span> <span class='symbol'>:terms</span><span class='comma'>,</span> <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+
+      <span class='id identifier rubyid_sort'>sort</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_by'>by</span> <span class='symbol'>:title</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>desc</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+
+      <span class='id identifier rubyid_facet'>facet</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>global-tags</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:global</span> <span class='op'>=&gt;</span> <span class='kw'>true</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_terms'>terms</span> <span class='symbol'>:tags</span>
+      <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_facet'>facet</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>current-tags</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_terms'>terms</span> <span class='symbol'>:tags</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>(Of course, we may also page the results with <code>from</code> and <code>size</code> query options, retrieve only specific fields
+or highlight content matching our query, etc.)</p>
+
+<p>Let&#39;s display the results:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_document'>document</span><span class='op'>|</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>* </span><span class='embexpr_beg'>#{</span> <span class='id identifier rubyid_document'>document</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span> <span class='rbrace'>}</span><span class='tstring_content'> [tags: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_document'>document</span><span class='period'>.</span><span class='id identifier rubyid_tags'>tags</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>, </span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># * Two [tags: ruby, python]
+</span></code></pre>
+
+<p>Let&#39;s display the global facets (distribution of tags across the whole database):</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_facets'>facets</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>global-tags</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>terms</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>count</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># ruby       3
+</span>    <span class='comment'># python     1
+</span>    <span class='comment'># php        1
+</span>    <span class='comment'># java       1
+</span></code></pre>
+
+<p>Now, let&#39;s display the facets based on current query (notice that count for articles
+tagged with &#39;java&#39; is included, even though it&#39;s not returned by our query;
+count for articles tagged &#39;php&#39; is excluded, since they don&#39;t match the current query):</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_facets'>facets</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>current-tags</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>terms</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_ljust'>ljust</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>count</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># ruby       1
+</span>    <span class='comment'># python     1
+</span>    <span class='comment'># java       1
+</span></code></pre>
+
+<p>Notice, that only variables from the enclosing scope are accessible.
+If we want to access the variables or methods from outer scope,
+we have to use a slight variation of the DSL, by passing the
+<code>search</code> and <code>query</code> objects around.</p>
+
+<pre class="code ruby"><code>    <span class='ivar'>@query</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>title:T*</span><span class='tstring_end'>'</span></span>
+
+    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_search'>search</span><span class='op'>|</span>
+      <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_query'>query</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_query'>query</span><span class='op'>|</span>
+        <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span> <span class='ivar'>@query</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Quite often, we need complex queries with boolean logic.
+Instead of composing long query strings such as <code>tags:ruby OR tags:java AND NOT tags:python</code>,
+we can use the <a href="http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html"><em>bool</em></a>
+query. In <em>Tire</em>, we build them declaratively.</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_query'>query</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_boolean'>boolean</span> <span class='kw'>do</span>
+          <span class='id identifier rubyid_should'>should</span>   <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tags:ruby</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+          <span class='id identifier rubyid_should'>should</span>   <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tags:java</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+          <span class='id identifier rubyid_must_not'>must_not</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tags:python</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>The best thing about <code>boolean</code> queries is that we can easily save these partial queries as Ruby blocks,
+to mix and reuse them later. So, we may define a query for the <em>tags</em> property:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_tags_query'>tags_query</span> <span class='op'>=</span> <span class='id identifier rubyid_lambda'>lambda</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_boolean'>boolean</span><span class='op'>|</span>
+      <span class='id identifier rubyid_boolean'>boolean</span><span class='period'>.</span><span class='id identifier rubyid_should'>should</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tags:ruby</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_boolean'>boolean</span><span class='period'>.</span><span class='id identifier rubyid_should'>should</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tags:java</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>And a query for the <em>published_on</em> property:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_published_on_query'>published_on_query</span> <span class='op'>=</span> <span class='id identifier rubyid_lambda'>lambda</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_boolean'>boolean</span><span class='op'>|</span>
+      <span class='id identifier rubyid_boolean'>boolean</span><span class='period'>.</span><span class='id identifier rubyid_must'>must</span>   <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>published_on:[2011-01-01 TO 2011-01-02]</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Now, we can combine these queries for different searches:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_query'>query</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_boolean'>boolean</span> <span class='op'>&amp;</span><span class='id identifier rubyid_tags_query'>tags_query</span>
+        <span class='id identifier rubyid_boolean'>boolean</span> <span class='op'>&amp;</span><span class='id identifier rubyid_published_on_query'>published_on_query</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Note, that you can pass options for configuring queries, facets, etc. by passing a Hash as the last argument to the method call:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_query'>query</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby python</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:default_operator</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>AND</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:use_dis_max</span> <span class='op'>=&gt;</span> <span class='kw'>true</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>You don&#39;t have to define the search criteria in one monolithic <em>Ruby</em> block -- you can build the search step by step,
+until you call the <code>results</code> method:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_query'>query</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>title:T*</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_filter'>filter</span> <span class='symbol'>:terms</span><span class='comma'>,</span> <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_p'>p</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span>
+</code></pre>
+
+<p>If configuring the search payload with blocks feels somehow too weak for you, you can pass
+a plain old Ruby <code>Hash</code> (or JSON string) with the query declaration to the <code>search</code> method:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:query</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:prefix</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fou</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+</code></pre>
+
+<p>If this sounds like a great idea to you, you are probably able to write your application
+using just <code>curl</code>, <code>sed</code> and <code>awk</code>.</p>
+
+<p>Do note again, however, that you&#39;re not tied to the declarative block-style DSL <em>Tire</em> offers to you.
+If it makes more sense in your context, you can use the API directly, in a more imperative style:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_search'>search</span> <span class='op'>=</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Search</span><span class='op'>::</span><span class='const'>Search</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>articles</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_query'>query</span>  <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>title:T*</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_filter'>filter</span> <span class='symbol'>:terms</span><span class='comma'>,</span> <span class='symbol'>:tags</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ruby</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span>   <span class='lbrace'>{</span> <span class='id identifier rubyid_by'>by</span> <span class='symbol'>:title</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>desc</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_facet'>facet</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>global-tags</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_terms'>terms</span> <span class='symbol'>:tags</span><span class='comma'>,</span> <span class='symbol'>:global</span> <span class='op'>=&gt;</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+    <span class='comment'># ...
+</span>    <span class='id identifier rubyid_p'>p</span> <span class='id identifier rubyid_search'>search</span><span class='period'>.</span><span class='id identifier rubyid_results'>results</span>
+</code></pre>
+
+<p>To debug the query we have laboriously set up like this,
+we can display the full query JSON for close inspection:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_to_json'>to_json</span>
+    <span class='comment'># {&quot;facets&quot;:{&quot;current-tags&quot;:{&quot;terms&quot;:{&quot;field&quot;:&quot;tags&quot;}},&quot;global-tags&quot;:{&quot;global&quot;:true,&quot;terms&quot;:{&quot;field&quot;:&quot;tags&quot;}}},&quot;query&quot;:{&quot;query_string&quot;:{&quot;query&quot;:&quot;title:T*&quot;}},&quot;filter&quot;:{&quot;terms&quot;:{&quot;tags&quot;:[&quot;ruby&quot;]}},&quot;sort&quot;:[{&quot;title&quot;:&quot;desc&quot;}]}
+</span></code></pre>
+
+<p>Or, better, we can display the corresponding <code>curl</code> command to recreate and debug the request in the terminal:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_to_curl'>to_curl</span>
+    <span class='comment'># curl -X POST &quot;http://localhost:9200/articles/_search?pretty=true&quot; -d '{&quot;facets&quot;:{&quot;current-tags&quot;:{&quot;terms&quot;:{&quot;field&quot;:&quot;tags&quot;}},&quot;global-tags&quot;:{&quot;global&quot;:true,&quot;terms&quot;:{&quot;field&quot;:&quot;tags&quot;}}},&quot;query&quot;:{&quot;query_string&quot;:{&quot;query&quot;:&quot;title:T*&quot;}},&quot;filter&quot;:{&quot;terms&quot;:{&quot;tags&quot;:[&quot;ruby&quot;]}},&quot;sort&quot;:[{&quot;title&quot;:&quot;desc&quot;}]}'
+</span></code></pre>
+
+<p>However, we can simply log every search query (and other requests) in this <code>curl</code>-friendly format:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_configure'>configure</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_logger'>logger</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>elasticsearch.log</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+</code></pre>
+
+<p>When you set the log level to <em>debug</em>:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_configure'>configure</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_logger'>logger</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>elasticsearch.log</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:level</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>debug</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+</code></pre>
+
+<p>the JSON responses are logged as well. This is not a great idea for production environment,
+but it&#39;s priceless when you want to paste a complicated transaction to the mailing list or IRC channel.</p>
+
+<p>The <em>Tire</em> DSL tries hard to provide a strong Ruby-like API for the main <em>ElasticSearch</em> features.</p>
+
+<p>By default, <em>Tire</em> wraps the results collection in a enumerable <code>Results::Collection</code> class,
+and result items in a <code>Results::Item</code> class, which looks like a child of <code>Hash</code> and <code>Openstruct</code>,
+for smooth iterating over and displaying the results.</p>
+
+<p>You may wrap the result items in your own class by setting the <code>Tire.configuration.wrapper</code>
+property. Your class must take a <code>Hash</code> of attributes on initialization.</p>
+
+<p>If that seems like a great idea to you, there&#39;s a big chance you already have such class.</p>
+
+<p>One would bet it&#39;s an <code>ActiveRecord</code> or <code>ActiveModel</code> class, containing model of your Rails application.</p>
+
+<p>Fortunately, <em>Tire</em> makes blending <em>ElasticSearch</em> features into your models trivially possible.</p>
+
+<h2>ActiveModel Integration</h2>
+
+<p>If you&#39;re the type with no time for lengthy introductions, you can generate a fully working
+example Rails application, with an <code>ActiveRecord</code> model and a search form, to play with
+(it even downloads <em>ElasticSearch</em> itself, generates the application skeleton and leaves you with
+a <em>Git</em> repository to explore the steps and the code):</p>
+
+<pre class="code ruby"><code>$ rails new searchapp -m https://raw.github.com/karmi/tire/master/examples/rails-application-template.rb
+</code></pre>
+
+<p>For the rest of us, let&#39;s suppose you have an <code>Article</code> class in your <em>Rails</em> application.</p>
+
+<p>To make it searchable with <em>Tire</em>, just <code>include</code> it:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>When you now save a record:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span>   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>I Love ElasticSearch</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                   <span class='symbol'>:content</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>...</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                   <span class='symbol'>:author</span> <span class='op'>=&gt;</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Captain Nemo</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                   <span class='symbol'>:published_on</span> <span class='op'>=&gt;</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
+</code></pre>
+
+<p>it is automatically added into an index called &#39;articles&#39;, because of the included callbacks.</p>
+
+<p>The document attributes are indexed exactly as when you call the <code>Article#to_json</code> method.</p>
+
+<p>Now you can search the records:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>OK. This is where the search game stops, often. Not here.</p>
+
+<p>First of all, you may use the full query DSL, as explained above, with filters, sorting,
+advanced facet aggregation, highlighting, etc:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_query'>query</span>             <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_facet'>facet</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>timeline</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_date'>date</span>   <span class='symbol'>:published_on</span><span class='comma'>,</span> <span class='symbol'>:interval</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>month</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_sort'>sort</span>              <span class='lbrace'>{</span> <span class='id identifier rubyid_by'>by</span>     <span class='symbol'>:published_on</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>desc</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Second, dynamic mapping is a godsend when you&#39;re prototyping.
+For serious usage, though, you&#39;ll definitely want to define a custom <em>mapping</em> for your models:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+
+      <span class='id identifier rubyid_mapping'>mapping</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:id</span><span class='comma'>,</span>           <span class='symbol'>:index</span>    <span class='op'>=&gt;</span> <span class='symbol'>:not_analyzed</span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:title</span><span class='comma'>,</span>        <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>snowball</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:boost</span> <span class='op'>=&gt;</span> <span class='int'>100</span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:content</span><span class='comma'>,</span>      <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>snowball</span><span class='tstring_end'>'</span></span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:content_size</span><span class='comma'>,</span> <span class='symbol'>:as</span>       <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>content.size</span><span class='tstring_end'>'</span></span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:author</span><span class='comma'>,</span>       <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>keyword</span><span class='tstring_end'>'</span></span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:published_on</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>date</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:include_in_all</span> <span class='op'>=&gt;</span> <span class='kw'>false</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>In this case, <em>only</em> the defined model attributes are indexed. The <code>mapping</code> declaration creates the
+index when the class is loaded or when the importing features are used, and <em>only</em> when it does not yet exist.</p>
+
+<p>You can define different <a href="http://www.elasticsearch.org/guide/reference/index-modules/analysis/index.html"><em>analyzers</em></a>,
+<a href="http://www.elasticsearch.org/guide/reference/mapping/boost-field.html"><em>boost</em></a> levels for different properties,
+or any other configuration for <em>elasticsearch</em>.</p>
+
+<p>You&#39;re not limited to 1:1 mapping between your model properties and the serialized document. With the <code>:as</code> option,
+you can pass a string or a <em>Proc</em> object which is evaluated in the instance context (see the <code>content_size</code> property).</p>
+
+<p>Chances are, you want to declare also a custom <em>settings</em> for the index, such as set the number of shards,
+replicas, or create elaborate analyzer chains, such as the hipster&#39;s choice: <a href="https://gist.github.com/1160430"><em>ngrams</em></a>.
+In this case, just wrap the <code>mapping</code> method in a <code>settings</code> one, passing it the settings as a Hash:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>URL</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+
+      <span class='id identifier rubyid_settings'>settings</span> <span class='symbol'>:number_of_shards</span> <span class='op'>=&gt;</span> <span class='int'>1</span><span class='comma'>,</span>
+               <span class='symbol'>:number_of_replicas</span> <span class='op'>=&gt;</span> <span class='int'>1</span><span class='comma'>,</span>
+               <span class='symbol'>:analysis</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+                 <span class='symbol'>:filter</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+                   <span class='symbol'>:url_ngram</span>  <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+                     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>type</span><span class='tstring_end'>&quot;</span></span>     <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>nGram</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>max_gram</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='int'>5</span><span class='comma'>,</span>
+                     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>min_gram</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>
+                 <span class='rbrace'>}</span><span class='comma'>,</span>
+                 <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+                   <span class='symbol'>:url_analyzer</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tokenizer</span><span class='tstring_end'>&quot;</span></span>    <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>lowercase</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>filter</span><span class='tstring_end'>&quot;</span></span>       <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>stop</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>url_ngram</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>type</span><span class='tstring_end'>&quot;</span></span>         <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                 <span class='rbrace'>}</span>
+               <span class='rbrace'>}</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_mapping'>mapping</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:url</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>url_analyzer</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>It may well be reasonable to wrap the index creation logic declared with <code>Tire.index(&#39;urls&#39;).create</code>
+in a class method of your model, in a module method, etc, to have better control on index creation when
+bootstrapping the application with Rake tasks or when setting up the test suite.
+<em>Tire</em> will not hold that against you.</p>
+
+<p>You may have just stopped wondering: what if I have my own <code>settings</code> class method defined?
+Or what if some other gem defines <code>settings</code>, or some other <em>Tire</em> method, such as <code>update_index</code>?
+Things will break, right? No, they won&#39;t.</p>
+
+<p>In fact, all this time you&#39;ve been using only <em>proxies</em> to the real <em>Tire</em> methods, which live in the <code>tire</code>
+class and instance methods of your model. Only when not trampling on someone&#39;s foot — which is the majority
+of cases —, will <em>Tire</em> bring its methods to the namespace of your class.</p>
+
+<p>So, instead of writing <code>Article.search</code>, you could write <code>Article.tire.search</code>, and instead of
+<code>@article.update_index</code> you could write <code>@article.tire.update_index</code>, to be on the safe side.
+Let&#39;s have a look on an example with the <code>mapping</code> method:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+
+      <span class='id identifier rubyid_tire'>tire</span><span class='period'>.</span><span class='id identifier rubyid_mapping'>mapping</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:id</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:index</span> <span class='op'>=&gt;</span> <span class='symbol'>:not_analyzed</span>
+        <span class='comment'># ...
+</span>      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Of course, you could also use the block form:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+
+      <span class='id identifier rubyid_tire'>tire</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_mapping'>mapping</span> <span class='kw'>do</span>
+          <span class='id identifier rubyid_indexes'>indexes</span> <span class='symbol'>:id</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>string</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:index</span> <span class='op'>=&gt;</span> <span class='symbol'>:not_analyzed</span>
+          <span class='comment'># ...
+</span>        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Internally, <em>Tire</em> uses these proxy methods exclusively. When you run into issues,
+use the proxied method, eg. <code>Article.tire.mapping</code>, directly.</p>
+
+<p>When you want a tight grip on how the attributes are added to the index, just
+implement the <code>to_indexed_json</code> method in your model.</p>
+
+<p>The easiest way is to customize the <code>to_json</code> serialization support of your model:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='comment'># ...
+</span>
+      <span class='id identifier rubyid_include_root_in_json'>include_root_in_json</span> <span class='op'>=</span> <span class='kw'>false</span>
+      <span class='kw'>def</span> <span class='id identifier rubyid_to_indexed_json'>to_indexed_json</span>
+        <span class='id identifier rubyid_to_json'>to_json</span> <span class='symbol'>:except</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>updated_at</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:methods</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>length</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Of course, it may well be reasonable to define the indexed JSON from the ground up:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='comment'># ...
+</span>
+      <span class='kw'>def</span> <span class='id identifier rubyid_to_indexed_json'>to_indexed_json</span>
+        <span class='id identifier rubyid_names'>names</span>      <span class='op'>=</span> <span class='id identifier rubyid_author'>author</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\W</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_last_name'>last_name</span>  <span class='op'>=</span> <span class='id identifier rubyid_names'>names</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span>
+        <span class='id identifier rubyid_first_name'>first_name</span> <span class='op'>=</span> <span class='id identifier rubyid_names'>names</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
+
+        <span class='lbrace'>{</span>
+          <span class='symbol'>:title</span>   <span class='op'>=&gt;</span> <span class='id identifier rubyid_title'>title</span><span class='comma'>,</span>
+          <span class='symbol'>:content</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
+          <span class='symbol'>:author</span>  <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+            <span class='symbol'>:first_name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_first_name'>first_name</span><span class='comma'>,</span>
+            <span class='symbol'>:last_name</span>  <span class='op'>=&gt;</span> <span class='id identifier rubyid_last_name'>last_name</span>
+          <span class='rbrace'>}</span>
+        <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_to_json'>to_json</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Notice, that you may want to skip including the <code>Tire::Model::Callbacks</code> module in special cases,
+like when your records are indexed via some external mechanism, let&#39;s say a <em>CouchDB</em> or <em>RabbitMQ</em>
+<a href="http://www.elasticsearch.org/blog/2010/09/28/the_river.html">river</a>, or when you need better
+control on how the documents are added to or removed from the index:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+
+      <span class='id identifier rubyid_after_save'>after_save</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_update_index'>update_index</span> <span class='kw'>if</span> <span class='id identifier rubyid_state'>state</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>published</span><span class='tstring_end'>'</span></span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>The results returned by <code>Article.search</code> are wrapped in the aforementioned <code>Item</code> class, by default.
+This way, we have a fast and flexible access to the properties returned from <em>ElasticSearch</em> (via the
+<code>_source</code> or <code>fields</code> JSON properties). This way, we can index whatever JSON we like in <em>ElasticSearch</em>,
+and retrieve it, simply, via the dot notation:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_articles'>articles</span> <span class='op'>=</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span>
+    <span class='id identifier rubyid_articles'>articles</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_article'>article</span><span class='op'>|</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_author'>author</span><span class='period'>.</span><span class='id identifier rubyid_last_name'>last_name</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>The <code>Item</code> instances masquerade themselves as instances of your model within a <em>Rails</em> application
+(based on the <code>_type</code> property retrieved from <em>ElasticSearch</em>), so you can use them carefree;
+all the <code>url_for</code> or <code>dom_id</code> helpers work as expected.</p>
+
+<p>If you need to access the “real” model (eg. to access its assocations or methods not
+stored in <em>ElasticSearch</em>), just load it from the database:</p>
+
+<pre class="code ruby"><code>    <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='symbol'>:include</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>comments</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_comments'>comments</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+</code></pre>
+
+<p>You can see that <em>Tire</em> stays as far from the database as possible. That&#39;s because it believes
+you have most of the data you want to display stored in <em>ElasticSearch</em>. When you need
+to eagerly load the records from the database itself, for whatever reason,
+you can do it with the <code>:load</code> option when searching:</p>
+
+<pre class="code ruby"><code>    <span class='comment'># Will call `Article.search [1, 2, 3]`
+</span>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='symbol'>:load</span> <span class='op'>=&gt;</span> <span class='kw'>true</span>
+</code></pre>
+
+<p>Instead of simple <code>true</code>, you can pass any options for the model&#39;s find method:</p>
+
+<pre class="code ruby"><code>    <span class='comment'># Will call `Article.search [1, 2, 3], :include =&gt; 'comments'`
+</span>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='symbol'>:load</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:include</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>comments</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_query'>query</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Note that <em>Tire</em> search results are fully compatible with <a href="https://github.com/mislav/will_paginate"><code>will_paginate</code></a>,
+so you can pass all the usual parameters to the <code>search</code> method in the controller:</p>
+
+<pre class="code ruby"><code>    <span class='ivar'>@articles</span> <span class='op'>=</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:q</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:page</span> <span class='op'>=&gt;</span> <span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:page</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='int'>1</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>OK. Chances are, you have lots of records stored in your database. How will you get them to <em>ElasticSearch</em>? Easy:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_import'>import</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
+</code></pre>
+
+<p>This way, however, all your records are loaded into memory, serialized into JSON,
+and sent down the wire to <em>ElasticSearch</em>. Not practical, you say? You&#39;re right.</p>
+
+<p>Provided your model implements some sort of <em>pagination</em> — and it probably does —, you can just run:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_import'>import</span>
+</code></pre>
+
+<p>In this case, the <code>Article.paginate</code> method is called, and your records are sent to the index
+in chunks of 1000. If that number doesn&#39;t suit you, just provide a better one:</p>
+
+<pre class="code ruby"><code>    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_import'>import</span> <span class='symbol'>:per_page</span> <span class='op'>=&gt;</span> <span class='int'>100</span>
+</code></pre>
+
+<p>Any other parameters you provide to the <code>import</code> method are passed down to the <code>paginate</code> method.</p>
+
+<p>Are we saying you have to fiddle with this thing in a <code>rails console</code> or silly Ruby scripts? No.
+Just call the included <em>Rake</em> task on the commandline:</p>
+
+<pre class="code bash"><code>    $ rake environment tire:import CLASS='Article'
+</code></pre>
+
+<p>You can also force-import the data by deleting the index first (and creating it with mapping
+provided by the <code>mapping</code> block in your model):</p>
+
+<pre class="code bash"><code>    $ rake environment tire:import CLASS='Article' FORCE=true
+</code></pre>
+
+<p>When you&#39;ll spend more time with <em>ElasticSearch</em>, you&#39;ll notice how
+<a href="http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html">index aliases</a>
+are the best idea since the invention of inverted index.
+You can index your data into a fresh index (and possibly update an alias once everything&#39;s fine):</p>
+
+<pre class="code bash"><code>    $ rake environment tire:import CLASS='Article' INDEX='articles-2011-05'
+</code></pre>
+
+<p>OK. All this time we have been talking about <code>ActiveRecord</code> models, since
+it is a reasonable <em>Rails</em>&#39; default for the storage layer.</p>
+
+<p>But what if you use another database such as <a href="http://www.mongodb.org/">MongoDB</a>,
+another object mapping library, such as <a href="http://mongoid.org/">Mongoid</a> or <a href="http://mongomapper.com/">MongoMapper</a>?</p>
+
+<p>Well, things stay mostly the same:</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Mongoid</span><span class='op'>::</span><span class='const'>Document</span>
+      <span class='id identifier rubyid_field'>field</span> <span class='symbol'>:title</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='const'>String</span>
+      <span class='id identifier rubyid_field'>field</span> <span class='symbol'>:content</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='const'>String</span>
+
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+
+      <span class='comment'># These Mongo guys sure do get funky with their IDs in +serializable_hash+, let's fix it.
+</span>      <span class='comment'>#
+</span>      <span class='kw'>def</span> <span class='id identifier rubyid_to_indexed_json'>to_indexed_json</span>
+        <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_to_json'>to_json</span>
+      <span class='kw'>end</span>
+
+    <span class='kw'>end</span>
+
+    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>I Love ElasticSearch</span><span class='tstring_end'>'</span></span>
+
+    <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_tire'>tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>love</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p><em>Tire</em> does not care what&#39;s your primary data storage solution, if it has an <em>ActiveModel</em>-compatible
+adapter. But there&#39;s more.</p>
+
+<p><em>Tire</em> implements not only <em>searchable</em> features, but also <em>persistence</em> features. This means you can use a <em>Tire</em> model <strong>instead of your database</strong>, not just for <em>searching</em> your database. Why would you like to do that?</p>
+
+<p>Well, because you&#39;re tired of database migrations and lots of hand-holding with your
+database to store stuff like <code>{ :name =&gt; &#39;Tire&#39;, :tags =&gt; [ &#39;ruby&#39;, &#39;search&#39; ] }</code>.
+Because all you need, really, is to just dump a JSON-representation of your data into a database and load it back again.
+Because you&#39;ve noticed that <em>searching</em> your data is a much more effective way of retrieval
+then constructing elaborate database query conditions.
+Because you have <em>lots</em> of data and want to use <em>ElasticSearch&#39;s</em> advanced distributed features.</p>
+
+<p>All good reasons to use <em>ElasticSearch</em> as a schema-free and highly-scalable storage and retrieval/aggregation engine for your data.</p>
+
+<p>To use the persistence mode, we&#39;ll include the <code>Tire::Persistence</code> module in our class and define its properties;
+we can add the standard mapping declarations, set default values, or define casting for the property to create
+lightweight associations between the models.</p>
+
+<pre class="code ruby"><code>    <span class='kw'>class</span> <span class='const'>Article</span>
+      <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Persistence</span>
+
+      <span class='id identifier rubyid_validates_presence_of'>validates_presence_of</span> <span class='symbol'>:title</span><span class='comma'>,</span> <span class='symbol'>:author</span>
+
+      <span class='id identifier rubyid_property'>property</span> <span class='symbol'>:title</span><span class='comma'>,</span>        <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>snowball</span><span class='tstring_end'>'</span></span>
+      <span class='id identifier rubyid_property'>property</span> <span class='symbol'>:published_on</span><span class='comma'>,</span> <span class='symbol'>:type</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>date</span><span class='tstring_end'>'</span></span>
+      <span class='id identifier rubyid_property'>property</span> <span class='symbol'>:tags</span><span class='comma'>,</span>         <span class='symbol'>:default</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:analyzer</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>keyword</span><span class='tstring_end'>'</span></span>
+      <span class='id identifier rubyid_property'>property</span> <span class='symbol'>:author</span><span class='comma'>,</span>       <span class='symbol'>:class</span> <span class='op'>=&gt;</span> <span class='const'>Author</span>
+      <span class='id identifier rubyid_property'>property</span> <span class='symbol'>:comments</span><span class='comma'>,</span>     <span class='symbol'>:class</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='const'>Comment</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Please be sure to peruse the <a href="https://github.com/karmi/tire/tree/master/test/integration">integration test suite</a>
+for examples of the API and <em>ActiveModel</em> integration usage.</p>
+
+<h2>Extensions and Additions</h2>
+
+<p>The <a href="http://github.com/karmi/tire-contrib/"><em>tire-contrib</em></a> project contains additions
+and extensions to the core <em>Tire</em> functionality — be sure to check them out.</p>
+
+<h2>Other Clients</h2>
+
+<p>Check out <a href="http://www.elasticsearch.org/guide/appendix/clients.html">other <em>ElasticSearch</em> clients</a>.</p>
+
+<h2>Feedback</h2>
+
+<p>You can send feedback via <a href="mailto:karmi@karmi.cz">e-mail</a> or via <a href="https://github.com/karmi/tire/issues">Github Issues</a>.</p>
+
+<hr>
+
+<p><a href="http://karmi.cz">Karel Minarik</a> and <a href="http://github.com/karmi/tire/contributors">contributors</a></p>
+</div></div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:03 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

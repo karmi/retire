@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Tire::Model::Percolate::ClassMethods
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../../../';
+  framesUrl = "../../../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Tire.html" title="Tire (module)">Tire</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Model.html" title="Tire::Model (module)">Model</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Percolate.html" title="Tire::Model::Percolate (module)">Percolate</a></span></span>
+     &raquo; 
+    <span class="title">ClassMethods</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../../../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../../../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Tire::Model::Percolate::ClassMethods
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+    <dt class="r1">Included in:</dt>
+    <dd class="r1"><span class='object_link'><a href="../Search/ClassMethodsProxy.html" title="Tire::Model::Search::ClassMethodsProxy (class)">Search::ClassMethodsProxy</a></span></dd>
+    
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/tire/model/percolate.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_percolate-instance_method" title="#on_percolate (instance method)">- (Object) <strong>on_percolate</strong>(pattern = true, &amp;block) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A callback method for intercepting percolator matches.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#percolate%21-instance_method" title="#percolate! (instance method)">- (Object) <strong>percolate!</strong>(pattern = true) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Set up the percolation when documents are being added to the index.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#percolator-instance_method" title="#percolator (instance method)">- (Object) <strong>percolator</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the status or pattern of percolator for this class.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="on_percolate-instance_method">
+  
+    - (<tt>Object</tt>) <strong>on_percolate</strong>(pattern = true, &amp;block) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A callback method for intercepting percolator matches.</p>
+
+<p>Usage:</p>
+
+<pre class="code ruby"><code><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='comment'># ...
+</span>  <span class='id identifier rubyid_on_percolate'>on_percolate</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Article title ???</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_title'>title</span><span class='rbrace'>}</span><span class='tstring_content'>??? matches queries: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_matches'>matches</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_matches'>matches</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>Based on the response received in <code>matches</code>, you may choose to fire notifications,
+increment counters, send out e-mail alerts, etc.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/percolate.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_percolate'>on_percolate</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='op'>=</span><span class='kw'>true</span><span class='comma'>,</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_percolate!'>percolate!</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_klass'>klass</span><span class='period'>.</span><span class='id identifier rubyid_after_update_elasticsearch_index'>after_update_elasticsearch_index</span><span class='lparen'>(</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="percolate!-instance_method">
+  
+    - (<tt>Object</tt>) <strong>percolate!</strong>(pattern = true) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Set up the percolation when documents are being added to the index.</p>
+
+<p>Usage:</p>
+
+<pre class="code ruby"><code><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='comment'># ...
+</span>  <span class='id identifier rubyid_percolate!'>percolate!</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>First, you have to register a percolator query:</p>
+
+<pre class="code ruby"><code><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='period'>.</span><span class='id identifier rubyid_register_percolator_query'>register_percolator_query</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fail</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>    <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_query'>query</span><span class='op'>|</span> <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>fail</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span>
+</code></pre>
+
+<p>Then, when you update the index, matching queries are returned in the <code>matches</code> property:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_p'>p</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>This is a FAIL!</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_matches'>matches</span>
+</code></pre>
+
+<p>You may pass a pattern to filter which percolator queries will be executed.</p>
+
+<p>See <a href="http://www.elasticsearch.org/guide/reference/api/index_.html">http://www.elasticsearch.org/guide/reference/api/index_.html</a> for more information.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+33
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/percolate.rb', line 33</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_percolate!'>percolate!</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='op'>=</span><span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='cvar'>@@_percolator</span> <span class='op'>=</span> <span class='id identifier rubyid_pattern'>pattern</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="percolator-instance_method">
+  
+    - (<tt>Object</tt>) <strong>percolator</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the status or pattern of percolator for this class.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/percolate.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_percolator'>percolator</span>
+  <span class='kw'>defined?</span><span class='lparen'>(</span><span class='cvar'>@@_percolator</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='cvar'>@@_percolator</span> <span class='op'>:</span> <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:04 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

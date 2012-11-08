@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Tire
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index (T)</a> &raquo;
+    
+    
+    <span class="title">Tire</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Tire
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+      <dt class="r1">Extended by:</dt>
+      <dd class="r1"><span class='object_link'><a href="Tire/DSL.html" title="Tire::DSL (module)">DSL</a></span></dd>
+      
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/tire/http/clients/faraday.rb<span class="defines">,<br />
+  lib/tire.rb,<br /> lib/tire/dsl.rb,<br /> lib/tire/utils.rb,<br /> lib/tire/index.rb,<br /> lib/tire/alias.rb,<br /> lib/tire/search.rb,<br /> lib/tire/logger.rb,<br /> lib/tire/version.rb,<br /> lib/tire/http/client.rb,<br /> lib/tire/search/scan.rb,<br /> lib/tire/search/sort.rb,<br /> lib/tire/model/naming.rb,<br /> lib/tire/model/import.rb,<br /> lib/tire/search/query.rb,<br /> lib/tire/search/facet.rb,<br /> lib/tire/results/item.rb,<br /> lib/tire/model/search.rb,<br /> lib/tire/multi_search.rb,<br /> lib/tire/http/response.rb,<br /> lib/tire/configuration.rb,<br /> lib/tire/search/filter.rb,<br /> lib/tire/model/indexing.rb,<br /> lib/tire/model/percolate.rb,<br /> lib/tire/model/callbacks.rb,<br /> lib/tire/search/highlight.rb,<br /> lib/tire/model/persistence.rb,<br /> lib/tire/http/clients/curb.rb,<br /> lib/tire/results/pagination.rb,<br /> lib/tire/results/collection.rb,<br /> lib/tire/search/script_field.rb,<br /> lib/tire/search/queries/match.rb,<br /> lib/tire/model/persistence/finders.rb,<br /> lib/tire/model/persistence/storage.rb,<br /> lib/tire/model/persistence/attributes.rb</span>
+</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A Faraday-based HTTP client, which allows you to choose a HTTP client.</p>
+
+<p>See <a href="https://github.com/technoweenie/faraday/tree/master/lib/faraday/adapter">https://github.com/technoweenie/faraday/tree/master/lib/faraday/adapter</a></p>
+
+<p>NOTE: Tire will switch to Faraday for the HTTP abstraction layer. This client is a temporary solution.</p>
+
+<h2>Example:</h2>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>typhoeus</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>tire/http/clients/faraday</span><span class='tstring_end'>'</span></span>
+
+<span class='const'>Tire</span><span class='period'>.</span><span class='id identifier rubyid_configure'>configure</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_config'>config</span><span class='op'>|</span>
+
+  <span class='comment'># Unless specified, tire will use Faraday.default_adapter and no middleware
+</span>  <span class='const'>Tire</span><span class='op'>::</span><span class='const'>HTTP</span><span class='op'>::</span><span class='const'>Client</span><span class='op'>::</span><span class='const'>Faraday</span><span class='period'>.</span><span class='id identifier rubyid_faraday_middleware'>faraday_middleware</span> <span class='op'>=</span> <span class='const'>Proc</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_builder'>builder</span><span class='op'>|</span>
+    <span class='id identifier rubyid_builder'>builder</span><span class='period'>.</span><span class='id identifier rubyid_adapter'>adapter</span> <span class='symbol'>:typhoeus</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_client'>client</span><span class='lparen'>(</span><span class='const'>Tire</span><span class='op'>::</span><span class='const'>HTTP</span><span class='op'>::</span><span class='const'>Client</span><span class='op'>::</span><span class='const'>Faraday</span><span class='rparen'>)</span>
+
+<span class='kw'>end</span>
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Tire/DSL.html" title="Tire::DSL (module)">DSL</a></span>, <span class='object_link'><a href="Tire/HTTP.html" title="Tire::HTTP (module)">HTTP</a></span>, <span class='object_link'><a href="Tire/Model.html" title="Tire::Model (module)">Model</a></span>, <span class='object_link'><a href="Tire/Results.html" title="Tire::Results (module)">Results</a></span>, <span class='object_link'><a href="Tire/Search.html" title="Tire::Search (module)">Search</a></span>, <span class='object_link'><a href="Tire/Utils.html" title="Tire::Utils (module)">Utils</a></span>
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Tire/Alias.html" title="Tire::Alias (class)">Alias</a></span>, <span class='object_link'><a href="Tire/Configuration.html" title="Tire::Configuration (class)">Configuration</a></span>, <span class='object_link'><a href="Tire/Index.html" title="Tire::Index (class)">Index</a></span>, <span class='object_link'><a href="Tire/Logger.html" title="Tire::Logger (class)">Logger</a></span>
+    
+  
+</p>
+
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="VERSION-constant" class="">VERSION =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.5.0</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="CHANGELOG-constant" class="">CHANGELOG =
+          
+        </dt>
+        <dd><pre class="code"><span class='heredoc_beg'>&lt;&lt;-END</span>
+<span class='tstring_content'>  IMPORTANT CHANGES LATELY:
+
+  * [!BREAKING!] Change format of sort/order in simple model searches to &lt;field&gt;:&lt;direction&gt;
+  * [FIX] Remove `page` and `per_page` from parameters sent to elasticsearch
+  * [FIX] Remove the `wrapper` options from URL params sent to elasticsearch
+  * [FIX] Use `options.delete(:sort)` in model search to halt bubbling of `sort` into URL parameters [#334]
+  * Added prettified JSON output for logging requests and responses at the `debug` level
+  * Improved the Rake import task
+  * Allow passing of arbitrary objects in the `:as` mapping option [#446]
+  * Allow to define default values for Tire::Model::Persistence `:as` lambdas
+  * Added `@search.results.max_score`
+  * Changed the URI escape/unescape compatibility patch to not require Rack
+  * Allow using the full DSL in filter facets
+  * Allow complex hash options for the `term` query
+  * Allow passing Hash-like objects to `terms` query as well
+  * Implemented `respond_to?` for `Item`
+  * Improved support for Kaminari pagination
+  * Added support for the `parent` URL parameter in `Index#store`
+  * Added the `min_score` and `track_scores` DSL methods
+  * Added support for loading partial fields
+  * Added support for boosting query
+  * Added the `facet_filter` DSL method
+  * Allow passing `routing`, `fields` and `preference` URL parameter to Index#retrieve
+  * Allow building the search request step-by-step in Tire's DSL [#496]
+  * Added a `match` query type
+  * Added support for multisearch (_msearch) and the `Tire.multi_search` DSL method
+  * Added support for multi-search in the ActiveModel integration and in Tire::Model::Persistence
+</span><span class='heredoc_end'>END</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#warn-class_method" title="warn (class method)">+ (Object) <strong>warn</strong>(message) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Tire/DSL.html" title="Tire::DSL (module)">DSL</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Tire/DSL.html#aliases-instance_method" title="Tire::DSL#aliases (method)">aliases</a></span>, <span class='object_link'><a href="Tire/DSL.html#configure-instance_method" title="Tire::DSL#configure (method)">configure</a></span>, <span class='object_link'><a href="Tire/DSL.html#index-instance_method" title="Tire::DSL#index (method)">index</a></span>, <span class='object_link'><a href="Tire/DSL.html#multi_search-instance_method" title="Tire::DSL#multi_search (method)">multi_search</a></span>, <span class='object_link'><a href="Tire/DSL.html#scan-instance_method" title="Tire::DSL#scan (method)">scan</a></span>, <span class='object_link'><a href="Tire/DSL.html#search-instance_method" title="Tire::DSL#search (method)">search</a></span></p>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="warn-class_method">
+  
+    + (<tt>Object</tt>) <strong>warn</strong>(message) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_caller'>caller</span><span class='period'>.</span><span class='id identifier rubyid_detect'>detect</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>!~</span> <span class='tstring'><span class='regexp_beg'>%r|</span><span class='tstring_content'>lib\/tire\/</span><span class='regexp_end'>|</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>:in .*</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+  <span class='const'>STDERR</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[31m[DEPRECATION WARNING] </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_message'>message</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(Called from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line'>line</span><span class='rbrace'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\e[0m</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:03 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

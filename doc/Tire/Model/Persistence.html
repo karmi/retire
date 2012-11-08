@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Tire::Model::Persistence
+  
+    &mdash; Documentation by YARD 0.8.3
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../../';
+  framesUrl = "../../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Tire.html" title="Tire (module)">Tire</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Model.html" title="Tire::Model (module)">Model</a></span></span>
+     &raquo; 
+    <span class="title">Persistence</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Tire::Model::Persistence
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">lib/tire/model/persistence.rb<span class="defines">,<br />
+  lib/tire/model/persistence/finders.rb,<br /> lib/tire/model/persistence/storage.rb,<br /> lib/tire/model/persistence/attributes.rb</span>
+</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Allows to use <em>ElasticSearch</em> as a primary database (storage).</p>
+
+<p>Contains all the <code>Tire::Model::Search</code> features and provides
+an <a href="http://rubygems.org/gems/activemodel"><em>ActiveModel</em></a>-compatible
+interface for persistance.</p>
+
+<p>Usage:</p>
+
+<pre class="code ruby"><code><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Persistence</span>
+
+  <span class='id identifier rubyid_property'>property</span> <span class='symbol'>:title</span>
+<span class='kw'>end</span>
+
+<span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span> <span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='int'>1</span><span class='comma'>,</span> <span class='symbol'>:title</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>One</span><span class='tstring_end'>'</span></span>
+
+<span class='id identifier rubyid_article'>article</span> <span class='op'>=</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span>
+
+<span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_destroy'>destroy</span>
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Persistence/Attributes.html" title="Tire::Model::Persistence::Attributes (module)">Attributes</a></span>, <span class='object_link'><a href="Persistence/Finders.html" title="Tire::Model::Persistence::Finders (module)">Finders</a></span>, <span class='object_link'><a href="Persistence/Storage.html" title="Tire::Model::Persistence::Storage (module)">Storage</a></span>
+    
+  
+    
+  
+</p>
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#included-class_method" title="included (class method)">+ (Object) <strong>included</strong>(base) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="included-class_method">
+  
+    + (<tt>Object</tt>) <strong>included</strong>(base) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tire/model/persistence.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_included'>included</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>AttributeMethods</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>Validations</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>Serialization</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>Serializers</span><span class='op'>::</span><span class='const'>JSON</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>Naming</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>Conversion</span>
+
+    <span class='id identifier rubyid_extend'>extend</span>  <span class='const'>ActiveModel</span><span class='op'>::</span><span class='const'>Callbacks</span>
+    <span class='id identifier rubyid_define_model_callbacks'>define_model_callbacks</span> <span class='symbol'>:save</span><span class='comma'>,</span> <span class='symbol'>:destroy</span>
+
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Search</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>Tire</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>Callbacks</span>
+
+    <span class='id identifier rubyid_extend'>extend</span>  <span class='const'>Persistence</span><span class='op'>::</span><span class='const'>Finders</span><span class='op'>::</span><span class='const'>ClassMethods</span>
+    <span class='id identifier rubyid_extend'>extend</span>  <span class='const'>Persistence</span><span class='op'>::</span><span class='const'>Attributes</span><span class='op'>::</span><span class='const'>ClassMethods</span>
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>Persistence</span><span class='op'>::</span><span class='const'>Attributes</span><span class='op'>::</span><span class='const'>InstanceMethods</span>
+
+    <span class='id identifier rubyid_include'>include</span> <span class='const'>Persistence</span><span class='op'>::</span><span class='const'>Storage</span>
+
+    <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_score</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_type</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_index</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_version</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sort</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>highlight</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>matches</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>_explanation</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_attr'>attr</span><span class='op'>|</span>
+      <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_attr'>attr</span><span class='rbrace'>}</span><span class='tstring_content'>=</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_value'>value</span><span class='op'>|</span> <span class='ivar'>@attributes</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='semicolon'>;</span> <span class='ivar'>@attributes</span><span class='lbracket'>[</span><span class='id identifier rubyid_attr'>attr</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_attr'>attr</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='lbrace'>{</span> <span class='ivar'>@attributes</span><span class='lbracket'>[</span><span class='id identifier rubyid_attr'>attr</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='symbol'>:wrapper</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='symbol'>:version</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Hash</span>
+      <span class='id identifier rubyid_args'>args</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='symbol'>:wrapper</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='symbol'>:version</span> <span class='op'>=&gt;</span> <span class='kw'>true</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span> <span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Hash</span> <span class='rbrace'>}</span>
+
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_tire'>tire</span><span class='period'>.</span><span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_multi_search'>multi_search</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='symbol'>:wrapper</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='symbol'>:version</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Hash</span>
+      <span class='id identifier rubyid_args'>args</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span> <span class='symbol'>:wrapper</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='symbol'>:version</span> <span class='op'>=&gt;</span> <span class='kw'>true</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span> <span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Hash</span> <span class='rbrace'>}</span>
+
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_tire'>tire</span><span class='period'>.</span><span class='id identifier rubyid_multi_search'>multi_search</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+  <span class='kw'>end</span>
+
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Thu Nov  8 21:37:04 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>
