@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bson_ext"
   s.add_development_dependency "redis-persistence"
   s.add_development_dependency "curb"
+  s.add_development_dependency "oj"
   s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
 
   s.description = <<-DESC
