@@ -24,21 +24,6 @@ namespace :test do
   end
 end
 
-# Generate coverage reports
-begin
-  require 'rcov/rcovtask'
-  Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.rcov_opts = ['--exclude', 'gems/*']
-    test.pattern = 'test/**/*_test.rb'
-    test.verbose = true
-  end
-rescue LoadError
-  task :rcov do
-    abort "[!] RCov gem is not available."
-  end
-end
-
 namespace :web do
 
   desc "Update the Github website"
