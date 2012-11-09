@@ -47,12 +47,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "minitest"
   s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
 
-  # These gems are not needed for CI at <http://travis-ci.org/#!/karmi/tire>
-  #
-  unless ENV["CI"]
-    s.add_development_dependency "rdoc"
-  end
-
   s.description = <<-DESC
    Tire is a Ruby client for the ElasticSearch search engine/database.
 
