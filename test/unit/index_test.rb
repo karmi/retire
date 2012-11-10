@@ -370,7 +370,7 @@ module Tire
 
         should "allow to set routing" do
           Configuration.client.expects(:get).with("#{@index.url}/article/id-1?routing=foo").
-                                             returns(mock_response('{"_id":"id-1"'))
+                                             returns(mock_response('{"_id":"id-1"}'))
           article = @index.retrieve :article, 'id-1', :routing => 'foo'
         end
 
@@ -378,7 +378,7 @@ module Tire
           Configuration.client.expects(:get).with do |url|
             assert url.include?('routing=foo'), url
             assert url.include?('fields=name'), url
-          end.returns(mock_response('{"_id":"id-1"'))
+          end.returns(mock_response('{"_id":"id-1"}'))
 
           article = @index.retrieve :article, 'id-1', :routing => 'foo', :fields => 'name'
         end
@@ -386,7 +386,7 @@ module Tire
         should "allow to set preference" do
           Configuration.client.expects(:get).with do |url|
             assert url.include?('preference=foo'), url
-          end.returns(mock_response('{"_id":"id-1"'))
+          end.returns(mock_response('{"_id":"id-1"}'))
 
           article = @index.retrieve :article, 'id-1', :preference => 'foo'
         end
