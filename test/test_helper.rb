@@ -4,7 +4,12 @@ require 'bundler/setup'
 require 'pathname'
 require 'test/unit'
 
-require 'yajl/json_gem'
+if ENV['JSON_LIBRARY']
+  puts "Using '#{ENV['JSON_LIBRARY']}' JSON library"
+  require ENV['JSON_LIBRARY']
+else
+  require 'yajl/json_gem'
+end
 require 'sqlite3'
 
 require 'shoulda'
