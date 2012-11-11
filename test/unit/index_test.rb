@@ -578,6 +578,23 @@ module Tire
 
         end
 
+        should "pass URL parameters such as refresh or consistency" do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              # p url
+              assert_match /\?consistency=one/, url
+              assert_match /&refresh=true/, url
+            end.
+            returns(mock_response('{}'), 200)
+
+          @index.bulk :index,
+                      [ {:id => '1', :title => 'One' } ],
+                      :consistency => 'one',
+                      :refresh => true
+
+        end
+
         should "serialize ActiveModel instances as payload" do
           Configuration.client.
             expects(:post).

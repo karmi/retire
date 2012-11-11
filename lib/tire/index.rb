@@ -130,7 +130,13 @@ module Tire
       count = 0
 
       begin
-        @response = Configuration.client.post("#{url}/_bulk", payload.join("\n"))
+        params = {}
+        params[:consistency] = options.delete(:consistency)
+        params[:refresh]     = options.delete(:refresh)
+        params               = params.reject { |name,value| !value }
+        params_encoded       = params.empty? ? '' : "?#{params.to_param}"
+
+        @response = Configuration.client.post("#{url}/_bulk#{params_encoded}", payload.join("\n"))
         raise RuntimeError, "#{@response.code} > #{@response.body}" if @response && @response.failure?
         @response
       rescue StandardError => error
