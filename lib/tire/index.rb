@@ -89,8 +89,16 @@ module Tire
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
       logged([type, id].join('/'), curl)
     end
-    
-    def bulk_api_action(action, documents, options={})
+
+    def bulk(action, documents, options={})
+      # TODO: A more Ruby-like DSL notation should be supported:
+      #
+      #     Tire.index('myindex').bulk do
+      #       create id: 1, title: 'bar', _routing: 'abc'
+      #       delete id: 1
+      #       # ...
+      #     end
+      #
       payload = documents.map do |document|
         type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
         id   = get_id_from_document(document)
@@ -99,9 +107,7 @@ module Tire
 
         output = []
         output << %Q|{"#{action}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
-        unless action == 'delete' # delete does not require a document, just an _id
-          output << convert_document_to_json(document)
-        end
+        output << convert_document_to_json(document) unless action.to_s == 'delete'
         output.join("\n")
       end
       payload << ""
@@ -125,21 +131,21 @@ module Tire
 
       ensure
         curl = %Q|curl -X POST "#{url}/_bulk" --data-binary '{... data omitted ...}'|
-        logged('BULK', curl)
+        logged('_bulk', curl)
       end
-      
+
     end
-    
+
     def bulk_create(documents, options={})
-      bulk_api_action("create", documents, options)
+      bulk :create, documents, options
     end
 
     def bulk_store(documents, options={})
-      bulk_api_action("index", documents, options)
+      bulk :index, documents, options
     end
 
     def bulk_delete(documents, options={})
-      bulk_api_action("delete", documents, options)
+      bulk :delete, documents, options
     end
 
     def import(klass_or_collection, options={})
