@@ -90,7 +90,7 @@ module Tire
       logged([type, id].join('/'), curl)
     end
 
-    # Performs a [multi-search](http://www.elasticsearch.org/guide/reference/api/bulk.html) request
+    # Performs a [bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) request
     #
     #     @myindex.bulk :index, [ {id: 1, title: 'One'}, { id: 2, title: 'Two', _version: 3 } ], refresh: true
     #
