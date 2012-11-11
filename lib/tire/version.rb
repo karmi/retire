@@ -1,5 +1,5 @@
 module Tire
-  VERSION   = "0.5.0"
+  VERSION   = "0.5.1"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
@@ -29,5 +29,8 @@ module Tire
     * Added a `match` query type
     * Added support for multisearch (_msearch) and the `Tire.multi_search` DSL method
     * Added support for multi-search in the ActiveModel integration and in Tire::Model::Persistence
+    * Added support for create and delete actions for Index#bulk
+    * Added support for meta information (`_routing`, `_parent`, etc) in Index#bulk
+    * Added support for URL parameters (`refresh`, `consistency`) in Index#bulk
   END
 end
