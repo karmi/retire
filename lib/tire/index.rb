@@ -90,6 +90,18 @@ module Tire
       logged([type, id].join('/'), curl)
     end
 
+    # Performs a [multi-search](http://www.elasticsearch.org/guide/reference/api/bulk.html) request
+    #
+    #     @myindex.bulk :index, [ {id: 1, title: 'One'}, { id: 2, title: 'Two', _version: 3 } ], refresh: true
+    #
+    # Pass the action (`index`, `create`, `delete`) as the first argument, the collection of documents as
+    # the second argument, and URL parameters as the last option.
+    #
+    # Any _meta_ information contained in documents (such as `_routing` or `_parent`) is extracted
+    # and added to the "header" line.
+    #
+    # Shortcut methods `bulk_store`, `bulk_delete` and `bulk_create` are available.
+    #
     def bulk(action, documents, options={})
       # TODO: A more Ruby-like DSL notation should be supported:
       #
