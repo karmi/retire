@@ -105,8 +105,22 @@ module Tire
 
         STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
 
+        header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
+
+        if document.respond_to?(:to_hash) && hash = document.to_hash
+          meta = {}
+          meta[:_version]   = hash.delete(:_version)
+          meta[:_routing]   = hash.delete(:_routing)
+          meta[:_percolate] = hash.delete(:_percolate)
+          meta[:_parent]    = hash.delete(:_parent)
+          meta[:_timestamp] = hash.delete(:_timestamp)
+          meta[:_ttl]       = hash.delete(:_ttl)
+          meta              = meta.reject { |name,value| !value || value.empty? }
+          header[action.to_sym].update(meta)
+        end
+
         output = []
-        output << %Q|{"#{action}":{"_index":"#{@name}","_type":"#{type}","_id":"#{id}"}}|
+        output << MultiJson.encode(header)
         output << convert_document_to_json(document) unless action.to_s == 'delete'
         output.join("\n")
       end

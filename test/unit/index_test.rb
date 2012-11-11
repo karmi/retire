@@ -556,6 +556,28 @@ module Tire
           @index.bulk :delete, [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
         end
 
+        should "serialize meta parameters such as routing into payload header" do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              # print payload
+              lines = payload.split("\n")
+              assert_match /"_routing":"A"/, lines[0]
+              assert_match /"_routing":"B"/, lines[2]
+              assert_match /"_ttl":"1d"/,    lines[2]
+              assert ! lines[4].include?('"_routing"')
+            end.
+            returns(mock_response('{}'), 200)
+
+          @index.bulk :index,
+                      [
+                        {:id => '1', :title => 'One', :_routing => 'A'},
+                        {:id => '2', :title => 'Two', :_routing => 'B', :_ttl => '1d'},
+                        {:id => '3', :title => 'Three'}
+                      ]
+
+        end
+
         should "serialize ActiveModel instances as payload" do
           Configuration.client.
             expects(:post).
@@ -577,14 +599,33 @@ module Tire
           ActiveModelArticle.index.bulk :index, [ one, two ]
         end
 
+        should "extract meta information from document objects" do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              print payload
+              lines = payload.split("\n")
+              assert_match /"_routing":"A"/, lines[0]
+            end.
+            returns(mock_response('{}'), 200)
+
+          class MyModel
+            def document_type;   "my_model";                                      end
+            def to_hash;         { :id => 1, :title => 'Foo', :_routing => 'A' }; end
+            def to_indexed_json; MultiJson.encode(to_hash);                       end
+          end
+
+          Tire.index('my_models').bulk_store [ MyModel.new ]
+        end
+
         context "with namespaced models" do
 
           should "not URL-escape the document_type" do
-            Configuration.client.expects(:post).with do |url, json|
-              # puts url, json
-              url  == "#{Configuration.url}/my_namespace_my_models/_bulk" &&
-              json =~ %r|"_index":"my_namespace_my_models"| &&
-              json =~ %r|"_type":"my_namespace/my_model"|
+            Configuration.client.expects(:post).with do |url, payload|
+              # puts url, payload
+              assert_equal "#{Configuration.url}/my_namespace_my_models/_bulk", url
+              assert_match %r|"_index":"my_namespace_my_models"|, payload
+              assert_match %r|"_type":"my_namespace/my_model"|, payload
             end.returns(mock_response('{}', 200))
 
             module MyNamespace
