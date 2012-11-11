@@ -573,7 +573,7 @@ module Tire
           assert !@index.bulk_store([ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ])
         end
 
-        should "signal exceptions should not be caught" do
+        should "retry on SIGINT type of exceptions" do
           Configuration.client.expects(:post).raises(Interrupt, "abort then interrupt!")
 
           assert_raise Interrupt do
