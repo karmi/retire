@@ -27,6 +27,11 @@ module Tire
         assert_match %r|localhost:9200/_search|, s.url
       end
 
+      should "be initialized with a base URL" do
+        s = Search::Search.new('index', :url => 'http://example.com:9200') { query { string 'foo' } }
+        assert_equal 'http://example.com:9200/index/_search', s.url
+      end
+
       should "allow to limit results with document type" do
         s = Search::Search.new('index', :type => 'bar') do
           query { string 'foo' }
@@ -198,7 +203,7 @@ module Tire
 
       should "allow to set the server url" do
         search = Search::Search.new('indexA')
-        Configuration.url 'http://es1.example.com'
+        search.url ='http://es1.example.com'
 
         Configuration.client.
           expects(:get).

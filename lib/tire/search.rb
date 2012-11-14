@@ -9,13 +9,16 @@ module Tire
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
         @types   = Array(options.delete(:type)).map { |type| EscapeUtils.escape_url(type.to_s) }
-        @url     = options.delete(:url) || Configuration.url
         @options = options
-
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
-        @url += @path
+
+        self.url = options.delete(:url) || Configuration.url
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def url=( url )
+        @url = url + @path
       end
 
       def results
