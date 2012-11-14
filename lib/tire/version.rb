@@ -1,8 +1,12 @@
 module Tire
-  VERSION = "0.4.2.2"
+  VERSION = "0.4.2.3"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
+
+    Version 0.4.2.3
+    ---------------
+    * Making the library multi-cluster capable
 
     Version 0.4.2.2
     ---------------
