@@ -4,14 +4,16 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain
+      attr_reader :indices, :json, :query, :facets, :filters, :options, :explain, :url
 
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
         @types   = Array(options.delete(:type)).map { |type| EscapeUtils.escape_url(type.to_s) }
+        @url     = options.delete(:url) || Configuration.url
         @options = options
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
+        @url += @path
 
         block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
       end
@@ -22,10 +24,6 @@ module Tire
 
       def response
         @response || (perform; @response)
-      end
-
-      def url
-        Configuration.url + @path
       end
 
       def params
