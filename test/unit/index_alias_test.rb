@@ -12,7 +12,13 @@ module Tire
         should "have a name and defaults" do
           @alias = Alias.new :name => 'dummy'
           assert_equal 'dummy', @alias.name
+          assert_equal Configuration.url, @alias.url
           assert @alias.indices.empty?
+        end
+
+        should "have a configurable base URL" do
+          @alias = Alias.new :url => 'http://example.com:9200'
+          assert_equal 'http://example.com:9200', @alias.url
         end
 
         should "have indices" do
@@ -94,7 +100,7 @@ module Tire
               a['add']['alias'] == 'alias_martha'
               end
           end.returns(mock_response('{}'), 200)
-          
+
           a = Alias.find('alias_martha')
           a.indices.push 'index_A'
           a.save
@@ -109,7 +115,7 @@ module Tire
                 a['remove']['alias'] == 'alias_martha'
               end
           end.returns(mock_response('{}'), 200)
-          
+
           a = Alias.find('alias_martha')
           a.indices.delete 'index_A'
           a.save
@@ -120,7 +126,7 @@ module Tire
             # puts json
             MultiJson.decode(json)['actions'].all? { |a| a['add']['routing'] == 'martha' }
           end.returns(mock_response('{}'), 200)
-          
+
           a = Alias.find('alias_martha')
           a.routing('martha')
           a.save
@@ -179,6 +185,14 @@ module Tire
 
         should "find an alias" do
           a = Alias.find('alias_martha')
+          assert_instance_of Alias, a
+          assert_equal ['index_B', 'index_C'], a.indices.to_a.sort
+
+          Configuration.client.expects(:get).with do |url, json|
+              url  == "http://example.com:9200/_aliases"
+            end.returns( mock_response(                               %q|{"index_A":{"aliases":{}},"index_B":{"aliases":{"alias_john":{"filter":{"term":{"user":"john"}}},"alias_martha":{"filter":{"term":{"user":"martha"}}}}},"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}}}}}}|), 200 )
+
+          a = Alias.find('http://example.com:9200', 'alias_martha')
           assert_instance_of Alias, a
           assert_equal ['index_B', 'index_C'], a.indices.to_a.sort
         end

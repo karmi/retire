@@ -74,6 +74,7 @@ module Tire
     def initialize(attributes={}, &block)
       raise ArgumentError, "Please pass a Hash-like object" unless attributes.respond_to?(:each_pair)
 
+      @url = attributes.delete(:url) || Configuration.url
       @attributes = { :indices => IndexCollection.new([]) }
 
       attributes.each_pair do |key, value|
@@ -87,34 +88,57 @@ module Tire
       block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
     end
 
+    attr_accessor :url
+
     # Returns a collection of Tire::Alias objects for all aliases defined in the cluster, or for a specific index.
     #
-    def self.all(index=nil)
-      @response = Configuration.client.get [Configuration.url, index, '_aliases'].compact.join('/')
+    def self.all(url=nil, index=nil)
+      if url and url !~ /^https?:\/\//i
+        index, url = url, Configuration.url
+      elsif url.nil?
+        url = Configuration.url
+      end
 
-      aliases = MultiJson.decode(@response.body).inject({}) do |result, (index, value)|
+      @response = Configuration.client.get [url, index, '_aliases'].compact.join('/')
+
+      aliases = MultiJson.decode(@response.body).inject({}) do |result, (name, value)|
         # 1] Skip indices without aliases
         next result if value['aliases'].empty?
 
         # 2] Build a reverse map of hashes (alias => indices, config)
-        value['aliases'].each do |key, value| (result[key] ||= { 'indices' => [] }).update(value)['indices'].push(index) end
+        value['aliases'].each do |key, v| (result[key] ||= { 'indices' => [] }).update(v)['indices'].push(name) end
         result
       end
 
       # 3] Build a collection of Alias objects from hashes
       aliases.map do |key, value|
-        self.new(value.update('name' => key))
+        self.new(value.update('name' => key, :url => url))
       end
 
     ensure
       # FIXME: Extract the `logged` method
-      Alias.new.logged '_aliases', %Q|curl "#{Configuration.url}/_aliases"|
+      Alias.new.logged '_aliases', %Q|curl "#{url}/_aliases"|
     end
 
     # Returns an alias by name
     #
-    def self.find(name, &block)
-      a = all.select { |a| a.name == name }.first
+    # Examples
+    #
+    #   Alias.find( url, name )
+    #   Alias.find( name )
+    #
+    def self.find(*args, &block)
+      case args.length
+      when 2
+        url, name = args
+      when 1
+        url = Configuration.url
+        name = args.first
+      else
+        raise ArgumentError, "wrong number of arguments (#{args.length} for 2)"
+      end
+
+      a = all(url).select { |b| b.name == name }.first
       block.call(a) if block_given?
       return a
     end
@@ -159,10 +183,10 @@ module Tire
     # Save the alias in _ElasticSearch_
     #
     def save
-      @response = Configuration.client.post "#{Configuration.url}/_aliases", to_json
+      @response = Configuration.client.post "#{url}/_aliases", to_json
 
     ensure
-      logged '_aliases', %Q|curl -X POST "#{Configuration.url}/_aliases" -d '#{to_json}'|
+      logged '_aliases', %Q|curl -X POST "#{url}/_aliases" -d '#{to_json}'|
     end
 
     # Return a Hash suitable for JSON serialization
