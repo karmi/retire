@@ -42,22 +42,22 @@ module Tire
     class Scan
       include Enumerable
 
-      attr_reader :indices, :options, :search
+      attr_reader :indices, :options, :search, :url
 
       def initialize(indices=nil, options={}, &block)
         @indices = Array(indices)
         @options = options.update(:search_type => 'scan', :scroll => '10m')
         @seen    = 0
+        @url     = options.fetch(:url, Configuration.url) + '/_search/scroll'
         @search  = Search.new(@indices, @options, &block)
       end
 
-      def url;                Configuration.url + "/_search/scroll";                           end
-      def params;             @options.empty? ? '' : '?' + @options.to_param;                  end
-      def results;            @results  || (__perform; @results);                              end
-      def response;           @response || (__perform; @response);                             end
-      def json;               @json     || (__perform; @json);                                 end
-      def total;              @total    || (__perform; @total);                                end
-      def seen;               @seen     || (__perform; @seen);                                 end
+      def params()   @options.empty? ? '' : '?' + @options.to_param; end
+      def results()  @results  || (__perform; @results);             end
+      def response() @response || (__perform; @response);            end
+      def json()     @json     || (__perform; @json);                end
+      def total()    @total    || (__perform; @total);               end
+      def seen()     @seen     || (__perform; @seen);                end
 
       def scroll_id
         @scroll_id ||= @search.perform.json['_scroll_id']
