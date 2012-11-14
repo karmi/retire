@@ -1,15 +1,26 @@
 module Tire
   class Index
 
-    attr_reader :name, :response
+    attr_reader :name, :response, :url
 
-    def initialize(name, &block)
-      @name = name
+    def initialize(*args, &block)
+      case args.length
+      when 2
+        @name = args.last
+        self.url = args.first
+      when 1
+        @name = args.first
+        self.url = Configuration.url
+      else
+        raise ArgumentError, "wrong number of arguments (#{args.length} for 2)"
+      end
+
       block.arity < 1 ? instance_eval(&block) : block.call(self) if block_given?
     end
 
-    def url
-      "#{Configuration.url}/#{@name}"
+    def url=( url )
+      @url = "#{url}/#@name"
+      @percolator_url = "#{url}/_percolator/#@name"
     end
 
     def exists?
@@ -239,20 +250,22 @@ module Tire
     def register_percolator_query(name, options={}, &block)
       options[:query] = Search::Query.new(&block).to_hash if block_given?
 
-      @response = Configuration.client.put "#{Configuration.url}/_percolator/#{@name}/#{name}", MultiJson.encode(options)
+      url = "#@percolator_url/#{name}"
+      @response = Configuration.client.put url, MultiJson.encode(options)
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/?pretty=1" -d '#{MultiJson.encode(options)}'|
+      curl = %Q|curl -X PUT "#{url}?pretty=true" -d '#{MultiJson.encode(options)}'|
       logged('_percolator', curl)
     end
 
     def unregister_percolator_query(name)
-      @response = Configuration.client.delete "#{Configuration.url}/_percolator/#{@name}/#{name}"
+      url = "#@percolator_url/#{name}"
+      @response = Configuration.client.delete url
       MultiJson.decode(@response.body)['ok']
 
     ensure
-      curl = %Q|curl -X DELETE "#{Configuration.url}/_percolator/#{@name}"|
+      curl = %Q|curl -X DELETE "#{url}"|
       logged('_percolator', curl)
     end
 

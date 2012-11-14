@@ -18,6 +18,11 @@ module Tire
         assert_equal "#{Configuration.url}/#{@index.name}", @index.url
       end
 
+      should "have a configurable URL endpoint" do
+        @index.url = 'http://example.com'
+        assert_equal "http://example.com/#{@index.name}", @index.url
+      end
+
       should "return HTTP response" do
         assert_respond_to @index, :response
 
