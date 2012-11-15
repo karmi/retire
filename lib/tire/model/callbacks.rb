@@ -34,6 +34,8 @@ module Tire
 
       end
 
+      # Update index
+      #
       def _tire_update_index_callback
         tire.update_index
       end
