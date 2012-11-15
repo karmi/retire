@@ -189,6 +189,13 @@ module Tire
           assert_equal 2.0,      @index.mapping['article']['properties']['title']['boost']
         end
 
+        should "raise an exception when used with the bang method" do
+          Configuration.client.expects(:put).returns(mock_response('{"error":"MergeMappingException","status":400}'))
+          assert_raise(RuntimeError) do
+            @index.mapping!("blah", {})
+          end
+        end
+
       end
 
       context "settings" do

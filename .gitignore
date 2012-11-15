@@ -12,3 +12,4 @@ examples/*.html
 .rvmrc
 .rbenv-version
 tmp/
+vendor/bundle
