@@ -1,4 +1,4 @@
-Tire
+Tire [![Build Status](https://secure.travis-ci.org/rails/rails.png)](http://travis-ci.org/karmi/tire)
 =========
 
 _Tire_ is a Ruby (1.8 or 1.9) client for the [ElasticSearch](http://www.elasticsearch.org/)
