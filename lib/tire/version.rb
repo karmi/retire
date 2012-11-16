@@ -1,5 +1,5 @@
 module Tire
-  VERSION = "0.4.2.3"
+  VERSION = "0.4.2.4"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
