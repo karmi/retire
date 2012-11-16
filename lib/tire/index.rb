@@ -19,8 +19,9 @@ module Tire
     end
 
     def url=( url )
-      @url = "#{url}/#@name"
-      @percolator_url = "#{url}/_percolator/#@name"
+      @base_url = url.dup
+      @url = "#@base_url/#@name"
+      @percolator_url = "#@base_url/_percolator/#@name"
     end
 
     def exists?
@@ -52,15 +53,15 @@ module Tire
     end
 
     def add_alias(alias_name, configuration={})
-      Alias.create(configuration.merge( :name => alias_name, :index => @name ) )
+      Alias.create(configuration.merge( :name => alias_name, :index => @name, :url => @base_url ) )
     end
 
     def remove_alias(alias_name)
-      Alias.find(alias_name) { |a| a.indices.delete @name }.save
+      Alias.find(@base_url, alias_name) { |a| a.indices.delete @name }.save
     end
 
     def aliases(alias_name=nil)
-      alias_name ? Alias.all(@name).select { |a| a.name == alias_name }.first : Alias.all(@name)
+      alias_name ? Alias.all(@base_url, @name).select { |a| a.name == alias_name }.first : Alias.all(@base_url, @name)
     end
 
     def mapping

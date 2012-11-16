@@ -4,6 +4,10 @@ module Tire
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
+    Version 0.4.2.4
+    ---------------
+    * Fixing url routing for index alais commands.
+
     Version 0.4.2.3
     ---------------
     * Making the library multi-cluster capable
