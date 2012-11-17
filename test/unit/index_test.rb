@@ -1034,6 +1034,27 @@ module Tire
 
       end
 
+      context "optimize" do
+
+        should "send optimize request" do
+          Configuration.client.expects(:get).with do |url, payload|
+            assert url.match /_optimize\?/
+          end.returns mock_response({}.to_json)
+
+          @index.optimize
+        end
+
+        should "pass through parameters" do
+          Configuration.client.expects(:get).with do |url, payload|
+            assert url.match /max_num_segments=1/
+            assert url.match /refresh=false/
+          end.returns mock_response({}.to_json)
+
+          @index.optimize max_num_segments: 1, refresh: false
+        end
+
+      end
+
     end
 
   end

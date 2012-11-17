@@ -430,5 +430,15 @@ module Tire
       end
     end
 
+    def optimize(opts = {})
+      options   = {:pretty => true}.update(opts).to_param
+      @response = Configuration.client.get "#{url}/_optimize?#{options}", MultiJson.encode({})
+
+      @response.success? ? MultiJson.decode(@response.body) : false
+    ensure
+      curl = %Q|curl -X GET "#{url}/_optimize?#{options}"|
+      logged('_optimize', curl)
+    end
+
   end
 end
