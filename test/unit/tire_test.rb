@@ -101,6 +101,22 @@ module Tire
           end
         end
 
+        context "when peforming cluster requests" do
+
+          should "create instance of Cluster" do
+            Cluster.expects(:new)
+
+            Tire.cluster
+          end
+
+          should "pass given block" do
+            Cluster.any_instance.expects(:health)
+
+            Tire.cluster { health }
+          end
+
+        end
+
       end
 
       context "aliases" do
