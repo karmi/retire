@@ -75,23 +75,22 @@ module Tire
     end
 
     def store(*args)
-      document, options = args
-      type = get_type_from_document(document)
+      document, params = args
+      id      = get_id_from_document(document)
+      type    = get_type_from_document(document)
+      routing = get_routing_from_document(document)
 
-      if options
-        percolate = options[:percolate]
-        percolate = "*" if percolate === true
-      end
+      params ||= {}
+      params[:routing] = routing if routing
+      params[:percolate] = '*' if params[:percolate] === true
 
-      id       = get_id_from_document(document)
+      url = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}"
+      url << "?#{params.to_param}" unless params.empty?
+
       document = convert_document_to_json(document)
-
-      url  = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}/"
-      url += "?percolate=#{percolate}" if percolate
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
-
     ensure
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
       logged([type, id].join('/'), curl)
@@ -180,20 +179,25 @@ module Tire
       end
       raise ArgumentError, "Please pass a document ID" unless id
 
-      url    = "#{self.url}/#{type}/#{id}"
+      routing = get_routing_from_document(document)
+
+      url = "#{self.url}/#{type}/#{id}"
+      url << "?routing=#{EscapeUtils.escape_url(routing)}" if routing
+
       result = Configuration.client.delete url
       MultiJson.decode(result.body) if result.success?
-
     ensure
       curl = %Q|curl -X DELETE "#{url}"|
       logged(id, curl)
     end
 
-    def retrieve(type, id)
+    def retrieve(type, id, params = {})
       raise ArgumentError, "Please pass a document ID" unless id
 
-      type      = EscapeUtils.escape_url(type.to_s)
-      url       = "#{self.url}/#{type}/#{id}"
+      type = EscapeUtils.escape_url(type.to_s)
+      url  = "#{self.url}/#{type}/#{id}"
+      url << "?#{params.to_param}" unless params.empty?
+
       @response = Configuration.client.get url
 
       h = MultiJson.decode(@response.body)
@@ -316,10 +320,10 @@ module Tire
 
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       type = case
-        when document.respond_to?(:document_type)
-          document.document_type
         when document.is_a?(Hash)
           document.delete(:_type) || document.delete('_type') || document[:type] || document['type']
+        when document.respond_to?(:document_type)
+          document.document_type
         when document.respond_to?(:_type)
           document._type
         when document.respond_to?(:type) && document.type != document.class
@@ -341,6 +345,17 @@ module Tire
       end
       $VERBOSE = old_verbose
       id
+    end
+
+    def get_routing_from_document(document)
+      case
+      when document.is_a?(Hash)
+        document.delete(:_routing) || document.delete('_routing') || document.delete(:routing) || document.delete('routing')
+      when document.respond_to?(:routing)
+        document.routing
+      when document.respond_to?(:_routing)
+        document._routing
+      end
     end
 
     def convert_document_to_json(document)
