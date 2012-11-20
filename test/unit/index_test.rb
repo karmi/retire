@@ -216,21 +216,21 @@ module Tire
 
         should "set type from Hash :type property" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            url == "#{@index.url}/article"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :type => 'article', :title => 'Test'
         end
 
         should "set type from Hash :_type property" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            url == "#{@index.url}/article"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :_type => 'article', :title => 'Test'
         end
 
         should "set type from Object _type method" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            url == "#{@index.url}/article"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
 
           article = Class.new do
@@ -242,7 +242,7 @@ module Tire
 
         should "set type from Object type method" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/article/"
+            url == "#{@index.url}/article"
           end.returns(mock_response('{"ok":true,"_id":"test"}'))
 
           article = Class.new do
@@ -254,7 +254,7 @@ module Tire
 
         should "properly encode namespaced document types" do
           Configuration.client.expects(:post).with do |url,document|
-            url == "#{@index.url}/my_namespace%2Fmy_model/"
+            url == "#{@index.url}/my_namespace%2Fmy_model"
           end.returns(mock_response('{"ok":true,"_id":"123"}'))
 
           module MyNamespace
@@ -268,7 +268,7 @@ module Tire
         end
 
         should "set default type" do
-          Configuration.client.expects(:post).with("#{@index.url}/document/", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
+          Configuration.client.expects(:post).with("#{@index.url}/document", '{"title":"Test"}').returns(mock_response('{"ok":true,"_id":"test"}'))
           @index.store :title => 'Test'
         end
 
@@ -315,7 +315,7 @@ module Tire
           Configuration.reset :wrapper
 
           Configuration.client.stubs(:post).with do |url, payload|
-                                              url     == "#{@index.url}/article/" &&
+                                              url     == "#{@index.url}/article" &&
                                               payload =~ /"title":"Test"/
                                             end.
                                             returns(mock_response('{"ok":true,"_id":"id-1"}'))
@@ -733,7 +733,7 @@ module Tire
           should "percolate document against all registered queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=*" &&
+                                   url     == "#{@index.url}/article?percolate=%2A" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
@@ -743,7 +743,7 @@ module Tire
           should "percolate document against specific queries" do
             Configuration.client.expects(:post).
                                  with do |url, payload|
-                                   url     == "#{@index.url}/article/?percolate=tag:alerts" &&
+                                   url     == "#{@index.url}/article?percolate=tag%3Aalerts" &&
                                    payload =~ /"title":"Test"/
                                  end.
                                  returns(mock_response('{"ok":true,"_id":"test","matches":["alerts"]}'))
