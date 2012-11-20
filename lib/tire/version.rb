@@ -1,8 +1,12 @@
 module Tire
-  VERSION = "0.4.2.4"
+  VERSION = "0.4.2.5"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
+
+    Version 0.4.2.4
+    ---------------
+    * Add routing support.
 
     Version 0.4.2.4
     ---------------
