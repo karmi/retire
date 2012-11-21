@@ -150,7 +150,7 @@ module Tire
               instance._index   = response['_index']   if instance.respond_to?(:_index=)
               instance._type    = response['_type']    if instance.respond_to?(:_type=)
               instance._version = response['_version'] if instance.respond_to?(:_version=)
-              instance.matches  = response['matches']  if instance.respond_to?(:matches=)
+              instance.tire.matches  = response['matches']  if instance.tire.respond_to?(:matches=)
               self
             end
           end
@@ -194,11 +194,15 @@ module Tire
         end
 
         def matches
-          @attributes['matches']
+          instance.instance_eval do
+            @attributes['tire__matches']
+          end
         end
 
         def matches=(value)
-          @attributes ||= {}; @attributes['matches'] = value
+          instance.instance_eval do
+            @attributes ||= {}; @attributes['tire__matches'] = value
+          end
         end
 
       end
