@@ -115,7 +115,9 @@ module Tire
         type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
         id   = get_id_from_document(document)
 
-        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
+        if ENV['DEBUG']
+          STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
+        end
 
         header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
 
@@ -421,8 +423,10 @@ module Tire
     def convert_document_to_json(document)
       document = case
         when document.is_a?(String)
-          Tire.warn "Passing the document as JSON string in Index#store has been deprecated, " +
-                     "please pass an object which responds to `to_indexed_json` or a plain Hash."
+          if ENV['DEBUG']
+            Tire.warn "Passing the document as JSON string has been deprecated, " +
+                       "please pass an object which responds to `to_indexed_json` or a plain Hash."
+          end
           document
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +
