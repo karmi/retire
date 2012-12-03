@@ -1,3 +1,5 @@
+ENV['DEBUG'] = 'true'
+
 require 'rubygems'
 require 'bundler/setup'
 
