@@ -375,10 +375,11 @@ module Tire
         code = @response ? @response.code : error.class rescue 'N/A'
 
         if Configuration.logger.level.to_s == 'debug'
-          body = if @response && @response.to_s.empty?
-            MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty)
-          else
-            MultiJson.encode( MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
+          body = if @response && @response.body && !@response.body.to_s.empty?
+              MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty)
+            elsif error && error.message && !error.message.to_s.empty?
+              MultiJson.encode( MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
+            else ''
           end
         else
           body = ''
