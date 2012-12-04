@@ -67,6 +67,7 @@ module Tire
 
       should "implement respond_to? for proxied methods" do
         assert @document.respond_to?(:title)
+        assert @document.respond_to?(:title, true)
       end
 
       should "return nil for non-existing keys/methods" do
