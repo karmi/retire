@@ -70,8 +70,19 @@ module Tire
           assert_equal 1,      s.results.facets.size
           assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
           assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
-        end
+      end
 
+      should "allow arbitrary order of methods in the DSL block" do
+          s = Tire.search('articles-test', :search_type => 'count') do
+            facet 'tags' do
+              facet_filter :range, { :published_on => { :from => '2011-01-01', :to => '2011-01-01' } }
+              terms :tags
+            end
+          end
+
+          assert_equal 1,      s.results.facets.size
+          assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
+          assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
       end
 
       context "terms" do
@@ -265,8 +276,8 @@ module Tire
           assert_equal 2, facets["count"], facets.inspect
         end
 
+      end
+
     end
-
   end
-
 end

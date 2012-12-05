@@ -73,6 +73,15 @@ module Tire::Search
                         f['foo'][:facet_filter].to_json )
         end
 
+        should "allow arbitrary ordering of methods in the DSL block" do
+          f = Facet.new('foo') do
+            facet_filter :terms, :tags => ['ruby']
+            terms :published_on
+          end.to_hash
+
+          assert_equal( { :terms => {:tags => ['ruby'] }}.to_json, f['foo'][:facet_filter].to_json)
+        end
+
       end
 
       context "terms facet" do
