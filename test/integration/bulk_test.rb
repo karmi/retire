@@ -18,6 +18,8 @@ module Tire
       teardown do
         @index.delete
         Tire.index('bulk-test-fresh').delete
+        Tire.index('bulk-test-consistency').delete
+        Tire.index('bulk-test-routing').delete
       end
 
       should "store a collection of documents and refresh the index" do
@@ -26,12 +28,15 @@ module Tire
       end
 
       should "extract the routing value from documents" do
-        @index.bulk_store [ { id: '1', title: 'A', _routing: 'a'}, { id: '2', title: 'B', _routing: 'b'} ]
-        @index.refresh
+        index = Tire.index('bulk-test-routing')
+        index.delete
+        index.create index: { number_of_shards: 2, number_of_replicas: 0 }
+        index.bulk_store [ { id: '1', title: 'A', _routing: 'a'}, { id: '2', title: 'B', _routing: 'b'} ]
+        index.refresh
 
-        assert_equal 2, Tire.search('bulk-test') { query {all} }.results.size
-        assert_equal 1, Tire.search('bulk-test', routing: 'a') { query {all} }.results.size
-        assert_equal 1, Tire.search('bulk-test', routing: 'b') { query {all} }.results.size
+        assert_equal 2, Tire.search('bulk-test-routing') { query {all} }.results.size
+        assert_equal 1, Tire.search('bulk-test-routing', routing: 'a') { query {all} }.results.size
+        assert_equal 1, Tire.search('bulk-test-routing', routing: 'b') { query {all} }.results.size
       end
 
       should "delete documents in bulk" do
@@ -61,14 +66,14 @@ module Tire
       should "timeout when consistency factor is not met" do
         # Tire.configure { logger STDERR, level: 'debug' }
 
-        Tire.index 'bulk-test' do
+        Tire.index 'bulk-test-consistency' do
           delete
           create index: { number_of_shards: 1, number_of_replicas: 15 }
         end
 
         assert_raise Timeout::Error do
           Timeout::timeout(3) do
-            Tire.index('bulk-test').bulk_store [ {id: '1', title: 'One' } ],
+            Tire.index('bulk-test-consistency').bulk_store [ {id: '1', title: 'One' } ],
                                                consistency: 'all',
                                                raise: true
           end
