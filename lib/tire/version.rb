@@ -1,10 +1,10 @@
 module Tire
-  VERSION = "0.4.2.5"
+  VERSION = "0.4.2.6"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    Version 0.4.2.5
+    Version 0.4.2.6
     ---------------
     * Add support for parent / child documents.
 
