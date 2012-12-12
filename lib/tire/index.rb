@@ -79,9 +79,11 @@ module Tire
       id      = get_id_from_document(document)
       type    = get_type_from_document(document)
       routing = get_routing_from_document(document)
+      parent  = get_parent_from_document(document)
 
       params ||= {}
       params[:routing] = routing if routing
+      params[:parent]  = parent  if parent
       params[:percolate] = '*' if params[:percolate] === true
 
       url = id ? "#{self.url}/#{type}/#{id}" : "#{self.url}/#{type}"
@@ -350,11 +352,22 @@ module Tire
     def get_routing_from_document(document)
       case
       when document.is_a?(Hash)
-        document.delete(:_routing) || document.delete('_routing') || document.delete(:routing) || document.delete('routing')
+        document.delete(:_routing) || document.delete('_routing')
       when document.respond_to?(:routing)
         document.routing
       when document.respond_to?(:_routing)
         document._routing
+      end
+    end
+
+    def get_parent_from_document(document)
+      case
+      when document.is_a?(Hash)
+        document.delete(:_parent) || document.delete('_parent')
+      when document.respond_to?(:parent)
+        document.parent
+      when document.respond_to?(:_parent)
+        document._parent
       end
     end
 

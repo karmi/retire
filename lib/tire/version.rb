@@ -4,6 +4,10 @@ module Tire
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
+    Version 0.4.2.5
+    ---------------
+    * Add support for parent / child documents.
+
     Version 0.4.2.4
     ---------------
     * Add routing support.
