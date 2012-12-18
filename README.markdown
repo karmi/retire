@@ -247,7 +247,7 @@ The best thing about `boolean` queries is that we can easily save these partial 
 to mix and reuse them later. So, we may define a query for the _tags_ property:
 
 ```ruby
-    tags_query = lambda do
+    tags_query = lambda do |boolean|
       boolean.should { string 'tags:ruby' }
       boolean.should { string 'tags:java' }
     end
@@ -256,7 +256,7 @@ to mix and reuse them later. So, we may define a query for the _tags_ property:
 And a query for the _published_on_ property:
 
 ```ruby
-    published_on_query = lambda do
+    published_on_query = lambda do |boolean|
       boolean.must   { string 'published_on:[2011-01-01 TO 2011-01-02]' }
     end
 ```
@@ -675,7 +675,7 @@ OK. All this time we have been talking about `ActiveRecord` models, since
 it is a reasonable _Rails_' default for the storage layer.
 
 But what if you use another database such as [MongoDB](http://www.mongodb.org/),
-another object mapping library, such as [Mongoid](http://mongoid.org/)?
+another object mapping library, such as [Mongoid](http://mongoid.org/) or [MongoMapper](http://mongomapper.com/)?
 
 Well, things stay mostly the same:
 
@@ -691,7 +691,7 @@ Well, things stay mostly the same:
       # These Mongo guys sure do get funky with their IDs in +serializable_hash+, let's fix it.
       #
       def to_indexed_json
-        self.as_json
+        self.to_json
       end
 
     end

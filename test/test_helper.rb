@@ -1,10 +1,17 @@
+ENV['DEBUG'] = 'true'
+
 require 'rubygems'
 require 'bundler/setup'
 
 require 'pathname'
 require 'test/unit'
 
-require 'yajl/json_gem'
+if ENV['JSON_LIBRARY']
+  puts "Using '#{ENV['JSON_LIBRARY']}' JSON library"
+  require ENV['JSON_LIBRARY']
+else
+  require 'yajl/json_gem'
+end
 require 'sqlite3'
 
 require 'shoulda'
@@ -14,6 +21,11 @@ require 'mocha'
 require 'active_support/core_ext/hash/indifferent_access'
 
 require 'tire'
+if ENV['CURB']
+  puts "Using 'curb' as the HTTP library"
+  require 'tire/http/clients/curb'
+  Tire.configure { client Tire::HTTP::Client::Curb }
+end
 
 # Require basic model files
 #
@@ -24,6 +36,7 @@ require File.dirname(__FILE__) + '/models/active_model_article_with_custom_index
 require File.dirname(__FILE__) + '/models/active_record_models'
 require File.dirname(__FILE__) + '/models/article'
 require File.dirname(__FILE__) + '/models/persistent_article'
+require File.dirname(__FILE__) + '/models/persistent_article_in_index'
 require File.dirname(__FILE__) + '/models/persistent_article_in_namespace'
 require File.dirname(__FILE__) + '/models/persistent_article_with_casting'
 require File.dirname(__FILE__) + '/models/persistent_article_with_defaults'
@@ -86,7 +99,8 @@ module Test::Integration
       mongoid_class_with_tire_methods
       supermodel_articles
       dynamic_index
-      model_with_nested_documents ].each do |index|
+      model_with_nested_documents
+      model_with_incorrect_mappings ].each do |index|
         ::RestClient.delete "#{URL}/#{index}" rescue nil
     end
   end

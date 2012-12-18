@@ -4,7 +4,7 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :query, :facets, :filters, :options, :explain, :script_fields
+      attr_reader :indices, :types, :query, :facets, :filters, :options, :explain, :script_fields
 
       def initialize(indices=nil, options={}, &block)
         if indices.is_a?(Hash)
@@ -48,7 +48,8 @@ module Tire
       end
 
       def params
-        @options.empty? ? '' : '?' + @options.to_param
+        options = @options.except(:wrapper)
+        options.empty? ? '' : '?' + options.to_param
       end
 
       def query(&block)
@@ -106,6 +107,11 @@ module Tire
         self
       end
 
+      def partial_field(name, options)
+        @partial_fields ||= {}
+        @partial_fields[name] = options
+      end
+
       def explain(value)
         @explain = value
         self
@@ -113,6 +119,16 @@ module Tire
 
       def version(value)
         @version = value
+        self
+      end
+
+      def min_score(value)
+        @min_score = value
+        self
+      end
+
+      def track_scores(value)
+        @track_scores = value
         self
       end
 
@@ -130,11 +146,11 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET "#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty=true" -d '#{to_json}'|
+        %Q|curl -X GET '#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty' -d '#{to_json}'|
       end
 
       def to_hash
-        @options.delete(:payload) || begin
+        @options[:payload] || begin
           request = {}
           request.update( { :indices_boost => @indices_boost } ) if @indices_boost
           request.update( { :query  => @query.to_hash } )    if @query
@@ -146,33 +162,39 @@ module Tire
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
+          request.update( { :partial_fields => @partial_fields } ) if @partial_fields
           request.update( { :script_fields => @script_fields } ) if @script_fields
           request.update( { :version => @version } )         if @version
           request.update( { :explain => @explain } )         if @explain
+          request.update( { :min_score => @min_score } )     if @min_score
+          request.update( { :track_scores => @track_scores } ) if @track_scores
           request
         end
       end
 
-      def to_json
+      def to_json(options={})
         payload = to_hash
         # TODO: Remove when deprecated interface is removed
-        payload.is_a?(String) ? payload : payload.to_json
+        if payload.is_a?(String)
+          payload
+        else
+          MultiJson.encode(payload, :pretty => Configuration.pretty)
+        end
       end
 
-      def logged(error=nil)
+      def logged(endpoint='_search')
         if Configuration.logger
 
-          Configuration.logger.log_request '_search', indices, to_curl
+          Configuration.logger.log_request endpoint, indices, to_curl
 
           took = @json['took']  rescue nil
           code = @response.code rescue nil
 
           if Configuration.logger.level.to_s == 'debug'
-            # FIXME: Depends on RestClient implementation
             body = if @json
-              defined?(Yajl) ? Yajl::Encoder.encode(@json, :pretty => true) : MultiJson.encode(@json)
+              MultiJson.encode( @json, :pretty => Configuration.pretty)
             else
-              @response.body rescue nil
+              MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty) rescue ''
             end
           else
             body = ''

@@ -124,6 +124,64 @@ module Tire
 
       end
 
+      context "multi search" do
+        setup do
+          # Tire.configure { logger STDERR }
+          PersistentArticle.create :title => 'Test'
+          PersistentArticle.create :title => 'Pest'
+          PersistentArticle.index.refresh
+        end
+
+        should "return multiple result sets" do
+          results = PersistentArticle.multi_search do
+            search do
+              query { match :title, 'test' }
+            end
+            search search_type: 'count' do
+              query { match :title, 'pest' }
+            end
+          end
+
+          assert_equal 2, results.size
+
+          assert_equal 1, results[0].size
+          assert_equal 1, results[0].total
+
+          assert_equal 0, results[1].size
+          assert_equal 1, results[1].total
+        end
+      end
+
+      context "with multiple types within single index" do
+
+        setup do
+          # Create documents of two types within single index
+          PersistentArticleInIndex.create :title => "TestInIndex", :tags => ['in_index']
+          PersistentArticle.create :title => "Test", :tags => []
+          PersistentArticle.index.refresh
+        end
+
+        should "returns all documents with proper type" do
+          results = PersistentArticle.all
+
+          assert_equal 1, results.size
+          assert results.all? { |r| r.tags == [] }, "Incorrect results? " + results.to_a.inspect
+
+          results = PersistentArticleInIndex.all
+
+          assert_equal 1, results.size
+          assert results.all? { |r| r.tags == ['in_index'] }, "Incorrect results? " + results.to_a.inspect
+        end
+
+        should "returns first document with proper type" do
+          assert_instance_of PersistentArticle, PersistentArticle.first
+          assert_instance_of PersistentArticleInIndex, PersistentArticleInIndex.first
+
+          assert_equal [], PersistentArticle.first.tags
+          assert_equal ['in_index'], PersistentArticleInIndex.first.tags
+        end
+      end
+
     end
 
   end

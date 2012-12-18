@@ -3,7 +3,7 @@ require 'benchmark'
 
 namespace :tire do
 
-  full_comment = <<-DESC.gsub(/    /, '')
+  full_comment_import = <<-DESC.gsub(/    /, '')
     Import data from your model using paginate: rake environment tire:import CLASS='MyModel'.
 
     Pass params for the `paginate` method:
@@ -15,7 +15,7 @@ namespace :tire do
     Set target index name:
       $ rake environment tire:import CLASS='Article' INDEX='articles-new'
   DESC
-  desc full_comment
+  desc full_comment_import
   task :import do |t|
 
     def elapsed_to_human(elapsed)
@@ -24,18 +24,18 @@ namespace :tire do
 
       case elapsed
       when 0..59
-        "#{sprintf("%1.5f", elapsed)} seconds"
+        "#{sprintf("%1.2f", elapsed)} seconds"
       when 60..hour-1
-        "#{elapsed/60} minutes and #{elapsed % 60} seconds"
+        "#{(elapsed/60).floor} minutes and #{(elapsed % 60).floor} seconds"
       when hour..day
-        "#{elapsed/hour} hours and #{elapsed % hour} minutes"
+        "#{(elapsed/hour).floor} hours and #{(elapsed/60 % hour).floor} minutes"
       else
-        "#{elapsed/hour} hours"
+        "#{(elapsed/hour).round} hours"
       end
     end
 
     if ENV['CLASS'].to_s == ''
-      puts '='*90, 'USAGE', '='*90, full_comment, ""
+      puts '='*90, 'USAGE', '='*90, full_comment_import, ""
       exit(1)
     end
 
@@ -52,16 +52,19 @@ namespace :tire do
     end
 
     unless index.exists?
-      mapping = defined?(Yajl) ? Yajl::Encoder.encode(klass.tire.mapping_to_hash, :pretty => true) :
-                                 MultiJson.encode(klass.tire.mapping_to_hash)
+      mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
       puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
-      index.create :mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings
+      unless index.create( :mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings )
+        STDERR.puts "[ERROR] There has been an error when creating the index -- elasticsearch returned:",
+                    index.response
+        exit(1)
+      end
     end
 
     STDOUT.sync = true
     puts "[IMPORT] Starting import for the '#{ENV['CLASS']}' class"
     tty_cols = 80
-    total    = klass.all.count rescue nil
+    total    = klass.count rescue nil
     offset   = (total.to_s.size*2)+8
     done     = 0
 
@@ -101,7 +104,7 @@ namespace :tire do
 
   namespace :index do
 
-    full_comment = <<-DESC.gsub(/      /, '')
+    full_comment_drop = <<-DESC.gsub(/      /, '')
       Delete indices passed in the INDEX environment variable; separate multiple indices by comma.
 
       Pass name of a single index to drop in the INDEX environmnet variable:
@@ -111,12 +114,12 @@ namespace :tire do
         $ rake environment tire:index:drop INDICES=articles-2011-01,articles-2011-02
 
     DESC
-    desc full_comment
+    desc full_comment_drop
     task :drop do
       index_names = (ENV['INDEX'] || ENV['INDICES']).to_s.split(/,\s*/)
 
       if index_names.empty?
-        puts '='*90, 'USAGE', '='*90, full_comment, ""
+        puts '='*90, 'USAGE', '='*90, full_comment_drop, ""
         exit(1)
       end
 

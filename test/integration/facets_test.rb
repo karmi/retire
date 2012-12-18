@@ -59,6 +59,32 @@ module Tire
         assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
       end
 
+      should "allow to define the facet filter with DSL" do
+          s = Tire.search('articles-test', :search_type => 'count') do
+            facet 'tags' do
+              terms :tags
+              facet_filter :range, { :published_on => { :from => '2011-01-01', :to => '2011-01-01' } }
+            end
+          end
+
+          assert_equal 1,      s.results.facets.size
+          assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
+          assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
+      end
+
+      should "allow arbitrary order of methods in the DSL block" do
+          s = Tire.search('articles-test', :search_type => 'count') do
+            facet 'tags' do
+              facet_filter :range, { :published_on => { :from => '2011-01-01', :to => '2011-01-01' } }
+              terms :tags
+            end
+          end
+
+          assert_equal 1,      s.results.facets.size
+          assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
+          assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
+      end
+
       context "terms" do
         setup do
           @s = Tire.search('articles-test') do
@@ -238,22 +264,20 @@ module Tire
       end
 
       context "filter" do
-        should "return a filtered facet" do
-          s = Tire.search('articles-test') do
-            query { all }
+
+        should "return a filter facet" do
+          s = Tire.search('articles-test', :search_type => 'count') do
             facet 'filtered' do
-              filter :tags, 'ruby'
+              filter :range, :words => { :from => 100, :to => 200 }
             end
           end
 
-          assert_equal 5, s.results.size, s.results.inspect
           facets = s.results.facets["filtered"]
           assert_equal 2, facets["count"], facets.inspect
         end
+
       end
 
     end
-
   end
-
 end

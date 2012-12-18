@@ -24,37 +24,6 @@ namespace :test do
   end
 end
 
-# Generate documentation
-begin
-  require 'rdoc'
-  require 'rdoc/task'
-  Rake::RDocTask.new do |rdoc|
-    rdoc.rdoc_dir = 'rdoc'
-    rdoc.title = "Tire"
-    rdoc.rdoc_files.include('README.markdown')
-    rdoc.rdoc_files.include('lib/**/*.rb')
-  end
-rescue LoadError
-  task :rdoc do
-    abort "[!] RDoc gem is not available."
-  end
-end
-
-# Generate coverage reports
-begin
-  require 'rcov/rcovtask'
-  Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.rcov_opts = ['--exclude', 'gems/*']
-    test.pattern = 'test/**/*_test.rb'
-    test.verbose = true
-  end
-rescue LoadError
-  task :rcov do
-    abort "[!] RCov gem is not available."
-  end
-end
-
 namespace :web do
 
   desc "Update the Github website"

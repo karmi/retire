@@ -7,7 +7,7 @@ class Article
     attributes.each { |k,v| instance_variable_set(:"@#{k}", v) }
   end
 
-  def to_json
+  def to_json(options={})
     { :id => @id, :title => @title, :body => @body }.to_json
   end
 

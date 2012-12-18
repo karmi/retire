@@ -72,20 +72,26 @@ module Tire
             options ||= {}
           end
 
-          sort      = Array( options[:order] || options[:sort] )
           options   = default_options.update(options)
+          sort      = Array( options.delete(:order) || options.delete(:sort) )
 
           s = Tire::Search::Search.new(options.delete(:index), options)
-          s.size( options[:per_page].to_i ) if options[:per_page]
-          s.from( options[:page].to_i <= 1 ? 0 : (options[:per_page].to_i * (options[:page].to_i-1)) ) if options[:page] && options[:per_page]
+
+          page     = options.delete(:page)
+          per_page = options.delete(:per_page) || Tire::Results::Pagination::default_per_page
+
+          s.size( per_page.to_i ) if per_page
+          s.from( page.to_i <= 1 ? 0 : (per_page.to_i * (page.to_i-1)) ) if page && per_page
+
           s.sort do
             sort.each do |t|
-              field_name, direction = t.split(' ')
+              field_name, direction = t.split(':')
               by field_name, direction
             end
           end unless sort.empty?
 
-          if version = options.delete(:version); s.version(version); end
+          version = options.delete(:version)
+          s.version(version) if version
 
           if block_given?
             block.arity < 1 ? s.instance_eval(&block) : block.call(s)
@@ -97,6 +103,12 @@ module Tire
           end
 
           s.results
+        end
+
+        def multi_search(options={}, &block)
+          default_options = {:type => document_type}
+          options         = default_options.update(options)
+          Tire::Search::Multi::Search.new(index.name, options, &block).results
         end
 
         # Returns a Tire::Index instance for this model.
@@ -138,7 +150,7 @@ module Tire
               instance._index   = response['_index']   if instance.respond_to?(:_index=)
               instance._type    = response['_type']    if instance.respond_to?(:_type=)
               instance._version = response['_version'] if instance.respond_to?(:_version=)
-              instance.matches  = response['matches']  if instance.respond_to?(:matches=)
+              instance.tire.matches = response['matches'] if instance.tire.respond_to?(:matches=)
               self
             end
           end
@@ -154,7 +166,7 @@ module Tire
         # declared in the mapping are serialized.
         #
         # For properties declared with the `:as` option, the passed String or Proc
-        # is evaluated in the instance context.
+        # is evaluated in the instance context. Other objects are indexed "as is".
         #
         def to_indexed_json
           if instance.class.tire.mapping.empty?
@@ -172,7 +184,9 @@ module Tire
                   hash[key] = instance.instance_eval(options[:as])
                 when Proc
                   hash[key] = instance.instance_eval(&options[:as])
-              end
+                else
+                  hash[key] = options[:as]
+              end if options[:as]
             end
 
             hash.to_json
@@ -180,11 +194,17 @@ module Tire
         end
 
         def matches
-          @attributes['matches']
+          instance.instance_eval do
+            @attributes ||= {}
+            @attributes['tire__matches']
+          end
         end
 
         def matches=(value)
-          @attributes ||= {}; @attributes['matches'] = value
+          instance.instance_eval do
+            @attributes ||= {}
+            @attributes['tire__matches'] = value
+          end
         end
 
       end
@@ -300,7 +320,6 @@ module Tire
         Results::Item.send :include, Loader
       end
 
-      
     end
 
   end

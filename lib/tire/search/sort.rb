@@ -16,7 +16,7 @@ module Tire
         @value
       end
 
-      def to_json
+      def to_json(options={})
         @value.to_json
       end
     end

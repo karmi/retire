@@ -105,11 +105,17 @@ module Tire
         #
         def create_elasticsearch_index
           unless index.exists?
-            index.create :mappings => mapping_to_hash, :settings => settings
+            new_index = index
+            unless result = new_index.create(:mappings => mapping_to_hash, :settings => settings)
+              STDERR.puts "[ERROR] There has been an error when creating the index -- elasticsearch returned:",
+                          new_index.response
+              result
+            end
           end
         rescue Errno::ECONNREFUSED => e
           STDERR.puts "Skipping index creation, cannot connect to ElasticSearch",
                       "(The original exception was: #{e.inspect})"
+          false
         end
 
         def mapping_options

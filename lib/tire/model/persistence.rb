@@ -11,7 +11,7 @@ module Tire
     #
     #     class Article
     #       include Tire::Model::Persistence
-    #     
+    #
     #       property :title
     #     end
     #
@@ -45,7 +45,7 @@ module Tire
 
           include Persistence::Storage
 
-          ['_score', '_type', '_index', '_version', 'sort', 'highlight', 'matches', '_explanation'].each do |attr|
+          ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each do |attr|
             define_method("#{attr}=") { |value| @attributes ||= {}; @attributes[attr] = value }
             define_method("#{attr}")  { @attributes[attr] }
           end
@@ -54,11 +54,14 @@ module Tire
             args.last.update(:wrapper => self, :version => true) if args.last.is_a? Hash
             args << { :wrapper => self, :version => true } unless args.any? { |a| a.is_a? Hash }
 
-            self.__search_without_persistence(*args, &block)
+            self.tire.search(*args, &block)
           end
 
-          def self.__search_without_persistence(*args, &block)
-            self.tire.search(*args, &block)
+          def self.multi_search(*args, &block)
+            args.last.update(:wrapper => self, :version => true) if args.last.is_a? Hash
+            args << { :wrapper => self, :version => true } unless args.any? { |a| a.is_a? Hash }
+
+            self.tire.multi_search(*args, &block)
           end
 
         end

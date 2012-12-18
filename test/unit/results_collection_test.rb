@@ -10,7 +10,8 @@ module Tire
         Configuration.reset
         @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
                                                      {'_id' => 2},
-                                                     {'_id' => 3}] } }
+                                                     {'_id' => 3}],
+                                          'max_score' => 1.0 } }
       end
 
       should "be iterable" do
@@ -32,11 +33,20 @@ module Tire
         assert_equal 2, Results::Collection.new(@default_response)[1][:id]
       end
 
+      should "allow slicing" do
+        assert_equal [2,3], Results::Collection.new(@default_response)[1,2].map  {|res| res[:id]}
+        assert_equal [3],   Results::Collection.new(@default_response)[-1,1].map {|res| res[:id]}
+      end
+
       should "be initialized with parsed json" do
         assert_nothing_raised do
           collection = Results::Collection.new( @default_response )
           assert_equal 3, collection.results.count
         end
+      end
+
+      should "return success/failure state" do
+        assert Results::Collection.new( @default_response ).success?
       end
 
       should "be populated lazily" do
@@ -59,8 +69,31 @@ module Tire
 
       should "be kaminari compatible" do
         collection = Results::Collection.new(@default_response)
-        %w(limit_value total_count num_pages offset_value).each do |method|
+        %w(limit_value total_count num_pages offset_value first_page? last_page?).each do |method|
           assert_respond_to collection, method
+        end
+      end
+
+      should "have max_score" do
+        collection = Results::Collection.new(@default_response)
+        assert_equal 1.0, collection.max_score
+      end
+
+      context "with error response" do
+        setup do
+          @collection = Results::Collection.new({'error' => 'SearchPhaseExecutionException...'})
+        end
+
+        should "return the error" do
+          assert_equal 'SearchPhaseExecutionException...', @collection.error
+        end
+
+        should "return the success/failure state" do
+          assert @collection.failure?
+        end
+
+        should "return empty results" do
+          assert @collection.empty?
         end
       end
 
@@ -210,6 +243,13 @@ module Tire
 
         should "return next page" do
           assert_equal 3, @collection.next_page
+        end
+
+        should "have default per_page" do
+          assert_equal 10, Tire::Results::Pagination::default_per_page
+
+          collection = Results::Collection.new @default_response
+          assert_equal 10, collection.per_page
         end
 
       end

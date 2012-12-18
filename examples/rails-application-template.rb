@@ -105,7 +105,7 @@ puts
 say_status  "Rubygems", "Adding Rubygems into Gemfile...\n", :yellow
 puts        '-'*80, ''; sleep 1
 
-gem 'tire'
+gem 'tire', :git => 'git://github.com/karmi/tire.git'
 gem 'will_paginate', '~> 3.0'
 
 git :add => '.'
@@ -137,7 +137,7 @@ say_status  "Database", "Seeding the database with data...", :yellow
 puts        '-'*80, ''; sleep 0.25
 
 run "rm -f db/seeds.rb"
-file 'db/seeds.rb', <<-CODE
+file 'db/seeds.rb', %q{
 contents = [
 'Lorem ipsum dolor sit amet.',
 'Consectetur adipisicing elit, sed do eiusmod tempor incididunt.',
@@ -149,11 +149,23 @@ contents = [
 puts "Deleting all articles..."
 Article.delete_all
 
-puts "Creating articles..."
-%w[ One Two Three Four Five ].each_with_index do |title, i|
-  Article.create :title => title, :content => contents[i], :published_on => i.days.ago.utc
+unless ENV['COUNT']
+
+  puts "Creating articles..."
+  %w[ One Two Three Four Five ].each_with_index do |title, i|
+    Article.create :title => title, :content => contents[i], :published_on => i.days.ago.utc
+  end
+
+else
+
+  puts "Creating 10,000 articles..."
+  (1..ENV['COUNT'].to_i).each_with_index do |title, i|
+    Article.create :title => "Title #{title}", :content => 'Lorem', :published_on => i.days.ago.utc
+    print '.'
+  end
+
 end
-CODE
+}
 
 rake "db:seed"
 
@@ -169,6 +181,8 @@ file 'app/models/article.rb', <<-CODE
 class Article < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
+
+  attr_accessible :title, :content, :published_on
 end
 CODE
 

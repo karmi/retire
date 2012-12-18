@@ -46,7 +46,7 @@ module Tire
 
             # Save property default value (when relevant):
             unless (default_value = options.delete(:default)).nil?
-              property_defaults[name.to_sym] = default_value
+              property_defaults[name.to_sym] = default_value.respond_to?(:call) ? default_value.call : default_value
             end
 
             # Save property casting (when relevant):

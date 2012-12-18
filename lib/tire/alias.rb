@@ -209,7 +209,7 @@ module Tire
 
         if Configuration.logger.level.to_s == 'debug'
           body = if @response
-            defined?(Yajl) ? Yajl::Encoder.encode(@response.body, :pretty => true) : MultiJson.encode(@response.body)
+            MultiJson.encode(@response.body, :pretty => Configuration.pretty)
           else
             error.message rescue ''
           end

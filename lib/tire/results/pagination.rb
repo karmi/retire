@@ -5,12 +5,17 @@ module Tire
     #
     module Pagination
 
+      def default_per_page
+        10
+      end
+      module_function :default_per_page
+
       def total_entries
         @total
       end
 
       def per_page
-        (@options[:per_page] || @options[:size] || 10 ).to_i
+        (@options[:per_page] || @options[:size] || default_per_page ).to_i
       end
 
       def total_pages
@@ -47,6 +52,15 @@ module Tire
       alias :total_count  :total_entries
       alias :num_pages    :total_pages
       alias :offset_value :offset
+
+      def first_page?
+        current_page == 1
+      end
+
+      def last_page?
+        current_page == total_pages
+      end
+
 
     end
 

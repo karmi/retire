@@ -117,9 +117,8 @@ module Tire
         s = Search::Search.new('index') do
           query { string 'title:foo' }
         end
-        assert_equal %q|curl -X GET "http://localhost:9200/index/_search?pretty=true" -d | +
-                     %q|'{"query":{"query_string":{"query":"title:foo"}}}'|,
-                     s.to_curl
+        assert_match %r|curl \-X GET 'http://localhost:9200/index/_search\?pretty' -d |, s.to_curl
+        assert_match %r|\s*{\s*"query"\s*:\s*"title:foo"\s*}\s*|, s.to_curl
       end
 
       should "return curl snippet with multiple indices for debugging" do
@@ -231,6 +230,15 @@ module Tire
           end
           hash = MultiJson.decode( s.to_json )
           assert_equal [{'title' => 'desc'}, '_score'], hash['sort']
+        end
+
+        should "allow to track scores" do
+          s = Search::Search.new('index') do
+            sort { by :title }
+            track_scores true
+          end
+
+          assert_equal 'true', s.to_hash[:track_scores].to_json
         end
 
       end
@@ -395,6 +403,30 @@ module Tire
 
       end
 
+      context "with min_score" do
+        should "allow to specify minimum score for returned documents" do
+          s = Search::Search.new('index') do
+            query { string 'foo' }
+            min_score 0.5
+          end
+
+          assert_equal( '0.5', s.to_hash[:min_score].to_json )
+        end
+      end
+
+      context "with partial fields" do
+
+        should "add partial_fields config" do
+          s = Search::Search.new('index') do
+            partial_field 'name', :include => 'name_*'
+          end
+
+          hash = MultiJson.decode( s.to_json )
+          assert_equal({'name' => { 'include' => 'name_*'} }, hash['partial_fields'])
+        end
+
+      end
+
       context "explain" do
 
         should "default to false" do
@@ -454,6 +486,31 @@ module Tire
 
           assert_equal( { 'query_string' => { 'query' => 'foo' } }, query['should'].first)
           assert_equal( { 'terms' => { 'tags' => ['baz'] } }, query['must'].last)
+        end
+
+      end
+
+      context "boosting queries" do
+
+        should "wrap other queries" do
+         s = Search::Search.new('index') do
+            query do
+              boosting do
+                positive { string 'foo' }
+                positive { term('bar', 'baz') }
+                negative { term('bar', 'moo') }
+              end
+            end
+          end
+
+          hash  = MultiJson.decode(s.to_json)
+          query = hash['query']['boosting']
+
+          assert_equal 2, query['positive'].size
+          assert_equal 1, query['negative'].size
+
+          assert_equal( { 'query_string' => { 'query' => 'foo' } }, query['positive'].first)
+          assert_equal( { 'term' => { 'bar' => {'term' => 'moo' } } }, query['negative'].first)
         end
 
       end

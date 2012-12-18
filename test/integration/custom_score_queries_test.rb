@@ -58,6 +58,7 @@ module Tire
         assert_equal 2, s.results.size
         assert_equal ['Three', 'Two'], s.results.map(&:title)
 
+        assert_equal 5.0, s.results.max_score
         assert_equal 5.0, s.results[0]._score
         assert_equal 3.0, s.results[1]._score
       end
