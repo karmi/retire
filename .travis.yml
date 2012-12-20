@@ -26,6 +26,8 @@ matrix:
       env: TEST_COMMAND="rake test:integration"
     - rvm: ree
       env: TEST_COMMAND="rake test:integration"
+    - rvm: jruby-18mode
+      env: TEST_COMMAND="rake test:integration"
 
 notifications:
   disable: true

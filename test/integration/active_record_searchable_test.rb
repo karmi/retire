@@ -7,7 +7,7 @@ module Tire
 
     def setup
       super
-      adapter = JRUBY ? 'jdbc-sqlite3' : 'sqlite3'
+      adapter = JRUBY ? 'jdbcsqlite3' : 'sqlite3'
       ActiveRecord::Base.establish_connection( :adapter => adapter, :database => ":memory:" )
 
       ActiveRecord::Migration.verbose = false
