@@ -276,7 +276,7 @@ module Tire
     def update(type, id, payload={}, options={})
       raise ArgumentError, "Please pass a document type" unless type
       raise ArgumentError, "Please pass a document ID"   unless id
-      raise ArgumentError, "Please pass a script in the payload hash" unless payload[:script]
+      raise ArgumentError, "Please pass a script or partial document in the payload hash" unless payload[:script] || payload[:doc]
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{id}/_update"
