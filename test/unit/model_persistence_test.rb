@@ -319,6 +319,16 @@ module Tire
             assert_equal 'A', article.stats.meta.tags
           end
 
+          should "create empty collection for empty value Array" do
+            article = PersistentArticleWithCastedCollection.new :title => 'Test', :comments => []
+            assert article.comments.empty?, article.inspect
+          end
+
+          should "pass non-array values to class constructor and create a collection" do
+            article = PersistentArticleWithCastedCollection.new :title => 'Test', :comments => nil
+            assert ! article.comments.empty?, article.inspect
+          end
+
         end
 
         context "when initializing" do

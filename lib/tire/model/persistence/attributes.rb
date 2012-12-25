@@ -120,6 +120,8 @@ module Tire
               when klass = self.class.property_types[name.to_sym]
                 if klass.is_a?(Array) && value.is_a?(Array)
                   value.map { |v| klass.first.new(v) }
+                elsif klass.is_a?(Array)
+                  Array(klass.first.new(value))
                 else
                   klass.new(value)
                 end
