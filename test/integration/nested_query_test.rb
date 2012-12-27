@@ -70,6 +70,51 @@ module Tire
         assert_equal 'Western Shirt', s.results.first.name
       end
 
+      should 'return a root document when the nested document and standard query match all criteria' do
+        s = Tire.search('products') do
+          query do
+            boolean do
+              must { string 'name:Western' }
+              must do
+                nested :path => 'variants' do
+                  query do
+                    boolean do
+                      must { string 'variants.size:M' }
+                      must { string 'variants.color:silver'}
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        assert_equal 1, s.results.size
+        assert_equal 'Western Shirt', s.results.first.name
+      end
+
+      should 'not return a root document when the nested document and standard query contradict' do
+        s = Tire.search('products') do
+          query do
+            boolean do
+              must { string 'name:Duck' }
+              must do
+                nested :path => 'variants' do
+                  query do
+                    boolean do
+                      must { string 'variants.size:M' }
+                      must { string 'variants.color:silver'}
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        assert_equal 0, s.results.size
+      end
+
       should 'not return a cross-object result' do
         s = Tire.search('products') do
           query do
