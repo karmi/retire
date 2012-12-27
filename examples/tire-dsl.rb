@@ -757,8 +757,8 @@ s = Tire.search 'articles' do
 end
 
 # The results:
-#     * Two [tags: ruby, python]
-#     * Three [tags: java]
+#     * Two [authors: Mr. Yukihiro Matsumoto, BDFL Guido van Rossum]
+#     * One [authors: Mr. Yukihiro Matsumoto]
 #
 puts "Matching nested queries: "
 s.results.each do |document|
