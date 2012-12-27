@@ -121,6 +121,8 @@ end
 # for the index.
 
 Tire.index 'articles' do
+  delete
+
   # To do so, let's just pass a Hash containing the specified mapping to the `Index#create` method.
   #
   create :mappings => {
@@ -141,9 +143,12 @@ Tire.index 'articles' do
         # But don't fret about getting the mapping right the first time, you won't.
         # In most cases, the default, dynamic mapping is just fine for prototyping.
         #
+        # And lastly, for authors, we want to index them as separate nested documents.
+        # 
         :title    => { :type => 'string', :analyzer => 'snowball', :boost => 2.0             },
         :tags     => { :type => 'string', :analyzer => 'keyword'                             },
-        :content  => { :type => 'string', :analyzer => 'czech'                               }
+        :content  => { :type => 'string', :analyzer => 'czech'                               },
+        :authors  => { :type => 'nested', :salutation => 'string', :first_name => 'string', :last_name => 'string' }
       }
     }
   }
@@ -161,13 +166,19 @@ articles = [
 
   # Notice that such objects must have an `id` property!
   #
-  { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01' },
+  { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01',
+    :authors => [ { :salutation => 'Mr.', :first_name => 'Yukihiro', :last_name => 'Matsumoto' } ] },
 
   # And, of course, they should contain the `type` property for the mapping to work!
   #
-  { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02' },
-  { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02' },
-  { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03' }
+  { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02',
+    :authors => [ { :salutation => 'Mr.', :first_name => 'Yukihiro', :last_name => 'Matsumoto' },
+                  { :salutation => 'BDFL', :first_name => 'Guido', :last_name => 'van Rossum' } ] },
+  { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02',
+    :authors => [ { :salutation => 'Officer', :first_name => 'James', :last_name => 'Gosling' } ] },
+  { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03',
+    :authors => [ { :salutation => 'Mr.', :first_name => 'Charlie', :last_name => 'Nutter' },
+                  { :salutation => 'Mr.', :first_name => 'Rasmus', :last_name => 'Lerdorf' } ] }
 ]
 
 # We can just push them into the index in one go.
@@ -179,8 +190,6 @@ end
 # Of course, we can easily manipulate the documents before storing them in the index.
 #
 Tire.index 'articles' do
-  delete
-
   # ... by passing a block to the `import` method. The collection will
   # be available in the block argument.
   #
@@ -718,6 +727,45 @@ end
 s.results.each do |document|
   puts "* #{ document.title.ljust(10) }  (Published on: #{ document.published_on })"
 end
+
+#### Nested Documents and Queries
+# Often, we want to query parts of a document as if they were separate entities. One
+# problem when indexing objects, like authors in our example, is if there is more than
+# author, "cross object" search matching will occur. _ElasticSearch_ provides 
+# [nested types](http://www.elasticsearch.org/guide/reference/mapping/nested-type.html) and
+# [nested queries](http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html)
+# to address the cross-object matching.
+#
+# In this example, we want to find a "Mr." named "Yukihiro" 
+#
+s = Tire.search 'articles' do
+  query do
+    nested :path => 'authors' do
+      query do 
+        boolean do
+          # Now we can search and get only results where Matz is an author and also his 
+          # salutation is 'Mr.' A a standard _ElasticSearch_ query would return any
+          # document where 'Mr' or 'Matsumoto' happen to be in the document, and rank one
+          # with both strings higher.
+          #
+          must { string 'salutation:Mr' }
+          must { string 'last_name:Matsumoto' }
+        end
+      end
+    end
+  end
+end
+
+# The results:
+#     * Two [tags: ruby, python]
+#     * Three [tags: java]
+#
+puts "Matching nested queries: "
+s.results.each do |document|
+  puts "* #{ document.title } [authors: " + document.authors.map { |a| "#{a.salutation} #{a.first_name} #{a.last_name}" }.join(', ') + "]"
+end
+puts "Found #{s.results.count} articles: #{s.results.map(&:title).join(', ')}"
+
 
 #### Highlighting
 
