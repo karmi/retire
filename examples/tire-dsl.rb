@@ -764,8 +764,36 @@ puts "Matching nested queries: "
 s.results.each do |document|
   puts "* #{ document.title } [authors: " + document.authors.map { |a| "#{a.salutation} #{a.first_name} #{a.last_name}" }.join(', ') + "]"
 end
-puts "Found #{s.results.count} articles: #{s.results.map(&:title).join(', ')}"
 
+## Boolean Queries with Nested Queries
+# Since we're often interested in other attributes and cross-object match, we'll need to
+# have the root boolean query in addition to the nested boolean query. 
+#
+s = Tire.search 'articles' do
+  query do
+    boolean do
+      # We want to search for articles where Mr. Matz was a co-author about Python 
+      must { term 'tags', 'python' }
+      must do
+        nested :path => 'authors' do
+          query do 
+            boolean do
+              must { string 'salutation:Mr' }
+              must { string 'last_name:Matsumoto' }
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+# The results:
+#     * Two [authors: Mr. Yukihiro Matsumoto, BDFL Guido van Rossum]
+puts "Matching boolean and nested queries: "
+s.results.each do |document|
+  puts "* #{ document.title } [authors: " + document.authors.map { |a| "#{a.salutation} #{a.first_name} #{a.last_name}" }.join(', ') + "]"
+end
 
 #### Highlighting
 
