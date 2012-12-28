@@ -148,7 +148,7 @@ Tire.index 'articles' do
         :title    => { :type => 'string', :analyzer => 'snowball', :boost => 2.0             },
         :tags     => { :type => 'string', :analyzer => 'keyword'                             },
         :content  => { :type => 'string', :analyzer => 'czech'                               },
-        :authors  => { :type => 'nested', :salutation => 'string', :first_name => 'string', :last_name => 'string' }
+        :authors  => { :type => 'nested' }
       }
     }
   }
