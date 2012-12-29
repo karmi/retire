@@ -167,18 +167,18 @@ articles = [
   # Notice that such objects must have an `id` property!
   #
   { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01',
-    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby'] } ] },
+    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby', 'c'] } ] },
 
   # And, of course, they should contain the `type` property for the mapping to work!
   #
   { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02',
-    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby'] },
-                  { :first_name => 'Guido', :last_name => 'van Rossum', :specialties => ['python'] } ] },
+    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby', 'c'] },
+                  { :first_name => 'Guido', :last_name => 'van Rossum', :specialties => ['python', 'c'] } ] },
   { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02',
-    :authors => [ { :first_name => 'James', :last_name => 'Gosling', :specialties => ['java'] } ] },
+    :authors => [ { :first_name => 'James', :last_name => 'Gosling', :specialties => ['java', 'c++'] } ] },
   { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03',
-    :authors => [ { :first_name => 'Charlie', :last_name => 'Nutter', :specialties => ['ruby', 'java'] },
-                  { :first_name => 'Rasmus', :last_name => 'Lerdorf', :specialties => ['php'] } ] }
+    :authors => [ { :first_name => 'Charlie', :last_name => 'Nutter', :specialties => ['ruby', 'java', 'c'] },
+                  { :first_name => 'Rasmus', :last_name => 'Lerdorf', :specialties => ['php', 'c'] } ] }
 ]
 
 # We can just push them into the index in one go.
@@ -744,12 +744,12 @@ s = Tire.search 'articles' do
       query do 
         boolean do
           # Now we can search and get only results where Matsumoto is an author and also
-          # specializes in 'ruby'. A a standard _ElasticSearch_ query would return any
-          # document where 'ruby' or 'Matsumoto' happen to be in the document, and rank one
-          # with both strings higher -- meaning Charlie Nutter would be in the result set.
+          # specializes in 'c'. A a standard _ElasticSearch_ query would return any
+          # document where is a term for an author 'c' or 'Matsumoto' is a string in the
+          # author's name. Results would be ranked accordingly. 
           #
           must { string 'last_name:Matsumoto' }
-          must { term 'specialties', 'ruby' }
+          must { term 'specialties', 'c' }
         end
       end
     end
@@ -782,7 +782,7 @@ s = Tire.search 'articles' do
           query do 
             boolean do
               must { string 'last_name:Matsumoto' }
-              must { term 'specialties', 'ruby' }
+              must { term 'specialties', 'c' }
             end
           end
         end
