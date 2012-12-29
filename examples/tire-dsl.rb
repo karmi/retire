@@ -757,8 +757,8 @@ s = Tire.search 'articles' do
 end
 
 # The results:
-#     * Two [authors: Mr. Yukihiro Matsumoto, BDFL Guido van Rossum]
-#     * One [authors: Mr. Yukihiro Matsumoto]
+#     * Two [authors: Yukihiro Matsumoto, Guido van Rossum]
+#     * One [authors: Yukihiro Matsumoto]
 #
 puts "Matching nested queries: "
 s.results.each do |document|
@@ -792,7 +792,7 @@ s = Tire.search 'articles' do
 end
 
 # The results:
-#     * Two [authors: Mr. Yukihiro Matsumoto, BDFL Guido van Rossum]
+#     * Two [authors: Yukihiro Matsumoto, Guido van Rossum]
 puts "Matching boolean and nested queries: "
 s.results.each do |document|
   puts "* #{ document.title } [authors: " + document.authors.map { |a| "#{a.salutation} #{a.first_name} #{a.last_name}" }.join(', ') + "]"
