@@ -167,18 +167,18 @@ articles = [
   # Notice that such objects must have an `id` property!
   #
   { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01',
-    :authors => [ { :salutation => 'Mr.', :first_name => 'Yukihiro', :last_name => 'Matsumoto' } ] },
+    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby'] } ] },
 
   # And, of course, they should contain the `type` property for the mapping to work!
   #
   { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02',
-    :authors => [ { :salutation => 'Mr.', :first_name => 'Yukihiro', :last_name => 'Matsumoto' },
-                  { :salutation => 'BDFL', :first_name => 'Guido', :last_name => 'van Rossum' } ] },
+    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby'] },
+                  { :first_name => 'Guido', :last_name => 'van Rossum', :specialties => ['python'] } ] },
   { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02',
-    :authors => [ { :salutation => 'Officer', :first_name => 'James', :last_name => 'Gosling' } ] },
+    :authors => [ { :first_name => 'James', :last_name => 'Gosling', :specialties => ['java'] } ] },
   { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03',
-    :authors => [ { :salutation => 'Mr.', :first_name => 'Charlie', :last_name => 'Nutter' },
-                  { :salutation => 'Mr.', :first_name => 'Rasmus', :last_name => 'Lerdorf' } ] }
+    :authors => [ { :first_name => 'Charlie', :last_name => 'Nutter', :specialties => ['ruby', 'java'] },
+                  { :first_name => 'Rasmus', :last_name => 'Lerdorf', :specialties => ['php'] } ] }
 ]
 
 # We can just push them into the index in one go.
@@ -736,20 +736,20 @@ end
 # [nested queries](http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html)
 # to address the cross-object matching.
 #
-# In this example, we want to find a "Mr." named "Yukihiro" 
+# In this example, we want to find authors who have a last name "Matsumoto" and a 'ruby' specialty.  
 #
 s = Tire.search 'articles' do
   query do
     nested :path => 'authors' do
       query do 
         boolean do
-          # Now we can search and get only results where Matz is an author and also his 
-          # salutation is 'Mr.' A a standard _ElasticSearch_ query would return any
-          # document where 'Mr' or 'Matsumoto' happen to be in the document, and rank one
-          # with both strings higher.
+          # Now we can search and get only results where Matsumoto is an author and also
+          # specializes in 'ruby'. A a standard _ElasticSearch_ query would return any
+          # document where 'ruby' or 'Matsumoto' happen to be in the document, and rank one
+          # with both strings higher -- meaning Charlie Nutter would be in the result set.
           #
-          must { string 'salutation:Mr' }
           must { string 'last_name:Matsumoto' }
+          must { term 'specialties', 'ruby' }
         end
       end
     end
@@ -767,19 +767,22 @@ end
 
 ## Boolean Queries with Nested Queries
 # Since we're often interested in other attributes and cross-object match, we'll need to
-# have the root boolean query in addition to the nested boolean query. 
+# have the root boolean query in addition to a nested boolean query.
+# 
 #
 s = Tire.search 'articles' do
   query do
     boolean do
-      # We want to search for articles where Mr. Matz was a co-author about Python 
+      # We want to search for articles tagged with 'python' where an author named
+      # Mastumoto, a 'ruby' specialist, co-wrote it.
+      #
       must { term 'tags', 'python' }
       must do
         nested :path => 'authors' do
           query do 
             boolean do
-              must { string 'salutation:Mr' }
               must { string 'last_name:Matsumoto' }
+              must { term 'specialties', 'ruby' }
             end
           end
         end
