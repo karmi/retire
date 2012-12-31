@@ -28,7 +28,11 @@ namespace :web do
 
   desc "Update the Github website"
   task :update => :generate do
-    current_branch = `git branch --no-color`.split("\n").select { |line| line =~ /^\* / }.to_s.gsub(/\* (.*)/, '\1')
+    current_branch = `git branch --no-color`.
+                       split("\n").
+                       select { |line| line =~ /^\* / }.
+                       first.to_s.
+                       gsub(/\* (.*)/, '\1')
     (puts "Unable to determine current branch"; exit(1) ) unless current_branch
     system "git checkout web"
     system "cp examples/tire-dsl.html index.html"
