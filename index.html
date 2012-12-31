@@ -33,7 +33,7 @@ based on <a href="http://lucene.apache.org/">Lucene</a>, written in Java.</p>
 from <a href="https://github.com/karmi/tire">https://github.com/karmi/tire</a>.</p>
 
 <p>By following these instructions you should have the search running
-on a sane operation system in less then 10 minutes.</p>
+on a sane operating system in less then 10 minutes.</p>
       </td>
       <td class=code>
         <div class='highlight'><pre></pre></div>
@@ -133,9 +133,9 @@ We want to use the <a href="https://github.com/brianmario/yajl-ruby"><em>yajl-ru
 
 <span class="sh"> [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:</span>
 
-<span class="sh"> curl -k -L -o elasticsearch-0.17.6.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz</span>
-<span class="sh"> tar -zxvf elasticsearch-0.17.6.tar.gz</span>
-<span class="sh"> ./elasticsearch-0.17.6/bin/elasticsearch -f</span>
+<span class="sh"> curl -k -L -o elasticsearch-0.19.0.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz</span>
+<span class="sh"> tar -zxvf elasticsearch-0.19.0.tar.gz</span>
+<span class="sh"> ./elasticsearch-0.19.0/bin/elasticsearch -f</span>
 <span class="no">INSTALL</span></pre></div>
       </td>
     </tr>
@@ -1162,6 +1162,7 @@ to mix and reuse them later, since we can call the <code>boolean</code> method m
 <li><a href="http://elasticsearch.org/guide/reference/query-dsl/terms-query.html">terms</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html">bool</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html">custom_score</a></li>
+<li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/fuzzy-query.html">fuzzy</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html">all</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html">ids</a></li>
 </ul>
@@ -1390,6 +1391,8 @@ java       1
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html">date</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/range-facet.html">range</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html">histogram</a></li>
+<li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html">statistical</a></li>
+<li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/terms-stats-facet.html">terms_stats</a></li>
 <li><a href="http://www.elasticsearch.org/guide/reference/api/search/facets/query-facet.html">query</a></li>
 </ul>
       </td>
@@ -1435,8 +1438,7 @@ with letter “T”, again, but filter the results, so only the articles tagged 
 are returned.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
-  </pre></div>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-107'>
@@ -1447,7 +1449,7 @@ are returned.</p>
         <p>We will use just the same <strong>query</strong> as before.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:T*&#39;</span> <span class="p">}</span> </pre></div>
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:T*&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
     <tr id='section-108'>
@@ -1586,7 +1588,7 @@ such as published date or product price? We can do that.</p>
         <p>We will search for articles tagged “ruby”, again, &hellip;</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span> </pre></div>
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tags:ruby&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
     <tr id='section-118'>
@@ -1638,7 +1640,7 @@ such as published date or product price? We can do that.</p>
         <p>We will just get all articles in this case.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">all</span> <span class="p">}</span> 
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">all</span> <span class="p">}</span>
 
   <span class="n">sort</span> <span class="k">do</span></pre></div>
       </td>
@@ -1717,7 +1719,7 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <p>Let&rsquo;s search for documents containing word “Two” in their titles,</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span> </pre></div>
+        <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
     <tr id='section-128'>
@@ -2010,7 +2012,8 @@ getting back a list of matching queries.</p>
         <p>Let&rsquo;s store a document with some trigger words in the index, and mark it for percolation.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span><span class="p">,</span> <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="kp">true</span></pre></div>
+        <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="p">{</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span> <span class="p">},</span>
+                        <span class="p">{</span> <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="kp">true</span> <span class="p">}</span> <span class="p">)</span></pre></div>
       </td>
     </tr>
     <tr id='section-152'>
@@ -2035,7 +2038,7 @@ getting back a list of matching queries.</p>
         <p>As with the <em>percolate</em> example, we can filter the executed queries.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span><span class="p">,</span></pre></div>
+        <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="p">{</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span> <span class="p">},</span></pre></div>
       </td>
     </tr>
     <tr id='section-154'>
@@ -2046,7 +2049,7 @@ getting back a list of matching queries.</p>
         <p>Let&rsquo;s use a simple string query for the “tsunami” tag.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre>                       <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="s1">&#39;tags:tsunami&#39;</span></pre></div>
+        <div class='highlight'><pre>                        <span class="p">{</span> <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="s1">&#39;tags:tsunami&#39;</span> <span class="p">}</span> <span class="p">)</span></pre></div>
       </td>
     </tr>
     <tr id='section-155'>
