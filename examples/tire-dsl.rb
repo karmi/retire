@@ -839,7 +839,8 @@ puts "Matching queries: " + matches.inspect
 
 # Let's store a document with some trigger words in the index, and mark it for percolation.
 #
-response = index.store :message => '[Warning] Severe floods expected after tsunami wave.', :percolate => true
+response = index.store( { :message => '[Warning] Severe floods expected after tsunami wave.' },
+                        { :percolate => true } )
 
 # We will get the names of all matching queries in response.
 #
@@ -849,9 +850,9 @@ puts "Matching queries: " + response['matches'].inspect
 
 # As with the _percolate_ example, we can filter the executed queries.
 #
-response = index.store :message => '[Warning] Severe floods expected after tsunami wave.',
-                       # Let's use a simple string query for the “tsunami” tag.
-                       :percolate => 'tags:tsunami'
+response = index.store( { :message => '[Warning] Severe floods expected after tsunami wave.' },
+                         # Let's use a simple string query for the “tsunami” tag.
+                        { :percolate => 'tags:tsunami' } )
 
 # Unsurprisingly, the response will contain just the name of the “tsunami” query.
 #
