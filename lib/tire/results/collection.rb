@@ -33,6 +33,12 @@ module Tire
         results.each(&block)
       end
 
+      def each_with_hit
+        results.each do |result|
+          yield result, __hit(result.id)
+        end
+      end
+
       def empty?
         results.empty?
       end
@@ -137,6 +143,9 @@ module Tire
         @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
       end
 
+      def __hit(id)
+        @response['hits']['hits'].select{|h| h['_id'].to_s == id.to_s}.first
+      end
     end
 
   end
