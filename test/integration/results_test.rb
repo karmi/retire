@@ -34,6 +34,22 @@ module Tire
 
     end
 
+    should "iterate with hits" do
+      q = 'title:one'
+      s = Tire.search('articles-test') { query { string q }.fields :title }
+
+      s.results.each_with_hit do |result, hit|
+        assert_equal 'One',  result.title
+
+        assert_equal 'articles-test', hit['_index']
+        assert_equal 'article', hit['_type']
+        assert ((0.3)..(0.4)).include?(hit['_score']), "not in range"
+
+        assert_equal "1", hit['_id']
+        assert_equal 'One', hit['fields']['title']
+      end
+
+    end
   end
 
 end
