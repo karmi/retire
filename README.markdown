@@ -617,6 +617,19 @@ Instead of simple `true`, you can pass any options for the model's find method:
     end
 ```
 
+If you need _ElasticSearch_ properties (`_type`, `_score`, and `_index`)
+and the "real" model, just iterate it through `each_with_hit`:
+
+```ruby
+    # Iterate with model and _internal properties
+    results = Article.search 'One', :load => true
+    results.each_with_hit do |result, hit|
+      puts "#{result.title} (score: #{hit['_score']})"
+    end
+
+    # One (score: 0.300123)
+```
+
 Note that _Tire_ search results are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
 so you can pass all the usual parameters to the `search` method in the controller:
 

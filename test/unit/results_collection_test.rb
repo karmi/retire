@@ -198,6 +198,35 @@ module Tire
 
       end
 
+      context "each_with_hit" do
+        should "have a result and hit from a wrapped Item wrap" do
+          response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
+
+          Results::Collection.new(response).each_with_hit do |result, hit|
+            assert_equal response['hits']['hits'].first, hit
+            assert_equal 'Test', result.title
+          end
+        end
+
+
+        should "have a result and hit from an eager loaded" do
+          response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'active_record_article'} ] } }
+          ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
+
+          item = Results::Item.new(:id => 1)
+          ActiveRecordArticle.expects(:find).with([1]).
+                              returns([ item ] )
+
+          Results::Collection.new(response, :load => true).each_with_hit do |result, hit|
+            assert_equal response['hits']['hits'].first, hit
+            assert_equal item, result
+          end
+
+        end
+
+
+      end
+
       context "while paginating results" do
 
         setup do
