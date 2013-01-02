@@ -198,28 +198,33 @@ module Tire
 
       end
 
-      context "each_with_hit" do
-        should "have a result and hit from a wrapped Item wrap" do
+      context "returning results with hits" do
+        should "yield the Item result and the raw hit" do
           response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
 
           Results::Collection.new(response).each_with_hit do |result, hit|
-            assert_equal response['hits']['hits'].first, hit
-            assert_equal 'Test', result.title
+            assert_instance_of Tire::Results::Item, result
+            assert_instance_of Hash, hit
+            assert_equal 'Test',   result.title
+            assert_equal 0.5, hit['_score']
           end
         end
 
+        should "yield the model instance and the raw hit" do
+          response = { 'hits' => { 'hits' => [ {'_id' => 1, '_score' => 0.5, '_type' => 'active_record_article'} ] } }
 
-        should "have a result and hit from an eager loaded" do
-          response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'active_record_article'} ] } }
-          ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
+          ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":memory:" )
+          ActiveRecord::Migration.verbose = false
+          ActiveRecord::Schema.define(:version => 1) { create_table(:active_record_articles) { |t| t.string(:title) } }
+          model = ActiveRecordArticle.new(:title => 'Test'); model.id = 1
 
-          item = Results::Item.new(:id => 1)
-          ActiveRecordArticle.expects(:find).with([1]).
-                              returns([ item ] )
+          ActiveRecordArticle.expects(:find).with([1]).returns([ model] )
 
           Results::Collection.new(response, :load => true).each_with_hit do |result, hit|
-            assert_equal response['hits']['hits'].first, hit
-            assert_equal item, result
+            assert_instance_of ActiveRecordArticle, result
+            assert_instance_of Hash, hit
+            assert_equal 'Test',   result.title
+            assert_equal 0.5, hit['_score']
           end
 
         end
