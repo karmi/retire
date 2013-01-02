@@ -29,14 +29,18 @@ module Tire
         end
       end
 
+      # Iterates over the `results` collection
+      #
       def each(&block)
         results.each(&block)
       end
 
-      def each_with_hit
-        results.each do |result|
-          yield result, __hit(result.id)
-        end
+      # Iterates over the `results` collection and yields
+      # the `result` object (Item or model instance) and the
+      # `hit` -- raw Elasticsearch response parsed as a Hash
+      #
+      def each_with_hit(&block)
+        results.zip(@response['hits']['hits']).each(&block)
       end
 
       def empty?
@@ -141,10 +145,6 @@ module Tire
 
       def __find_records_by_ids(klass, ids)
         @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
-      end
-
-      def __hit(id)
-        @response['hits']['hits'].select{|h| h['_id'].to_s == id.to_s}.first
       end
     end
 
