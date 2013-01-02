@@ -32,21 +32,17 @@ module Tire
         assert_nil s.results.first.published_on
       end
 
-    end
+      should "iterate results with hits" do
+        s = Tire.search('articles-test') { query { string 'title:one' } }
 
-    should "iterate with hits" do
-      q = 'title:one'
-      s = Tire.search('articles-test') { query { string q }.fields :title }
+        s.results.each_with_hit do |result, hit|
+          assert_instance_of Tire::Results::Item, result
+          assert_instance_of Hash, hit
 
-      s.results.each_with_hit do |result, hit|
-        assert_equal 'One',  result.title
-
-        assert_equal 'articles-test', hit['_index']
-        assert_equal 'article', hit['_type']
-        assert ((0.3)..(0.4)).include?(hit['_score']), "not in range"
-
-        assert_equal "1", hit['_id']
-        assert_equal 'One', hit['fields']['title']
+          assert_equal 'One', result.title
+          assert_equal 'One', hit['_source']['title']
+          assert_not_nil hit['_score']
+        end
       end
 
     end
