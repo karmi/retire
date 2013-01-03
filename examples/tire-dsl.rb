@@ -143,12 +143,9 @@ Tire.index 'articles' do
         # But don't fret about getting the mapping right the first time, you won't.
         # In most cases, the default, dynamic mapping is just fine for prototyping.
         #
-        # And lastly, for authors, we want to index them as separate nested documents.
-        # 
         :title    => { :type => 'string', :analyzer => 'snowball', :boost => 2.0             },
         :tags     => { :type => 'string', :analyzer => 'keyword'                             },
-        :content  => { :type => 'string', :analyzer => 'czech'                               },
-        :authors  => { :type => 'nested' }
+        :content  => { :type => 'string', :analyzer => 'czech'                               }
       }
     }
   }
@@ -166,19 +163,13 @@ articles = [
 
   # Notice that such objects must have an `id` property!
   #
-  { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01',
-    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby', 'c'] } ] },
+  { :id => '1', :type => 'article', :title => 'one',   :tags => ['ruby'],           :published_on => '2011-01-01' },
 
   # And, of course, they should contain the `type` property for the mapping to work!
   #
-  { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02',
-    :authors => [ { :first_name => 'Yukihiro', :last_name => 'Matsumoto', :specialties => ['ruby', 'c'] },
-                  { :first_name => 'Guido', :last_name => 'van Rossum', :specialties => ['python', 'c'] } ] },
-  { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02',
-    :authors => [ { :first_name => 'James', :last_name => 'Gosling', :specialties => ['java', 'c++'] } ] },
-  { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03',
-    :authors => [ { :first_name => 'Charlie', :last_name => 'Nutter', :specialties => ['ruby', 'java', 'c'] },
-                  { :first_name => 'Rasmus', :last_name => 'Lerdorf', :specialties => ['php', 'c'] } ] }
+  { :id => '2', :type => 'article', :title => 'two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02' },
+  { :id => '3', :type => 'article', :title => 'three', :tags => ['java'],           :published_on => '2011-01-02' },
+  { :id => '4', :type => 'article', :title => 'four',  :tags => ['ruby', 'php'],    :published_on => '2011-01-03' }
 ]
 
 # We can just push them into the index in one go.
@@ -719,6 +710,7 @@ s = Tire.search 'articles' do
 end
 
 # The results:
+#
 #     * One         (Published on: 2011-01-01)
 #     * Two         (Published on: 2011-01-02)
 #     * Three       (Published on: 2011-01-02)
@@ -729,74 +721,58 @@ s.results.each do |document|
 end
 
 #### Nested Documents and Queries
-# Often, we want to query parts of a document as if they were separate entities. One
-# problem when indexing objects, like authors in our example, is if there is more than
-# author, "cross object" search matching will occur. _ElasticSearch_ provides 
-# [nested types](http://www.elasticsearch.org/guide/reference/mapping/nested-type.html) and
-# [nested queries](http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html)
-# to address the cross-object matching.
+
+# Often, we want to store more complex entities in _Elasticsearch_;
+# for example, we may want to store the information about comments for each article,
+# and then search for articles where a certain person left a certain note.
+
+# In the simplest case, we can store the comments as an Array of JSON documents in the
+# article document. If we do that naively, our search results will be incorrect, though.
+# That's because a match in just one field will be enough to match a document.
+# We need to query parts of the document as if they were separate entities.
+
+# _Elasticsearch_ provides a specific `nested`
+# [field type](http://www.elasticsearch.org/guide/reference/mapping/nested-type.html) and
+# [query](http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html)
+# for working with "embedded" documents like these.
+
+# So, let's update the mapping for the index first, adding the `comments` property as a `nested` type:
 #
-# In this example, we want to find authors who have a last name "Matsumoto" and a 'ruby' specialty.  
+Tire::Configuration.client.put Tire.index('articles').url+'/article/_mapping',
+                               { :article => { :properties => { :comments => { :type => 'nested' } } } }.to_json
+
+# And let's add comments to articles (notice that both articles contain a comment with the _Cool!_ message,
+# though by different authors):
+#
+Tire.index 'articles' do
+  update :article, 1,
+         :doc => { :comments => [ { :author => 'John', :message => 'Great!' }, { :author => 'Bob', :message => 'Cool!' } ]   }
+  update :article, 2,
+         :doc => { :comments => [ { :author => 'John', :message => 'Cool!' }, { :author => 'Mary', :message => 'Thanks!' } ] }
+  refresh
+end
+
+# We'll use the `nested` query to search for articles where _John_ left a _"Cool"_ message:
 #
 s = Tire.search 'articles' do
   query do
-    nested :path => 'authors' do
-      query do 
-        boolean do
-          # Now we can search and get only results where Matsumoto is an author and also
-          # specializes in 'c'. A a standard _ElasticSearch_ query would return any
-          # document where is a term for an author 'c' or 'Matsumoto' is a string in the
-          # author's name. Results would be ranked accordingly. 
-          #
-          must { string 'last_name:Matsumoto' }
-          must { term 'specialties', 'c' }
-        end
+    nested :path => 'comments' do
+      query do
+        match 'comments.author',  'John'
+        match 'comments.message', 'cool'
       end
     end
   end
 end
 
-# The results:
-#     * Two [authors: Yukihiro Matsumoto, Guido van Rossum]
-#     * One [authors: Yukihiro Matsumoto]
+# The results contain just the second document, correctly:
 #
-puts "Matching nested queries: "
+#     * Two (comments: 2)
+#
 s.results.each do |document|
-  puts "* #{ document.title } [authors: " + document.authors.map { |a| "#{a.salutation} #{a.first_name} #{a.last_name}" }.join(', ') + "]"
+  puts "* #{ document.title } (comments: #{document.comments.size})"
 end
 
-## Boolean Queries with Nested Queries
-# Since we're often interested in other attributes and cross-object match, we'll need to
-# have the root boolean query in addition to a nested boolean query.
-# 
-#
-s = Tire.search 'articles' do
-  query do
-    boolean do
-      # We want to search for articles tagged with 'python' where an author named
-      # Mastumoto, a 'ruby' specialist, co-wrote it.
-      #
-      must { term 'tags', 'python' }
-      must do
-        nested :path => 'authors' do
-          query do 
-            boolean do
-              must { string 'last_name:Matsumoto' }
-              must { term 'specialties', 'c' }
-            end
-          end
-        end
-      end
-    end
-  end
-end
-
-# The results:
-#     * Two [authors: Yukihiro Matsumoto, Guido van Rossum]
-puts "Matching boolean and nested queries: "
-s.results.each do |document|
-  puts "* #{ document.title } [authors: " + document.authors.map { |a| "#{a.salutation} #{a.first_name} #{a.last_name}" }.join(', ') + "]"
-end
 
 #### Highlighting
 
