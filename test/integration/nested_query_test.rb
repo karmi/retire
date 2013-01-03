@@ -8,43 +8,42 @@ module Tire
     context 'Nested queries' do
 
       setup do
-        Tire.index('products') do
-          delete 
+        @index = Tire.index('products-test') do
+          delete
 
-          create :mappings => {
-            :product => {
-              :name => { :type => 'string' },
-              :properties => { :variants => { :type => 'nested', :size => 'string', :color => 'string' } }
-            }
-          }
+          create mappings: {
+                   product: {
+                      properties: {
+                        name:     { type: 'string' },
+                        variants: { type: 'nested', size: 'string', color: 'string' }
+                      }
+                    }
+                  }
 
-          store :type => 'product', :name => 'Duck Shirt',
-            :variants => [{ :size => 'M', :color => 'yellow'}, { :size => 'L', :color => 'silver'}]
-          store :type => 'product', :name => 'Western Shirt',
-            :variants => [{ :size => 'S', :color => 'yellow'}, { :size => 'M', :color => 'silver'}]
+          store type: 'product',
+                name: 'Duck Shirt',
+                variants: [{ size: 'M', color: 'yellow'}, { size: 'L', color: 'silver'}]
+          store type: 'product',
+                name: 'Western Shirt',
+                variants: [{ size: 'S', color: 'yellow'}, { size: 'M', color: 'silver'}]
 
           refresh
         end
       end
 
-      should 'search normally on non-nested types' do
-        s = Tire.search('products') do
-          query do
-            boolean do
-              must { string 'name:Duck' }
-            end
-          end
-        end
+      # teardown { @index.delete }
 
-        assert_equal 1, s.results.size
-        assert_equal 'Duck Shirt', s.results.first.name
-      end
-
-      should 'not return results for a standard query on a nested document' do
-        s = Tire.search('products') do
+      should "not return a results when properties match for different objects" do
+        s = Tire.search @index.name do
           query do
-            boolean do
-              must { string 'variants.size:M' }
+            nested path: 'variants' do
+              query do
+                boolean do
+                  # No product matches size "S" and color "silver"
+                  must { match 'variants.size',  'S' }
+                  must { match 'variants.color', 'silver'}
+                end
+              end
             end
           end
         end
@@ -52,14 +51,28 @@ module Tire
         assert_equal 0, s.results.size
       end
 
-      should 'return a root document when the nested document meets all criteria' do
-        s = Tire.search('products') do
+      should "return all matching documents when nested documents meet criteria" do
+        s = Tire.search @index.name do
           query do
-            nested :path => 'variants' do
+            nested path: 'variants' do
+              query do
+                match 'variants.size', 'M'
+              end
+            end
+          end
+        end
+
+        assert_equal 2, s.results.size
+      end
+
+      should "return matching document when a nested document meets all criteria" do
+        s = Tire.search @index.name do
+          query do
+            nested path: 'variants' do
               query do
                 boolean do
-                  must { string 'variants.size:M' }
-                  must { string 'variants.color:silver'}
+                  must { match 'variants.size',  'M' }
+                  must { match 'variants.color', 'silver'}
                 end
               end
             end
@@ -70,18 +83,17 @@ module Tire
         assert_equal 'Western Shirt', s.results.first.name
       end
 
-      should 'return a root document when the nested document and standard query match all criteria' do
-        s = Tire.search('products') do
+      should "return matching document when both the query and nested document meet all criteria" do
+        s = Tire.search @index.name do
           query do
             boolean do
-              must { string 'name:Western' }
               must do
-                nested :path => 'variants' do
+                match 'name', 'Western'
+              end
+              must do
+                nested path: 'variants' do
                   query do
-                    boolean do
-                      must { string 'variants.size:M' }
-                      must { string 'variants.color:silver'}
-                    end
+                    match 'variants.size',  'M'
                   end
                 end
               end
@@ -93,36 +105,21 @@ module Tire
         assert_equal 'Western Shirt', s.results.first.name
       end
 
-      should 'not return a root document when the nested document and standard query contradict' do
-        s = Tire.search('products') do
+      should "not return results when the query and the nested document contradict" do
+        s = Tire.search @index.name do
           query do
             boolean do
-              must { string 'name:Duck' }
               must do
-                nested :path => 'variants' do
+                match 'name', 'Duck'
+              end
+              must do
+                nested path: 'variants' do
                   query do
                     boolean do
-                      must { string 'variants.size:M' }
-                      must { string 'variants.color:silver'}
+                      must { match 'variants.size',  'M' }
+                      must { match 'variants.color', 'silver'}
                     end
                   end
-                end
-              end
-            end
-          end
-        end
-
-        assert_equal 0, s.results.size
-      end
-
-      should 'not return a cross-object result' do
-        s = Tire.search('products') do
-          query do
-            nested :path => 'variants' do
-              query do
-                boolean do
-                  must { string 'variants.size:S' }
-                  must { string 'variants.color:silver'}
                 end
               end
             end

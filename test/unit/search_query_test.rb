@@ -374,7 +374,7 @@ module Tire::Search
 
       should "allow searching in multiple fields with multi_match" do
         assert_equal( { :multi_match => { :query => 'bar', :fields => [:foo, :moo] } },
-                        Query.new.match([:foo, :moo], 'bar') )
+                      Query.new.match([:foo, :moo], 'bar') )
       end
 
       should "encode options" do
@@ -404,7 +404,7 @@ module Tire::Search
           query { string 'foo' }
         end
 
-        assert_equal 'articles', query[:nested][:path]
+        assert_equal 'articles',   query[:nested][:path]
         assert_equal 'score_mode', query[:nested][:score_mode]
       end
 

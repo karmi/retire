@@ -81,7 +81,7 @@ module Tire
         @value[:dis_max] = @dis_max.to_hash
         @value
       end
-      
+
       def nested(options={}, &block)
         @nested = NestedQuery.new(options)
         block.arity < 1 ? @nested.instance_eval(&block) : block.call(@nested) if block_given?
@@ -202,14 +202,14 @@ module Tire
         to_hash.to_json
       end
     end
-    
+
     class NestedQuery
       def initialize(options={}, &block)
         @options = options
         @value = {}
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
       end
-      
+
       def query(&block)
         @value[:query] = Query.new(&block).to_hash
         @value
