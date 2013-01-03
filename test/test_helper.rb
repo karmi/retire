@@ -6,7 +6,7 @@ require 'bundler/setup'
 require 'pathname'
 require 'test/unit'
 
-JRUBY = defined?(RUBY_PLATFORM) && RUBY_PLATFORM == 'java'
+JRUBY = defined?(JRUBY_VERSION)
 
 if ENV['JSON_LIBRARY']
   puts "Using '#{ENV['JSON_LIBRARY']}' JSON library"
