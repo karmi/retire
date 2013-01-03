@@ -311,7 +311,8 @@ wrap the results in instances of this class; we&rsquo;ll see how to do that furt
 for the index.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+  <span class="n">delete</span></pre></div>
       </td>
     </tr>
     <tr id='section-24'>
@@ -451,8 +452,7 @@ for importing the data.</p>
         <p>Of course, we can easily manipulate the documents before storing them in the index.</p>
       </td>
       <td class=code>
-        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
-  <span class="n">delete</span></pre></div>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
     <tr id='section-35'>
@@ -1674,15 +1674,135 @@ such as published date or product price? We can do that.</p>
         <div class="pilwrap">
           <a class="pilcrow" href="#section-124">&#182;</a>
         </div>
-        <p>The results:
-    * One         (Published on: 2011-01-01)
-    * Two         (Published on: 2011-01-02)
-    * Three       (Published on: 2011-01-02)
-    * Four        (Published on: 2011-01-03)</p>
+        <p>The results:</p>
+
+<pre><code>* One         (Published on: 2011-01-01)
+* Two         (Published on: 2011-01-02)
+* Three       (Published on: 2011-01-02)
+* Four        (Published on: 2011-01-03)
+</code></pre>
       </td>
       <td class=code>
         <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
   <span class="nb">puts</span> <span class="s2">&quot;* </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="si">}</span><span class="s2">  (Published on: </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">published_on</span> <span class="si">}</span><span class="s2">)&quot;</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-Nested_Documents_and_Queries'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-Nested_Documents_and_Queries">&#182;</a>
+        </div>
+        <h3>Nested Documents and Queries</h3>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-126'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-126">&#182;</a>
+        </div>
+        <p>Often, we want to store more complex entities in <em>Elasticsearch</em>;
+for example, we may want to store the information about comments for each article,
+and then search for articles where a certain person left a certain note.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-127'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-127">&#182;</a>
+        </div>
+        <p>In the simplest case, we can store the comments as an Array of JSON documents in the
+article document. If we do that naively, our search results will be incorrect, though.
+That&rsquo;s because a match in just one field will be enough to match a document.
+We need to query parts of the document as if they were separate entities.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-128'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-128">&#182;</a>
+        </div>
+        <p><em>Elasticsearch</em> provides a specific <code>nested</code>
+<a href="http://www.elasticsearch.org/guide/reference/mapping/nested-type.html">field type</a> and
+<a href="http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html">query</a>
+for working with &ldquo;embedded&rdquo; documents like these.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-129'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-129">&#182;</a>
+        </div>
+        <p>So, let&rsquo;s update the mapping for the index first, adding the <code>comments</code> property as a <code>nested</code> type:</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">::</span><span class="no">Configuration</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">put</span> <span class="no">Tire</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">url</span><span class="o">+</span><span class="s1">&#39;/article/_mapping&#39;</span><span class="p">,</span>
+                               <span class="p">{</span> <span class="ss">:article</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:properties</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:comments</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s1">&#39;nested&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span><span class="o">.</span><span class="n">to_json</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-130'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-130">&#182;</a>
+        </div>
+        <p>And let&rsquo;s add comments to articles (notice that both articles contain a comment with the <em>Cool!</em> message,
+though by different authors):</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+  <span class="n">update</span> <span class="ss">:article</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+         <span class="ss">:doc</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:comments</span> <span class="o">=&gt;</span> <span class="o">[</span> <span class="p">{</span> <span class="ss">:author</span> <span class="o">=&gt;</span> <span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;Great!&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="ss">:author</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;Cool!&#39;</span> <span class="p">}</span> <span class="o">]</span>   <span class="p">}</span>
+  <span class="n">update</span> <span class="ss">:article</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
+         <span class="ss">:doc</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:comments</span> <span class="o">=&gt;</span> <span class="o">[</span> <span class="p">{</span> <span class="ss">:author</span> <span class="o">=&gt;</span> <span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;Cool!&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="ss">:author</span> <span class="o">=&gt;</span> <span class="s1">&#39;Mary&#39;</span><span class="p">,</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;Thanks!&#39;</span> <span class="p">}</span> <span class="o">]</span> <span class="p">}</span>
+  <span class="n">refresh</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-131'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-131">&#182;</a>
+        </div>
+        <p>We&rsquo;ll use the <code>nested</code> query to search for articles where <em>John</em> left a <em>&ldquo;Cool&rdquo;</em> message:</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span>
+  <span class="n">query</span> <span class="k">do</span>
+    <span class="n">nested</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;comments&#39;</span> <span class="k">do</span>
+      <span class="n">query</span> <span class="k">do</span>
+        <span class="n">match</span> <span class="s1">&#39;comments.author&#39;</span><span class="p">,</span>  <span class="s1">&#39;John&#39;</span>
+        <span class="n">match</span> <span class="s1">&#39;comments.message&#39;</span><span class="p">,</span> <span class="s1">&#39;cool&#39;</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-132'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-132">&#182;</a>
+        </div>
+        <p>The results contain just the second document, correctly:</p>
+
+<pre><code>* Two (comments: 2)
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">s</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">document</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">&quot;* </span><span class="si">#{</span> <span class="n">document</span><span class="o">.</span><span class="n">title</span> <span class="si">}</span><span class="s2"> (comments: </span><span class="si">#{</span><span class="n">document</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">)&quot;</span>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
@@ -1697,10 +1817,10 @@ such as published date or product price? We can do that.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-126'>
+    <tr id='section-134'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-126">&#182;</a>
+          <a class="pilcrow" href="#section-134">&#182;</a>
         </div>
         <p>Often, we want to highlight the snippets matching our query in the displayed results.
 <em>ElasticSearch</em> provides rich
@@ -1711,10 +1831,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre><span class="n">s</span> <span class="o">=</span> <span class="no">Tire</span><span class="o">.</span><span class="n">search</span> <span class="s1">&#39;articles&#39;</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-127'>
+    <tr id='section-135'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-127">&#182;</a>
+          <a class="pilcrow" href="#section-135">&#182;</a>
         </div>
         <p>Let&rsquo;s search for documents containing word “Two” in their titles,</p>
       </td>
@@ -1722,10 +1842,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre>  <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-128'>
+    <tr id='section-136'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-128">&#182;</a>
+          <a class="pilcrow" href="#section-136">&#182;</a>
         </div>
         <p>and instruct <em>ElasticSearch</em> to highlight relevant snippets.</p>
       </td>
@@ -1734,10 +1854,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-129'>
+    <tr id='section-137'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-129">&#182;</a>
+          <a class="pilcrow" href="#section-137">&#182;</a>
         </div>
         <p>The results:
     Title: Two; Highlighted: <em>Two</em></p>
@@ -1748,10 +1868,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-130'>
+    <tr id='section-138'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-130">&#182;</a>
+          <a class="pilcrow" href="#section-138">&#182;</a>
         </div>
         <p>We can configure many options for highlighting, such as:</p>
       </td>
@@ -1760,10 +1880,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
   <span class="n">query</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;title:Two&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-131'>
+    <tr id='section-139'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-131">&#182;</a>
+          <a class="pilcrow" href="#section-139">&#182;</a>
         </div>
         <p>• specify the fields to highlight</p>
       </td>
@@ -1771,10 +1891,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span></pre></div>
       </td>
     </tr>
-    <tr id='section-132'>
+    <tr id='section-140'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-132">&#182;</a>
+          <a class="pilcrow" href="#section-140">&#182;</a>
         </div>
         <p>• specify their individual options</p>
       </td>
@@ -1782,10 +1902,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre>  <span class="n">highlight</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:number_of_fragments</span> <span class="o">=&gt;</span> <span class="mi">0</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-133'>
+    <tr id='section-141'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-133">&#182;</a>
+          <a class="pilcrow" href="#section-141">&#182;</a>
         </div>
         <p>• or specify global highlighting options, such as the wrapper tag</p>
       </td>
@@ -1805,10 +1925,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-135'>
+    <tr id='section-143'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-135">&#182;</a>
+          <a class="pilcrow" href="#section-143">&#182;</a>
         </div>
         <p><em>ElasticSearch</em> comes with one very interesting, and rather unique feature:
 <a href="http://www.elasticsearch.org/guide/reference/api/percolate.html"><em>percolation</em></a>.</p>
@@ -1817,10 +1937,10 @@ features, and <em>Tire</em> makes them trivial to use.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-136'>
+    <tr id='section-144'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-136">&#182;</a>
+          <a class="pilcrow" href="#section-144">&#182;</a>
         </div>
         <p>It works in a „reverse search“ manner to regular search workflow of adding
 documents to the index and then querying them.
@@ -1831,10 +1951,10 @@ matches it, either on demand, or immediately as the document is being indexed.</
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-137'>
+    <tr id='section-145'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-137">&#182;</a>
+          <a class="pilcrow" href="#section-145">&#182;</a>
         </div>
         <p>Let&rsquo;s review an example for an index named <em>weather</em>.
 We will register three queries for percolation against this index.</p>
@@ -1845,10 +1965,10 @@ We will register three queries for percolation against this index.</p>
   <span class="n">create</span></pre></div>
       </td>
     </tr>
-    <tr id='section-138'>
+    <tr id='section-146'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-138">&#182;</a>
+          <a class="pilcrow" href="#section-146">&#182;</a>
         </div>
         <p>First, a query named <em>warning</em>,</p>
       </td>
@@ -1856,10 +1976,10 @@ We will register three queries for percolation against this index.</p>
         <div class='highlight'><pre>  <span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;warning&#39;</span><span class="p">,</span> <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;warning&#39;</span><span class="o">]</span><span class="p">)</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;warning OR severe OR extreme&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-139'>
+    <tr id='section-147'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-139">&#182;</a>
+          <a class="pilcrow" href="#section-147">&#182;</a>
         </div>
         <p>a query named <em>tsunami</em>,</p>
       </td>
@@ -1867,10 +1987,10 @@ We will register three queries for percolation against this index.</p>
         <div class='highlight'><pre>  <span class="n">register_percolator_query</span><span class="p">(</span><span class="s1">&#39;tsunami&#39;</span><span class="p">,</span> <span class="ss">:tags</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;tsunami&#39;</span><span class="o">]</span><span class="p">)</span> <span class="p">{</span> <span class="n">string</span> <span class="s1">&#39;tsunami&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-140'>
+    <tr id='section-148'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-140">&#182;</a>
+          <a class="pilcrow" href="#section-148">&#182;</a>
         </div>
         <p>and a query named <em>floods</em>.</p>
       </td>
@@ -1880,10 +2000,10 @@ We will register three queries for percolation against this index.</p>
 <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-141'>
+    <tr id='section-149'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-141">&#182;</a>
+          <a class="pilcrow" href="#section-149">&#182;</a>
         </div>
         <p>Notice, that we have added a <em>tags</em> field to the query document, because it behaves
 just like any other document in <em>ElasticSearch</em>.</p>
@@ -1892,10 +2012,10 @@ just like any other document in <em>ElasticSearch</em>.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-142'>
+    <tr id='section-150'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-142">&#182;</a>
+          <a class="pilcrow" href="#section-150">&#182;</a>
         </div>
         <p>We will refresh the <code>_percolator</code> index for immediate access.</p>
       </td>
@@ -1903,10 +2023,10 @@ just like any other document in <em>ElasticSearch</em>.</p>
         <div class='highlight'><pre><span class="no">Tire</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;_percolator&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">refresh</span></pre></div>
       </td>
     </tr>
-    <tr id='section-143'>
+    <tr id='section-151'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-143">&#182;</a>
+          <a class="pilcrow" href="#section-151">&#182;</a>
         </div>
         <p>Now, let&rsquo;s <em>percolate</em> a document containing some trigger words against all registered queries.</p>
       </td>
@@ -1914,10 +2034,10 @@ just like any other document in <em>ElasticSearch</em>.</p>
         <div class='highlight'><pre><span class="n">matches</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">percolate</span><span class="p">(</span><span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Extreme flooding expected after tsunami wave.&#39;</span><span class="p">)</span></pre></div>
       </td>
     </tr>
-    <tr id='section-144'>
+    <tr id='section-152'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-144">&#182;</a>
+          <a class="pilcrow" href="#section-152">&#182;</a>
         </div>
         <p>The result will contain, unsurprisingly, names of all the three registered queries:</p>
 
@@ -1928,10 +2048,10 @@ just like any other document in <em>ElasticSearch</em>.</p>
         <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">matches</span><span class="o">.</span><span class="n">inspect</span></pre></div>
       </td>
     </tr>
-    <tr id='section-145'>
+    <tr id='section-153'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-145">&#182;</a>
+          <a class="pilcrow" href="#section-153">&#182;</a>
         </div>
         <p>We can filter the executed queries with a regular <em>ElasticSearch</em> query passed as a block to
 the <code>percolate</code> method.</p>
@@ -1940,10 +2060,10 @@ the <code>percolate</code> method.</p>
         <div class='highlight'><pre><span class="n">matches</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">percolate</span><span class="p">(</span><span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Extreme flooding expected after tsunami wave.&#39;</span><span class="p">)</span> <span class="k">do</span></pre></div>
       </td>
     </tr>
-    <tr id='section-146'>
+    <tr id='section-154'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-146">&#182;</a>
+          <a class="pilcrow" href="#section-154">&#182;</a>
         </div>
         <p>Let&rsquo;s use a <em>terms</em> query against the <code>tags</code> field.</p>
       </td>
@@ -1952,10 +2072,10 @@ the <code>percolate</code> method.</p>
           <span class="k">end</span></pre></div>
       </td>
     </tr>
-    <tr id='section-147'>
+    <tr id='section-155'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-147">&#182;</a>
+          <a class="pilcrow" href="#section-155">&#182;</a>
         </div>
         <p>In this case, the result will contain only the name of the “tsunami” query.</p>
 
@@ -1966,10 +2086,10 @@ the <code>percolate</code> method.</p>
         <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">matches</span><span class="o">.</span><span class="n">inspect</span></pre></div>
       </td>
     </tr>
-    <tr id='section-148'>
+    <tr id='section-156'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-148">&#182;</a>
+          <a class="pilcrow" href="#section-156">&#182;</a>
         </div>
         <p>What if we percolate another document, without the “tsunami” trigger word?</p>
       </td>
@@ -1977,10 +2097,10 @@ the <code>percolate</code> method.</p>
         <div class='highlight'><pre><span class="n">matches</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">percolate</span><span class="p">(</span><span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Extreme temperatures expected.&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="n">term</span> <span class="ss">:tags</span><span class="p">,</span> <span class="s1">&#39;tsunami&#39;</span> <span class="p">}</span></pre></div>
       </td>
     </tr>
-    <tr id='section-149'>
+    <tr id='section-157'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-149">&#182;</a>
+          <a class="pilcrow" href="#section-157">&#182;</a>
         </div>
         <p>As expected, we will get an empty array:</p>
 
@@ -1991,10 +2111,10 @@ the <code>percolate</code> method.</p>
         <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">matches</span><span class="o">.</span><span class="n">inspect</span></pre></div>
       </td>
     </tr>
-    <tr id='section-150'>
+    <tr id='section-158'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-150">&#182;</a>
+          <a class="pilcrow" href="#section-158">&#182;</a>
         </div>
         <p>Well, that&rsquo;s of course immensely useful for real-time search systems. But, there&rsquo;s more.
 We can <em>percolate</em> a document <em>at the same time</em> it is being stored in the index,
@@ -2004,10 +2124,10 @@ getting back a list of matching queries.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-151'>
+    <tr id='section-159'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-151">&#182;</a>
+          <a class="pilcrow" href="#section-159">&#182;</a>
         </div>
         <p>Let&rsquo;s store a document with some trigger words in the index, and mark it for percolation.</p>
       </td>
@@ -2016,10 +2136,10 @@ getting back a list of matching queries.</p>
                         <span class="p">{</span> <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="kp">true</span> <span class="p">}</span> <span class="p">)</span></pre></div>
       </td>
     </tr>
-    <tr id='section-152'>
+    <tr id='section-160'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-152">&#182;</a>
+          <a class="pilcrow" href="#section-160">&#182;</a>
         </div>
         <p>We will get the names of all matching queries in response.</p>
 
@@ -2030,10 +2150,10 @@ getting back a list of matching queries.</p>
         <div class='highlight'><pre><span class="nb">puts</span> <span class="s2">&quot;Matching queries: &quot;</span> <span class="o">+</span> <span class="n">response</span><span class="o">[</span><span class="s1">&#39;matches&#39;</span><span class="o">].</span><span class="n">inspect</span></pre></div>
       </td>
     </tr>
-    <tr id='section-153'>
+    <tr id='section-161'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-153">&#182;</a>
+          <a class="pilcrow" href="#section-161">&#182;</a>
         </div>
         <p>As with the <em>percolate</em> example, we can filter the executed queries.</p>
       </td>
@@ -2041,10 +2161,10 @@ getting back a list of matching queries.</p>
         <div class='highlight'><pre><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="p">{</span> <span class="ss">:message</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Warning] Severe floods expected after tsunami wave.&#39;</span> <span class="p">},</span></pre></div>
       </td>
     </tr>
-    <tr id='section-154'>
+    <tr id='section-162'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-154">&#182;</a>
+          <a class="pilcrow" href="#section-162">&#182;</a>
         </div>
         <p>Let&rsquo;s use a simple string query for the “tsunami” tag.</p>
       </td>
@@ -2052,10 +2172,10 @@ getting back a list of matching queries.</p>
         <div class='highlight'><pre>                        <span class="p">{</span> <span class="ss">:percolate</span> <span class="o">=&gt;</span> <span class="s1">&#39;tags:tsunami&#39;</span> <span class="p">}</span> <span class="p">)</span></pre></div>
       </td>
     </tr>
-    <tr id='section-155'>
+    <tr id='section-163'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-155">&#182;</a>
+          <a class="pilcrow" href="#section-163">&#182;</a>
         </div>
         <p>Unsurprisingly, the response will contain just the name of the “tsunami” query.</p>
 
@@ -2077,10 +2197,10 @@ getting back a list of matching queries.</p>
         <div class='highlight'><pre></pre></div>
       </td>
     </tr>
-    <tr id='section-157'>
+    <tr id='section-165'>
       <td class=docs>
         <div class="pilwrap">
-          <a class="pilcrow" href="#section-157">&#182;</a>
+          <a class="pilcrow" href="#section-165">&#182;</a>
         </div>
         <p>As you can see, <a href="https://github.com/karmi/tire"><em>Tire</em></a> supports the
 main features of <em>ElasticSearch</em> in Ruby.</p>
