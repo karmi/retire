@@ -57,6 +57,14 @@ module Tire
       end
       alias :[] :slice
 
+      def to_ary
+        self
+      end
+
+      def as_json(options=nil)
+        to_a.map { |item| item.as_json(options) }
+      end
+
       def error
         @response['error']
       end
@@ -67,10 +75,6 @@ module Tire
 
       def failure?
         ! success?
-      end
-
-      def to_ary
-        self
       end
 
       # Handles _source prefixed fields properly: strips the prefix and converts fields to nested Hashes

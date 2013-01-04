@@ -45,6 +45,13 @@ module Tire
         end
       end
 
+      should "be serialized to JSON" do
+        s = Tire.search('articles-test') { query { string 'title:one' } }
+
+        assert_not_nil s.results.as_json(only: 'title').first['title']
+        assert_nil     s.results.as_json(only: 'title').first['published_on']
+      end
+
     end
   end
 
