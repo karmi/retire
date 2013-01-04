@@ -47,7 +47,7 @@ module Tire
 
       if defined?(Curl)
         require 'tire/http/clients/curb'
-        
+
         context "Curb" do
           setup do
             Configuration.client Client::Curb
@@ -70,8 +70,8 @@ module Tire
           end
 
         end
-      end
 
+      end
 
     end
   end

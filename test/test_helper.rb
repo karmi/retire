@@ -26,7 +26,7 @@ else
 end
 
 require 'shoulda'
-require 'turn/autorun' unless ENV["TM_FILEPATH"] || defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
+require 'turn/autorun' unless ENV["TM_FILEPATH"] || JRUBY
 require 'mocha'
 
 require 'active_support/core_ext/hash/indifferent_access'
