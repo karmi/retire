@@ -77,7 +77,8 @@ module Tire
         params[:percolate] = "*" if params[:percolate] === true
       end
 
-      params[:parent] = options[:parent] if options[:parent]
+      params[:parent]  = options[:parent]  if options[:parent]
+      params[:routing] = options[:routing] if options[:routing]
 
       params_encoded = params.empty? ? '' : "?#{params.to_param}"
 

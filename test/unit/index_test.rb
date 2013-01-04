@@ -288,6 +288,14 @@ module Tire
           @index.store '{"foo" : "bar"}'
         end
 
+        should "extract the routing information from options" do
+          Configuration.client.expects(:post).with do |url, payload|
+            assert_match /routing=abc/, url
+          end.returns(mock_response('{"ok":true,"_id":"123"}'))
+
+          @index.store( {:id => 123, :title => 'Test'}, {:routing => 'abc'} )
+        end
+
         context "document with ID" do
 
           should "store Hash it under its ID property" do
