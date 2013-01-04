@@ -16,8 +16,10 @@ env:
 
 script: "bundle exec $TEST_COMMAND"
 
-before_install:
-  - sudo service elasticsearch start
+services:
+  - elasticsearch
+  - redis
+  - mongodb
 
 matrix:
   exclude:
