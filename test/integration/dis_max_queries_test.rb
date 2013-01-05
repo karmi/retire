@@ -22,7 +22,7 @@ module Tire
         Tire.index('dis_max_test').delete
       end
 
-      should "boost matches in both fields" do
+      should_eventually "boost matches in both fields" do
         dis_max = Tire.search 'dis_max_test' do
           query do
             dis_max do
