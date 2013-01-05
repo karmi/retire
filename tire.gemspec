@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   #
   s.add_development_dependency "bundler",      "~> 1.0"
   s.add_development_dependency "shoulda"
-  s.add_development_dependency "mocha"
+  s.add_development_dependency "mocha",        "~> 0.13"
   s.add_development_dependency "minitest",     "~> 2.12"
   s.add_development_dependency "activerecord", ">= 3.0"
   s.add_development_dependency "mongoid",      "~> 2.2"
