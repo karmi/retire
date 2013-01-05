@@ -94,6 +94,10 @@ module Tire
     alias :multisearch :multi_search
     alias :msearch     :multi_search
 
+    def count(indices=nil, options={}, &block)
+      Search::Count.new(indices, options, &block).value
+    end
+
     def index(name, &block)
       Index.new(name, &block)
     end
