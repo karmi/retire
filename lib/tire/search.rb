@@ -146,7 +146,8 @@ module Tire
       end
 
       def to_curl
-        %Q|curl -X GET '#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty' -d '#{to_json}'|
+        to_json_escaped = to_json.gsub("'",'\u0027')
+        %Q|curl -X GET '#{url}#{params.empty? ? '?' : params.to_s + '&'}pretty' -d '#{to_json_escaped}'|
       end
 
       def to_hash

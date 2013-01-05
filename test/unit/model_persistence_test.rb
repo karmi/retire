@@ -319,6 +319,12 @@ module Tire
             assert_equal 'A', article.stats.meta.tags
           end
 
+          should "create empty collection for missing value" do
+            article = PersistentArticleWithCastedCollection.new :title => 'Test'
+            assert_respond_to article.comments, :each
+            assert article.comments.empty?, "article.comments should be empty: " + article.inspect
+          end
+
         end
 
         context "when initializing" do

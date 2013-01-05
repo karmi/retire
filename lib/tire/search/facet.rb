@@ -27,8 +27,9 @@ module Tire
       end
 
       def date(field, options={})
-        interval = options.delete(:interval) || 'day'
-        @value[:date_histogram] = { :field => field, :interval => interval }.update(options)
+        interval = { :interval => options.delete(:interval) || 'day' }
+        fields   = options[:value_field] || options[:value_script] ? { :key_field => field } : { :field => field }
+        @value[:date_histogram] = {}.update(fields).update(interval).update(options)
         self
       end
 

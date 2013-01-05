@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'tire/http/clients/curb'
 
 module Tire
   module HTTP
@@ -46,29 +45,33 @@ module Tire
 
       end
 
-      context "Curb" do
-        setup do
-          Configuration.client Client::Curb
-        end
+      if defined?(Curl)
+        require 'tire/http/clients/curb'
 
-        teardown do
-          Configuration.client Client::RestClient
-        end
+        context "Curb" do
+          setup do
+            Configuration.client Client::Curb
+          end
 
-        should "use POST method if request body passed" do
-          ::Curl::Easy.any_instance.expects(:http_post)
+          teardown do
+            Configuration.client Client::RestClient
+          end
 
-          response = Configuration.client.get "http://localhost:3000", '{ "query_string" : { "query" : "apple" }}'
-        end
+          should "use POST method if request body passed" do
+            ::Curl::Easy.any_instance.expects(:http_post)
 
-        should "use GET method if request body is nil" do
-          ::Curl::Easy.any_instance.expects(:http_get)
+            response = Configuration.client.get "http://localhost:3000", '{ "query_string" : { "query" : "apple" }}'
+          end
 
-          response = Configuration.client.get "http://localhost:9200/articles/article/1"
+          should "use GET method if request body is nil" do
+            ::Curl::Easy.any_instance.expects(:http_get)
+
+            response = Configuration.client.get "http://localhost:9200/articles/article/1"
+          end
+
         end
 
       end
-
 
     end
   end

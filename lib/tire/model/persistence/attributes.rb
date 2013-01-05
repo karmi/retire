@@ -52,6 +52,11 @@ module Tire
             # Save property casting (when relevant):
             property_types[name.to_sym] = options[:class] if options[:class]
 
+            # Define default value for colletions:
+            if options[:class].is_a?(Array)
+              property_defaults[name.to_sym] ||= []
+            end
+
             # Store mapping for the property:
             mapping[name] = options
             self
