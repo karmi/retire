@@ -107,6 +107,26 @@ module Tire
 
     end
 
+    context "Counting documents in the index" do
+
+      teardown { Tire.index('articles-test-count').delete }
+
+      setup do
+        Tire.index 'articles-test-count' do
+          delete
+          create
+          store :id => 1, :title => 'One'
+          store :id => 2, :title => 'Two'
+          refresh
+        end
+      end
+
+      should "count documents in the index" do
+        assert_equal 2, Tire.index('articles-test-count').count
+      end
+
+    end
+
   end
 
 end

@@ -52,6 +52,11 @@ module Tire
       alias_name ? Alias.all(@name).select { |a| a.name == alias_name }.first : Alias.all(@name)
     end
 
+    def count
+      @response = Configuration.client.get("#{url}/_count")
+      MultiJson.decode(@response.body)['count']
+    end
+
     def mapping
       @response = Configuration.client.get("#{url}/_mapping")
       MultiJson.decode(@response.body)[@name]
