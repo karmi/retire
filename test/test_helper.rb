@@ -27,7 +27,7 @@ end
 
 require 'shoulda'
 require 'turn/autorun' unless ENV["TM_FILEPATH"] || JRUBY
-require 'mocha'
+require 'mocha/setup'
 
 require 'active_support/core_ext/hash/indifferent_access'
 
