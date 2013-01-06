@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "tire"
   s.version     = Tire::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.summary       = "Ruby client for ElasticSearch"
+  s.summary       = "Ruby client for Elasticsearch"
   s.homepage      = "http://github.com/karmi/tire"
   s.authors       = [ 'Karel Minarik' ]
   s.email         = 'karmi@karmi.cz'
@@ -53,9 +53,9 @@ Gem::Specification.new do |s|
   end
 
   s.description = <<-DESC
-   Tire is a Ruby client for the ElasticSearch search engine/database.
+   Tire is a Ruby client for the Elasticsearch search engine/database.
 
-   It provides Ruby-like API for fluent communication with the ElasticSearch server
+   It provides Ruby-like API for fluent communication with the Elasticsearch server
    and blends with ActiveModel class for convenient usage in Rails applications.
 
    It allows to delete and create indices, define mapping for them, supports

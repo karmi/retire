@@ -84,7 +84,7 @@ module Test::Integration
     begin
       ::RestClient.get URL
     rescue Errno::ECONNREFUSED
-      abort "\n\n#{'-'*87}\n[ABORTED] You have to run ElasticSearch on #{URL} for integration tests\n#{'-'*87}\n\n"
+      abort "\n\n#{'-'*87}\n[ABORTED] You have to run Elasticsearch on #{URL} for integration tests\n#{'-'*87}\n\n"
     end
 
     ::RestClient.delete "#{URL}/articles-test"     rescue nil

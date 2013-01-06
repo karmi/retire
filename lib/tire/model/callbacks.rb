@@ -2,7 +2,7 @@ module Tire
   module Model
 
     # Main module containing the infrastructure for automatic updating
-    # of the _ElasticSearch_ index on model instance create, update or delete.
+    # of the _Elasticsearch_ index on model instance create, update or delete.
     #
     # Include it in your model: `include Tire::Model::Callbacks`
     #

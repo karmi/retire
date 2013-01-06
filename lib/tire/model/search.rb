@@ -52,7 +52,7 @@ module Tire
         #     end
         #
         # This methods returns a Tire::Results::Collection instance, containing instances
-        # of Tire::Results::Item, populated by the data available in _ElasticSearch, by default.
+        # of Tire::Results::Item, populated by the data available in _Elasticsearch, by default.
         #
         # If you'd like to load the "real" models from the database, you may use the `:load` option:
         #
@@ -132,7 +132,7 @@ module Tire
           instance.class.tire.index
         end
 
-        # Updates the index in _ElasticSearch_.
+        # Updates the index in _Elasticsearch_.
         #
         # On model instance create or update, it will store its serialized representation in the index.
         #
@@ -158,7 +158,7 @@ module Tire
         #
         # If you don't define any mapping, the model is serialized as-is.
         #
-        # If you do define the mapping for _ElasticSearch_, only attributes
+        # If you do define the mapping for _Elasticsearch_, only attributes
         # declared in the mapping are serialized.
         #
         # For properties declared with the `:as` option, the passed String or Proc

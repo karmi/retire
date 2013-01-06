@@ -1,8 +1,8 @@
 # ===================================================================================================================
-# Template for generating a no-frills Rails application with support for ElasticSearch full-text search via Tire
+# Template for generating a no-frills Rails application with support for Elasticsearch full-text search via Tire
 # ===================================================================================================================
 #
-# This file creates a basic, fully working Rails application with support for ElasticSearch full-text search
+# This file creates a basic, fully working Rails application with support for Elasticsearch full-text search
 # via the Tire gem [http://github.com/karmi/tire].
 #
 # You DON'T NEED ELASTICSEARCH INSTALLED, it is installed and launched automatically by this script.
@@ -14,7 +14,7 @@
 # * Ruby >= 1.8.7
 # * Rubygems
 # * Rails >= 3.0.7
-# * Sun Java 6 (for ElasticSearch)
+# * Sun Java 6 (for Elasticsearch)
 #
 #
 # Usage
@@ -46,7 +46,7 @@ end
 at_exit do
   pid = File.read("#{destination_root}/tmp/pids/elasticsearch.pid") rescue nil
   if pid
-    say_status  "Stop", "ElasticSearch", :yellow
+    say_status  "Stop", "Elasticsearch", :yellow
     run "kill #{pid}"
   end
 end
@@ -79,24 +79,24 @@ unless (RestClient.get('http://localhost:9200') rescue false)
   COMMAND
 
   puts        "\n"
-  say_status  "ERROR", "ElasticSearch not running!\n", :red
+  say_status  "ERROR", "Elasticsearch not running!\n", :red
   puts        '-'*80
-  say_status  '',      "It appears that ElasticSearch is not running on this machine."
+  say_status  '',      "It appears that Elasticsearch is not running on this machine."
   say_status  '',      "Is it installed? Do you want me to install it for you with this command?\n\n"
   COMMAND.each_line { |l| say_status '', "$ #{l}" }
   puts
   say_status  '',      "(To uninstall, just remove the generated application directory.)"
   puts        '-'*80, ''
 
-  if yes?("Install ElasticSearch?", :bold)
+  if yes?("Install Elasticsearch?", :bold)
     puts
-    say_status  "Install", "ElasticSearch", :yellow
+    say_status  "Install", "Elasticsearch", :yellow
 
     commands = COMMAND.split("\n")
     exec     = commands.pop
     inside("vendor") do
       commands.each { |command| run command }
-      run "(#{exec})"  # Launch ElasticSearch in subshell
+      run "(#{exec})"  # Launch Elasticsearch in subshell
     end
   end
 end

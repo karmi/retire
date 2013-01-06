@@ -1,4 +1,4 @@
-# Example class with ElasticSearch persistence
+# Example class with Elasticsearch persistence
 
 class PersistentArticle
 

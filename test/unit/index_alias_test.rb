@@ -130,7 +130,7 @@ module Tire
 
       context "saving" do
 
-        should "send data to ElasticSearch" do
+        should "send data to Elasticsearch" do
           Configuration.client.expects(:post).with do |url, json|
             url  == "#{Configuration.url}/_aliases" &&
             json =~ /"index":"index_2012_05"/ &&

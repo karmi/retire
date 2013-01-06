@@ -1,4 +1,4 @@
-# Example class with ElasticSearch persistence and custom index name
+# Example class with Elasticsearch persistence and custom index name
 
 class PersistentArticleWithCustomIndexName
 

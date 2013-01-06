@@ -34,7 +34,7 @@ module Tire
     #       query { term 'author.exact', 'John Smith' }
     #     end
     #
-    # See ElasticSearch documentation for further reference:
+    # See Elasticsearch documentation for further reference:
     #
     # * http://www.elasticsearch.org/guide/reference/api/search/search-type.html
     # * http://www.elasticsearch.org/guide/reference/api/search/scroll.html

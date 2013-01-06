@@ -2,7 +2,7 @@ module Tire
   module Model
 
     # Contains support for the [percolation](http://www.elasticsearch.org/guide/reference/api/percolate.html)
-    # feature of _ElasticSearch_.
+    # feature of _Elasticsearch_.
     #
     module Percolate
 

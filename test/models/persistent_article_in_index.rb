@@ -1,4 +1,4 @@
-# Example class with ElasticSearch persistence in index `persistent_articles`
+# Example class with Elasticsearch persistence in index `persistent_articles`
 #
 # The `index` is `persistent_articles`
 #

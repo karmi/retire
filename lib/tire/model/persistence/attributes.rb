@@ -19,7 +19,7 @@ module Tire
           #      property :tags,      :analyzer => 'keywords', :default => []
           #    end
           #
-          # You can pass mapping definition for ElasticSearch in the options Hash.
+          # You can pass mapping definition for Elasticsearch in the options Hash.
           #
           # You can define default property values.
           #

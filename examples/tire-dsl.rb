@@ -1,9 +1,9 @@
 # encoding: UTF-8
 #
 # **Tire** provides rich and comfortable Ruby API for the
-# [_ElasticSearch_](http://www.elasticsearch.org/) search engine/database.
+# [_Elasticsearch_](http://www.elasticsearch.org/) search engine/database.
 #
-# _ElasticSearch_ is a scalable, distributed, cloud-ready, highly-available
+# _Elasticsearch_ is a scalable, distributed, cloud-ready, highly-available
 # full-text search engine and database, communicating by JSON over RESTful HTTP,
 # based on [Lucene](http://lucene.apache.org/), written in Java.
 #
@@ -40,10 +40,10 @@ require 'tire'
 
 #### Prerequisites
 
-# We'll need a working and running _ElasticSearch_ server, of course. Thankfully, that's easy.
+# We'll need a working and running _Elasticsearch_ server, of course. Thankfully, that's easy.
 ( puts <<-"INSTALL" ; exit(1) ) unless (RestClient.get('http://localhost:9200') rescue false)
 
- [ERROR] You don’t appear to have ElasticSearch installed. Please install and launch it with the following commands:
+ [ERROR] You don’t appear to have Elasticsearch installed. Please install and launch it with the following commands:
 
  curl -k -L -o elasticsearch-0.20.2.tar.gz http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.20.2.tar.gz
  tar -zxvf elasticsearch-0.20.2.tar.gz
@@ -68,7 +68,7 @@ Tire.index 'articles' do
   store :title => 'One',   :tags => ['ruby'],           :published_on => '2011-01-01'
   store :title => 'Two',   :tags => ['ruby', 'python'], :published_on => '2011-01-02'
 
-  # We usually want to set a specific _type_ for the document in _ElasticSearch_.
+  # We usually want to set a specific _type_ for the document in _Elasticsearch_.
   # Simply setting a `type` property is OK.
   #
   store :type => 'article',
@@ -137,7 +137,7 @@ Tire.index 'articles' do
         #
         :id       => { :type => 'string', :index => 'not_analyzed', :include_in_all => false },
 
-        # ... set the boost or analyzer settings for the field, etc. The _ElasticSearch_ guide
+        # ... set the boost or analyzer settings for the field, etc. The _Elasticsearch_ guide
         # has [more information](http://elasticsearch.org/guide/reference/mapping/index.html).
         # Don't forget, that proper mapping is key to efficient and effective search.
         # But don't fret about getting the mapping right the first time, you won't.
@@ -154,7 +154,7 @@ end
 #### Bulk Indexing
 
 # Of course, we may have large amounts of data, and adding them to the index one by one really isn't the best idea.
-# We can use _ElasticSearch's_ [bulk API](http://www.elasticsearch.org/guide/reference/api/bulk.html)
+# We can use _Elasticsearch's_ [bulk API](http://www.elasticsearch.org/guide/reference/api/bulk.html)
 # for importing the data.
 
 # So, for demonstration purposes, let's suppose we have a simple collection of hashes to store.
@@ -197,7 +197,7 @@ end
 
 ### Searching
 
-# With the documents indexed and stored in the _ElasticSearch_ database, we can search them, finally.
+# With the documents indexed and stored in the _Elasticsearch_ database, we can search them, finally.
 #
 # _Tire_ exposes the search interface via simple domain-specific language.
 
@@ -289,7 +289,7 @@ end
 # We may use any valid [Lucene query syntax](http://lucene.apache.org/java/3_0_3/queryparsersyntax.html)
 # for the `query_string` queries.
 
-# For debugging our queries, we can display the JSON which is being sent to _ElasticSearch_.
+# For debugging our queries, we can display the JSON which is being sent to _Elasticsearch_.
 #
 #     {"query":{"query_string":{"query":"title:T*"}}}
 #
@@ -342,7 +342,7 @@ end
 #
 Tire.configure do
 
-  # First of all, we can configure the URL for _ElasticSearch_.
+  # First of all, we can configure the URL for _Elasticsearch_.
   #
   url "http://search.example.com"
 
@@ -362,7 +362,7 @@ end
 ### Complex Searching
 
 # Query strings are convenient for simple searches, but we may want to define our queries more expressively,
-# using the _ElasticSearch_ [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/index.html).
+# using the _Elasticsearch_ [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/index.html).
 #
 s = Tire.search('articles') do
 
@@ -471,7 +471,7 @@ Tire.search('articles') do
   end
 end
 
-# _ElasticSearch_ supports many types of [queries](http://www.elasticsearch.org/guide/reference/query-dsl/).
+# _Elasticsearch_ supports many types of [queries](http://www.elasticsearch.org/guide/reference/query-dsl/).
 #
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
 #
@@ -487,7 +487,7 @@ end
 
 #### Faceted Search
 
-# _ElasticSearch_ makes it trivial to retrieve complex aggregated data from our index/database,
+# _Elasticsearch_ makes it trivial to retrieve complex aggregated data from our index/database,
 # so called [_facets_](http://www.elasticsearch.org/guide/reference/api/search/facets/index.html).
 
 # Let's say we want to display article counts for every tag in the database.
@@ -579,7 +579,7 @@ s.results.facets['global-tags']['terms'].each do |f|
   puts "#{f['term'].ljust(10)} #{f['count']}"
 end
 
-# _ElasticSearch_ supports many advanced types of facets, such as those for computing statistics or geographical distance.
+# _Elasticsearch_ supports many advanced types of facets, such as those for computing statistics or geographical distance.
 #
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
 #
@@ -591,7 +591,7 @@ end
 # * [terms_stats](http://www.elasticsearch.org/guide/reference/api/search/facets/terms-stats-facet.html)
 # * [query](http://www.elasticsearch.org/guide/reference/api/search/facets/query-facet.html)
 
-# We have seen that _ElasticSearch_ facets enable us to fetch complex aggregations from our data.
+# We have seen that _Elasticsearch_ facets enable us to fetch complex aggregations from our data.
 #
 # They are frequently used for another feature, „faceted navigation“.
 # We can be combine query and facets with
@@ -777,7 +777,7 @@ end
 #### Highlighting
 
 # Often, we want to highlight the snippets matching our query in the displayed results.
-# _ElasticSearch_ provides rich
+# _Elasticsearch_ provides rich
 # [highlighting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html)
 # features, and _Tire_ makes them trivial to use.
 #
@@ -786,7 +786,7 @@ s = Tire.search 'articles' do
   # Let's search for documents containing word “Two” in their titles,
   query { string 'title:Two' }
 
-   # and instruct _ElasticSearch_ to highlight relevant snippets.
+   # and instruct _Elasticsearch_ to highlight relevant snippets.
    #
   highlight :title
 end
@@ -818,7 +818,7 @@ end
 
 #### Percolation
 
-# _ElasticSearch_ comes with one very interesting, and rather unique feature:
+# _Elasticsearch_ comes with one very interesting, and rather unique feature:
 # [_percolation_](http://www.elasticsearch.org/guide/reference/api/percolate.html).
 
 # It works in a „reverse search“ manner to regular search workflow of adding
@@ -848,7 +848,7 @@ index = Tire.index('weather') do
 end
 
 # Notice, that we have added a _tags_ field to the query document, because it behaves
-# just like any other document in _ElasticSearch_.
+# just like any other document in _Elasticsearch_.
 
 # We will refresh the `_percolator` index for immediate access.
 #
@@ -864,7 +864,7 @@ matches = index.percolate(:message => '[Warning] Extreme flooding expected after
 #
 puts "Matching queries: " + matches.inspect
 
-# We can filter the executed queries with a regular _ElasticSearch_ query passed as a block to
+# We can filter the executed queries with a regular _Elasticsearch_ query passed as a block to
 # the `percolate` method.
 #
 matches = index.percolate(:message => '[Warning] Extreme flooding expected after tsunami wave.') do
@@ -918,7 +918,7 @@ puts "Matching queries: " + response['matches'].inspect
 ### ActiveModel Integration
 
 # As you can see, [_Tire_](https://github.com/karmi/tire) supports the
-# main features of _ElasticSearch_ in Ruby.
+# main features of _Elasticsearch_ in Ruby.
 #
 # It allows you to create and delete indices, add documents, search them, retrieve the facets, highlight the results,
 # and comes with a usable logging facility.

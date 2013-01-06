@@ -1,7 +1,7 @@
 module Tire
   module Model
 
-    # Allows to use _ElasticSearch_ as a primary database (storage).
+    # Allows to use _Elasticsearch_ as a primary database (storage).
     #
     # Contains all the `Tire::Model::Search` features and provides
     # an [_ActiveModel_](http://rubygems.org/gems/activemodel)-compatible
