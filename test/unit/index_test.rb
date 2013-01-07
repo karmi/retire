@@ -296,6 +296,16 @@ module Tire
           @index.store( {:id => 123, :title => 'Test'}, {:routing => 'abc'} )
         end
 
+        should "extract the replication type from options" do
+          Configuration.client.expects(:post).
+            with do |url, payload|
+              assert_equal "#{Configuration.url}/dummy/document/?replication=async", url
+            end.
+            returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          @index.store({:title => 'Test'}, {:replication => 'async'})
+        end
+
         context "document with ID" do
 
           should "store Hash it under its ID property" do
