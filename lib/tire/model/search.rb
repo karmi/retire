@@ -191,15 +191,15 @@ module Tire
 
         def matches
           instance.instance_eval do
-            @attributes ||= {}
-            @attributes['tire__matches']
+            @tire__attributes ||= {}
+            @tire__attributes['matches']
           end
         end
 
         def matches=(value)
           instance.instance_eval do
-            @attributes ||= {}
-            @attributes['tire__matches'] = value
+            @tire__attributes ||= {}
+            @tire__attributes['matches'] = value
           end
         end
 
