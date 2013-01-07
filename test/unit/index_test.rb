@@ -1007,6 +1007,19 @@ module Tire
         end
       end
 
+      context "when passing replication option" do
+
+        should "set the :replication option in the request parameters" do
+          Configuration.client.expects(:post).
+            with do |url, payload|
+              assert_equal "#{Configuration.url}/dummy/document/?replication=async", url
+            end.
+            returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          @index.store({:title => 'Test'}, {:replication => 'async'})
+        end
+      end
+
       context "reindexing" do
         setup do
           @results = {

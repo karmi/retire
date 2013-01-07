@@ -79,6 +79,7 @@ module Tire
 
       params[:parent]  = options[:parent]  if options[:parent]
       params[:routing] = options[:routing] if options[:routing]
+      params[:replication] = options[:replication] if options[:replication]
 
       params_encoded = params.empty? ? '' : "?#{params.to_param}"
 
