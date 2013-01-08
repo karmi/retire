@@ -21,6 +21,19 @@ module Tire
       logged('HEAD', curl)
     end
 
+    def has_document?(type , id)
+      raise ArgumentError , "Please pass a document ID" unless id
+
+      type      = Utils.escape(type)
+      url       = "#{self.url}/#{type}/#{id}"
+
+      @response = Configuration.client.head("#{url}")
+      @response.success?
+    ensure
+      curl = %Q|curl -I "#{url}"|
+      logged('HEAD', curl)
+    end
+
     def delete
       @response = Configuration.client.delete url
       @response.success?
