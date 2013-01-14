@@ -529,7 +529,7 @@ The easiest way is to customize the `to_json` serialization support of your mode
     class Article < ActiveRecord::Base
       # ...
 
-      include_root_in_json = false
+      self.include_root_in_json = false
       def to_indexed_json
         to_json :except => ['updated_at'], :methods => ['length']
       end
