@@ -158,6 +158,16 @@ module Tire
             assert hit['_score'] > 0
           end
         end
+
+        should "provide access to highlighted fields in hit" do
+          results = ActiveRecordArticle.search :load => true do
+            query { string '"Test 1" OR "Test 2"' }
+            highlight :title
+          end
+          results.each_with_hit do |result, hit|
+            assert_equal 1, hit['highlight']['title'].size
+          end
+        end
       end
 
       context "with pagination" do
