@@ -75,7 +75,7 @@ module Tire
         #
         def document_type name=nil
           @document_type = name if name
-          @document_type || klass.model_name.underscore
+          @document_type || klass.model_name.to_s.underscore
         end
       end
 
