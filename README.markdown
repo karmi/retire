@@ -357,6 +357,11 @@ If that seems like a great idea to you, there's a big chance you already have su
 
 One would bet it's an `ActiveRecord` or `ActiveModel` class, containing model of your Rails application.
 
+If your search results return items with different classes, you can set
+`Tire.configuration.wrapper` to `:infer` and Tire will try to use the class
+from the item `_type` property (i.e. if `_type` is `article` the inferred
+class will be `Article`).
+
 Fortunately, _Tire_ makes blending _Elasticsearch_ features into your models trivially possible.
 
 
