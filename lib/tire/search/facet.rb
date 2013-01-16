@@ -16,12 +16,12 @@ module Tire
       end
 
       def terms(field, options={})
-        size      = options.delete(:size) || 10
-        all_terms = options.delete(:all_terms) || false
+        options[:size]      ||= 10
+        options[:all_terms] ||= false
         @value[:terms] = if field.is_a?(Enumerable) and not field.is_a?(String)
-          { :fields => field }.update({ :size => size, :all_terms => all_terms }).update(options)
+          { :fields => field }.update(options)
         else
-          { :field => field  }.update({ :size => size, :all_terms => all_terms }).update(options)
+          { :field => field  }.update(options)
         end
         self
       end
