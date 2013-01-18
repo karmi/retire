@@ -34,7 +34,7 @@ module Tire
           end
 
           def update_index
-            send :_run_update_elasticsearch_index_callbacks do
+            run_callbacks :update_elasticsearch_index do
               if destroyed?
                 index.remove self
               else
