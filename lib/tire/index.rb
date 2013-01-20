@@ -440,7 +440,12 @@ module Tire
     protected
 
     def parse_response(response)
-      MultiJson.decode(response.body) if response.success?
+      if response.success?
+        MultiJson.decode(response.body)
+      else
+        Configuration.logger.log_response(response.code, nil, response.body) if Configuration.logger
+        nil
+      end
     end
 
   end
