@@ -141,7 +141,7 @@ module Tire
         # It will also execute any `<after|before>_update_elasticsearch_index` callback hooks.
         #
         def update_index
-          instance.send :_run_update_elasticsearch_index_callbacks do
+          instance.run_callbacks :update_elasticsearch_index do
             if instance.destroyed?
               index.remove instance
             else
