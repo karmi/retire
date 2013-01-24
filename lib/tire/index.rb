@@ -453,15 +453,15 @@ module Tire
 
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       type = case
-        when document.respond_to?(:document_type)
-          document.document_type
-        when document.is_a?(Hash)
-          document[:_type] || document['_type'] || document[:type] || document['type']
-        when document.respond_to?(:_type)
-          document._type
-        when document.respond_to?(:type) && document.type != document.class
-          document.type
-        end
+             when document.respond_to?(:document_type)
+               document.document_type
+             when document.is_a?(Hash)
+               document.values_at(:_type, '_type', :type, 'type').compact.first
+             when document.respond_to?(:_type)
+               document._type
+             when document.respond_to?(:type) && document.type != document.class
+               document.type
+             end
       $VERBOSE = old_verbose
 
       type ||= 'document'
