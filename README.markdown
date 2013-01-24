@@ -594,7 +594,7 @@ The `Item` instances masquerade themselves as instances of your model within a _
 (based on the `_type` property retrieved from _Elasticsearch_), so you can use them carefree;
 all the `url_for` or `dom_id` helpers work as expected.
 
-If you need to access the “real” model (eg. to access its assocations or methods not
+If you need to access the “real” model (eg. to access its associations or methods not
 stored in _Elasticsearch_), just load it from the database:
 
 ```ruby
@@ -664,7 +664,7 @@ in chunks of 1000. If that number doesn't suit you, just provide a better one:
 Any other parameters you provide to the `import` method are passed down to the `paginate` method.
 
 Are we saying you have to fiddle with this thing in a `rails console` or silly Ruby scripts? No.
-Just call the included _Rake_ task on the commandline:
+Just call the included _Rake_ task on the command line:
 
 ```bash
     $ rake environment tire:import CLASS='Article'
