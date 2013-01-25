@@ -321,7 +321,7 @@ module Tire
           Results::Collection.new(@response, :load => true).results
         end
 
-        should "pass the :load option Hash to model find metod" do
+        should "pass the :load option Hash to model find method" do
           ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
