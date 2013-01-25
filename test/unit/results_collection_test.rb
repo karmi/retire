@@ -366,6 +366,24 @@ module Tire
 
         end
 
+        context "with Mongoid" do
+          setup do
+            @response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'mongoid_article'},
+                                                  {'_id' => 2, '_type' => 'mongoid_article'},
+                                                  {'_id' => 3, '_type' => 'mongoid_article'}] } }
+          end
+
+          should "pass the :load option Hash to model find and includes method" do
+            articles = [MongoidArticle.new(:id => 3), MongoidArticle.new(:id => 1), MongoidArticle.new(:id => 2)]
+            criteria = mock("Criteria")
+            criteria.expects(:find).with([1, 2, 3]).returns(articles)
+            MongoidArticle.expects(:includes).with('comments').returns(criteria)
+
+            Results::Collection.new(@response, :load => { :include => 'comments' }).results
+          end
+
+        end
+
       end
 
     end
