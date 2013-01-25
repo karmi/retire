@@ -306,61 +306,64 @@ module Tire
       end
 
       context "with eager loading" do
-        setup do
-          @response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'active_record_article'},
-                                                {'_id' => 2, '_type' => 'active_record_article'},
-                                                {'_id' => 3, '_type' => 'active_record_article'}] } }
-          ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
-        end
-
-        should "load the records via model find method from database" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
-          Results::Collection.new(@response, :load => true).results
-        end
-
-        should "pass the :load option Hash to model find method" do
-          ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
-          Results::Collection.new(@response, :load => { :include => 'comments' }).results
-        end
-
-        should "preserve the order of records returned from search" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
-          assert_equal [1,2,3], Results::Collection.new(@response, :load => true).results.map(&:id)
-        end
-
-        should "raise error when model class cannot be inferred from _type" do
-          assert_raise(NameError) do
-            response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'hic_sunt_leones'}] } }
-            Results::Collection.new(response, :load => true).results
+        context "with ActiveRecord" do
+          setup do
+            @response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'active_record_article'},
+                                                  {'_id' => 2, '_type' => 'active_record_article'},
+                                                  {'_id' => 3, '_type' => 'active_record_article'}] } }
+            ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
           end
-        end
 
-        should "raise error when _type is missing" do
-          assert_raise(NoMethodError) do
-            response = { 'hits' => { 'hits' => [ {'_id' => 1}] } }
-            Results::Collection.new(response, :load => true).results
+          should "load the records via model find method from database" do
+            ActiveRecordArticle.expects(:find).with([1,2,3]).
+                                returns([ Results::Item.new(:id => 3),
+                                          Results::Item.new(:id => 1),
+                                          Results::Item.new(:id => 2)  ])
+            Results::Collection.new(@response, :load => true).results
           end
-        end
 
-        should "return empty array for empty hits" do
-          response = { 'hits'  => {
-                         'hits' => [],
-                         'total' => 4
-                       },
-                       'took'  => 1 }
-          @collection = Results::Collection.new( response, :load => true )
-          assert @collection.empty?, 'Collection should be empty'
-          assert @collection.results.empty?, 'Collection results should be empty'
-          assert_equal 0, @collection.size
+          should "pass the :load option Hash to model find method" do
+            ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
+                                returns([ Results::Item.new(:id => 3),
+                                          Results::Item.new(:id => 1),
+                                          Results::Item.new(:id => 2)  ])
+            Results::Collection.new(@response, :load => { :include => 'comments' }).results
+          end
+
+          should "preserve the order of records returned from search" do
+            ActiveRecordArticle.expects(:find).with([1,2,3]).
+                                returns([ Results::Item.new(:id => 3),
+                                          Results::Item.new(:id => 1),
+                                          Results::Item.new(:id => 2)  ])
+            assert_equal [1,2,3], Results::Collection.new(@response, :load => true).results.map(&:id)
+          end
+
+          should "raise error when model class cannot be inferred from _type" do
+            assert_raise(NameError) do
+              response = { 'hits' => { 'hits' => [ {'_id' => 1, '_type' => 'hic_sunt_leones'}] } }
+              Results::Collection.new(response, :load => true).results
+            end
+          end
+
+          should "raise error when _type is missing" do
+            assert_raise(NoMethodError) do
+              response = { 'hits' => { 'hits' => [ {'_id' => 1}] } }
+              Results::Collection.new(response, :load => true).results
+            end
+          end
+
+          should "return empty array for empty hits" do
+            response = { 'hits'  => {
+                           'hits' => [],
+                           'total' => 4
+                         },
+                         'took'  => 1 }
+            @collection = Results::Collection.new( response, :load => true )
+            assert @collection.empty?, 'Collection should be empty'
+            assert @collection.results.empty?, 'Collection results should be empty'
+            assert_equal 0, @collection.size
+          end
+
         end
 
       end
