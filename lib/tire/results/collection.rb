@@ -148,7 +148,15 @@ module Tire
       end
 
       def __find_records_by_ids(klass, ids)
-        @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+        if @options[:load] === true
+          klass.find(ids)
+        else
+          if @options[:load][:include] && defined?(Mongoid) && klass < Mongoid::Document
+            klass.includes(@options[:load][:include]).find(ids)
+          else
+            klass.find(ids, @options[:load])
+          end
+        end
       end
     end
 
