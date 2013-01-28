@@ -574,6 +574,9 @@ control on how the documents are added to or removed from the index:
     end
 ```
 
+When you're integrating _Tire_ with ActiveRecord models, you should use the `after_commit`
+and `after_rollback` hooks to keep the index in sync with your database.
+
 The results returned by `Article.search` are wrapped in the aforementioned `Item` class, by default.
 This way, we have a fast and flexible access to the properties returned from _Elasticsearch_ (via the
 `_source` or `fields` JSON properties). This way, we can index whatever JSON we like in _Elasticsearch_,
