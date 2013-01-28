@@ -574,6 +574,13 @@ control on how the documents are added to or removed from the index:
     end
 ```
 
+Also notice, that for ActiveRecord models which use a transactional database, such as MySQL, you will
+want to use the `after_commit` and `after_rollback` hooks instead, to avoid having the transactions take
+longer than necessary. In fact, even if you send a message, such as via _RabbitMQ_, you should be using
+`after_commit` and `after_rollback`, because otherwise your consumer might be processing the message even
+before it has been written to the database.
+
+
 The results returned by `Article.search` are wrapped in the aforementioned `Item` class, by default.
 This way, we have a fast and flexible access to the properties returned from _Elasticsearch_ (via the
 `_source` or `fields` JSON properties). This way, we can index whatever JSON we like in _Elasticsearch_,
