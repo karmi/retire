@@ -544,10 +544,7 @@ module Tire
       end
       
       context "Persistent model with dynamic creation" do
-        
-        setup { @article = PersistentArticle.new :title => 'Test', :tags => [:one, :two] }
-        
-        
+                
         should "permit access to attrs passed to create" do 
           @article = PersistentArticleWithDynamicCreation.new :name => 'Elasticsearch', :title => 'You know, for Search!'
           assert_equal @article.name, 'Elasticsearch'
