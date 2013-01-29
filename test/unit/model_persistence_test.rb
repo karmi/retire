@@ -260,7 +260,7 @@ module Tire
 
           should "have attribute names" do
             article = PersistentArticle.new :title => 'Test', :tags => ['one', 'two']
-            assert_equal ['published_on', 'tags', 'title'], article.attribute_names
+            assert_equal ['published_on', 'tags', 'title'].all? { |attr| article.attribute_names.include? attr }, true
           end
 
           should "have setter method for attribute" do
@@ -541,6 +541,25 @@ module Tire
           assert_equal 'snowball', PersistentArticleWithMapping.mapping[:title][:analyzer]
         end
 
+      end
+      
+      context "Persistent model with dynamic creation" do
+        
+        setup { @article = PersistentArticle.new :title => 'Test', :tags => [:one, :two] }
+        
+        
+        should "permit access to attrs passed to create" do 
+          @article = PersistentArticleWithDynamicCreation.new :name => 'Elasticsearch', :title => 'You know, for Search!'
+          assert_equal @article.name, 'Elasticsearch'
+        end
+        
+        should "not override explicit persistent properties" do
+          @article = PersistentArticleWithDynamicCreation.new :name => 'Elasticsearch', :author => { :name => 'Inigo Montoya' }
+          assert_equal @article.author.name, 'Inigo Montoya'
+          assert_equal @article.tags.class, Array
+          assert_equal @article.tags.length, 0
+        end
+        
       end
 
     end
