@@ -12,10 +12,6 @@ module Tire
     #
     module Callbacks
 
-			def self.save_only_on_indexed
-				true
-			end
-
       # A hook triggered by the `include Tire::Model::Callbacks` statement in the model.
       #
       def self.included(base)
