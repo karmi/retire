@@ -6,7 +6,7 @@ search engine/database.
 
 _Elasticsearch_ is a scalable, distributed, cloud-ready, highly-available,
 full-text search engine and database with
-[powerfull aggregation features](http://www.elasticsearch.org/guide/reference/api/search/facets/),
+[powerful aggregation features](http://www.elasticsearch.org/guide/reference/api/search/facets/),
 communicating by JSON over RESTful HTTP, based on [Lucene](http://lucene.apache.org/), written in Java.
 
 This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/tire/>.
