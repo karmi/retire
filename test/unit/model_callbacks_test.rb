@@ -50,7 +50,7 @@ end
 class ModelWithCallbackUpdatedOnIndexedAttributeChanges < ModelTwo
 	include ActiveModel::Dirty
 	define_attribute_methods [:name]
-	save_only_on_index_changes true
+	should_tire_only_update_on_index_changes true
 
 	def name
 		@name

@@ -1,4 +1,3 @@
-require 'set'
 module Tire
   module Model
 
@@ -24,13 +23,12 @@ module Tire
         end
 
 				def should_save?
-					if self.respond_to?(:changes) && self.class.save_only_on_index_changes?
+					if self.respond_to?(:changes) && self.class.should_tire_only_update_on_index_changes?
 						unless defined? @indexed_properties
 							raise "No tire index mapping has been defined for #{self.class.name}" if self.tire.index.mapping.nil?	
-							@indexed_properties = Set.new(self.tire.index.mapping[self.class.name.underscore]['properties'].keys)
+							@indexed_properties = self.tire.index.mapping[self.class.name.underscore]['properties'].keys
 						end	
-						changed_properties = self.changes.keys
-						changed_properties.any? {|changed_property| @indexed_properties.include? changed_property } 
+						(@indexed_properties & self.changes.keys).any?
 					else
 						return true
 					end
@@ -50,12 +48,12 @@ module Tire
       end
 
 			module ClassMethods
-				def save_only_on_index_changes(should_change = false)
-					@save_only_on_index_changes = should_change
+				def should_tire_only_update_on_index_changes(should_change = false)
+					@should_tire_only_update_on_index_changes = should_change
 				end
 
-				def save_only_on_index_changes?
-					@save_only_on_index_changes ||= false
+				def should_tire_only_update_on_index_changes?
+					@should_tire_only_update_on_index_changes ||= false
 				end
 			end
 
