@@ -759,6 +759,12 @@ module Tire
           @index.bulk :index,  [ {:id => '1', :title => 'One'} ]
         end
 
+
+          should "return immediately with empty collection" do
+            Configuration.client.expects(:post).never
+            @index.bulk_store []
+          end
+
       end
 
       context "when importing" do

@@ -105,6 +105,8 @@ module Tire
     # Shortcut methods `bulk_store`, `bulk_delete` and `bulk_create` are available.
     #
     def bulk(action, documents, options={})
+      return false if documents.empty?
+
       # TODO: A more Ruby-like DSL notation should be supported:
       #
       #     Tire.index('myindex').bulk do
@@ -112,7 +114,7 @@ module Tire
       #       delete id: 1
       #       # ...
       #     end
-      #
+
       payload = documents.map do |document|
         type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
         id   = get_id_from_document(document)
