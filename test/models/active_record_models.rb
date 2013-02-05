@@ -120,3 +120,12 @@ class ActiveRecordNamespace::MyModel < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
 end
+
+# Model with percolation
+
+class ActiveRecordModelWithPercolation < ActiveRecord::Base
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+
+  percolate!
+end

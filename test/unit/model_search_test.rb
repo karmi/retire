@@ -748,7 +748,7 @@ module Tire
               percolate!
             end
 
-            assert_equal true, ::ActiveModelArticleWithCallbacks.percolator
+            assert_equal true, ::ActiveModelArticleWithPercolation.percolator
           end
 
           should "set the percolator pattern" do
@@ -756,7 +756,7 @@ module Tire
               percolate! 'tags:alert'
             end
 
-            assert_equal 'tags:alert', ::ActiveModelArticleWithCallbacks.percolator
+            assert_equal 'tags:alert', ::ActiveModelArticleWithPercolation.percolator
           end
 
           should "mark the class for percolation on index update" do

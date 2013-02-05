@@ -182,6 +182,23 @@ module Tire
         end
       end
 
+      context "percolated search" do
+        setup do
+          PersistentArticleWithPercolation.index.register_percolator_query('alert') { string 'warning' }
+          Tire.index('_percolator').refresh
+        end
+
+        should "return matching queries when percolating" do
+          a = PersistentArticleWithPercolation.new :title => 'Warning!'
+          assert_contains a.percolate, 'alert'
+        end
+
+        should "return matching queries when saving" do
+          a = PersistentArticleWithPercolation.create :title => 'Warning!'
+          assert_contains a.matches, 'alert'
+        end
+      end
+
     end
 
   end

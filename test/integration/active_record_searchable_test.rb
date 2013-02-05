@@ -32,6 +32,10 @@ module Tire
         create_table :active_record_class_with_dynamic_index_names do |t|
           t.string     :title
         end
+        create_table :active_record_model_with_percolations do |t|
+          t.string   :title
+          t.datetime :created_at, :default => 'NOW()'
+        end
       end
     end
 
@@ -581,6 +585,24 @@ module Tire
         end
 
       end
+
+      context "percolated search" do
+        setup do
+          ActiveRecordModelWithPercolation.index.register_percolator_query('alert') { string 'warning' }
+          Tire.index('_percolator').refresh
+        end
+
+        should "return matching queries when percolating" do
+          a = ActiveRecordModelWithPercolation.new :title => 'Warning!'
+          assert_contains a.percolate, 'alert'
+        end
+
+        should "return matching queries when saving" do
+          a = ActiveRecordModelWithPercolation.create! :title => 'Warning!'
+          assert_contains a.matches, 'alert'
+        end
+      end
+
     end
 
   end

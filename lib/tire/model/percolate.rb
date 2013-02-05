@@ -31,7 +31,7 @@ module Tire
         # See <http://www.elasticsearch.org/guide/reference/api/index_.html> for more information.
         #
         def percolate!(pattern=true)
-          @@_percolator = pattern
+          @_percolator = pattern
           self
         end
 
@@ -57,7 +57,7 @@ module Tire
         # Returns the status or pattern of percolator for this class.
         #
         def percolator
-          defined?(@@_percolator) ? @@_percolator : nil
+          @_percolator
         end
       end
 
