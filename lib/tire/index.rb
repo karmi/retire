@@ -54,12 +54,12 @@ module Tire
 
     def mapping
       @response = Configuration.client.get("#{url}/_mapping")
-      MultiJson.decode(@response.body)[@name]
+      (parse_response(@response) || {})[@name]
     end
 
     def settings
       @response = Configuration.client.get("#{url}/_settings")
-      MultiJson.decode(@response.body)[@name]['settings']
+      (parse_response(@response) || {})[@name]['settings']
     end
 
     def store(*args)
@@ -86,7 +86,8 @@ module Tire
       url  = id ? "#{self.url}/#{type}/#{id}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
 
       @response = Configuration.client.post url, document
-      MultiJson.decode(@response.body)
+      
+      parse_response(@response)
     ensure
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
       logged([type, id].join('/'), curl)
@@ -241,7 +242,7 @@ module Tire
 
       url    = "#{self.url}/#{type}/#{id}"
       result = Configuration.client.delete url
-      MultiJson.decode(result.body) if result.success?
+      parse_response(result)
 
     ensure
       curl = %Q|curl -X DELETE "#{url}"|
@@ -262,11 +263,11 @@ module Tire
 
       @response = Configuration.client.get "#{url}#{params_encoded}"
 
-      h = MultiJson.decode(@response.body)
+      h = parse_response(@response)
       wrapper = options[:wrapper] || Configuration.wrapper
       if wrapper == Hash then h
       else
-        return nil if h['exists'] == false
+        return nil if !h || (h.has_key?('exists') && h['exists'] == false)
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
         wrapper.new(document)
@@ -286,7 +287,7 @@ module Tire
       url       = "#{self.url}/#{type}/#{id}/_update"
       url      += "?#{options.to_param}" unless options.keys.empty?
       @response = Configuration.client.post url, MultiJson.encode(payload)
-      MultiJson.decode(@response.body)
+      parse_response(@response)
 
     ensure
       curl = %Q|curl -X POST "#{url}" -d '#{MultiJson.encode(payload, :pretty => Configuration.pretty)}'|
@@ -304,7 +305,7 @@ module Tire
     def open(options={})
       # TODO: Remove the duplication in the execute > rescue > ensure chain
       @response = Configuration.client.post "#{url}/_open", MultiJson.encode(options)
-      MultiJson.decode(@response.body)['ok']
+      (parse_response(@response) || {})['ok']
 
     ensure
       curl = %Q|curl -X POST "#{url}/_open"|
@@ -313,7 +314,7 @@ module Tire
 
     def close(options={})
       @response = Configuration.client.post "#{url}/_close", MultiJson.encode(options)
-      MultiJson.decode(@response.body)['ok']
+      (parse_response(@response) || {})['ok']
 
     ensure
       curl = %Q|curl -X POST "#{url}/_close"|
@@ -324,7 +325,7 @@ module Tire
       options = {:pretty => true}.update(options)
       params  = options.to_param
       @response = Configuration.client.get "#{url}/_analyze?#{params}", text
-      @response.success? ? MultiJson.decode(@response.body) : false
+      @response.success? ? parse_response(@response) : false
 
     ensure
       curl = %Q|curl -X GET "#{url}/_analyze?#{params}" -d '#{text}'|
@@ -335,7 +336,7 @@ module Tire
       options[:query] = Search::Query.new(&block).to_hash if block_given?
 
       @response = Configuration.client.put "#{Configuration.url}/_percolator/#{@name}/#{name}", MultiJson.encode(options)
-      MultiJson.decode(@response.body)['ok']
+      (parse_response(@response) || {})['ok']
 
     ensure
       curl = %Q|curl -X PUT "#{Configuration.url}/_percolator/#{@name}/#{name}?pretty" -d '#{MultiJson.encode(options, :pretty => Configuration.pretty)}'|
@@ -344,7 +345,7 @@ module Tire
 
     def unregister_percolator_query(name)
       @response = Configuration.client.delete "#{Configuration.url}/_percolator/#{@name}/#{name}"
-      MultiJson.decode(@response.body)['ok']
+      (parse_response(@response) || {})['ok']
 
     ensure
       curl = %Q|curl -X DELETE "#{Configuration.url}/_percolator/#{@name}"|
@@ -363,7 +364,7 @@ module Tire
       payload.update( :query => query ) if query
 
       @response = Configuration.client.get "#{url}/#{type}/_percolate", MultiJson.encode(payload)
-      MultiJson.decode(@response.body)['matches']
+      (parse_response(@response) || {})['matches']
 
     ensure
       curl = %Q|curl -X GET "#{url}/#{type}/_percolate?pretty" -d '#{MultiJson.encode(payload, :pretty => Configuration.pretty)}'|
@@ -436,6 +437,17 @@ module Tire
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +
                                   "'#{document.class}' given."
+      end
+    end
+
+    protected
+
+    def parse_response(response)
+      if response.success?
+        MultiJson.decode(response.body)
+      else
+        Configuration.logger.log_response(response.code, nil, response.body) if Configuration.logger
+        nil
       end
     end
 
