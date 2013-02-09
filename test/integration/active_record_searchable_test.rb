@@ -309,6 +309,16 @@ module Tire
               assert_nil results.first
             end
 
+            should "find second page with four loaded models" do
+              results = ActiveRecordArticle.search :load => true, :page => 2, :per_page => 5 do |search|
+                search.query { |query| query.string @q }
+                search.sort  { by :title }
+              end
+              assert_equal 4, results.size
+              assert results.all? { |r| assert_instance_of ActiveRecordArticle, r }
+              assert_equal 'Test6', results.first.title
+            end
+
           end
 
           context "with from/size" do
