@@ -751,6 +751,15 @@ lightweight associations between the models.
 Please be sure to peruse the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
 for examples of the API and _ActiveModel_ integration usage.
 
+Custom Server Url
+-----------------
+
+Create an initializer file in config/initializers and add the following to it
+
+```
+Tire.configure { url "your_server_ip:port" } 
+```
+
 
 Extensions and Additions
 ------------------------
