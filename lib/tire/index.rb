@@ -103,6 +103,15 @@ module Tire
       logged("PUT MAPPING #{type}", curl)
     end
 
+    def del_mapping(type)
+      url = "#{self.url}/#{type}"
+      @response = Configuration.client.delete(url)
+      MultiJson.decode(@response.body)
+    ensure
+      curl = %Q|curl -X DELETE "#{url}"|
+      logged("DELETE MAPPING #{type}", curl)
+    end
+
     def settings
       @response = Configuration.client.get("#{url}/_settings")
       MultiJson.decode(@response.body)[@name]['settings']
