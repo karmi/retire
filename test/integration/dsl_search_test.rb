@@ -13,6 +13,7 @@ module Tire
 
         assert_equal 2, s.results.count
         assert_equal 2, s.results.facets['tags']['count']
+        assert_match /_search\?pretty' -d '{/, s.to_curl, 'Make sure to ignore payload in URL params'
       end
 
       should "allow building search query iteratively" do
