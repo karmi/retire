@@ -70,8 +70,19 @@ module Tire
           assert_equal 1,      s.results.facets.size
           assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
           assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
-        end
+      end
 
+      should "allow arbitrary order of methods in the DSL block" do
+          s = Tire.search('articles-test', :search_type => 'count') do
+            facet 'tags' do
+              facet_filter :range, { :published_on => { :from => '2011-01-01', :to => '2011-01-01' } }
+              terms :tags
+            end
+          end
+
+          assert_equal 1,      s.results.facets.size
+          assert_equal 'ruby', s.results.facets['tags']['terms'].first['term']
+          assert_equal 1,      s.results.facets['tags']['terms'].first['count'].to_i
       end
 
       context "terms" do
@@ -103,7 +114,7 @@ module Tire
 
       context "date histogram" do
 
-        should "return aggregated values for all results" do
+        should "return aggregated counts for each bucket" do
           s = Tire.search('articles-test') do
             query { all }
             facet 'published_on' do
@@ -113,7 +124,35 @@ module Tire
 
           facets = s.results.facets['published_on']['entries']
           assert_equal 4, facets.size, facets.inspect
-          assert_equal 2, facets.entries[1]["count"], facets.inspect
+          assert_equal 2, facets.entries[1]['count'], facets.inspect
+        end
+
+        should "return value statistics for each bucket" do
+          s = Tire.search('articles-test', search_type: 'count') do
+            query { all }
+            facet 'published_on' do
+              date :published_on, value_field: 'words'
+            end
+          end
+
+          facets = s.results.facets['published_on']['entries']
+          assert_equal 4, facets.size, facets.inspect
+          assert_equal 2, facets.entries[1]['count'], facets.inspect
+          assert_equal 625.0, facets.entries[1]['total'], facets.inspect
+        end
+
+        should "return value statistics for each bucket by script" do
+          s = Tire.search('articles-test', search_type: 'count') do
+            query { all }
+            facet 'published_on' do
+              date :published_on, value_script: "doc.title.value.length()"
+            end
+          end
+
+          facets = s.results.facets['published_on']['entries']
+          assert_equal 4, facets.size, facets.inspect
+          assert_equal 2, facets.entries[1]['count'], facets.inspect
+          assert_equal 8.0, facets.entries[1]['total'], facets.inspect # Two + Three => 8 characters
         end
 
       end
@@ -265,8 +304,8 @@ module Tire
           assert_equal 2, facets["count"], facets.inspect
         end
 
+      end
+
     end
-
   end
-
 end

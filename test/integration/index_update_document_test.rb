@@ -79,6 +79,16 @@ module Tire
         assert_equal 3, document.tags.size, document.inspect
       end
 
+      should "update the document with a partial one" do
+        Tire.index('articles-with-tags') do
+          update( 'article', '1', :doc => { :title => 'One UPDATED' } )
+          refresh
+        end
+
+        document = Tire.search('articles-with-tags') { query { string 'title:one' } }.results.first
+        assert_equal 'One UPDATED', document.title, document.inspect
+      end
+
       should "access variables from the outer scope" do
         $t = self
 

@@ -28,25 +28,29 @@ Gem::Specification.new do |s|
   #
   s.add_dependency "rake"
   s.add_dependency "rest-client", "~> 1.6"
-  s.add_dependency "multi_json",  "~> 1.0"
+  s.add_dependency "multi_json",  "~> 1.3"
   s.add_dependency "activemodel", ">= 3.0"
   s.add_dependency "hashr",       "~> 0.0.19"
 
   # = Development dependencies
   #
-  s.add_development_dependency "bundler",     "~> 1.0"
-  s.add_development_dependency "yajl-ruby",   "~> 1.0"
+  s.add_development_dependency "bundler",      "~> 1.0"
   s.add_development_dependency "shoulda"
-  s.add_development_dependency "mocha"
+  s.add_development_dependency "mocha",        "~> 0.13"
   s.add_development_dependency "minitest",     "~> 2.12"
   s.add_development_dependency "activerecord", ">= 3.0"
-  s.add_development_dependency "sqlite3"
   s.add_development_dependency "mongoid",      "~> 2.2"
-  s.add_development_dependency "bson_ext"
   s.add_development_dependency "redis-persistence"
-  s.add_development_dependency "curb"
-  s.add_development_dependency "oj"
-  s.add_development_dependency "turn", "~> 0.9" if defined?(RUBY_VERSION) && RUBY_VERSION > '1.9'
+  s.add_development_dependency "faraday"
+
+  unless defined?(JRUBY_VERSION)
+    s.add_development_dependency "yajl-ruby",   "~> 1.0"
+    s.add_development_dependency "sqlite3"
+    s.add_development_dependency "bson_ext"
+    s.add_development_dependency "curb"
+    s.add_development_dependency "oj"
+    s.add_development_dependency "turn",        "~> 0.9"
+  end
 
   s.description = <<-DESC
    Tire is a Ruby client for the ElasticSearch search engine/database.

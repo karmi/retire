@@ -121,6 +121,8 @@ end
 # for the index.
 
 Tire.index 'articles' do
+  delete
+
   # To do so, let's just pass a Hash containing the specified mapping to the `Index#create` method.
   #
   create :mappings => {
@@ -179,8 +181,6 @@ end
 # Of course, we can easily manipulate the documents before storing them in the index.
 #
 Tire.index 'articles' do
-  delete
-
   # ... by passing a block to the `import` method. The collection will
   # be available in the block argument.
   #
@@ -710,6 +710,7 @@ s = Tire.search 'articles' do
 end
 
 # The results:
+#
 #     * One         (Published on: 2011-01-01)
 #     * Two         (Published on: 2011-01-02)
 #     * Three       (Published on: 2011-01-02)
@@ -718,6 +719,60 @@ end
 s.results.each do |document|
   puts "* #{ document.title.ljust(10) }  (Published on: #{ document.published_on })"
 end
+
+#### Nested Documents and Queries
+
+# Often, we want to store more complex entities in _Elasticsearch_;
+# for example, we may want to store the information about comments for each article,
+# and then search for articles where a certain person left a certain note.
+
+# In the simplest case, we can store the comments as an Array of JSON documents in the
+# article document. If we do that naively, our search results will be incorrect, though.
+# That's because a match in just one field will be enough to match a document.
+# We need to query parts of the document as if they were separate entities.
+
+# _Elasticsearch_ provides a specific `nested`
+# [field type](http://www.elasticsearch.org/guide/reference/mapping/nested-type.html) and
+# [query](http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html)
+# for working with "embedded" documents like these.
+
+# So, let's update the mapping for the index first, adding the `comments` property as a `nested` type:
+#
+Tire::Configuration.client.put Tire.index('articles').url+'/article/_mapping',
+                               { :article => { :properties => { :comments => { :type => 'nested' } } } }.to_json
+
+# And let's add comments to articles (notice that both articles contain a comment with the _Cool!_ message,
+# though by different authors):
+#
+Tire.index 'articles' do
+  update :article, 1,
+         :doc => { :comments => [ { :author => 'John', :message => 'Great!' }, { :author => 'Bob', :message => 'Cool!' } ]   }
+  update :article, 2,
+         :doc => { :comments => [ { :author => 'John', :message => 'Cool!' }, { :author => 'Mary', :message => 'Thanks!' } ] }
+  refresh
+end
+
+# We'll use the `nested` query to search for articles where _John_ left a _"Cool"_ message:
+#
+s = Tire.search 'articles' do
+  query do
+    nested :path => 'comments' do
+      query do
+        match 'comments.author',  'John'
+        match 'comments.message', 'cool'
+      end
+    end
+  end
+end
+
+# The results contain just the second document, correctly:
+#
+#     * Two (comments: 2)
+#
+s.results.each do |document|
+  puts "* #{ document.title } (comments: #{document.comments.size})"
+end
+
 
 #### Highlighting
 
@@ -839,7 +894,8 @@ puts "Matching queries: " + matches.inspect
 
 # Let's store a document with some trigger words in the index, and mark it for percolation.
 #
-response = index.store :message => '[Warning] Severe floods expected after tsunami wave.', :percolate => true
+response = index.store( { :message => '[Warning] Severe floods expected after tsunami wave.' },
+                        { :percolate => true } )
 
 # We will get the names of all matching queries in response.
 #
@@ -849,9 +905,9 @@ puts "Matching queries: " + response['matches'].inspect
 
 # As with the _percolate_ example, we can filter the executed queries.
 #
-response = index.store :message => '[Warning] Severe floods expected after tsunami wave.',
-                       # Let's use a simple string query for the “tsunami” tag.
-                       :percolate => 'tags:tsunami'
+response = index.store( { :message => '[Warning] Severe floods expected after tsunami wave.' },
+                         # Let's use a simple string query for the “tsunami” tag.
+                        { :percolate => 'tags:tsunami' } )
 
 # Unsurprisingly, the response will contain just the name of the “tsunami” query.
 #

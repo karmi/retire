@@ -62,6 +62,10 @@ module Tire
           assert_respond_to Tire, :msearch
         end
 
+        should "count documents" do
+          assert_respond_to Tire, :count
+        end
+
         context "when retrieving results" do
 
           should "not call the #perform method immediately" do

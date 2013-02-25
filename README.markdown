@@ -617,6 +617,18 @@ Instead of simple `true`, you can pass any options for the model's find method:
     end
 ```
 
+If you would like to access properties returned by Elasticsearch (such as `_score`),
+in addition to model instance, use the `each_with_hit` method:
+
+```ruby
+    results = Article.search 'One', :load => true
+    results.each_with_hit do |result, hit|
+      puts "#{result.title} (score: #{hit['_score']})"
+    end
+
+    # One (score: 0.300123)
+```
+
 Note that _Tire_ search results are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
 so you can pass all the usual parameters to the `search` method in the controller:
 

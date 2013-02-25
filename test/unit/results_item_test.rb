@@ -67,6 +67,7 @@ module Tire
 
       should "implement respond_to? for proxied methods" do
         assert @document.respond_to?(:title)
+        assert @document.respond_to?(:title, true)
       end
 
       should "return nil for non-existing keys/methods" do
@@ -117,6 +118,12 @@ module Tire
 
         assert_equal 'Kafka', @document.to_hash[:author][:name]
         assert_equal '1925',  @document.to_hash[:awards][:best_fiction][:year]
+      end
+
+      should "be convertible to JSON" do
+        assert_instance_of Hash, @document.as_json
+        assert_equal 'Test', @document.as_json(:only => 'title')['title']
+        assert_nil           @document.as_json(:only => 'title')['author']
       end
 
       should "be inspectable" do

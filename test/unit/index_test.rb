@@ -295,6 +295,14 @@ module Tire
           @index.store '{"foo" : "bar"}'
         end
 
+        should "extract the routing information from options" do
+          Configuration.client.expects(:post).with do |url, payload|
+            assert_match /routing=abc/, url
+          end.returns(mock_response('{"ok":true,"_id":"123"}'))
+
+          @index.store( {:id => 123, :title => 'Test'}, {:routing => 'abc'} )
+        end
+
         context "document with ID" do
 
           should "store Hash it under its ID property" do
@@ -309,6 +317,25 @@ module Tire
                                                      {:id => 123, :title => 'Test', :body => 'Lorem'}.to_json).
                                                 returns(mock_response('{"ok":true,"_id":"123"}'))
             @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
+          end
+
+          should "convert document ID to string or number" do
+            # This is related to issues #529, #535:
+            # When using Mongoid and the Yajl gem, document IDs from Mongo (Moped::BSON::ObjectId)
+            # are incorrectly serialized to JSON, and documents are stored with incorrect, auto-generated IDs.
+            class Document1; def id; "one"; end; end
+            class Document2; def id; 1;     end; end
+            class Document3; class ID; def as_json; 'c'; end; end
+                             def id;   ID.new; end
+            end
+
+            document_1 = Document1.new
+            document_2 = Document2.new
+            document_3 = Document3.new
+
+            assert_equal 'one', @index.get_id_from_document(document_1)
+            assert_equal 1,     @index.get_id_from_document(document_2)
+            assert_equal 'c',   @index.get_id_from_document(document_3)
           end
 
         end
@@ -457,7 +484,7 @@ module Tire
 
       context "when updating" do
 
-        should "send payload" do
+        should "send script payload" do
           Configuration.client.expects(:post).with do |url,payload|
                                 payload = MultiJson.decode(payload)
                                 # p [url, payload]
@@ -470,6 +497,20 @@ module Tire
                                 mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
 
           assert @index.update('document', '42', {:script => "ctx._source.foo = bar;", :params => { :bar => '21' }})
+        end
+
+        should "send partial doc payload" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                payload = MultiJson.decode(payload)
+                                # p [url, payload]
+                                assert_equal( "#{@index.url}/document/42/_update", url ) &&
+                                assert_not_nil( payload['doc'] ) &&
+                                assert_equal('bar', payload['doc']['foo'])
+                              end.
+                              returns(
+                                mock_response('{"ok":"true","_index":"dummy","_type":"document","_id":"42","_version":"2"}'))
+
+          assert @index.update('document', '42', {:doc => {:foo => 'bar'}})
         end
 
         should "send options" do
@@ -489,11 +530,11 @@ module Tire
           assert_raise(ArgumentError) { @index.update(nil, '123', :script => 'foobar') }
         end
 
-        should "raise an error when no script is passed" do
-          assert_raise ArgumentError do
-            @index.update('article', "42", {:params => {"foo" => "bar"}})
-          end
-        end
+        should "raise an error when no script or partial document is passed" do
+           assert_raise ArgumentError do
+             @index.update('article', "42", {:foo => 'bar'})
+           end
+         end
 
       end
 

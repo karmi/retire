@@ -29,8 +29,18 @@ module Tire
         end
       end
 
+      # Iterates over the `results` collection
+      #
       def each(&block)
         results.each(&block)
+      end
+
+      # Iterates over the `results` collection and yields
+      # the `result` object (Item or model instance) and the
+      # `hit` -- raw Elasticsearch response parsed as a Hash
+      #
+      def each_with_hit(&block)
+        results.zip(@response['hits']['hits']).each(&block)
       end
 
       def empty?
@@ -47,6 +57,14 @@ module Tire
       end
       alias :[] :slice
 
+      def to_ary
+        self
+      end
+
+      def as_json(options=nil)
+        to_a.map { |item| item.as_json(options) }
+      end
+
       def error
         @response['error']
       end
@@ -57,10 +75,6 @@ module Tire
 
       def failure?
         ! success?
-      end
-
-      def to_ary
-        self
       end
 
       # Handles _source prefixed fields properly: strips the prefix and converts fields to nested Hashes
@@ -136,7 +150,6 @@ module Tire
       def __find_records_by_ids(klass, ids)
         @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
       end
-
     end
 
   end

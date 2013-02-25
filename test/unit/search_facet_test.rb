@@ -73,6 +73,15 @@ module Tire::Search
                         f['foo'][:facet_filter].to_json )
         end
 
+        should "allow arbitrary ordering of methods in the DSL block" do
+          f = Facet.new('foo') do
+            facet_filter :terms, :tags => ['ruby']
+            terms :published_on
+          end.to_hash
+
+          assert_equal( { :terms => {:tags => ['ruby'] }}.to_json, f['foo'][:facet_filter].to_json)
+        end
+
       end
 
       context "terms facet" do
@@ -106,7 +115,7 @@ module Tire::Search
 
         should "encode custom options" do
           f = Facet.new('date') { date :published_on, :value_field => 'price'  }
-          assert_equal( {:date=>{:date_histogram=>{:field=>'published_on',:interval=>'day',:value_field=>'price' } } }.to_json,
+          assert_equal( {:date=>{:date_histogram=>{:key_field=>'published_on',:interval=>'day',:value_field=>'price' } } }.to_json,
                         f.to_json )
         end
 

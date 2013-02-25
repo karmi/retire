@@ -8,6 +8,7 @@ rvm:
   - 1.9.3
   - 1.8.7
   - ree
+  - jruby-19mode
 
 env:
   - TEST_COMMAND="rake test:unit"
@@ -15,8 +16,10 @@ env:
 
 script: "bundle exec $TEST_COMMAND"
 
-before_install:
-  - sudo service elasticsearch start
+services:
+  - elasticsearch
+  - redis
+  - mongodb
 
 matrix:
   exclude:

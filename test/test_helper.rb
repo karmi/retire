@@ -1,20 +1,33 @@
+ENV['DEBUG'] = 'true'
+
 require 'rubygems'
 require 'bundler/setup'
 
 require 'pathname'
 require 'test/unit'
 
+JRUBY = defined?(JRUBY_VERSION)
+
 if ENV['JSON_LIBRARY']
   puts "Using '#{ENV['JSON_LIBRARY']}' JSON library"
   require ENV['JSON_LIBRARY']
+elsif JRUBY
+  require 'json'
 else
   require 'yajl/json_gem'
 end
-require 'sqlite3'
+
+if JRUBY
+  require 'jdbc/sqlite3'
+  require 'active_record'
+  require 'active_record/connection_adapters/jdbcsqlite3_adapter'
+else
+  require 'sqlite3'
+end
 
 require 'shoulda'
-require 'turn/autorun' unless ENV["TM_FILEPATH"] || defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
-require 'mocha'
+require 'turn/autorun' unless ENV["TM_FILEPATH"] || JRUBY
+require 'mocha/setup'
 
 require 'active_support/core_ext/hash/indifferent_access'
 

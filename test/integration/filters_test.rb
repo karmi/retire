@@ -19,6 +19,18 @@ module Tire
         assert_equal 'Two', s.results.first.title
       end
 
+      should "filter the results with multiple terms" do
+        # 2.json > Is tagged  *both* "ruby" and "python"
+
+        s = Tire.search('articles-test') do
+          query { all }
+          filter :terms, :tags => ['ruby', 'python'], :execution => 'and'
+        end
+
+        assert_equal 1, s.results.count
+        assert_equal 'Two', s.results.first.title
+      end
+
       should "filter the results with multiple 'or' filters" do
         # 4.json > Begins with "F" and is tagged "erlang"
 

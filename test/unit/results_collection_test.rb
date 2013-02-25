@@ -8,7 +8,7 @@ module Tire
       setup do
         begin; Object.send(:remove_const, :Rails); rescue; end
         Configuration.reset
-        @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test'}},
+        @default_response = { 'hits' => { 'hits' => [{'_id' => 1, '_score' => 1, '_source' => {:title => 'Test', :author => 'John'}},
                                                      {'_id' => 2},
                                                      {'_id' => 3}],
                                           'max_score' => 1.0 } }
@@ -38,7 +38,7 @@ module Tire
         assert_equal [3],   Results::Collection.new(@default_response)[-1,1].map {|res| res[:id]}
       end
 
-      should "be initialized with parsed json" do
+      should "be initialized with parsed JSON" do
         assert_nothing_raised do
           collection = Results::Collection.new( @default_response )
           assert_equal 3, collection.results.count
@@ -77,6 +77,23 @@ module Tire
       should "have max_score" do
         collection = Results::Collection.new(@default_response)
         assert_equal 1.0, collection.max_score
+      end
+
+      context "serialization" do
+
+        should "be serialized to JSON" do
+          collection = Results::Collection.new(@default_response)
+          assert_instance_of Array, collection.as_json
+          assert_equal 'Test', collection.as_json.first['title']
+          assert_equal 'John', collection.as_json.first['author']
+        end
+
+        should "pass options to as_json" do
+          collection = Results::Collection.new(@default_response)
+          assert_equal 'Test', collection.as_json(:only => 'title').first['title']
+          assert_nil           collection.as_json(:only => 'title').first['author']
+        end
+
       end
 
       context "with error response" do
@@ -195,6 +212,40 @@ module Tire
           assert_equal 1000,      @item.artist.meta.favorited
           assert_equal 3,         @item.track.info.duration.minutes
         end
+
+      end
+
+      context "returning results with hits" do
+        should "yield the Item result and the raw hit" do
+          response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
+
+          Results::Collection.new(response).each_with_hit do |result, hit|
+            assert_instance_of Tire::Results::Item, result
+            assert_instance_of Hash, hit
+            assert_equal 'Test',   result.title
+            assert_equal 0.5, hit['_score']
+          end
+        end
+
+        should "yield the model instance and the raw hit" do
+          response = { 'hits' => { 'hits' => [ {'_id' => 1, '_score' => 0.5, '_type' => 'active_record_article'} ] } }
+
+          ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":memory:" )
+          ActiveRecord::Migration.verbose = false
+          ActiveRecord::Schema.define(:version => 1) { create_table(:active_record_articles) { |t| t.string(:title) } }
+          model = ActiveRecordArticle.new(:title => 'Test'); model.id = 1
+
+          ActiveRecordArticle.expects(:find).with([1]).returns([ model] )
+
+          Results::Collection.new(response, :load => true).each_with_hit do |result, hit|
+            assert_instance_of ActiveRecordArticle, result
+            assert_instance_of Hash, hit
+            assert_equal 'Test',   result.title
+            assert_equal 0.5, hit['_score']
+          end
+
+        end
+
 
       end
 

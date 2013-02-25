@@ -133,7 +133,8 @@ module Tire
         params[:percolate] = "*" if params[:percolate] === true
       end
 
-      params[:parent] = options[:parent] if options[:parent]
+      params[:parent]  = options[:parent]  if options[:parent]
+      params[:routing] = options[:routing] if options[:routing]
 
       params_encoded = params.empty? ? '' : "?#{params.to_param}"
 
@@ -146,7 +147,7 @@ module Tire
       logged([type, id].join('/'), curl)
     end
 
-    # Performs a [multi-search](http://www.elasticsearch.org/guide/reference/api/bulk.html) request
+    # Performs a [bulk](http://www.elasticsearch.org/guide/reference/api/bulk.html) request
     #
     #     @myindex.bulk :index, [ {id: 1, title: 'One'}, { id: 2, title: 'Two', _version: 3 } ], refresh: true
     #
@@ -171,7 +172,9 @@ module Tire
         type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
         id   = get_id_from_document(document)
 
-        STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
+        if ENV['DEBUG']
+          STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
+        end
 
         header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
 
@@ -330,7 +333,7 @@ module Tire
     def update(type, id, payload={}, options={})
       raise ArgumentError, "Please pass a document type" unless type
       raise ArgumentError, "Please pass a document ID"   unless id
-      raise ArgumentError, "Please pass a script in the payload hash" unless payload[:script]
+      raise ArgumentError, "Please pass a script or partial document in the payload hash" unless payload[:script] || payload[:doc]
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{id}/_update"
@@ -429,10 +432,11 @@ module Tire
         code = @response ? @response.code : error.class rescue 'N/A'
 
         if Configuration.logger.level.to_s == 'debug'
-          body = if @response
-            MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty)
-          else
-            MultiJson.encode( MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
+          body = if @response && @response.body && !@response.body.to_s.empty?
+              MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty)
+            elsif error && error.message && !error.message.to_s.empty?
+              MultiJson.encode( MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
+            else ''
           end
         else
           body = ''
@@ -468,7 +472,7 @@ module Tire
         when document.is_a?(Hash)
           document[:_id] || document['_id'] || document[:id] || document['id']
         when document.respond_to?(:id) && document.id != document.object_id
-          document.id
+          document.id.as_json
       end
       $VERBOSE = old_verbose
       id
@@ -477,8 +481,10 @@ module Tire
     def convert_document_to_json(document)
       document = case
         when document.is_a?(String)
-          Tire.warn "Passing the document as JSON string in Index#store has been deprecated, " +
-                     "please pass an object which responds to `to_indexed_json` or a plain Hash."
+          if ENV['DEBUG']
+            Tire.warn "Passing the document as JSON string has been deprecated, " +
+                       "please pass an object which responds to `to_indexed_json` or a plain Hash."
+          end
           document
         when document.respond_to?(:to_indexed_json) then document.to_indexed_json
         else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +

@@ -56,7 +56,7 @@ module Tire
         end
 
         assert_equal 3, s.results.count
-        assert_equal %w(Four One Two), s.results.map(&:title)
+        assert_equal %w(Four One Two), s.results.map(&:title).sort
       end
 
     end

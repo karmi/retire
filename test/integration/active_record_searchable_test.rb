@@ -145,6 +145,19 @@ module Tire
             assert ! results.any?
           end
         end
+
+        should "iterate results with hits" do
+          results = ActiveRecordArticle.search :load => true do
+            query { string '"Test 1" OR "Test 2"' }
+          end
+          results.each_with_hit do |result, hit|
+            assert_instance_of ActiveRecordArticle, result
+            assert_instance_of Hash, hit
+            assert_match /Test \d/, result.title
+            assert_match /Test \d/, hit['_source']['title']
+            assert hit['_score'] > 0
+          end
+        end
       end
 
       context "with pagination" do

@@ -374,7 +374,7 @@ module Tire::Search
 
       should "allow searching in multiple fields with multi_match" do
         assert_equal( { :multi_match => { :query => 'bar', :fields => [:foo, :moo] } },
-                        Query.new.match([:foo, :moo], 'bar') )
+                      Query.new.match([:foo, :moo], 'bar') )
       end
 
       should "encode options" do
@@ -389,6 +389,28 @@ module Tire::Search
 
         assert_not_nil  query.to_hash[:bool]
         assert_equal 2, query.to_hash[:bool][:must].size
+      end
+
+    end
+
+    context "NestedQuery" do
+
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.nested }
+      end
+
+      should "encode options" do
+        query = Query.new.nested(:path => 'articles', :score_mode => 'score_mode') do
+          query { string 'foo' }
+        end
+
+        assert_equal 'articles',   query[:nested][:path]
+        assert_equal 'score_mode', query[:nested][:score_mode]
+      end
+
+      should "wrap single query" do
+        assert_equal( { :nested => {:query => { :query_string => { :query => 'foo' } } }},
+                      Query.new.nested { query { string 'foo' } } )
       end
 
     end

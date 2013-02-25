@@ -32,8 +32,27 @@ module Tire
         assert_nil s.results.first.published_on
       end
 
-    end
+      should "iterate results with hits" do
+        s = Tire.search('articles-test') { query { string 'title:one' } }
 
+        s.results.each_with_hit do |result, hit|
+          assert_instance_of Tire::Results::Item, result
+          assert_instance_of Hash, hit
+
+          assert_equal 'One', result.title
+          assert_equal 'One', hit['_source']['title']
+          assert_not_nil hit['_score']
+        end
+      end
+
+      should "be serialized to JSON" do
+        s = Tire.search('articles-test') { query { string 'title:one' } }
+
+        assert_not_nil s.results.as_json(only: 'title').first['title']
+        assert_nil     s.results.as_json(only: 'title').first['published_on']
+      end
+
+    end
   end
 
 end

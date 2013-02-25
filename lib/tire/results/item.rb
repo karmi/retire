@@ -26,7 +26,7 @@ module Tire
         @attributes[method_name.to_sym]
       end
 
-      def respond_to?(method_name)
+      def respond_to?(method_name, include_private = false)
         @attributes.has_key?(method_name.to_sym) || super
       end
 
@@ -65,6 +65,16 @@ module Tire
         end
       end
 
+      def as_json(options=nil)
+        hash = to_hash
+        hash.respond_to?(:with_indifferent_access) ? hash.with_indifferent_access.as_json(options) : hash.as_json(options)
+      end
+
+      def to_json(options=nil)
+        as_json.to_json(options)
+      end
+      alias_method :to_indexed_json, :to_json
+
       # Let's pretend we're someone else in Rails
       #
       def class
@@ -77,11 +87,6 @@ module Tire
         s = []; @attributes.each { |k,v| s << "#{k}: #{v.inspect}" }
         %Q|<Item#{self.class.to_s == 'Tire::Results::Item' ? '' : " (#{self.class})"} #{s.join(', ')}>|
       end
-
-      def to_json(options=nil)
-        @attributes.to_json(options)
-      end
-      alias_method :to_indexed_json, :to_json
 
     end
 

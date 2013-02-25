@@ -60,7 +60,11 @@ module Tire
             # Add 1 to every "document" and return them
             documents.map { |d| d + 1 }
           end
+        end
 
+        should "store the documents in a different index" do
+          Tire::Index.expects(:new).with('new_index').returns( mock('index') { expects(:import) } )
+          ImportModel.import :index => 'new_index'
         end
 
       end

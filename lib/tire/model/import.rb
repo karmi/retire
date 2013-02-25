@@ -15,6 +15,7 @@ module Tire
 
         def import options={}, &block
           options = { :method => 'paginate' }.update options
+          index   = options[:index] ? Tire::Index.new(options.delete(:index)) : self.index
           index.import klass, options, &block
         end
 
