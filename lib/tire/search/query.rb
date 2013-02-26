@@ -20,7 +20,7 @@ module Tire
 
       def terms(field, value, options={})
         @value = { :terms => { field => value } }
-        @value[:terms].update(options)# if options.present?
+        @value[:terms].update(options)
         @value
       end
 
