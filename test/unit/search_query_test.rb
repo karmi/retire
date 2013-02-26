@@ -415,5 +415,27 @@ module Tire::Search
 
     end
 
+    context 'ConstantScoreQuery' do
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.constant_score }
+      end
+
+      should "wrap query" do
+        assert_equal( { :constant_score => {:query => { :term => { :attr => { :term => 'foo' } } } } },
+                      Query.new.constant_score { query { term :attr, 'foo' } } )
+      end
+
+      should "wrap filter" do
+        assert_equal( { :constant_score => {:filter => { :term => { :attr => 'foo' } } } },
+                      Query.new.constant_score { filter :term, :attr => 'foo' } )
+      end
+
+      should "wrap the boost" do
+        assert_equal( { :constant_score => {:boost => 3 } },
+                      Query.new.constant_score { boost 3 } )
+      end
+
+    end
+
   end
 end
