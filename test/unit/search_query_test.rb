@@ -55,6 +55,11 @@ module Tire::Search
         assert_equal( { :terms => { :foo => ['bar', 'baz'], :minimum_match => 2 } },
                       Query.new.terms(:foo, ['bar', 'baz'], :minimum_match => 2) )
       end
+
+      should "allow set boost when searching for multiple terms" do
+        assert_equal( { :terms => { :foo => ['bar', 'baz'], :boost => 2 } },
+                      Query.new.terms(:foo, ['bar', 'baz'], :boost => 2) )
+      end
     end
 
     context "Range query" do
