@@ -1,8 +1,12 @@
 module Tire
-  VERSION = "0.4.2.6"
+  VERSION = "0.4.2.7"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
+
+    Version 0.4.2.7
+    ---------------
+    * Bumped escape_utils dependency to ~> 0.3.x
 
     Version 0.4.2.6
     ---------------
