@@ -56,6 +56,10 @@ module Tire
         @value
       end
 
+      def constant_score(&block)
+        @value.update( { constant_score: ConstantScoreQuery.new(&block).to_hash } ) if block_given?
+      end
+
       def fuzzy(field, value, options={})
         query = { field => { :term => value }.update(options) }
         @value = { :fuzzy => query }
@@ -113,6 +117,29 @@ module Tire
         to_hash.to_json
       end
 
+    end
+
+    class ConstantScoreQuery
+      def initialize(&block)
+        @value = {}
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def filter(type, *options)
+        @value.update(filter: Filter.new(type, *options).to_hash)
+      end
+
+      def query(&block)
+        @value.update(query: Query.new(&block).to_hash)
+      end
+
+      def boost(boost)
+        @value.update(boost: boost)
+      end
+
+      def to_hash
+        @value
+      end
     end
 
     class BooleanQuery
