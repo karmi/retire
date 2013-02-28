@@ -20,7 +20,7 @@ module Tire
 
       def terms(field, value, options={})
         @value = { :terms => { field => value } }
-        @value[:terms].update(options)
+        @value[:terms].update( { :minimum_match => options[:minimum_match] } ) if options[:minimum_match]
         @value
       end
 
