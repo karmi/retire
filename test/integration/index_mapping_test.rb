@@ -38,6 +38,37 @@ module Tire
       end
     end
 
+    context "Put mapping" do
+      setup{ Tire.index("mapped-index").create; sleep 1 }
+      teardown{ Tire.index("mapped-index").delete; sleep 0.1 }
+
+      should "update the mapping for a given type" do
+        index = Tire.index("mapped-index")
+
+        index.mapping("article", :properties => { :body => { :type => "string" } })
+        assert_equal({ "type" => "string" }, index.mapping["article"]["properties"]["body"])
+
+        index.mapping("article", :properties => { :title => { :type => "string" } })
+        mapping = index.mapping
+        assert_equal mapping["article"]["properties"]["body"], { "type" => "string" }
+        assert_equal mapping["article"]["properties"]["title"], { "type" => "string" }
+      end
+
+      should "honor the ignore conflicts option" do
+        index = Tire.index("mapped-index")
+
+        index.mapping("article", :properties => { :body => { :type => "string" } })
+        assert_equal({ "type" => "string" }, index.mapping["article"]["properties"]["body"])
+
+        response = index.mapping("article", :properties => { :body => { :type => "integer" } })
+        assert response["error"] =~ /^MergeMappingException/
+
+        response = index.mapping("article", :ignore_conflicts => true, :properties => { :body => { :type => "integer" } })
+        assert response["ok"]
+      end
+
+    end
+
   end
 
 end
