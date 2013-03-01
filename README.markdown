@@ -677,6 +677,13 @@ provided by the `mapping` block in your model):
     $ rake environment tire:import CLASS='Article' FORCE=true
 ```
 
+When importing records from multiple tables, you can fight the n+1 queries problem by passing
+`include` parameters to the `paginate` method:
+
+```bash
+    rake environment tire:import PARAMS='{:include => ["comments"]}' CLASS=Article FORCE=true
+```
+
 When you'll spend more time with _Elasticsearch_, you'll notice how
 [index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
 are the best idea since the invention of inverted index.
@@ -684,6 +691,16 @@ You can index your data into a fresh index (and possibly update an alias once ev
 
 ```bash
     $ rake environment tire:import CLASS='Article' INDEX='articles-2011-05'
+```
+
+Finally, consider the Rake importing task just a convenient starting point. If you're loading
+substantial amounts of data, want better control on which data will be indexed, etc., use the
+lower-level Tire API with eg. `ActiveRecordBase#find_in_batches`:
+
+```ruby
+    Article.where("published_on > ?", Time.parse("2012-10-01")).find_in_batches do |group|
+      Tire.index("articles").import group
+    end
 ```
 
 OK. All this time we have been talking about `ActiveRecord` models, since
