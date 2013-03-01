@@ -28,6 +28,8 @@ matrix:
       env: TEST_COMMAND="rake test:integration"
     - rvm: ree
       env: TEST_COMMAND="rake test:integration"
+  allow_failures:
+    - rvm: ree
 
 notifications:
   disable: true
