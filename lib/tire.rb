@@ -6,7 +6,8 @@ require 'cgi'
 
 require 'active_support/core_ext/object/to_param'
 require 'active_support/core_ext/object/to_query'
-require 'active_support/core_ext/hash/except.rb'
+require 'active_support/core_ext/hash/except'
+require 'active_support/json'
 
 # Ruby 1.8 compatibility
 require 'tire/rubyext/ruby_1_8' if defined?(RUBY_VERSION) && RUBY_VERSION < '1.9'
