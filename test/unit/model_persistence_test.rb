@@ -307,8 +307,14 @@ module Tire
             assert_equal '4chan',       article.comments.first.nick
           end
 
-          should "automatically format strings in UTC format as Time" do
+          should "automatically format strings in ISO8601 with UTC designator as Time" do
             article = PersistentArticle.new :published_on => '2011-11-01T23:00:00Z'
+            assert_instance_of Time, article.published_on
+            assert_equal 2011, article.published_on.year
+          end
+
+          should "automatically format strings in ISO8601 with time zone a time zone offset as Time" do
+            article = PersistentArticle.new :published_on => '2011-05-16T00:00:00+01:00'
             assert_instance_of Time, article.published_on
             assert_equal 2011, article.published_on.year
           end
