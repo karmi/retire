@@ -206,6 +206,16 @@ module Tire
           end
         end
 
+        should "delete the mapping" do
+          Configuration.client.expects(:delete).returns(mock_response('{"ok":true}', 200))
+          assert @index.delete_mapping('document')
+        end
+
+        should "fail when deleting the mapping for non-existing type" do
+          Configuration.client.expects(:delete).returns(mock_response('{"error":"TypeMissingException[[dummy] type[document] missing]","status":404}', 400))
+          assert ! @index.delete_mapping('document')
+        end
+
       end
 
       context "settings" do

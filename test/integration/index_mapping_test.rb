@@ -47,7 +47,7 @@ module Tire
       setup    { Tire.index("mapped-index").create; sleep 1   }
       teardown { Tire.index("mapped-index").delete; sleep 0.1 }
 
-      should "update the mapping for a given type" do
+      should "update the mapping for type" do
         index = Tire.index("mapped-index")
 
         index.mapping "article", :properties => { :body => { :type => "string" } }
@@ -96,6 +96,21 @@ module Tire
         assert mapping, index.response.inspect
       end
 
+    end
+
+    context "Delete mapping" do
+      setup    { Tire.index("mapped-index").create; sleep 1   }
+      teardown { Tire.index("mapped-index").delete; sleep 0.1 }
+
+      should "delete the mapping for type" do
+        index = Tire.index("mapped-index")
+
+        # 1. Update initial index mapping
+        assert index.mapping 'article', properties: { body: { type: "string" } }
+
+        assert index.delete_mapping 'article'
+        assert index.mapping.empty?, index.response.inspect
+      end
     end
 
   end
