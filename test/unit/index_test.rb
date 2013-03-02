@@ -170,7 +170,7 @@ module Tire
                                             }
         end
 
-        should "return the mapping" do
+        should "return the mapping as a Hash" do
           json =<<-JSON
           {
             "dummy" : {
@@ -189,8 +189,18 @@ module Tire
           assert_equal 2.0,      @index.mapping['article']['properties']['title']['boost']
         end
 
-        should "raise an exception when used with the bang method" do
-          Configuration.client.expects(:put).returns(mock_response('{"error":"MergeMappingException","status":400}'))
+        should "update the mapping" do
+          Configuration.client.expects(:put).returns(mock_response('{"ok":true,"acknowledged":true}', 200))
+          assert @index.mapping( 'document', { properties: { body: {type: 'string', analyzer: 'english'} } } )
+        end
+
+        should "fail to update the mapping when conflicts occur" do
+          Configuration.client.expects(:put).returns(mock_response('{"error":"MergeMappingException","status":400}', 400))
+          assert ! @index.mapping( 'document', { properties: { body: {type: 'string', analyzer: 'english'} } } )
+        end
+
+        should "raise an exception for the bang method" do
+          Configuration.client.expects(:put).returns(mock_response('{"error":"MergeMappingException","status":400}', 400))
           assert_raise(RuntimeError) do
             @index.mapping!("blah", {})
           end

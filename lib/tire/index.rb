@@ -52,65 +52,55 @@ module Tire
       alias_name ? Alias.all(@name).select { |a| a.name == alias_name }.first : Alias.all(@name)
     end
 
-    # :call-seq:
-    #   mapping
-    #   mapping(type, mapping)
+    # Get or update the index mapping
     #
-    # With no arguments, retrieves all the mappings for this index.
-    # With a _type_ and _mapping_ hash, issues a "put mapping" for that type.
-    # You can specify the _ignore_conflicts_ option in the _mapping_ hash.
+    # Without arguments, returns the index mapping as a Hash
     #
-    # Ex:
-    #   mapping("tweet", :ignore_conflicts => true, :properties => { :message => { :type => "string", :store => "yes" } } )
+    # When passed arguments, attempts to update the index mapping:
+    #
+    #     index.mapping 'article', properties: { body: { type: "string" } }
+    #
+    # You can pass the `ignore_conflicts` option as a part of the Hash:
+    #
+    #     index.mapping 'article', properties: { body: { type: "string" } }, ignore_conflicts: true
+    #
     def mapping(*args)
-      if args.empty?
-        get_mapping
-      else
-        put_mapping(*args)
-      end
+      args.empty? ? get_mapping : put_mapping(*args)
     end
 
-    # Same as mapping, but raises any errors as exceptions.
+    # Raises an exception for unsuccessful responses
+    #
     def mapping!(*args)
-      mapping(*args).tap do |response|
-        raise RuntimeError, response["error"] unless response["ok"]
-      end
+      mapping(*args)
+      raise RuntimeError, response.body unless response.success?
     end
 
     def get_mapping
       @response = Configuration.client.get("#{url}/_mapping")
-      MultiJson.decode(@response.body)[@name]
+      result = MultiJson.decode(@response.body)[@name]
+      @response.success? ? result : false
     ensure
-      curl = %Q|curl -X GET "#{url}/_mapping"|
+      curl = %Q|curl -X GET "#{url}/_mapping?pretty"|
       logged("GET MAPPING", curl)
     end
 
     def put_mapping(type, mapping)
-
-      # Figure out the params
       params = {}
-      ignore_conflicts = mapping.delete(:ignore_conflicts) || mapping.delete("ignore_conflicts")
-      params[:ignore_conflicts] = ignore_conflicts unless ignore_conflicts.nil?
+      if ignore_conflicts = mapping.delete(:ignore_conflicts) || mapping.delete("ignore_conflicts")
+        params[:ignore_conflicts] = ignore_conflicts
+      end
 
-      # Figure out the url
-      url = "#{self.url}/#{type}/_mapping"
+      url  = "#{self.url}/#{type}/_mapping"
       url += "?#{params.to_param}" unless params.empty?
 
-      # Figure out the payload
       payload = { type => mapping }.to_json
 
-      # Do it
       @response = Configuration.client.put url, payload
-      MultiJson.decode(@response.body)
-
+      result = MultiJson.decode(@response.body)
+      @response.success? ? result : false
     ensure
       curl = %Q|curl -X PUT "#{url}" -d '#{payload}'|
       logged("PUT MAPPING #{type}", curl)
-    end
-
-    # Same as put_mapping but raises any errors as exceptions.
-    def put_mapping!(type, mapping)
-      mapping!(type, mapping)
     end
 
     def settings
