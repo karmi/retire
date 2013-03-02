@@ -87,6 +87,14 @@ module Tire
           attr_accessor :id
 
           def initialize(attributes={})
+  
+            attributes.each do |attr, value|
+              # call Tire's property class method
+              self.class.property attr unless self.class.property_types.keys.include? attr
+              # set instance variable
+              instance_variable_set("@#{attr}", value)
+            end          
+            
             # Make a copy of objects in the property defaults hash, so default values such as `[]` or `{ foo: [] }` are left intact
             property_defaults = self.class.property_defaults.inject({}) do |hash, item|
               key, value = item
