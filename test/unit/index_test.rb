@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'test_helper'
 
 module Tire
@@ -368,6 +370,16 @@ module Tire
             assert_equal 'c',   @index.get_id_from_document(document_3)
           end
 
+          should "escape the ID in URL" do
+            Configuration.client.expects(:post).with do |url, payload|
+              assert_equal "#{@index.url}/document/%C3%A4ccent", url
+              assert_equal 'äccent', MultiJson.load(payload)['id']
+            end.
+            returns(mock_response('{"ok":true,"_id":"äccent"}'))
+
+            @index.store :id => 'äccent'
+          end
+
         end
 
       end
@@ -424,6 +436,13 @@ module Tire
           assert_raise ArgumentError do
             @index.retrieve 'article', nil
           end
+        end
+
+        should "escape the ID in URL" do
+          Configuration.client.expects(:get).with("#{@index.url}/document/%C3%A4ccent").
+                                             returns(mock_response('{"_id":"äccent"}'))
+
+          @index.retrieve 'document', 'äccent'
         end
 
         should "properly encode document type" do
@@ -504,6 +523,13 @@ module Tire
           end
         end
 
+        should "escape the ID in URL" do
+          Configuration.client.expects(:delete).with("#{@index.url}/document/%C3%A4ccent").
+                                                returns(mock_response('{"ok":true,"_id":"äccent"}'))
+
+          @index.remove 'document', 'äccent'
+        end
+
         should "properly encode document type" do
           Configuration.client.expects(:delete).with("#{@index.url}/my_namespace%2Fmy_model/id-1").
                                              returns(mock_response('{"_id":"id-1","_version":1, "_source" : {"title":"Test"}}'))
@@ -558,6 +584,15 @@ module Tire
         should "raise error when no type or ID is passed" do
           assert_raise(ArgumentError) { @index.update('article', nil, :script => 'foobar') }
           assert_raise(ArgumentError) { @index.update(nil, '123', :script => 'foobar') }
+        end
+
+        should "escape the ID in URL" do
+          Configuration.client.expects(:post).with do |url,payload|
+                                assert_equal( "#{@index.url}/document/%C3%A4ccent/_update", url )
+                              end.
+                              returns(mock_response('{"ok":"true","_id":"äccent","_version":"2"}'))
+
+          assert @index.update('document', 'äccent', {:doc => {:foo => 'bar'}})
         end
 
         should "raise an error when no script or partial document is passed" do

@@ -138,7 +138,7 @@ module Tire
 
       params_encoded = params.empty? ? '' : "?#{params.to_param}"
 
-      url  = id ? "#{self.url}/#{type}/#{id}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
+      url  = id ? "#{self.url}/#{type}/#{Utils.escape(id)}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
@@ -294,20 +294,19 @@ module Tire
       end
       raise ArgumentError, "Please pass a document ID" unless id
 
-      url    = "#{self.url}/#{type}/#{id}"
+      url    = "#{self.url}/#{type}/#{Utils.escape(id)}"
       result = Configuration.client.delete url
       MultiJson.decode(result.body) if result.success?
 
     ensure
       curl = %Q|curl -X DELETE "#{url}"|
-      logged(id, curl)
+      logged("#{type}/#{id}", curl)
     end
 
     def retrieve(type, id, options={})
       raise ArgumentError, "Please pass a document ID" unless id
 
-      type      = Utils.escape(type)
-      url       = "#{self.url}/#{type}/#{id}"
+      url       = "#{self.url}/#{Utils.escape(type)}/#{Utils.escape(id)}"
 
       params    = {}
       params[:routing]    = options[:routing] if options[:routing]
@@ -329,7 +328,7 @@ module Tire
 
     ensure
       curl = %Q|curl -X GET "#{url}"|
-      logged(id, curl)
+      logged("#{type}/#{id}", curl)
     end
 
     def update(type, id, payload={}, options={})
@@ -338,7 +337,7 @@ module Tire
       raise ArgumentError, "Please pass a script or partial document in the payload hash" unless payload[:script] || payload[:doc]
 
       type      = Utils.escape(type)
-      url       = "#{self.url}/#{type}/#{id}/_update"
+      url       = "#{self.url}/#{type}/#{Utils.escape(id)}/_update"
       url      += "?#{options.to_param}" unless options.keys.empty?
       @response = Configuration.client.post url, MultiJson.encode(payload)
       MultiJson.decode(@response.body)
