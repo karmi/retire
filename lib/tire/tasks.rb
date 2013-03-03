@@ -72,7 +72,8 @@ namespace :tire do
       # Create the index if it doesn't exist
       unless index.exists?
         mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
-        puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
+        puts "[IMPORT] Creating index '#{index.name}' with mapping:",
+             mapping
         unless index.create(:mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings)
           STDERR.puts "[ERROR] There has been an error when creating the index -- elasticsearch returned:",
                       index.response
