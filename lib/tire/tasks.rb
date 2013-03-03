@@ -121,10 +121,10 @@ namespace :tire do
     full_comment_drop = <<-DESC.gsub(/      /, '')
       Delete indices passed in the INDEX environment variable; separate multiple indices by comma.
 
-      Pass name of a single index to drop in the INDEX environmnet variable:
+      Pass name of a single index to drop in the INDEX environment variable:
         $ rake environment tire:index:drop INDEX=articles
 
-      Pass names of multiple indices to drop in the INDEX or INDICES environmnet variable:
+      Pass names of multiple indices to drop in the INDEX or INDICES environment variable:
         $ rake environment tire:index:drop INDICES=articles-2011-01,articles-2011-02
 
     DESC
