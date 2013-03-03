@@ -81,25 +81,14 @@ namespace :tire do
         end
       end
 
-      puts "[IMPORT] Starting import for the '#{klass}' class"
-      progress_bar = ProgressBar.new(klass.count)
-
-      # Use an indexer scope if it is defined
-      klass = klass.indexer if klass.respond_to? :indexer
-
-      # Try and use AR find_in_batches
-      if klass.respond_to?(:find_in_batches)
-        klass.find_in_batches do |group|
-          index.import(group, params) do |documents|
-            GC.start
-            progress_bar.increment! documents.count
-            documents
+      # Add Pagination to the class if it doesn't exist
+      if defined?(Kaminari) && klass.respond_to?(:page)
+        klass.instance_eval do
+          def paginate(options = {})
+            page(options[:page]).per(options[:per_page]).to_a
           end
         end
-      elsif klass.respond_to? :all
-        index.import(klass.all, params) do |documents|
-          GC.start
-          progress_bar.increment! documents.count
+      end unless klass.respond_to?(:paginate)
           documents
         end
       else
