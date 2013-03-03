@@ -21,7 +21,6 @@ namespace :tire do
 
   DESC
   desc full_comment_import
-  task :import => :environment do
 
     STDOUT.sync = true
     TIRE_MODELS = Set.new
