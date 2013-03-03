@@ -1,3 +1,5 @@
+require 'set'
+
 module Tire
   module Model
 
@@ -18,6 +20,9 @@ module Tire
     #
     #
     module Search
+
+      mattr_accessor :dependents
+      self.dependents = Set.new
 
       # Alias for Tire::Model::Naming::ClassMethods.index_prefix
       #
@@ -254,6 +259,7 @@ module Tire
       # A hook triggered by the `include Tire::Model::Search` statement in the model.
       #
       def self.included(base)
+        self.dependents << base
         base.class_eval do
 
           # Returns proxy to the _Tire's_ class methods.
