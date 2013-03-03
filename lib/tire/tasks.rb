@@ -21,6 +21,12 @@ namespace :tire do
 
   DESC
   desc full_comment_import
+  task :import do
+
+    if defined?(Rails)
+      puts "[IMPORT] Rails detected, booting environment..."
+      Rake::Task["environment"].invoke
+    end
 
     STDOUT.sync = true
     TIRE_MODELS = Set.new
