@@ -60,9 +60,8 @@ namespace :tire do
 
     TIRE_MODELS.each do |klass|
 
-      puts "\n\n"
-
-      index = klass.tire.index
+      # Set the Index
+      index = ENV['INDEX'].to_s != '' ? Tire::Index.new(ENV['INDEX']) : klass.tire.index
 
       # Force delete the index
       if ENV['FORCE']
