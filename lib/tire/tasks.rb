@@ -89,15 +89,26 @@ namespace :tire do
           end
         end
       end unless klass.respond_to?(:paginate)
+
+      puts "[IMPORT] Starting import for the '#{klass}' class"
+      progress_bar = ANSI::ProgressBar.new(klass.name, klass.count) rescue nil
+
+      # Use the model importer if it exists for this class
+      if klass.ancestors.include?(Tire::Model::Search)
+        options = params.update({ :index => index.name })
+        klass.tire.import options do |documents|
+          progress_bar.inc documents.count if progress_bar
           documents
         end
       else
+        # Try and import the class normally
         index.import(klass, params) do |documents|
-          GC.start
-          progress_bar.increment! documents.count
+          progress_bar.inc documents.count if progress_bar
           documents
         end
       end
+
+      progress_bar.finish if progress_bar
 
     end
 
