@@ -15,6 +15,10 @@ namespace :tire do
 
     Set target classes:
       $ rake tire:import CLASS='Article, Comment'
+
+    OR require a set of files in a directory
+      $ rake tire:import DIR='app/models'
+
   DESC
   desc full_comment_import
   task :import => :environment do
@@ -23,22 +27,17 @@ namespace :tire do
     TIRE_MODELS = Set.new
     HRULE       = '='*90
 
-    if ENV['CLASS'].to_s != ''
+    # Use classes passed with the CLASS env var.
+    if (classes = ENV['CLASS']).to_s != ''
       # Use Models in the ENV Vars
-      TIRE_MODELS += ENV['CLASS'].split(',').map { |k| eval k }
+      TIRE_MODELS += classes.split(',').map { |k| eval k }
+    end
 
-    else
-      # Find all the classes which call mapping
-      puts "\n", "[IMPORT] Preloading Models..."
-      Tire::Model::Search::ClassMethods.module_eval do
-        def mapping(*args, &block)
-          TIRE_MODELS << self.klass
-          super(*args, &block)
-        end
-      end
-
-      # Require everything in the models directory
-      Dir.glob(Rails.root.join('app/models/**/*.rb')).each { |path| require path }
+    # Load a directory and use Tire::Search::Model dependants
+    if (dir = ENV['DIR']).to_s != ''
+      puts "[IMPORT] Loading Directory '#{dir}'"
+      Dir.glob(Rails.root.join("#{dir}/**/*.rb")).each { |path| require path }
+      TIRE_MODELS = Tire::Model::Search.dependents
     end
 
     # exit(1) if no models are found!
