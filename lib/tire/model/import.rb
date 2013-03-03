@@ -16,7 +16,14 @@ module Tire
         def import options={}, &block
           options = { :method => 'paginate' }.update options
           index   = options[:index] ? Tire::Index.new(options.delete(:index)) : self.index
-          index.import klass, options, &block
+          if klass.respond_to? :find_in_batches
+            klass.tire.index_scope.find_in_batches do |group|
+              index.import group, options, &block
+              GC.start
+            end
+          else
+            index.import klass.index_scope, options, &block
+          end
         end
 
       end
