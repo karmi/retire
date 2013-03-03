@@ -1,5 +1,5 @@
 require 'rake'
-require 'progress_bar'
+require 'ansi/progressbar'
 require 'set'
 
 namespace :tire do
