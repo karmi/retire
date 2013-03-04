@@ -90,13 +90,15 @@ namespace :tire do
       if klass.ancestors.include?(Tire::Model::Search)
         options = params.update({ :index => index.name })
         klass.tire.import options do |documents|
-          progress_bar.increment! documents.count unless documents.count > progress_bar.remaining
+          document_count = documents.to_a.size
+          progress_bar.increment! document_count
           documents
         end
       else
         # Try and import the class normally
         index.import(klass, params) do |documents|
-          progress_bar.increment! documents.count unless documents.count > progress_bar.remaining
+          document_count = documents.to_a.size
+          progress_bar.increment! document_count
           documents
         end
       end
