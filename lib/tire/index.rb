@@ -245,7 +245,7 @@ module Tire
       case
         when method = options.delete(:method)
           options = {:page => 1, :per_page => 1000}.merge options
-          while documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page])) \
+          while (documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page]))) \
                             && documents.to_a.length > 0
 
             documents = yield documents if block_given?
