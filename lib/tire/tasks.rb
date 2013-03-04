@@ -1,9 +1,9 @@
 require 'rake'
-require 'benchmark'
+require 'set'
 
 namespace :tire do
 
-  full_comment_import = <<-DESC.gsub(/    /, '')
+  import_desc = <<-DESC.gsub(/    /, '')
     Import data from your model using paginate: rake environment tire:import CLASS='MyModel'.
 
     Pass params for the `paginate` method:
@@ -15,64 +15,37 @@ namespace :tire do
     Set target index name:
       $ rake environment tire:import CLASS='Article' INDEX='articles-new'
   DESC
-  desc full_comment_import
-  task :import do |t|
 
-    def elapsed_to_human(elapsed)
-      hour = 60*60
-      day  = hour*24
+  import_all_desc = <<-DESC.gsub(/    /, '')
+    TODO: Describe Import all...
+  DESC
 
-      case elapsed
-      when 0..59
-        "#{sprintf("%1.2f", elapsed)} seconds"
-      when 60..hour-1
-        "#{(elapsed/60).floor} minutes and #{(elapsed % 60).floor} seconds"
-      when hour..day
-        "#{(elapsed/hour).floor} hours and #{(elapsed/60 % hour).floor} minutes"
-      else
-        "#{(elapsed/hour).round} hours"
+  namespace :import do
+
+    HRULE = '='*90
+
+    def build_index(index, klass)
+      # Delete the index if force is passed
+      if ENV['FORCE']
+        puts "[IMPORT] Deleting index '#{index.name}'"
+        index.delete
+      end
+
+      # Create the index if it doesn't exist
+      unless index.exists?
+        mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
+        puts "[IMPORT] Creating index '#{index.name}' with mapping:",
+             mapping
+        unless index.create(:mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings)
+          STDERR.puts "[ERROR] There has been an error when creating the index -- elasticsearch returned:",
+                      index.response
+          exit(1)
+        end
       end
     end
 
-    if ENV['CLASS'].to_s == ''
-      puts '='*90, 'USAGE', '='*90, full_comment_import, ""
-      exit(1)
-    end
-
-    klass  = eval(ENV['CLASS'].to_s)
-    params = eval(ENV['PARAMS'].to_s) || {}
-
-    params.update :method => 'paginate'
-
-    index = Tire::Index.new( ENV['INDEX'] || klass.tire.index.name )
-
-    if ENV['FORCE']
-      puts "[IMPORT] Deleting index '#{index.name}'"
-      index.delete
-    end
-
-    unless index.exists?
-      mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
-      puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
-      unless index.create( :mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings )
-        STDERR.puts "[ERROR] There has been an error when creating the index -- elasticsearch returned:",
-                    index.response
-        exit(1)
-      end
-    end
-
-    STDOUT.sync = true
-    puts "[IMPORT] Starting import for the '#{ENV['CLASS']}' class"
-    tty_cols = 80
-    total    = klass.count rescue nil
-    offset   = (total.to_s.size*2)+8
-    done     = 0
-
-    STDOUT.puts '-'*tty_cols
-    elapsed = Benchmark.realtime do
-
-      # Add Kaminari-powered "paginate" method
-      #
+    # Add Pagination to the class if it doesn't exist
+    def add_pagination_to_klass(klass)
       if defined?(Kaminari) && klass.respond_to?(:page)
         klass.instance_eval do
           def paginate(options = {})
@@ -80,37 +53,134 @@ namespace :tire do
           end
         end
       end unless klass.respond_to?(:paginate)
+    end
 
-      # Import the documents
-      #
-      index.import(klass, params) do |documents|
+    def create_progress_bar(klass)
+      require 'progress_bar'
+      ProgressBar.new klass.count
+    rescue LoadError
+      puts <<-INFO.gsub(/        /, '') unless @progress_bar_message_shown
+        [IMPORT] To display a progress bar add the following to your Gemfile:
 
-        if total
-          done += documents.to_a.size
-          # I CAN HAZ PROGREZ BAR LIEK HOMEBRU!
-          percent  = ( (done.to_f / total) * 100 ).to_i
-          glyphs   = ( percent * ( (tty_cols-offset).to_f/100 ) ).to_i
-          STDOUT.print( "#" * glyphs )
-          STDOUT.print( "\r"*tty_cols+"#{done}/#{total} | \e[1m#{percent}%\e[0m " )
+                   gem 'progress_bar', require: false
+
+        INFO
+      @progress_bar_message_shown = true
+      # Create a stub so that progress_bar methods dont raise errors
+      progress_bar_stub
+    rescue NoMethodError
+      puts "[IMPORT] #{klass} does not respond to count. Skipping progress bar"
+      progress_bar_stub
+    end
+
+    def progress_bar_stub
+      @progress_bar_stub ||= Module.new do
+        def self.method_missing(*args)
+          self
         end
-
-        # Don't forget to return the documents collection back!
-        documents
       end
     end
 
-    puts "", '='*80, "Import finished in #{elapsed_to_human(elapsed)}"
+    def do_import(index, klass, params)
+      build_index index, klass
+      add_pagination_to_klass klass
+      puts "[IMPORT] Starting import for the '#{klass}' class"
+      progress_bar = create_progress_bar klass
+      # Use the model importer if it exists for this class
+      if klass.ancestors.include?(Tire::Model::Search)
+        options = params.update({ :index => index.name })
+        klass.tire.import options do |documents|
+          document_count = documents.to_a.size
+          progress_bar.increment! document_count
+          documents
+        end
+      else
+        # Try and import the class normally
+        index.import(klass, params) do |documents|
+          document_count = documents.to_a.size
+          progress_bar.increment! document_count
+          documents
+        end
+      end
+    end
+
+    desc import_desc
+    task :model do
+      STDOUT.sync = true
+
+      # Load the environment if Rails exists
+      if defined?(Rails)
+        puts "[IMPORT] Rails detected, booting environment..."
+        Rake::Task["environment"].invoke
+      end
+
+      # Raise and exit if no class is defined.
+      if ENV['CLASS'].to_s == ''
+        puts HRULE, 'USAGE', HRULE, import_desc, ""
+        exit(1)
+      end
+
+      # Get the klass
+      klass  = eval(ENV['CLASS'].to_s)
+
+      # Set the Params
+      params = eval(ENV['PARAMS'].to_s) || {}
+      params.update :method => 'paginate'
+
+      # Set the index
+      index = Tire::Index.new(ENV['INDEX'] || klass.tire.index.name)
+
+      # Do the import
+      do_import(index, klass, params)
+      puts '[DONE]'
+
+    end
+
+    desc import_all_desc
+    task :all do
+      STDOUT.sync = true
+
+      # Load the environment if Rails exists
+      if defined?(Rails)
+        puts "[IMPORT] Rails detected, booting environment..."
+        Rake::Task["environment"].invoke
+      end
+
+      # Set the directory to load
+      dir = ENV['DIR'].to_s != '' ? ENV['DIR'] : 'app/models'
+
+      puts "[IMPORT] Loading Directory '#{dir}'"
+      Dir.glob(Rails.root.join("#{dir}/**/*.rb")).each { |path| require path }
+
+      # Set the Params
+      params = eval(ENV['PARAMS'].to_s) || {}
+      params.update :method => 'paginate'
+
+      # Import All the classes
+      Tire::Model::Search.dependents.each do |klass|
+        index = klass.tire.index
+
+        # Do the import
+        do_import(index, klass, params)
+      end
+
+      puts '[DONE]'
+
+    end
+
   end
+
+  task :import => ["import:model"]
 
   namespace :index do
 
     full_comment_drop = <<-DESC.gsub(/      /, '')
       Delete indices passed in the INDEX environment variable; separate multiple indices by comma.
 
-      Pass name of a single index to drop in the INDEX environmnet variable:
+      Pass name of a single index to drop in the INDEX environment variable:
         $ rake environment tire:index:drop INDEX=articles
 
-      Pass names of multiple indices to drop in the INDEX or INDICES environmnet variable:
+      Pass names of multiple indices to drop in the INDEX or INDICES environment variable:
         $ rake environment tire:index:drop INDICES=articles-2011-01,articles-2011-02
 
     DESC
@@ -126,7 +196,7 @@ namespace :tire do
       index_names.each do |name|
         index = Tire::Index.new(name)
         print "* Deleting index \e[1m#{index.name}\e[0m... "
-        puts  index.delete ? "\e[32mOK\e[0m" : "\e[31mFAILED\e[0m  | #{index.response.body}"
+        puts index.delete ? "\e[32mOK\e[0m" : "\e[31mFAILED\e[0m  | #{index.response.body}"
       end
 
       puts ""
