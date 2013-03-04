@@ -27,6 +27,28 @@ module Tire
           yield if block_given?
         end
 
+        # Define the _index_scope_ for the corresponding model, telling tire how to look at the model for
+        # indexing its contents.
+        #
+        # Usage:
+        #
+        #     class Article
+        #       # ...
+        #       index_scope do
+        #         includes(:comments)
+        #       end
+        #     end
+        #
+
+        def index_scope(&block)
+          @index_scope ||= proc { self }
+          if block_given?
+            @index_scope = block
+          else
+            klass.class_eval(&@index_scope)
+          end
+        end
+
         # Define the [_mapping_](http://www.elasticsearch.org/guide/reference/mapping/index.html)
         # for the corresponding index, telling _Elasticsearch_ how to understand your documents:
         # what type is which property, whether it is analyzed or no, which analyzer to use, etc.
