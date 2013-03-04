@@ -245,12 +245,13 @@ module Tire
       case
         when method = options.delete(:method)
           options = {:page => 1, :per_page => 1000}.merge options
-          while documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page])) \
-                            and documents.to_a.length > 0
+          while (documents = klass_or_collection.send(method.to_sym, options.merge(:page => options[:page]))) \
+                            && documents.to_a.length > 0
 
             documents = yield documents if block_given?
 
             bulk_store documents, options
+            GC.start
             options[:page] += 1
           end
 
