@@ -106,12 +106,13 @@ module Tire
           hits.map do |h|
             document = {}
 
-            # Update the document with content and ID
-            document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
-            document.update( {'id' => h['_id']} )
+            # Update the document with fields and or source
+            document.update h['_source'] if h['_source']
+            document.update __parse_fields__(h['fields']) if h['fields']
+            document['id'] = h['_id']
 
             # Update the document with meta information
-            ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
+            ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( { key => h[key] } || {} ) }
 
             # Return an instance of the "wrapper" class
             @wrapper.new(document)
