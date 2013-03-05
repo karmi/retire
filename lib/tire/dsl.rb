@@ -26,10 +26,6 @@ module Tire
         options.update(:payload => payload) unless payload.empty?
         Search::Search.new(indices, options)
       end
-    rescue Exception => error
-      STDERR.puts "[REQUEST FAILED] #{error.class} #{error.message rescue nil}\n"
-      raise
-    ensure
     end
 
     # Build and perform a [multi-search](http://elasticsearch.org/guide/reference/api/multi-search.html)
