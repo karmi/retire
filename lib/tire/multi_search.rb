@@ -218,12 +218,12 @@ module Tire
         end
 
         def perform
-          @responses = Configuration.client.get(url + params, to_payload)
-          if @responses.failure?
+          @response = Configuration.client.get(url + params, to_payload)
+          if @response.failure?
             STDERR.puts "[REQUEST FAILED] #{to_curl}\n"
-            raise SearchRequestFailed, @responses.to_s
+            raise SearchRequestFailed, @response.to_s
           end
-          @json     = MultiJson.decode(@responses.body)
+          @json     = MultiJson.decode(@response.body)
           @results  = Tire::Search::Multi::Results.new @searches, @json['responses']
           return self
         ensure
