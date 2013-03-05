@@ -29,13 +29,6 @@ module Tire
           Tire.search 'dummy', payload
         end
 
-        should "allow searching with a JSON string" do
-          payload = '{"query":{"query_string":{"query":"foo"}}}'
-          Search::Search.expects(:new).with('dummy', :payload => payload).returns( stub(:perform => true) )
-
-          Tire.search 'dummy', payload
-        end
-
         should "raise an error when passed incorrect payload" do
           assert_raise(ArgumentError) do
             Tire.search 'dummy', 1

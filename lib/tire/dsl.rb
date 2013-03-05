@@ -5,20 +5,14 @@ module Tire
       Configuration.class_eval(&block)
     end
 
-    def search(indices=nil, options={}, &block)
+    def search(indices=nil, payload={}, &block)
       if block_given?
-        Search::Search.new(indices, options, &block)
+        Search::Search.new(indices, payload, &block)
       else
-        payload = case options
-          when Hash    then
-            options
-          when String  then
-            Tire.warn "Passing the payload as a JSON string in Tire.search has been deprecated, " +
-                       "please use the block syntax or pass a plain Hash."
-            options
-          else raise ArgumentError, "Please pass a Ruby Hash or String with JSON"
-        end
-        unless options.empty?
+        raise ArgumentError, "Please pass a Ruby Hash or an object with `to_hash` method, not #{payload.class}" \
+              unless payload.respond_to?(:to_hash)
+
+        unless payload.empty?
           Search::Search.new(indices, :payload => payload)
         else
           Search::Search.new(indices)
