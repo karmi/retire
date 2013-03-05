@@ -12,11 +12,19 @@ module Tire
         raise ArgumentError, "Please pass a Ruby Hash or an object with `to_hash` method, not #{payload.class}" \
               unless payload.respond_to?(:to_hash)
 
-        unless payload.empty?
-          Search::Search.new(indices, :payload => payload)
-        else
-          Search::Search.new(indices)
+        # Extract URL parameters from payload
+        #
+        search_params = %w| search_type routing scroll from size timeout |
+
+        options = search_params.inject({}) do |sum,item|
+          if param = (payload.delete(item) || payload.delete(item.to_sym))
+            sum[item.to_sym] = param
+          end
+          sum
         end
+
+        options.update(:payload => payload) unless payload.empty?
+        Search::Search.new(indices, options)
       end
     rescue Exception => error
       STDERR.puts "[REQUEST FAILED] #{error.class} #{error.message rescue nil}\n"

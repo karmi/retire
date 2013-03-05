@@ -35,6 +35,17 @@ module Tire
           end
         end
 
+        should "extract URL parameters from options" do
+          payload = { :query => { :match => { :foo => 'bar' } } }
+
+          Search::Search.expects(:new).with do |index,options|
+            assert_equal 'bar',   options[:payload][:query][:match][:foo]
+            assert_equal 'count', options[:search_type]
+          end.returns( stub(:perform => true) )
+
+          Tire.search 'dummy', :query => { :match => { :foo => 'bar' } }, :search_type => 'count'
+        end
+
         should "raise SearchRequestFailed when receiving bad response from backend" do
           assert_raise(Search::SearchRequestFailed) do
             Tire::Configuration.client.expects(:get).returns( mock_response('INDEX DOES NOT EXIST', 404) )
