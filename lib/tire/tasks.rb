@@ -24,7 +24,7 @@ namespace :tire do
 
     HRULE = '='*90
 
-    def build_index(index)
+    def build_index(index, klass)
       # Delete the index if force is passed
       if ENV['FORCE']
         puts "[IMPORT] Deleting index '#{index.name}'"
@@ -82,7 +82,7 @@ namespace :tire do
     end
 
     def do_import(index, klass, params)
-      build_index index
+      build_index index, klass
       add_pagination_to_klass klass
       puts "[IMPORT] Starting import for the '#{klass}' class"
       progress_bar = create_progress_bar klass
