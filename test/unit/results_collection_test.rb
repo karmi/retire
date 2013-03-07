@@ -149,6 +149,14 @@ module Tire
           assert_equal   'Test',  article.title
         end
 
+        should "allow wrapping hits in inferred class" do
+          Configuration.wrapper(:infer)
+
+          article =  Results::Collection.new(@response).first
+          assert_kind_of Article, article
+          assert_equal   'Test',  article.title
+        end
+
         should "return score" do
           document =  Results::Collection.new(@response).first
           assert_equal 0.5, document._score

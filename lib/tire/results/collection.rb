@@ -57,14 +57,6 @@ module Tire
       end
       alias :[] :slice
 
-      def to_ary
-        self
-      end
-
-      def as_json(options=nil)
-        to_a.map { |item| item.as_json(options) }
-      end
-
       def error
         @response['error']
       end
@@ -75,6 +67,10 @@ module Tire
 
       def failure?
         ! success?
+      end
+
+      def to_ary
+        self
       end
 
       # Handles _source prefixed fields properly: strips the prefix and converts fields to nested Hashes
@@ -113,8 +109,22 @@ module Tire
             # Update the document with meta information
             ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
 
-            # Return an instance of the "wrapper" class
-            @wrapper.new(document)
+            if @wrapper == :infer
+              begin
+                type = document['_type']
+                klass = type.camelize.constantize
+
+                # Return an instance of the _type class
+                klass.new(document)
+              rescue NameError => e
+                raise NameError, "You have tried to infer the results wrapper, but " +
+                                 "Tire cannot find the model class '#{type.camelize}' " +
+                                 "based on _type '#{type}'.", e.backtrace
+              end
+            else
+              # Return an instance of the "wrapper" class
+              @wrapper.new(document)
+            end
           end
         end
       end
