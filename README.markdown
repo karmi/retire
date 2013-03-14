@@ -11,8 +11,7 @@ communicating by JSON over RESTful HTTP, based on [Lucene](http://lucene.apache.
 
 This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/tire/>.
 
-Both of these documents contain a lot of information. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please refer to the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration)
-and [issues](https://github.com/karmi/tire/issues).
+Both of these documents contain a lot of information. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please see the project [Wiki](https://github.com/karmi/tire/wiki/_pages), search the [issues](https://github.com/karmi/tire/issues), and refer to the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration).
 
 Installation
 ------------
