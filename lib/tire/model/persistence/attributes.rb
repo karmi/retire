@@ -87,13 +87,14 @@ module Tire
           attr_accessor :id
 
           def initialize(attributes={})
-            # Make a copy of objects in the property defaults hash, so default values such as `[]` or `{ foo: [] }` are left intact
+            # Make a copy of objects in the property defaults hash, so default values
+            # such as `[]` or `{ foo: [] }` are preserved.
+            #
             property_defaults = self.class.property_defaults.inject({}) do |hash, item|
               key, value = item
-              hash[key.to_s] = value.class.respond_to?(:new) ? value.clone : value
+              hash[key.to_sym] = value.class.respond_to?(:new) ? value.clone : value
               hash
             end
-
             __update_attributes(property_defaults.merge(attributes))
           end
 
