@@ -193,12 +193,12 @@ module Tire
 
         should "update the mapping" do
           Configuration.client.expects(:put).returns(mock_response('{"ok":true,"acknowledged":true}', 200))
-          assert @index.mapping( 'document', { properties: { body: {type: 'string', analyzer: 'english'} } } )
+          assert @index.mapping( 'document', { :properties => { :body => { :type => 'string', :analyzer => 'english'} } } )
         end
 
         should "fail to update the mapping when conflicts occur" do
           Configuration.client.expects(:put).returns(mock_response('{"error":"MergeMappingException","status":400}', 400))
-          assert ! @index.mapping( 'document', { properties: { body: {type: 'string', analyzer: 'english'} } } )
+          assert ! @index.mapping( 'document', { :properties => { :body => { :type => 'string', :analyzer => 'english'} } } )
         end
 
         should "raise an exception for the bang method" do
@@ -337,10 +337,12 @@ module Tire
 
         context "document with ID" do
 
-          should "store Hash it under its ID property" do
-            Configuration.client.expects(:post).with("#{@index.url}/document/123",
-                                                     MultiJson.encode({:id => 123, :title => 'Test'})).
-                                                returns(mock_response('{"ok":true,"_id":"123"}'))
+          should "store a Hash under its ID property" do
+            Configuration.client.expects(:post).with do |path, json|
+              assert_equal "#{@index.url}/document/123", path
+              assert_equal 123, MultiJson.load(json)['id']
+            end.returns(mock_response('{"ok":true,"_id":"123"}'))
+
             @index.store :id => 123, :title => 'Test'
           end
 
