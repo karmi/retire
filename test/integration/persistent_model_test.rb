@@ -186,6 +186,7 @@ module Tire
         setup do
           PersistentArticleWithPercolation.index.register_percolator_query('alert') { string 'warning' }
           Tire.index('_percolator').refresh
+          sleep 0.2
         end
 
         should "return matching queries when percolating" do
