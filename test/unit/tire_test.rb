@@ -15,18 +15,24 @@ module Tire
       context "DSL" do
 
         should "allow searching with a block" do
-          Search::Search.expects(:new).returns( stub(:perform => true) )
+          Search::Search.expects(:new).with do |index, options, block|
+            assert_equal 'dummy', index
+          end.returns( stub(:perform => true) )
 
           Tire.search 'dummy' do
-            query 'foo'
+            query { string 'foo' }
           end
         end
 
         should "allow searching with a Ruby Hash" do
           payload = { :query => { :query_string => { :query => 'foo' } } }
-          Search::Search.expects(:new).with('dummy', :payload => payload).returns( stub(:perform => true) )
 
-          Tire.search 'dummy', payload
+          Search::Search.expects(:new).with do |index, options|
+            assert_equal index, 'dummy'
+            assert_equal payload, options[:payload]
+          end.returns( stub(:perform => true) )
+
+          s = Tire.search 'dummy', payload
         end
 
         should "raise an error when passed incorrect payload" do
@@ -38,12 +44,20 @@ module Tire
         should "extract URL parameters from options" do
           payload = { :query => { :match => { :foo => 'bar' } } }
 
-          Search::Search.expects(:new).with do |index,options|
+          Search::Search.expects(:new).with do |index, options|
             assert_equal 'bar',   options[:payload][:query][:match][:foo]
             assert_equal 'count', options[:search_type]
           end.returns( stub(:perform => true) )
 
           Tire.search 'dummy', :query => { :match => { :foo => 'bar' } }, :search_type => 'count'
+        end
+
+        should "allow to pass document type" do
+          Search::Search.expects(:new).with do |index, options|
+            assert_equal 'dummy/foo', index
+          end
+
+          Tire.search 'dummy/foo', {}
         end
 
         should "raise SearchRequestFailed when receiving bad response from backend" do

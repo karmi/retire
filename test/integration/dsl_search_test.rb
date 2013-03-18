@@ -13,7 +13,7 @@ module Tire
 
         assert_equal 2, s.results.count
         assert_equal 2, s.results.facets['tags']['count']
-        assert_match /_search\?pretty' -d '{/, s.to_curl, 'Make sure to ignore payload in URL params'
+        assert_match %r|articles-test/_search\?pretty' -d '{|, s.to_curl, 'Make sure to ignore payload in URL params'
       end
 
       should "allow passing URL parameters" do
@@ -21,7 +21,14 @@ module Tire
 
         assert_equal 0, s.results.count
         assert_equal 2, s.results.total
-        assert_match /_search.*search_type=count.*' -d '{/, s.to_curl
+        assert_match %r|articles-test/_search.*search_type=count.*' -d '{|, s.to_curl
+      end
+
+      should "allow to pass document type in index name" do
+        s = Tire.search 'articles-test/article', query: { match: { tags: 'ruby' } }
+
+        assert_equal 2, s.results.total
+        assert_match %r|articles-test/article/_search|, s.to_curl
       end
 
       should "allow building search query iteratively" do
