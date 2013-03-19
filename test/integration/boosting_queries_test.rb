@@ -34,7 +34,7 @@ module Tire
         end
 
         teardown do
-          # @index.delete
+          @index.delete
         end
 
         should "return featured results first" do
