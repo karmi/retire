@@ -5,45 +5,62 @@ module Tire
   class ConstantScoreQueriesIntegrationTest < Test::Unit::TestCase
     include Test::Integration
     context "Constant score queries" do
-      context 'with filter' do
-        should "return a constant score for all documents even if one document match 'more'" do
-          s = Tire.search('articles-test') do
-            query do
-              constant_score do
-                filter :terms, :tags => ['ruby', 'python']
+
+      should "return the same score for all results" do
+        s = Tire.search('articles-test') do
+          query do
+            constant_score do
+              query do
+                terms :tags, ['ruby', 'python']
               end
             end
           end
-
-          assert_equal 2, s.results.size
-          assert_equal ['One', 'Two'], s.results.map(&:title)
-
-          assert s.results[0]._score > 0
-          assert s.results[1]._score > 0
-          assert s.results[0]._score == s.results[1]._score
         end
+
+        assert_equal 2, s.results.size
+        assert s.results[0]._score == s.results[1]._score
       end
 
-      context 'with query' do
-        should "return a constant score for all documents even if one document match more" do
-          s = Tire.search('articles-test') do
+      context "in the featured results scenario" do
+        # Adapted from: http://www.fullscale.co/blog/2013/01/24/Implementing_Featured_Results_With_ElasticSearch.html
+        setup do
+          @index = Tire.index('featured-results-test') do
+            delete; create
+            store title: 'Kitchen special tool',   featured: true
+            store title: 'Kitchen tool tool tool', featured: false
+            store title: 'Garage tool',            featured: false
+            refresh
+          end
+        end
+
+        teardown do
+          @index.delete
+        end
+
+
+        should "return featured results first" do
+          s = Tire.search('featured-results-test') do
             query do
-              constant_score do
-                query do
-                  terms :tags, ['ruby', 'python']
+              boolean do
+                should do
+                  constant_score do
+                    query  { match :title, 'tool' }
+                    filter :term, featured: true
+                    boost 100
+                  end
+                end
+                should do
+                  match :title, 'tool'
                 end
               end
             end
           end
 
-          assert_equal 2, s.results.size
-          assert_equal ['One', 'Two'], s.results.map(&:title)
-
-          assert s.results[0]._score > 0
-          assert s.results[1]._score > 0
-          assert s.results[0]._score == s.results[1]._score
+          assert_equal 'Kitchen special tool', s.results[0].title
+          assert_equal 'Kitchen tool tool tool', s.results[1].title
         end
       end
+
     end
   end
 end
