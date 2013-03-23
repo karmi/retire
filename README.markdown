@@ -778,7 +778,7 @@ and extensions to the core _Tire_ functionality — be sure to check them out.
 Other Clients
 -------------
 
-Check out [other _Elasticsearch_ clients](http://www.elasticsearch.org/guide/appendix/clients.html).
+Check out [other _Elasticsearch_ clients](http://www.elasticsearch.org/guide/clients/).
 
 
 Feedback
