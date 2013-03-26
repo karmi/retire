@@ -57,7 +57,7 @@ module Tire
       end
 
       def constant_score(&block)
-        @value.update( { constant_score: ConstantScoreQuery.new(&block).to_hash } ) if block_given?
+        @value.update( { :constant_score => ConstantScoreQuery.new(&block).to_hash } ) if block_given?
       end
 
       def fuzzy(field, value, options={})
@@ -193,15 +193,15 @@ module Tire
       end
 
       def filter(type, *options)
-        @value.update(filter: Filter.new(type, *options).to_hash)
+        @value.update(:filter => Filter.new(type, *options).to_hash)
       end
 
       def query(&block)
-        @value.update(query: Query.new(&block).to_hash)
+        @value.update(:query => Query.new(&block).to_hash)
       end
 
       def boost(boost)
-        @value.update(boost: boost)
+        @value.update(:boost => boost)
       end
 
       def to_hash
