@@ -19,9 +19,6 @@ module Tire
     #
     module Search
 
-      def self.dependents
-        @dependents ||= Set.new
-      end
       # Alias for Tire::Model::Naming::ClassMethods.index_prefix
       #
       def self.index_prefix(*args)
@@ -257,7 +254,6 @@ module Tire
       # A hook triggered by the `include Tire::Model::Search` statement in the model.
       #
       def self.included(base)
-        self.dependents << base
         base.class_eval do
 
           # Returns proxy to the _Tire's_ class methods.
