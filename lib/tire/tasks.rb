@@ -131,9 +131,15 @@ namespace :tire do
       params = eval(ENV['PARAMS'].to_s) || {}
 
       puts "[IMPORT] Loading models from: #{dir}"
-      Dir.glob(File.join("#{dir}/**/*.rb")).each { |path| require path }
+      Dir.glob(File.join("#{dir}/**/*.rb")).each do |path|
+        require path
 
-      Tire::Model::Search.dependents.each do |klass|
+        model_filename = path[/#{Regexp.escape(dir.to_s)}\/([^\.]+).rb/, 1]
+        klass          = model_filename.classify.constantize
+
+        # Skip if the class doesn't have Tire integration
+        next unless klass.respond_to?(:tire)
+
         total  = klass.count rescue nil
 
         Tire::Tasks::Import.add_pagination_to_klass(klass)
