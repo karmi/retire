@@ -106,6 +106,6 @@ module Tire
       Configuration.client.get("#{Configuration.url}/_percolator/percolator-test/weather") rescue nil
     end
 
-  end
+  end unless ENV['TRAVIS']
 
 end
