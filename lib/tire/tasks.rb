@@ -1,186 +1,163 @@
 require 'rake'
-require 'set'
 
-namespace :tire do
+module Tire
+  module Tasks
 
-  import_desc = <<-DESC.gsub(/    /, '')
-    Import data from your model using paginate: rake environment tire:import CLASS='MyModel'.
+    module Import
+      HRULE = '='*90
 
-    Pass params for the `paginate` method:
-      $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}'
-
-    Force rebuilding the index (delete and create):
-      $ rake environment tire:import CLASS='Article' PARAMS='{:page => 1}' FORCE=1
-
-    Set target index name:
-      $ rake environment tire:import CLASS='Article' INDEX='articles-new'
-  DESC
-
-  import_all_desc = <<-DESC.gsub(/    /, '')
-    TODO: Describe Import all...
-  DESC
-
-  namespace :import do
-
-    HRULE = '='*90
-
-    def build_index(index, klass)
-      # Delete the index if force is passed
-      if ENV['FORCE']
+      def delete_index(index)
         puts "[IMPORT] Deleting index '#{index.name}'"
         index.delete
       end
 
-      # Create the index if it doesn't exist
-      unless index.exists?
-        mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
-        puts "[IMPORT] Creating index '#{index.name}' with mapping:",
-             mapping
-        unless index.create(:mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings)
-          STDERR.puts "[ERROR] There has been an error when creating the index -- elasticsearch returned:",
-                      index.response
-          exit(1)
-        end
-      end
-    end
-
-    # Add Pagination to the class if it doesn't exist
-    def add_pagination_to_klass(klass)
-      if defined?(Kaminari) && klass.respond_to?(:page)
-        klass.instance_eval do
-          def paginate(options = {})
-            page(options[:page]).per(options[:per_page])
+      def create_index(index, klass)
+        unless index.exists?
+          mapping = MultiJson.encode(klass.tire.mapping_to_hash, :pretty => Tire::Configuration.pretty)
+          puts "[IMPORT] Creating index '#{index.name}' with mapping:", mapping
+          unless index.create(:mappings => klass.tire.mapping_to_hash, :settings => klass.tire.settings)
+            puts "[ERROR] There has been an error when creating the index -- Elasticsearch returned:",
+                        index.response
+            exit(1)
           end
         end
-      end unless klass.respond_to?(:paginate)
-    end
+      end
 
-    def create_progress_bar(klass)
-      require 'progress_bar'
-      ProgressBar.new klass.count
-    rescue LoadError
-      puts <<-INFO.gsub(/        /, '') unless @progress_bar_message_shown
-        [IMPORT] To display a progress bar add the following to your Gemfile:
+      def add_pagination_to_klass(klass)
+        if defined?(Kaminari) && klass.respond_to?(:page)
+          klass.instance_eval do
+            def paginate(options = {})
+              page(options[:page]).per(options[:per_page])
+            end
+          end
+        end unless klass.respond_to?(:paginate)
+      end
 
-                   gem 'progress_bar', require: false
+      def progress_bar(klass, total=nil)
+        @progress_bars ||= {}
 
-        INFO
-      @progress_bar_message_shown = true
-      # Create a stub so that progress_bar methods dont raise errors
-      progress_bar_stub
-    rescue NoMethodError
-      puts "[IMPORT] #{klass} does not respond to count. Skipping progress bar"
-      progress_bar_stub
-    end
-
-    def progress_bar_stub
-      @progress_bar_stub ||= Module.new do
-        def self.method_missing(*args)
-          self
+        if total
+          @progress_bars[klass.to_s] ||= ANSI::Progressbar.new(klass.to_s, total)
+        else
+          @progress_bars[klass.to_s]
         end
       end
-    end
 
-    def do_import(index, klass, params)
-      build_index index, klass
-      add_pagination_to_klass klass
-      puts "[IMPORT] Starting import for the '#{klass}' class"
-      progress_bar = create_progress_bar klass
-      # Use the model importer if it exists for this class
-      if klass.ancestors.include?(Tire::Model::Search)
-        options = params.update({ :index => index.name })
-        klass.tire.import options do |documents|
-          document_count = documents.to_a.size
-          progress_bar.increment! document_count
+      def import_model(index, klass, params)
+        unless progress_bar(klass)
+          puts "[IMPORT] Importing '#{klass.to_s}'"
+        end
+        klass.tire.import(params) do |documents|
+          progress_bar(klass).inc documents.size if progress_bar(klass)
           documents
         end
-      else
-        # Try and import the class normally
-        index.import(klass, params) do |documents|
-          document_count = documents.to_a.size
-          progress_bar.increment! document_count
-          documents
-        end
+        progress_bar(klass).finish if progress_bar(klass)
       end
+
+      extend self
     end
 
-    desc import_desc
+  end
+end
+
+namespace :tire do
+
+  import_model_desc = <<-DESC.gsub(/    /, '')
+    Import data from your model (pass name as CLASS environment variable).
+
+      $ rake environment tire:import:model CLASS='MyModel'
+
+    Pass params for the `import` method:
+      $ rake environment tire:import:model CLASS='Article' PARAMS='{:page => 1}'
+
+    Force rebuilding the index (delete and create):
+      $ rake environment tire:import:model CLASS='Article' FORCE=1
+
+    Set target index name:
+      $ rake environment tire:import:model CLASS='Article' INDEX='articles-new'
+  DESC
+
+  import_all_desc = <<-DESC.gsub(/    /, '')
+    Import all indices from `app/models` (or use DIR environment variable).
+
+      $ rake environment tire:import:all DIR=app/models
+  DESC
+
+  task :import => 'import:model'
+
+  namespace :import do
+    desc import_model_desc
     task :model do
-      STDOUT.sync = true
-
-      # Load the environment if Rails exists
       if defined?(Rails)
-        puts "[IMPORT] Rails detected, booting environment..."
+        puts "[IMPORT] Rails detected, loading environment..."
         Rake::Task["environment"].invoke
       end
 
-      # Raise and exit if no class is defined.
       if ENV['CLASS'].to_s == ''
-        puts HRULE, 'USAGE', HRULE, import_desc, ""
+        puts HRULE, 'USAGE', HRULE, import_model_desc, ""
         exit(1)
       end
 
-      # Get the klass
       klass  = eval(ENV['CLASS'].to_s)
-
-      # Set the Params
       params = eval(ENV['PARAMS'].to_s) || {}
-      params.update :method => 'paginate'
+      total  = klass.count rescue nil
 
-      # Set the index
-      index = Tire::Index.new(ENV['INDEX'] || klass.tire.index.name)
+      if ENV['INDEX']
+        index = Tire::Index.new(ENV['INDEX'])
+        params[:index] = index.name
+      else
+        index = klass.tire.index
+      end
 
-      # Do the import
-      do_import(index, klass, params)
-      puts '[DONE]'
+      Tire::Tasks::Import.add_pagination_to_klass(klass)
+      Tire::Tasks::Import.progress_bar(klass, total) if total
 
+      Tire::Tasks::Import.delete_index(index) if ENV['FORCE']
+      Tire::Tasks::Import.create_index(index, klass)
+
+      Tire::Tasks::Import.import_model(index, klass, params)
+
+      puts '[IMPORT] Done.'
     end
 
     desc import_all_desc
     task :all do
-      STDOUT.sync = true
-
-      # Load the environment if Rails exists
       if defined?(Rails)
-        puts "[IMPORT] Rails detected, booting environment..."
+        puts "[IMPORT] Rails detected, loading environment..."
         Rake::Task["environment"].invoke
       end
 
-      # Set the directory to load
-      dir = ENV['DIR'].to_s != '' ? ENV['DIR'] : 'app/models'
-
-      puts "[IMPORT] Loading Directory '#{dir}'"
-      Dir.glob(Rails.root.join("#{dir}/**/*.rb")).each { |path| require path }
-
-      # Set the Params
+      dir    = ENV['DIR'].to_s != '' ? ENV['DIR'] : Rails.root.join("app/models")
       params = eval(ENV['PARAMS'].to_s) || {}
-      params.update :method => 'paginate'
 
-      # Import All the classes
+      puts "[IMPORT] Loading models from: #{dir}"
+      Dir.glob(File.join("#{dir}/**/*.rb")).each { |path| require path }
+
       Tire::Model::Search.dependents.each do |klass|
-        index = klass.tire.index
+        total  = klass.count rescue nil
 
-        # Do the import
-        do_import(index, klass, params)
+        Tire::Tasks::Import.add_pagination_to_klass(klass)
+        Tire::Tasks::Import.progress_bar(klass, total) if total
+
+        index = klass.tire.index
+        Tire::Tasks::Import.delete_index(index) if ENV['FORCE']
+        Tire::Tasks::Import.create_index(index, klass)
+
+        Tire::Tasks::Import.import_model(index, klass, params)
+        puts
       end
 
-      puts '[DONE]'
-
+      puts '[Import] Done.'
     end
 
   end
 
-  task :import => ["import:model"]
-
   namespace :index do
 
     full_comment_drop = <<-DESC.gsub(/      /, '')
-      Delete indices passed in the INDEX environment variable; separate multiple indices by comma.
+      Delete indices passed in the INDEX/INDICES environment variable; separate multiple indices by comma.
 
-      Pass name of a single index to drop in the INDEX environment variable:
         $ rake environment tire:index:drop INDEX=articles
-
-      Pass names of multiple indices to drop in the INDEX or INDICES environment variable:
         $ rake environment tire:index:drop INDICES=articles-2011-01,articles-2011-02
 
     DESC
