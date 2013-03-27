@@ -69,6 +69,18 @@ module Tire
             response = Configuration.client.get "http://localhost:9200/articles/article/1"
           end
 
+          should "be threadsafe" do
+            threads = []
+
+            %w| foo bar |.each do |q|
+              threads << Thread.new do
+                Tire.search { query { match :_all, q } }.results.to_a
+              end
+            end
+
+            threads.each { |t| t.join() }
+          end
+
         end
 
       end
