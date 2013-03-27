@@ -1,14 +1,11 @@
 module Tire
-  VERSION   = "0.5.5"
+  VERSION   = "0.5.6"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Improved documentation
-    * Improved isolation of Tire methods in model integrations
-    * Improved handling of times/dates in `Model::Persistence`
-    * Added support for "Put Mapping" and "Delete mapping" APIs
-    * Added escaping document IDs in URLs
-    * Allowed passing URL options when passing search definition as a Hash
+    * Added support for the `constant_score` query
+    * Prevent `Curl::Err::MultiBadEasyHandle` errors in the Curb client
+    * Refactored the model importing integration and Rake tasks
   END
 end
