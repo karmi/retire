@@ -260,8 +260,8 @@ module Tire
           bulk_store documents, options
 
         else
-          raise ArgumentError, "Please pass either an Enumerable compatible class, or a collection object" +
-                               "with a method for fetching records in batches (such as 'paginate')"
+          raise ArgumentError, "Please pass either an Enumerable compatible class, or a collection object " +
+                               "with a method for fetching records in batches (such as 'paginate')."
       end
     end
 

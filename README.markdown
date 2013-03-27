@@ -631,8 +631,9 @@ in addition to model instance, use the `each_with_hit` method:
     # One (score: 0.300123)
 ```
 
-Note that _Tire_ search results are fully compatible with [`will_paginate`](https://github.com/mislav/will_paginate),
-so you can pass all the usual parameters to the `search` method in the controller:
+Note that _Tire_ search results are fully compatible with [_WillPaginate_](https://github.com/mislav/will_paginate)
+and [_Kaminari_](https://github.com/amatsuda/kaminari), so you can pass all the usual parameters to the
+`search` method in the controller:
 
 ```ruby
     @articles = Article.search params[:q], :page => (params[:page] || 1)
@@ -647,20 +648,15 @@ OK. Chances are, you have lots of records stored in your database. How will you 
 This way, however, all your records are loaded into memory, serialized into JSON,
 and sent down the wire to _Elasticsearch_. Not practical, you say? You're right.
 
-Provided your model implements some sort of _pagination_ — and it probably does —, you can just run:
+When your model is an `ActiveRecord::Base` or `Mongoid::Document` one, or when it implements
+some sort of pagination, you can just run:
 
 ```ruby
     Article.import
 ```
 
-In this case, the `Article.paginate` method is called, and your records are sent to the index
-in chunks of 1000. If that number doesn't suit you, just provide a better one:
-
-```ruby
-    Article.import :per_page => 100
-```
-
-Any other parameters you provide to the `import` method are passed down to the `paginate` method.
+Depending on the setup of your model, either `find_in_batches`, `limit..skip` or pagination is used
+to import your data.
 
 Are we saying you have to fiddle with this thing in a `rails console` or silly Ruby scripts? No.
 Just call the included _Rake_ task on the command line:
@@ -676,13 +672,6 @@ provided by the `mapping` block in your model):
     $ rake environment tire:import CLASS='Article' FORCE=true
 ```
 
-When importing records from multiple tables, you can fight the n+1 queries problem by passing
-`include` parameters to the `paginate` method:
-
-```bash
-    rake environment tire:import PARAMS='{:include => ["comments"]}' CLASS=Article FORCE=true
-```
-
 When you'll spend more time with _Elasticsearch_, you'll notice how
 [index aliases](http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases.html)
 are the best idea since the invention of inverted index.
@@ -694,21 +683,16 @@ You can index your data into a fresh index (and possibly update an alias once ev
 
 Finally, consider the Rake importing task just a convenient starting point. If you're loading
 substantial amounts of data, want better control on which data will be indexed, etc., use the
-lower-level Tire API with eg. `ActiveRecordBase#find_in_batches`:
+lower-level Tire API with eg. `ActiveRecordBase#find_in_batches` directly:
 
 ```ruby
-    Article.where("published_on > ?", Time.parse("2012-10-01")).find_in_batches do |group|
-      Tire.index("articles").import group
+    Article.where("published_on > ?", Time.parse("2012-10-01")).find_in_batches(include: authors) do |batch|
+      Tire.index("articles").import batch
     end
 ```
-
-OK. All this time we have been talking about `ActiveRecord` models, since
-it is a reasonable _Rails_' default for the storage layer.
-
-But what if you use another database such as [MongoDB](http://www.mongodb.org/),
-another object mapping library, such as [Mongoid](http://mongoid.org/) or [MongoMapper](http://mongomapper.com/)?
-
-Well, things stay mostly the same:
+If you're using a different database, such as [MongoDB](http://www.mongodb.org/),
+another object mapping library, such as [Mongoid](http://mongoid.org/) or [MongoMapper](http://mongomapper.com/),
+things stay mostly the same:
 
 ```ruby
     class Article
@@ -778,7 +762,7 @@ and extensions to the core _Tire_ functionality — be sure to check them out.
 Other Clients
 -------------
 
-Check out [other _Elasticsearch_ clients](http://www.elasticsearch.org/guide/appendix/clients.html).
+Check out [other _Elasticsearch_ clients](http://www.elasticsearch.org/guide/clients/).
 
 
 Feedback
