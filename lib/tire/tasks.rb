@@ -1,4 +1,5 @@
 require 'rake'
+require 'ansi/progressbar'
 
 module Tire
   module Tasks
