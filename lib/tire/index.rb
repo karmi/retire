@@ -41,7 +41,7 @@ module Tire
     end
 
     def add_alias(alias_name, configuration={})
-      Alias.create(configuration.merge( :name => alias_name, :index => @name ) )
+      Alias.create(configuration.merge(:name => alias_name, :index => @name))
     end
 
     def remove_alias(alias_name)
@@ -90,10 +90,10 @@ module Tire
         params[:ignore_conflicts] = ignore_conflicts
       end
 
-      url  = "#{self.url}/#{type}/_mapping"
+      url = "#{self.url}/#{type}/_mapping"
       url += "?#{params.to_param}" unless params.empty?
 
-      payload = { type => mapping }.to_json
+      payload = {type => mapping}.to_json
 
       @response = Configuration.client.put url, payload
       result = MultiJson.decode(@response.body)
@@ -120,25 +120,41 @@ module Tire
     def store(*args)
       document, options = args
 
-      id       = get_id_from_document(document)
-      type     = get_type_from_document(document)
+      id = get_id_from_document(document)
+      type = get_type_from_document(document)
+      hash = document.to_hash if document.respond_to?(:to_hash) && document.to_hash.is_a?(Hash)
       document = convert_document_to_json(document)
 
       options ||= {}
-      params    = {}
+      params = {}
 
       if options[:percolate]
         params[:percolate] = options[:percolate]
         params[:percolate] = "*" if params[:percolate] === true
       end
 
-      params[:parent]  = options[:parent]  if options[:parent]
+      params[:version] = options[:version] if options[:version]
+      params[:version_type] = options[:version_type] if options[:version_type]
       params[:routing] = options[:routing] if options[:routing]
+      params[:percolate] = options[:percolate] if options[:percolate]
+      params[:parent] = options[:parent] if options[:parent]
+      params[:timestamp] = options[:timestamp] if options[:timestamp]
+      params[:ttl] = options[:ttl] if options[:ttl]
       params[:replication] = options[:replication] if options[:replication]
+
+      if hash
+        params[:version] ||= hash.delete(:_version) if hash.has_key?(:_version)
+        params[:version_type] ||= hash.delete(:_version_type) if hash.has_key?(:_version_type)
+        params[:routing] ||= hash.delete(:_routing) if hash.has_key?(:_routing)
+        params[:percolate] ||= hash.delete(:_percolate) if hash.has_key?(:_percolate)
+        params[:parent] ||= hash.delete(:_parent) if hash.has_key?(:_parent)
+        params[:timestamp] ||= hash.delete(:_timestamp) if hash.has_key?(:_timestamp)
+        params[:ttl] ||= hash.delete(:_ttl) if hash.has_key?(:_ttl)
+      end
 
       params_encoded = params.empty? ? '' : "?#{params.to_param}"
 
-      url  = id ? "#{self.url}/#{type}/#{Utils.escape(id)}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
+      url = id ? "#{self.url}/#{type}/#{Utils.escape(id)}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
 
       @response = Configuration.client.post url, document
       MultiJson.decode(@response.body)
@@ -172,23 +188,24 @@ module Tire
 
       payload = documents.map do |document|
         type = get_type_from_document(document, :escape => false) # Do not URL-escape the _type
-        id   = get_id_from_document(document)
+        id = get_id_from_document(document)
 
         if ENV['DEBUG']
           STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
         end
 
-        header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
+        header = {action.to_sym => {:_index => name, :_type => type, :_id => id}}
 
         if document.respond_to?(:to_hash) && hash = document.to_hash
           meta = {}
-          meta[:_version]   = hash.delete(:_version)
-          meta[:_routing]   = hash.delete(:_routing)
+          meta[:_version] = hash.delete(:_version)
+          meta[:_version_type] = hash.delete(:_version_type)
+          meta[:_routing] = hash.delete(:_routing)
           meta[:_percolate] = hash.delete(:_percolate)
-          meta[:_parent]    = hash.delete(:_parent)
+          meta[:_parent] = hash.delete(:_parent)
           meta[:_timestamp] = hash.delete(:_timestamp)
-          meta[:_ttl]       = hash.delete(:_ttl)
-          meta              = meta.reject { |name,value| !value || value.empty? }
+          meta[:_ttl] = hash.delete(:_ttl)
+          meta = meta.reject { |name, value| !value || value.empty? }
           header[action.to_sym].update(meta)
         end
 
@@ -205,9 +222,9 @@ module Tire
       begin
         params = {}
         params[:consistency] = options.delete(:consistency)
-        params[:refresh]     = options.delete(:refresh)
-        params               = params.reject { |name,value| !value }
-        params_encoded       = params.empty? ? '' : "?#{params.to_param}"
+        params[:refresh] = options.delete(:refresh)
+        params = params.reject { |name, value| !value }
+        params_encoded = params.empty? ? '' : "?#{params.to_param}"
 
         @response = Configuration.client.post("#{url}/_bulk#{params_encoded}", payload.join("\n"))
         raise RuntimeError, "#{@response.code} > #{@response.body}" if @response && @response.failure?
@@ -261,7 +278,7 @@ module Tire
 
         else
           raise ArgumentError, "Please pass either an Enumerable compatible class, or a collection object " +
-                               "with a method for fetching records in batches (such as 'paginate')."
+              "with a method for fetching records in batches (such as 'paginate')."
       end
     end
 
@@ -274,8 +291,8 @@ module Tire
       Search::Scan.new(self.name, &block).each do |results|
 
         documents = results.map do |document|
-          document  = document.to_hash.except(:type, :_index, :_explanation, :_score, :_version, :highlight, :sort)
-          document  = transform.call(document) if transform
+          document = document.to_hash.except(:type, :_index, :_explanation, :_score, :_version, :highlight, :sort)
+          document = transform.call(document) if transform
           document
         end
 
@@ -286,16 +303,16 @@ module Tire
     def remove(*args)
       if args.size > 1
         type, document = args
-        type           = Utils.escape(type)
-        id             = get_id_from_document(document) || document
+        type = Utils.escape(type)
+        id = get_id_from_document(document) || document
       else
         document = args.pop
-        type     = get_type_from_document(document)
-        id       = get_id_from_document(document) || document
+        type = get_type_from_document(document)
+        id = get_id_from_document(document) || document
       end
       raise ArgumentError, "Please pass a document ID" unless id
 
-      url    = "#{self.url}/#{type}/#{Utils.escape(id)}"
+      url = "#{self.url}/#{type}/#{Utils.escape(id)}"
       result = Configuration.client.delete url
       MultiJson.decode(result.body) if result.success?
 
@@ -307,19 +324,20 @@ module Tire
     def retrieve(type, id, options={})
       raise ArgumentError, "Please pass a document ID" unless id
 
-      url       = "#{self.url}/#{Utils.escape(type)}/#{Utils.escape(id)}"
+      url = "#{self.url}/#{Utils.escape(type)}/#{Utils.escape(id)}"
 
-      params    = {}
-      params[:routing]    = options[:routing] if options[:routing]
-      params[:fields]     = options[:fields]  if options[:fields]
+      params = {}
+      params[:routing] = options[:routing] if options[:routing]
+      params[:fields] = options[:fields] if options[:fields]
       params[:preference] = options[:preference] if options[:preference]
-      params_encoded      = params.empty? ? '' : "?#{params.to_param}"
+      params_encoded = params.empty? ? '' : "?#{params.to_param}"
 
       @response = Configuration.client.get "#{url}#{params_encoded}"
 
       h = MultiJson.decode(@response.body)
       wrapper = options[:wrapper] || Configuration.wrapper
-      if wrapper == Hash then h
+      if wrapper == Hash then
+        h
       else
         return nil if h['exists'] == false
         document = h['_source'] || h['fields'] || {}
@@ -334,12 +352,12 @@ module Tire
 
     def update(type, id, payload={}, options={})
       raise ArgumentError, "Please pass a document type" unless type
-      raise ArgumentError, "Please pass a document ID"   unless id
+      raise ArgumentError, "Please pass a document ID" unless id
       raise ArgumentError, "Please pass a script or partial document in the payload hash" unless payload[:script] || payload[:doc]
 
-      type      = Utils.escape(type)
-      url       = "#{self.url}/#{type}/#{Utils.escape(id)}/_update"
-      url      += "?#{options.to_param}" unless options.keys.empty?
+      type = Utils.escape(type)
+      url = "#{self.url}/#{type}/#{Utils.escape(id)}/_update"
+      url += "?#{options.to_param}" unless options.keys.empty?
       @response = Configuration.client.post url, MultiJson.encode(payload)
       MultiJson.decode(@response.body)
 
@@ -377,7 +395,7 @@ module Tire
 
     def analyze(text, options={})
       options = {:pretty => true}.update(options)
-      params  = options.to_param
+      params = options.to_param
       @response = Configuration.client.get "#{url}/_analyze?#{params}", text
       @response.success? ? MultiJson.decode(@response.body) : false
 
@@ -408,14 +426,14 @@ module Tire
 
     def percolate(*args, &block)
       document = args.shift
-      type     = get_type_from_document(document)
+      type = get_type_from_document(document)
 
       document = MultiJson.decode convert_document_to_json(document)
 
       query = Search::Query.new(&block).to_hash if block_given?
 
-      payload = { :doc => document }
-      payload.update( :query => query ) if query
+      payload = {:doc => document}
+      payload.update(:query => query) if query
 
       @response = Configuration.client.get "#{url}/#{type}/_percolate", MultiJson.encode(payload)
       MultiJson.decode(@response.body)['matches']
@@ -435,11 +453,12 @@ module Tire
 
         if Configuration.logger.level.to_s == 'debug'
           body = if @response && @response.body && !@response.body.to_s.empty?
-              MultiJson.encode( MultiJson.load(@response.body), :pretty => Configuration.pretty)
-            elsif error && error.message && !error.message.to_s.empty?
-              MultiJson.encode( MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
-            else ''
-          end
+                   MultiJson.encode(MultiJson.load(@response.body), :pretty => Configuration.pretty)
+                 elsif error && error.message && !error.message.to_s.empty?
+                   MultiJson.encode(MultiJson.load(error.message), :pretty => Configuration.pretty) rescue ''
+                 else
+                   ''
+                 end
         else
           body = ''
         end
@@ -453,15 +472,15 @@ module Tire
 
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#type deprecation warnings
       type = case
-        when document.respond_to?(:document_type)
-          document.document_type
-        when document.is_a?(Hash)
-          document[:_type] || document['_type'] || document[:type] || document['type']
-        when document.respond_to?(:_type)
-          document._type
-        when document.respond_to?(:type) && document.type != document.class
-          document.type
-        end
+               when document.respond_to?(:document_type)
+                 document.document_type
+               when document.is_a?(Hash)
+                 document[:_type] || document['_type'] || document[:type] || document['type']
+               when document.respond_to?(:_type)
+                 document._type
+               when document.respond_to?(:type) && document.type != document.class
+                 document.type
+             end
       $VERBOSE = old_verbose
 
       type ||= 'document'
@@ -471,27 +490,29 @@ module Tire
     def get_id_from_document(document)
       old_verbose, $VERBOSE = $VERBOSE, nil # Silence Object#id deprecation warnings
       id = case
-        when document.is_a?(Hash)
-          document[:_id] || document['_id'] || document[:id] || document['id']
-        when document.respond_to?(:id) && document.id != document.object_id
-          document.id.as_json
-      end
+             when document.is_a?(Hash)
+               document[:_id] || document['_id'] || document[:id] || document['id']
+             when document.respond_to?(:id) && document.id != document.object_id
+               document.id.as_json
+           end
       $VERBOSE = old_verbose
       id
     end
 
     def convert_document_to_json(document)
       document = case
-        when document.is_a?(String)
-          if ENV['DEBUG']
-            Tire.warn "Passing the document as JSON string has been deprecated, " +
-                       "please pass an object which responds to `to_indexed_json` or a plain Hash."
-          end
-          document
-        when document.respond_to?(:to_indexed_json) then document.to_indexed_json
-        else raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +
-                                  "'#{document.class}' given."
-      end
+                   when document.is_a?(String)
+                     if ENV['DEBUG']
+                       Tire.warn "Passing the document as JSON string has been deprecated, " +
+                                     "please pass an object which responds to `to_indexed_json` or a plain Hash."
+                     end
+                     document
+                   when document.respond_to?(:to_indexed_json) then
+                     document.to_indexed_json
+                   else
+                     raise ArgumentError, "Please pass a JSON string or object with a 'to_indexed_json' method," +
+                         "'#{document.class}' given."
+                 end
     end
 
   end
