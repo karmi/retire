@@ -58,7 +58,7 @@ module Tire
             end
 
             # Store mapping for the property:
-            mapping[name] = options
+            mapping[name] = { :type => 'string' }.merge(options)
             self
           end
 

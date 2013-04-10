@@ -50,6 +50,10 @@ module Tire
           end
         end
 
+        should "define property as a string by default" do
+          assert_equal 'string', PersistentArticle.mapping[:title][:type]
+        end
+
       end
 
       context "Finders" do
