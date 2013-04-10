@@ -51,6 +51,7 @@ require File.dirname(__FILE__) + '/models/persistent_article_in_index'
 require File.dirname(__FILE__) + '/models/persistent_article_in_namespace'
 require File.dirname(__FILE__) + '/models/persistent_article_with_casting'
 require File.dirname(__FILE__) + '/models/persistent_article_with_defaults'
+require File.dirname(__FILE__) + '/models/persistent_article_with_strict_mapping'
 require File.dirname(__FILE__) + '/models/persistent_articles_with_custom_index_name'
 require File.dirname(__FILE__) + '/models/validated_model'
 

@@ -17,8 +17,11 @@ module Tire
           def create(args={})
             document    = new(args)
             return false unless document.valid?
-            document.save
-            document
+            if result = document.save
+              document
+            else
+              result
+            end
           end
         end
 
@@ -36,33 +39,34 @@ module Tire
           def update_index
             run_callbacks :update_elasticsearch_index do
               if destroyed?
-                index.remove self
+                response = index.remove self
               else
-                response  = index.store( self, {:percolate => percolator} )
-                self.id     ||= response['_id']
-                self._index   = response['_index']
-                self._type    = response['_type']
-                self._version = response['_version']
-                self.matches  = response['matches']
-                self
+                if response = index.store( self, {:percolate => percolator} )
+                  self.id     ||= response['_id']
+                  self._index   = response['_index']
+                  self._type    = response['_type']
+                  self._version = response['_version']
+                  self.matches  = response['matches']
+                end
               end
+              response
             end
           end
 
           def save
             return false unless valid?
             run_callbacks :save do
-              update_index
+              response = update_index
+              !! response['ok']
             end
-            self
           end
 
           def destroy
             run_callbacks :destroy do
               @destroyed = true
-              update_index
+              response = update_index
+              ! response.nil?
             end
-            self.freeze
           end
 
           def destroyed?   ;  !!@destroyed;       end

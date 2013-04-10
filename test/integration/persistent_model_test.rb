@@ -7,13 +7,16 @@ module Tire
 
     def setup
       super
-      PersistentArticle.index.delete
+      PersistentArticle.create_elasticsearch_index
+      PersistentArticleWithDefaults.create_elasticsearch_index
+      PersistentArticleWithStrictMapping.create_elasticsearch_index
     end
 
     def teardown
       super
       PersistentArticle.index.delete
       PersistentArticleWithDefaults.index.delete
+      PersistentArticleWithStrictMapping.index.delete
     end
 
     context "PersistentModel" do
@@ -197,6 +200,25 @@ module Tire
         should "return matching queries when saving" do
           a = PersistentArticleWithPercolation.create :title => 'Warning!'
           assert_contains a.matches, 'alert'
+        end
+      end
+
+      context "with strict mapping" do
+        should "successfuly save valid model" do
+          a = PersistentArticleWithStrictMapping.create :title => 'Test'
+          assert a.save
+        end
+        should "return false when creating fails" do
+          a = PersistentArticleWithStrictMapping.create :created => 'NOTVALID'
+          assert_equal false, a
+        end
+        should "return false when saving fails for invalid format" do
+          a = PersistentArticleWithStrictMapping.new :created => 'NOTVALID'
+          assert_equal false, a.save
+        end
+        should "return false when saving fails for unmapped property" do
+          a = PersistentArticleWithStrictMapping.new :myproperty => true
+          assert_equal false, a.save
         end
       end
 
