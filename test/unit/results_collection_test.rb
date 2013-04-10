@@ -220,6 +220,32 @@ module Tire
 
       end
 
+      context "using fields when also relying on _source" do
+        setup do
+          Configuration.reset
+          @default_response = { 'hits' => { 'hits' =>
+            [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article',
+                '_source' => {
+                  'title' => 'Knee Deep in JSON'
+                },
+                'fields' => {
+                  '_parent' => '4f99f98ea2b279ec3d002522'
+                }
+              }
+            ] } }
+          collection = Results::Collection.new(@default_response)
+          @item      = collection.first
+        end
+
+        should "return the returned fields" do
+          assert_equal '4f99f98ea2b279ec3d002522', @item._parent
+        end
+
+        should "return fields from the _source" do
+          assert_equal 'Knee Deep in JSON', @item.title
+        end
+      end
+
       context "returning results with hits" do
         should "yield the Item result and the raw hit" do
           response = { 'hits' => { 'hits' => [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article', '_source' => { :title => 'Test', :body => 'Lorem' } } ] } }
