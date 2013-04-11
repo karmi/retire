@@ -235,7 +235,7 @@ module Tire
           ActiveRecord::Schema.define(:version => 1) { create_table(:active_record_articles) { |t| t.string(:title) } }
           model = ActiveRecordArticle.new(:title => 'Test'); model.id = 1
 
-          ActiveRecordArticle.expects(:find).with([1]).returns([ model] )
+          ActiveRecordArticle.expects(:where).with(id: [1]).returns([ model])
 
           Results::Collection.new(response, :load => true).each_with_hit do |result, hit|
             assert_instance_of ActiveRecordArticle, result
@@ -313,24 +313,27 @@ module Tire
           ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
         end
 
-        should "load the records via model find method from database" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
+        should "load the records via model where method from database" do
+          ActiveRecordArticle.expects(:where).with(id: [1,2,3]).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
           Results::Collection.new(@response, :load => true).results
         end
 
-        should "pass the :load option Hash to model find metod" do
-          ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
+        should "pass the :load option Hash to model where metod" do
+          relation = mock("<ActiveRecord::Relation>")
+          relation.expects(:all).with(:include => "comments").
+            returns([ Results::Item.new(:id => 3),
+                      Results::Item.new(:id => 1),
+                      Results::Item.new(:id => 2) ])
+
+          ActiveRecordArticle.expects(:where).with(id: [1,2,3]).returns(relation)
           Results::Collection.new(@response, :load => { :include => 'comments' }).results
         end
 
         should "preserve the order of records returned from search" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
+          ActiveRecordArticle.expects(:where).with(id: [1,2,3]).
                               returns([ Results::Item.new(:id => 3),
                                         Results::Item.new(:id => 1),
                                         Results::Item.new(:id => 2)  ])
