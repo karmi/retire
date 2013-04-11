@@ -168,6 +168,21 @@ module Tire::Search
         end
       end
 
+      context "geo_distance facet" do
+        should "encode facet options" do
+          f = Facet.new('geo_distance') { geo_distance :location, {:lat => 50, :lon => 9}, [{:to => 1}] }
+          assert_equal({:geo_distance => {:geo_distance => {:location => {:lat => 50, :lon => 9}, :ranges => [{:to => 1}]}}}.to_json,
+                       f.to_json)
+        end
+
+        should "encode custom options" do
+          f = Facet.new('geo_distance') { geo_distance :location, {:lat => 50, :lon => 9}, [{:to => 1}],
+                                                       :unit => 'km', :value_script => 'doc["field"].value'}
+          assert_equal({:geo_distance => {:geo_distance => {:location => {:lat => 50, :lon => 9}, :ranges => [{:to => 1}],
+                                                            :unit => "km", :value_script => 'doc["field"].value'}}}.to_json, f.to_json)
+        end
+      end
+
       context "filter facet" do
 
         should "encode facet options" do
