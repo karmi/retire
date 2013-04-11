@@ -63,6 +63,15 @@ module Tire
         assert_equal 'Kafka', @document[:author][:name]
       end
 
+      should "retrieve simple values from read_attribute_for_serialization" do
+        assert_equal 'Test', @document.read_attribute_for_serialization(:title)
+      end
+
+      should "retrieve hash values from read_attribute_for_serialization" do
+        assert_equal 'Kafka', @document.read_attribute_for_serialization(:author)[:name]
+      end
+
+
       should "allow to retrieve value by methods" do
         assert_not_nil @document.title
         assert_equal 'Test', @document.title
