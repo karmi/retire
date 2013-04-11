@@ -34,6 +34,10 @@ module Tire
         @attributes[key.to_sym]
       end
 
+      def read_attribute_for_serialization(key)
+        @attributes[key.to_sym]
+      end
+
       def id
         @attributes[:_id]   || @attributes[:id]
       end
