@@ -33,10 +33,9 @@ module Tire
       def [](key)
         @attributes[key.to_sym]
       end
+      
+      alias :read_attribute_for_serialization :[]
 
-      def read_attribute_for_serialization(key)
-        @attributes[key.to_sym]
-      end
 
       def id
         @attributes[:_id]   || @attributes[:id]
