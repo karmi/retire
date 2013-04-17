@@ -442,5 +442,24 @@ module Tire::Search
 
     end
 
+    context 'SpanNearQuery' do
+      should "single term" do
+        assert_equal( { :span_near => {:clauses => [{ :span_term => { :abc => 123 } }], :slop => 10, :in_order => false } },
+                      Query.new.span_near { term :abc, 123 } )
+      end
+
+      should "multiple terms" do
+        assert_equal( { :span_near => {:clauses => [{ :span_term => { :abc => 123 } }, { :span_term => { :test => "hello"} }], :slop => 10, :in_order => false } },
+                      Query.new.span_near do
+                        term :abc, 123 
+                        term :test, "hello"
+                      end )
+      end
+
+      should "override default options" do
+        assert_equal( { :span_near => {:clauses => [{ :span_term => { :abc => 123 } }], :slop => 15, :in_order => true } },
+                      Query.new.span_near(:slop => 15, :in_order => true) { term :abc, 123 } )
+      end
+    end
   end
 end
