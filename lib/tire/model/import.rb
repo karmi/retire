@@ -8,6 +8,8 @@ module Tire
     # Two dedicated strategies for popular pagination libraries are also provided: WillPaginate and Kaminari.
     # These could be used in situations where your model is neither ActiveRecord nor Mongoid based.
     #
+    # You can implement your own custom strategy and pass it via the `:strategy` option.
+    #
     # Note, that it's always possible to use the `Tire::Index#import` method directly.
     #
     # @note See `Tire::Import::Strategy`.
@@ -22,10 +24,12 @@ module Tire
       end
 
       # Importing strategies for common persistence frameworks (ActiveModel, Mongoid), as well as
-      # pagination libraries (WillPaginate, Kaminari).
+      # pagination libraries (WillPaginate, Kaminari), or a custom strategy.
       #
       module Strategy
         def self.from_class(klass, options={})
+          return const_get(options[:strategy]).new(klass, options) if options[:strategy]
+
           case
           when defined?(::ActiveRecord) && klass.ancestors.include?(::ActiveRecord::Base)
             ActiveRecord.new klass, options
