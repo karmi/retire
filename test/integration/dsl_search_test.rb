@@ -39,6 +39,24 @@ module Tire
         assert_equal 1, s.results.count
       end
 
+      context "passing wrapper option" do
+        should "be allowed when passing a block" do
+          s = Tire.search 'articles-test', wrapper: Results::Item do; end
+
+          assert_equal Results::Item, s.options[:wrapper]
+        end
+
+        should "be allowed when not passing a block" do
+          s = Tire.search(
+            'articles-test',
+            payload: { query: { match: { tags: 'ruby' } } },
+            wrapper: Results::Item
+          )
+
+          assert_equal Results::Item, s.options[:wrapper]
+        end
+      end
+
     end
 
   end
