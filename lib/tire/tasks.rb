@@ -5,8 +5,6 @@ module Tire
   module Tasks
 
     module Import
-      HRULE = '='*90
-
       def delete_index(index)
         puts "[IMPORT] Deleting index '#{index.name}'"
         index.delete
@@ -95,7 +93,7 @@ namespace :tire do
       end
 
       if ENV['CLASS'].to_s == ''
-        puts HRULE, 'USAGE', HRULE, import_model_desc, ""
+        puts '='*90, 'USAGE', '='*90, import_model_desc, ""
         exit(1)
       end
 
