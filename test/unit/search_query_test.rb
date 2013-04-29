@@ -430,9 +430,12 @@ module Tire::Search
                       Query.new.constant_score { query { term :attr, 'foo' } } )
       end
 
-      should "wrap filter" do
-        assert_equal( { :constant_score => {:filter => { :term => { :attr => 'foo' } } } },
-                      Query.new.constant_score { filter :term, :attr => 'foo' } )
+      should "wrap multiple filters" do
+        assert_equal( { :constant_score => {:filter => {:and => [ { :term => { :attr => 'foo' } }, { :term => { :attr => 'bar' } } ] } } },
+                      Query.new.constant_score do
+                        filter :term, :attr => 'foo'
+                        filter :term, :attr => 'bar'
+                      end )
       end
 
       should "wrap the boost" do
