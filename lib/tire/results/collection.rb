@@ -58,7 +58,7 @@ module Tire
       alias :[] :slice
 
       def to_ary
-        self
+        results
       end
 
       def as_json(options=nil)
