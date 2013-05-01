@@ -79,6 +79,11 @@ module Tire
         assert_equal 1.0, collection.max_score
       end
 
+      should "return an array" do
+        collection = Results::Collection.new(@default_response)
+        assert_instance_of Array, collection.to_ary
+      end
+
       context "serialization" do
 
         should "be serialized to JSON" do
