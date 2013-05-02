@@ -60,7 +60,11 @@ module Tire
 
       def to_hash
         @attributes.reduce({}) do |sum, item|
-          sum[ item.first ] = item.last.respond_to?(:to_hash) ? item.last.to_hash : item.last
+          if item.last.is_a?(Array)
+            sum[ item.first ] = item.last.map { |item| item.respond_to?(:to_hash) ? item.to_hash : item }
+          else
+            sum[ item.first ] = item.last.respond_to?(:to_hash) ? item.last.to_hash : item.last
+          end
           sum
         end
       end
