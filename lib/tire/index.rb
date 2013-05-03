@@ -494,5 +494,22 @@ module Tire
       end
     end
 
+    def flush
+      @response = Configuration.client.post "#{url}/_flush", MultiJson.encode({})
+
+    ensure
+      curl = %Q|curl -X POST "#{url}/_flush"|
+      logged('_flush', curl)
+    end
+
+    def optimize(opts = {})
+      options   = {:pretty => true}.update(opts).to_param
+      @response = Configuration.client.post "#{url}/_optimize", MultiJson.encode(options)
+
+    ensure
+      curl = %Q|curl -X POST "#{url}/_optimize#{options}"|
+      logged('_optimize', curl)
+    end
+
   end
 end
