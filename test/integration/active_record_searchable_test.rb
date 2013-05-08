@@ -134,6 +134,20 @@ module Tire
           assert_equal ActiveRecordArticle.find(1), results.first
         end
 
+        should "load single record" do
+          a = ActiveRecordArticle.create :title => 'foo'
+          a.save
+          a.index.refresh
+
+          results = ActiveRecordArticle.search load: true do
+            query { string 'title:foo' }
+          end
+
+          assert_instance_of ActiveRecordArticle, results.first
+          assert_equal 'foo', results.first.title
+          assert_equal 3, a.length # Make sure we have the "real model"
+        end
+
         should "load records with options on query search" do
           assert_equal ActiveRecordArticle.find(['1'], :include => 'comments').first,
                        ActiveRecordArticle.search('"Test 1"',

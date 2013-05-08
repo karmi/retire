@@ -69,7 +69,7 @@ module Tire
 
         a.index.refresh
         results = SupermodelArticle.search 'test'
-        
+
         assert_equal 0, results.count
       end
 
@@ -90,19 +90,24 @@ module Tire
 
         setup do
           module ::Rails; end
+          @article = SupermodelArticle.new :title => 'Test'
+          @article.save
+          @article.index.refresh
         end
 
-        should "load the underlying model" do
-          a = SupermodelArticle.new :title => 'Test'
-          a.save
-          a.index.refresh
-
+        should "fake the underlying model with _source" do
           results = SupermodelArticle.search 'test'
 
           assert_instance_of Results::Item, results.first
           assert_instance_of SupermodelArticle, results.first.load
-
           assert_equal 'Test', results.first.load.title
+        end
+
+        should "load the record from database" do
+          results = SupermodelArticle.search 'test', load: true
+
+          assert_instance_of SupermodelArticle, results.first
+          assert_equal 'Test', results.first.title
         end
 
       end
