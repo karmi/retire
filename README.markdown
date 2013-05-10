@@ -642,7 +642,7 @@ and [_Kaminari_](https://github.com/amatsuda/kaminari), so you can pass all the 
 OK. Chances are, you have lots of records stored in your database. How will you get them to _Elasticsearch_? Easy:
 
 ```ruby
-    Article.index.import Article.all
+    Article.tire.import Article.all
 ```
 
 This way, however, all your records are loaded into memory, serialized into JSON,
