@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   # = Development dependencies
   #
   s.add_development_dependency "bundler",      "~> 1.0"
-  s.add_development_dependency "shoulda"
+  s.add_development_dependency "shoulda-context"
   s.add_development_dependency "mocha",        "~> 0.13"
   s.add_development_dependency "minitest",     "~> 2.12"
   s.add_development_dependency "activerecord", ">= 3.0"
