@@ -136,7 +136,7 @@ module Tire
                              "based on _type '#{type}'.", e.backtrace
           end
 
-          records[type] = __find_records_by_ids klass, items.map { |h| h['_id'] }
+          records[type] = Array(__find_records_by_ids klass, items.map { |h| h['_id'] })
         end
 
         # Reorder records to preserve the order from search results

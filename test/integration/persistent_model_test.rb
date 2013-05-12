@@ -44,6 +44,14 @@ module Tire
         assert_instance_of PersistentArticle, results.first
       end
 
+      should "return real instances of model" do
+        PersistentArticle.create :id => 1, :title => 'One'
+        PersistentArticle.index.refresh
+
+        results = PersistentArticle.search 'one', load: true
+        assert_instance_of PersistentArticle, results.first
+      end
+
       should "save documents into index and find them by IDs" do
         one = PersistentArticle.create :id => 1, :title => 'One'
         two = PersistentArticle.create :id => 2, :title => 'Two'
