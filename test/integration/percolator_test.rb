@@ -8,13 +8,13 @@ module Tire
     context "Percolator" do
       setup do
         delete_registered_queries
-        # delete_percolator_index if ENV['TRAVIS']
+        delete_percolator_index if ENV['TRAVIS']
         @index = Tire.index('percolator-test')
         @index.create
       end
       teardown do
         delete_registered_queries
-        # delete_percolator_index if ENV['TRAVIS']
+        delete_percolator_index if ENV['TRAVIS']
         @index.delete
       end
 
