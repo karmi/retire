@@ -8,7 +8,7 @@ module Tire
     context "Boosting queries" do
 
       should "allow to set multiple queries per condition" do
-        s = Tire.search('articles-test') do
+        s = Tire.search('articles-test', search_type: 'dfs_query_then_fetch') do
           query do
             boosting negative_boost: 0.2 do
               positive { string "title:Two title:One tags:ruby tags:python"     }
@@ -25,7 +25,8 @@ module Tire
         setup do
           # Tire.configure { logger STDERR }
           @index = Tire.index('featured-results-test') do
-            delete; create
+            delete
+            create
             store title: 'Kitchen special tool',   featured: true
             store title: 'Kitchen tool tool tool', featured: false
             store title: 'Garage tool',            featured: false
@@ -38,7 +39,7 @@ module Tire
         end
 
         should "return featured results first" do
-          s = Tire.search('featured-results-test') do
+          s = Tire.search('featured-results-test', search_type: 'dfs_query_then_fetch') do
             query do
               boosting negative_boost: 0.1 do
                 positive do

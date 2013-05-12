@@ -25,7 +25,8 @@ module Tire
         # Adapted from: http://www.fullscale.co/blog/2013/01/24/Implementing_Featured_Results_With_ElasticSearch.html
         setup do
           @index = Tire.index('featured-results-test') do
-            delete; create
+            delete
+            create
             store title: 'Kitchen special tool',   featured: true
             store title: 'Kitchen tool tool tool', featured: false
             store title: 'Garage tool',            featured: false
@@ -39,7 +40,7 @@ module Tire
 
 
         should "return featured results first" do
-          s = Tire.search('featured-results-test') do
+          s = Tire.search('featured-results-test', search_type: 'dfs_query_then_fetch') do
             query do
               boolean do
                 should do
