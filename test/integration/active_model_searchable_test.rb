@@ -69,7 +69,7 @@ module Tire
 
         a.index.refresh
         results = SupermodelArticle.search 'test'
-        
+
         assert_equal 0, results.count
       end
 
@@ -103,6 +103,18 @@ module Tire
           assert_instance_of SupermodelArticle, results.first.load
 
           assert_equal 'Test', results.first.load.title
+        end
+
+        should "autoload the underlying model" do
+          a = SupermodelArticle.new :title => 'Test'
+          a.save
+          a.index.refresh
+
+          results = SupermodelArticle.search 'test', load: true
+
+          assert_instance_of SupermodelArticle, results.first
+
+          assert_equal 'Test', results.first.title
         end
 
       end
