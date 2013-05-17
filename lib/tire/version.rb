@@ -1,12 +1,14 @@
 module Tire
-  VERSION   = "0.5.7"
+  VERSION   = "0.5.8"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Added support for the `constant_score` query
-    * Prevent `Curl::Err::MultiBadEasyHandle` errors in the Curb client
-    * Refactored the model importing integration and Rake tasks
-    * Enabled passing options to the `terms` query
+    * Fixed, that Model::Persistence uses "string" as the default mapping type
+    * Fixed, that Model::Persistence returns true/false for #save and #destroy operations
+    * Fixed the `uninitialized constant HRULE` in Rake tasks
+    * Fixed `Item#to_hash` functionality to work with Arrays
+    * Updated the Rails application template and install instructions
+    * Improved the test suite for Travis
   END
 end

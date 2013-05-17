@@ -134,6 +134,20 @@ module Tire
           assert_equal ActiveRecordArticle.find(1), results.first
         end
 
+        should "load single record" do
+          a = ActiveRecordArticle.create :title => 'foo'
+          a.save
+          a.index.refresh
+
+          results = ActiveRecordArticle.search load: true do
+            query { string 'title:foo' }
+          end
+
+          assert_instance_of ActiveRecordArticle, results.first
+          assert_equal 'foo', results.first.title
+          assert_equal 3, a.length # Make sure we have the "real model"
+        end
+
         should "load records with options on query search" do
           assert_equal ActiveRecordArticle.find(['1'], :include => 'comments').first,
                        ActiveRecordArticle.search('"Test 1"',
@@ -598,9 +612,14 @@ module Tire
 
       context "percolated search" do
         setup do
+          delete_registered_queries
+          delete_percolator_index if ENV['TRAVIS']
           ActiveRecordModelWithPercolation.index.register_percolator_query('alert') { string 'warning' }
           Tire.index('_percolator').refresh
-          sleep 0.2
+        end
+
+        teardown do
+          ActiveRecordModelWithPercolation.index.unregister_percolator_query('alert') { string 'warning' }
         end
 
         should "return matching queries when percolating" do
@@ -614,6 +633,16 @@ module Tire
         end
       end
 
+    end
+
+    private
+
+    def delete_registered_queries
+      Configuration.client.delete("#{Configuration.url}/_percolator/active_record_model_with_percolations/alert") rescue nil
+    end
+
+    def delete_percolator_index
+      Configuration.client.delete("#{Configuration.url}/_percolator") rescue nil
     end
 
   end

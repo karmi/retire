@@ -25,9 +25,9 @@ else
   require 'sqlite3'
 end
 
-require 'shoulda'
-require 'turn/autorun' unless ENV["TM_FILEPATH"] || JRUBY
+require 'shoulda-context'
 require 'mocha/setup'
+require 'turn/autorun' unless ENV["TM_FILEPATH"] || JRUBY
 
 require 'active_support/core_ext/hash/indifferent_access'
 
