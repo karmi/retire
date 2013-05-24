@@ -186,7 +186,7 @@ Let's display the results:
 Let's display the global facets (distribution of tags across the whole database):
 
 ```ruby
-    s.results.facets['global-tags']['terms'].each do |f|
+    s.facets['global-tags']['terms'].each do |f|
       puts "#{f['term'].ljust(10)} #{f['count']}"
     end
 
