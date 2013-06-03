@@ -134,7 +134,7 @@ namespace :tire do
         require path
 
         model_filename = path[/#{Regexp.escape(dir.to_s)}\/([^\.]+).rb/, 1]
-        klass          = model_filename.classify.constantize
+        klass          = model_filename.camelize.constantize
 
         # Skip if the class doesn't have Tire integration
         next unless klass.respond_to?(:tire)
