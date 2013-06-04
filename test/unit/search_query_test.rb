@@ -121,6 +121,61 @@ module Tire::Search
       end
     end
 
+    context 'CustomFiltersScoreQuery' do
+      should "encode options" do
+        query = Query.new.custom_filters_score(:score_mode => 'multiply', :max_boost => 2.0) do
+          query { string 'foo' }
+        end
+        assert_equal 'multiply', query[:custom_filters_score][:score_mode]
+        assert_equal 2.0, query[:custom_filters_score][:max_boost]
+      end
+
+      should "wrap single query with filters" do
+        query = Query.new.custom_filters_score do
+          query { string 'foo' }
+          filter({:boost => 2}, :term, :attr => 'foo')
+          filter({:boost => 3}, :term, :attr => 'bar')
+        end
+
+        assert_equal( { :custom_filters_score => {
+                          :query => {:query_string => {:query => 'foo'}},
+                          :filters => [
+                            {:filter => {:term => {:attr => 'foo'} }, :boost => 2},
+                            {:filter => {:term => {:attr => 'bar'} }, :boost => 3}
+                          ]
+                        }},
+                      query)
+
+      end
+
+      should "use DSL to define the filters" do
+        query = Query.new.custom_filters_score do
+          query { string 'foo' }
+
+          filter do
+            boost 2
+            filter :term, :attr => 'foo'
+          end
+
+          filter do
+            boost 3
+            filter :term, :attr => 'bar'
+          end
+        end
+
+        assert_equal( { :custom_filters_score => {
+                          :query => {:query_string => {:query => 'foo'}},
+                          :filters => [
+                            {:filter => {:term => {:attr => 'foo'} }, :boost => 2},
+                            {:filter => {:term => {:attr => 'bar'} }, :boost => 3}
+                          ]
+                        }},
+                      query)
+
+      end
+
+    end
+
     context "All query" do
       should "search for all documents" do
         assert_equal( { :match_all => { } }, Query.new.all )
@@ -438,34 +493,6 @@ module Tire::Search
       should "wrap the boost" do
         assert_equal( { :constant_score => {:boost => 3 } },
                       Query.new.constant_score { boost 3 } )
-      end
-
-    end
-
-    context 'CustomFiltersScoreQuery' do
-      should "encode options" do
-        query = Query.new.custom_filters_score(:score_mode => 'multiply', :max_boost => 2.0) do
-          query { string 'foo' }
-        end
-        assert_equal 'multiply', query[:custom_filters_score][:score_mode]
-        assert_equal 2.0, query[:custom_filters_score][:max_boost]
-      end
-
-      should "wrap single query with filters" do
-        query = Query.new.custom_filters_score do
-          query { string 'foo' } 
-          filter({:boost => 2}, :term, :attr => 'foo')
-          filter({:boost => 3}, :term, :attr => 'bar')
-        end
-        assert_equal( { :custom_filters_score => {
-                          :query => {:query_string => {:query => 'foo'}},
-                          :filters => [
-                            {:filter => {:term => {:attr => 'foo'} }, :boost => 2},
-                            {:filter => {:term => {:attr => 'bar'} }, :boost => 3}
-                          ]
-                        }},
-                      query)
-                        
       end
 
     end
