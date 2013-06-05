@@ -21,6 +21,10 @@ class ImportModel
   end
 end
 
+class CustomImportStrategy
+  include Tire::Model::Import::Strategy::Base
+end
+
 module Tire
   module Model
 
@@ -65,6 +69,20 @@ module Tire
         should "store the documents in a different index" do
           Tire::Index.expects(:new).with('new_index').returns( mock('index') { expects(:import) } )
           ImportModel.import :index => 'new_index'
+        end
+
+        context 'Strategy' do
+
+          should 'return explicitly specified strategy from predefined strategies' do
+            strategy = Tire::Model::Import::Strategy.from_class(ImportModel, :strategy => 'WillPaginate')
+            assert_equal strategy.class.name, 'Tire::Model::Import::Strategy::WillPaginate'
+          end
+
+          should 'return custom strategy class' do
+            strategy = Tire::Model::Import::Strategy.from_class(ImportModel, :strategy => 'CustomImportStrategy')
+            assert_equal strategy.class.name, 'CustomImportStrategy'
+          end
+
         end
 
       end

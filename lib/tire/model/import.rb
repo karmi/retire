@@ -26,6 +26,7 @@ module Tire
       #
       module Strategy
         def self.from_class(klass, options={})
+          return const_get(options[:strategy]).new(klass, options) if options[:strategy]
           case
           when defined?(::ActiveRecord) && klass.ancestors.include?(::ActiveRecord::Base)
             ActiveRecord.new klass, options
