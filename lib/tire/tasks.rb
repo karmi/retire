@@ -87,11 +87,6 @@ namespace :tire do
   namespace :import do
     desc import_model_desc
     task :model do
-      if defined?(Rails)
-        puts "[IMPORT] Rails detected, loading environment..."
-        Rake::Task["environment"].invoke
-      end
-
       if ENV['CLASS'].to_s == ''
         puts '='*90, 'USAGE', '='*90, import_model_desc, ""
         exit(1)
@@ -121,11 +116,6 @@ namespace :tire do
 
     desc import_all_desc
     task :all do
-      if defined?(Rails)
-        puts "[IMPORT] Rails detected, loading environment..."
-        Rake::Task["environment"].invoke
-      end
-
       dir    = ENV['DIR'].to_s != '' ? ENV['DIR'] : Rails.root.join("app/models")
       params = eval(ENV['PARAMS'].to_s) || {}
 
