@@ -12,6 +12,8 @@ module Tire
         raise ArgumentError, "Please pass a Ruby Hash or an object with `to_hash` method, not #{params.class}" \
               unless params.respond_to?(:to_hash)
 
+       params = params.to_hash
+
        if payload = params.delete(:payload)
           options = params
         else
