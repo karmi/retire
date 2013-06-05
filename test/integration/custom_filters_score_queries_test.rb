@@ -7,23 +7,7 @@ module Tire
 
     context "Custom filters score queries" do
 
-      should "allow boosting score based on filters" do
-        s = Tire.search('articles-test') do
-          query do
-            custom_filters_score do
-              query { all }
-
-              # Give documents over 300 words a score of 3
-              filter({:boost => 3}, :range, :words => {:gt => 300})
-            end
-          end
-        end
-
-        assert_equal 3, s.results[0]._score
-        assert_equal 1, s.results[1]._score
-      end
-
-      should "allow boosting score based on filters defined in DSL" do
+      should "score the document based on a matching filter" do
         s = Tire.search('articles-test') do
           query do
             custom_filters_score do
@@ -39,6 +23,27 @@ module Tire
         end
 
         assert_equal 3, s.results[0]._score
+        assert_equal 1, s.results[1]._score
+      end
+
+      should "allow to use a script based boost factor" do
+        s = Tire.search('articles-test') do
+          query do
+            custom_filters_score do
+              query { all }
+
+              # Give documents over 300 words a score of 3
+              filter do
+                filter :range, words: { gt: 300 }
+                script 'doc.words.value * 2'
+              end
+            end
+          end
+        end
+
+        # p s.results.to_a.map { |r| [r.title, r.words, r._score] }
+
+        assert_equal 750, s.results[0]._score
         assert_equal 1, s.results[1]._score
       end
 

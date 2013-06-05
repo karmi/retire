@@ -122,58 +122,118 @@ module Tire::Search
     end
 
     context 'CustomFiltersScoreQuery' do
-      should "encode options" do
-        query = Query.new.custom_filters_score(:score_mode => 'multiply', :max_boost => 2.0) do
-          query { string 'foo' }
-        end
-        assert_equal 'multiply', query[:custom_filters_score][:score_mode]
-        assert_equal 2.0, query[:custom_filters_score][:max_boost]
+      should "not raise an error when no block is given" do
+        assert_nothing_raised { Query.new.custom_filters_score }
       end
 
-      should "wrap single query with filters" do
+      should "provides a default filter if no filter is given" do
         query = Query.new.custom_filters_score do
-          query { string 'foo' }
-          filter({:boost => 2}, :term, :attr => 'foo')
-          filter({:boost => 3}, :term, :attr => 'bar')
+          query { term :foo, 'bar' }
         end
 
-        assert_equal( { :custom_filters_score => {
-                          :query => {:query_string => {:query => 'foo'}},
-                          :filters => [
-                            {:filter => {:term => {:attr => 'foo'} }, :boost => 2},
-                            {:filter => {:term => {:attr => 'bar'} }, :boost => 3}
-                          ]
-                        }},
-                      query)
+        f = query[:custom_filters_score]
 
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
+        assert_equal( { :match_all => {} }, f[:filters].first[:filter])
+        assert_equal( 1.0, f[:filters].first[:boost])
       end
 
-      should "use DSL to define the filters" do
+      should "properly encode filter with boost" do
         query = Query.new.custom_filters_score do
-          query { string 'foo' }
-
+          query { term :foo, 'bar' }
           filter do
-            boost 2
-            filter :term, :attr => 'foo'
-          end
-
-          filter do
-            boost 3
-            filter :term, :attr => 'bar'
+            filter :terms, :tags => ['ruby']
+            boost 2.0
           end
         end
 
-        assert_equal( { :custom_filters_score => {
-                          :query => {:query_string => {:query => 'foo'}},
-                          :filters => [
-                            {:filter => {:term => {:attr => 'foo'} }, :boost => 2},
-                            {:filter => {:term => {:attr => 'bar'} }, :boost => 3}
-                          ]
-                        }},
-                      query)
+        f = query[:custom_filters_score]
 
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
+        assert_equal( { :tags => ['ruby'] }, f[:filters].first[:filter][:terms])
+        assert_equal( 2.0, f[:filters].first[:boost])
       end
 
+      should "properly encode filter with script" do
+        query = Query.new.custom_filters_score do
+          query { term :foo, 'bar' }
+          filter do
+            filter :terms, :tags => ['ruby']
+            script '2.0'
+          end
+        end
+
+        f = query[:custom_filters_score]
+
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
+        assert_equal( { :tags => ['ruby'] }, f[:filters].first[:filter][:terms])
+        assert_equal( '2.0', f[:filters].first[:script])
+      end
+
+      should "properly encode multiple filters" do
+        query = Query.new.custom_filters_score do
+          query { term :foo, 'bar' }
+          filter do
+            filter :terms, :tags => ['ruby']
+            boost 2.0
+          end
+          filter do
+            filter :terms, :tags => ['python']
+            script '2.0'
+          end
+        end
+
+        f = query[:custom_filters_score]
+
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
+        assert_equal( { :tags => ['ruby'] }, f[:filters].first[:filter][:terms])
+        assert_equal( 2.0, f[:filters].first[:boost])
+        assert_equal( { :tags => ['python'] }, f[:filters].last[:filter][:terms])
+        assert_equal( '2.0', f[:filters].last[:script])
+      end
+
+      should "allow setting the score_mode" do
+        query = Query.new.custom_filters_score do
+          query { term :foo, 'bar' }
+          score_mode 'total'
+        end
+
+        f = query[:custom_filters_score]
+
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
+        assert_equal( 'total', f[:score_mode])
+      end
+
+      should "allow setting params" do
+        query = Query.new.custom_filters_score do
+          query { term :foo, 'bar' }
+          params :a => 'b'
+        end
+
+        f = query[:custom_filters_score]
+
+        assert_equal( { :term => { :foo => { :term => 'bar' } } }, f[:query].to_hash )
+        assert_equal( { :a => 'b' }, f[:params] )
+      end
+
+      should "allow using script parameters" do
+        score_script = "foo * 2"
+
+        query = Query.new.custom_filters_score do
+          query { string 'foo' }
+
+          params :foo => 42
+
+          filter do
+            filter :exists, :field => 'date'
+            script score_script
+          end
+        end
+
+        f = query[:custom_filters_score]
+
+        assert_equal 42, f[:params][:foo]
+      end
     end
 
     context "All query" do

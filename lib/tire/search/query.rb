@@ -56,13 +56,6 @@ module Tire
         @value
       end
 
-      def custom_filters_score(options={}, &block)
-        @custom_filters ||= CustomFiltersScoreQuery.new(options)
-        block.arity < 1 ? @custom_filters.instance_eval(&block) : block.call(@custom_filters) if block_given?
-        @value[:custom_filters_score] = @custom_filters.to_hash
-        @value
-      end
-
       def constant_score(&block)
         @value.update( { :constant_score => ConstantScoreQuery.new(&block).to_hash } ) if block_given?
       end
@@ -280,51 +273,5 @@ module Tire
       end
     end
 
-    class CustomFiltersScoreQuery
-      class Filter
-        def initialize(filter_options={}, type=nil, options=[], &block)
-          if block_given?
-            block.arity < 1 ? self.instance_eval(&block) : block.call(self)
-          else
-            @filter = Tire::Search::Filter.new(type, options)
-            @boost  = filter_options[:boost]
-          end
-        end
-
-        def filter(type, *options)
-          @filter = Tire::Search::Filter.new(type, *options)
-        end
-
-        def boost(value)
-          @boost = value
-          self
-        end
-
-        def to_hash
-          { :filter => @filter.to_hash, :boost => @boost }
-        end
-      end
-
-      def initialize(options={},&block)
-        @value = options
-        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
-      end
-
-      def query(options={}, &block)
-        @value[:query] = Query.new(&block).to_hash
-        @value
-      end
-
-      def filter(filter_options=nil, type=nil, options=[], &block)
-        f = Tire::Search::CustomFiltersScoreQuery::Filter.new(filter_options, type, options, &block)
-        @value[:filters] ||= []
-        @value[:filters] << f.to_hash
-        @value
-      end
-
-      def to_hash
-        @value
-      end
-    end
   end
 end
