@@ -1,6 +1,8 @@
 module Tire
   class Index
 
+    SUPPORTED_META_PARAMS_FOR_BULK = [:_routing, :_ttl, :_version, :_version_type, :_percolate, :_parent, :_timestamp]
+
     attr_reader :name, :response
 
     def initialize(name, &block)
@@ -180,15 +182,12 @@ module Tire
 
         header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
 
-        if document.respond_to?(:to_hash) && hash = document.to_hash
-          meta = {}
-          meta[:_version]   = hash.delete(:_version)
-          meta[:_routing]   = hash.delete(:_routing)
-          meta[:_percolate] = hash.delete(:_percolate)
-          meta[:_parent]    = hash.delete(:_parent)
-          meta[:_timestamp] = hash.delete(:_timestamp)
-          meta[:_ttl]       = hash.delete(:_ttl)
-          meta              = meta.reject { |name,value| !value || value.empty? }
+        if document.respond_to?(:to_hash) && doc_hash = document.to_hash
+          meta = SUPPORTED_META_PARAMS_FOR_BULK.inject({}) { |hash, param|
+            value = doc_hash.delete(param)
+            hash[param] = value unless !value || value.empty?
+            hash
+          }
           header[action.to_sym].update(meta)
         end
 
