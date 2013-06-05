@@ -5,26 +5,33 @@ module Tire
       Configuration.class_eval(&block)
     end
 
-    def search(indices=nil, payload={}, &block)
+    def search(indices=nil, params={}, &block)
       if block_given?
-        Search::Search.new(indices, payload, &block)
+        Search::Search.new(indices, params, &block)
       else
-        raise ArgumentError, "Please pass a Ruby Hash or an object with `to_hash` method, not #{payload.class}" \
-              unless payload.respond_to?(:to_hash)
+        raise ArgumentError, "Please pass a Ruby Hash or an object with `to_hash` method, not #{params.class}" \
+              unless params.respond_to?(:to_hash)
+
+       if payload = params.delete(:payload)
+          options = params
+        else
+          payload = params
+        end
 
         # Extract URL parameters from payload
         #
         search_params = %w| search_type routing scroll from size timeout |
 
-        options = search_params.inject({}) do |sum,item|
+        search_options = search_params.inject({}) do |sum,item|
           if param = (payload.delete(item) || payload.delete(item.to_sym))
             sum[item.to_sym] = param
           end
           sum
         end
 
-        options.update(:payload => payload) unless payload.empty?
-        Search::Search.new(indices, options)
+        search_options.update(options) if options && !options.empty?
+        search_options.update(:payload => payload) unless payload.empty?
+        Search::Search.new(indices, search_options)
       end
     end
 
