@@ -66,9 +66,13 @@ module Tire
         class Mongoid
           include Base
           def import &block
-            0.step(klass.count, options[:per_page]) do |offset|
-              items = klass.limit(options[:per_page]).skip(offset)
-              index.import items.to_a, options, &block
+            items = []
+            klass.all.each do |item|
+              items << item
+              if items.length >= options[:per_page]
+                index.import items, options, &block
+                items = []
+              end
             end
             self
           end
