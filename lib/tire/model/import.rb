@@ -69,7 +69,7 @@ module Tire
             items = []
             klass.all.each do |item|
               items << item
-              if items.length >= options[:per_page]
+              if items.length % options[:per_page] == 0
                 index.import items, options, &block
                 items = []
               end
