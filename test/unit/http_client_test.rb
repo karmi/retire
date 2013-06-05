@@ -43,6 +43,10 @@ module Tire
           end
         end
 
+        should "have __host_unreachable_exceptions" do
+          assert_respond_to Client::RestClient, :__host_unreachable_exceptions
+        end
+
       end
 
       if defined?(Curl)
@@ -79,6 +83,10 @@ module Tire
             end
 
             threads.each { |t| t.join() }
+          end
+
+          should "have __host_unreachable_exceptions" do
+            assert_respond_to Client::RestClient, :__host_unreachable_exceptions
           end
 
         end

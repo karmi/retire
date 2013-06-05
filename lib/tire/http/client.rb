@@ -47,6 +47,10 @@ module Tire
           Response.new e.http_body, e.http_code
         end
 
+        def self.__host_unreachable_exceptions
+          [Errno::ECONNREFUSED, ::RestClient::ServerBrokeConnection, ::RestClient::RequestTimeout]
+        end
+
         private
 
         def self.perform(response)

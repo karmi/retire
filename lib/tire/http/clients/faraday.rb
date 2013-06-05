@@ -13,14 +13,14 @@ require 'faraday'
 #     require 'tire/http/clients/faraday'
 #
 #     Tire.configure do |config|
-#     
+#
 #       # Unless specified, tire will use Faraday.default_adapter and no middleware
 #       Tire::HTTP::Client::Faraday.faraday_middleware = Proc.new do |builder|
 #         builder.adapter :typhoeus
 #       end
-#     
+#
 #       config.client(Tire::HTTP::Client::Faraday)
-#     
+#
 #     end
 #
 #
@@ -56,6 +56,10 @@ module Tire
 
           def head(url)
             request(:head, url)
+          end
+
+          def __host_unreachable_exceptions
+            [::Faraday::Error::ConnectionFailed, ::Faraday::Error::TimeoutError]
           end
 
           private

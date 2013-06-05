@@ -112,7 +112,8 @@ module Tire
               result
             end
           end
-        rescue Errno::ECONNREFUSED => e
+
+        rescue *Tire::Configuration.client.__host_unreachable_exceptions => e
           STDERR.puts "Skipping index creation, cannot connect to Elasticsearch",
                       "(The original exception was: #{e.inspect})"
           false

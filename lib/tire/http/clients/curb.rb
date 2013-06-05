@@ -56,6 +56,10 @@ module Tire
           Response.new client.body_str, client.response_code
         end
 
+        def self.__host_unreachable_exceptions
+          [::Curl::Err::HostResolutionError, ::Curl::Err::ConnectionFailedError]
+        end
+
       end
 
     end
