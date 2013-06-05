@@ -220,7 +220,7 @@ module Tire
 
       end
 
-      context "using fields when also relying on _source" do
+      context "using fields when also returning the _source" do
         setup do
           Configuration.reset
           @default_response = { 'hits' => { 'hits' =>
@@ -237,11 +237,11 @@ module Tire
           @item      = collection.first
         end
 
-        should "return the returned fields" do
+        should "return an individual field" do
           assert_equal '4f99f98ea2b279ec3d002522', @item._parent
         end
 
-        should "return fields from the _source" do
+        should "return fields from the _source as well" do
           assert_equal 'Knee Deep in JSON', @item.title
         end
       end
