@@ -28,13 +28,6 @@ module Tire
         @value = { :range => { field => value } }
       end
 
-      def text(field, value, options={})
-        Tire.warn "The 'text' query has been deprecated, please use a 'match' query."
-        query_options = { :query => value }.update(options)
-        @value = { :text => { field => query_options } }
-        @value
-      end
-
       def string(value, options={})
         @value = { :query_string => { :query => value } }
         @value[:query_string].update(options)

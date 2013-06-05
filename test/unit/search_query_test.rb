@@ -68,17 +68,6 @@ module Tire::Search
       end
     end
 
-    context "Text query" do
-      should "allow search with a text search" do
-        assert_equal( { :text => {'field' => {:query => 'foo'}}}, Query.new.text('field', 'foo'))
-      end
-
-      should "allow search with a different operator for text search" do
-        assert_equal( { :text => {'field' => {:query => 'foo', :operator => 'and'}}},
-                      Query.new.text('field', 'foo', :operator => 'and'))
-      end
-    end
-
     context "Query String query" do
       should "allow search with a query string" do
         assert_equal( { :query_string => { :query => 'title:foo' } },
