@@ -74,6 +74,7 @@ module Tire
                 items = []
               end
             end
+            index.import items, options, &block unless items.empty?
             self
           end
         end
