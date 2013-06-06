@@ -184,11 +184,23 @@ module Tire
         header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
 
         if document.respond_to?(:to_hash) && doc_hash = document.to_hash
-          meta = SUPPORTED_META_PARAMS_FOR_BULK.inject({}) { |hash, param|
-            value = doc_hash.delete(param)
-            hash[param] = value unless !value || value.empty?
-            hash
-          }
+          meta = doc_hash.select do |k,v|
+            [ :_parent,
+              :_percolate,
+              :_routing,
+              :_timestamp,
+              :_ttl,
+              :_version,
+              :_version_type].include?(k)
+          end
+          # Normalize Ruby 1.8 and Ruby 1.9 Hash#select behaviour
+          meta = Hash[meta] unless meta.is_a?(Hash)
+
+          # meta = SUPPORTED_META_PARAMS_FOR_BULK.inject({}) { |hash, param|
+          #   value = doc_hash.delete(param)
+          #   hash[param] = value unless !value || value.empty?
+          #   hash
+          # }
           header[action.to_sym].update(meta)
         end
 
@@ -223,7 +235,8 @@ module Tire
         end
 
       ensure
-        curl = %Q|curl -X POST "#{url}/_bulk" --data-binary '{... data omitted ...}'|
+        data = Configuration.logger && Configuration.logger.level.to_s == 'verbose' ? payload.join("\n") : '... data omitted ...'
+        curl = %Q|curl -X POST "#{url}/_bulk" --data-binary '#{data}'|
         logged('_bulk', curl)
       end
 

@@ -79,6 +79,19 @@ module Tire
           end
         end
       end
+
+      should "take external versioning into account" do
+        # Tire.configure { logger STDERR, level: 'verbose' }
+        index = Tire.index 'bulk-test-external-versioning' do
+          delete
+          create
+          store id: '1', title: 'A', _version: 10, _version_type: 'external'
+        end
+
+        response = index.bulk_store [ { id: '1', title: 'A', _version: 0, _version_type: 'external'} ]
+
+        assert_match /VersionConflictEngineException/, MultiJson.load(response.body)['items'][0]['index']['error']
+      end
     end
 
   end

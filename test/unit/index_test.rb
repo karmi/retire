@@ -682,12 +682,9 @@ module Tire
         end
 
         should "serialize meta parameters into payload header" do
-          expected_params =  [:_routing, :_ttl, :_version, :_version_type, :_percolate, :_parent, :_timestamp]
-          assert_empty Index::SUPPORTED_META_PARAMS_FOR_BULK.reject { |param| expected_params.include?(param) }
-
           Configuration.client.
             expects(:post).
-            with { |url, payload|
+            with do |url, payload|
               # print payload
               lines = payload.split("\n")
 
@@ -695,7 +692,6 @@ module Tire
 
               assert_match /"_ttl":"1d"/,                        lines[2]
               assert ! lines[2].include?('"_:parent"')
-
 
               assert_match /"_version":"1234"/,                  lines[4]
               assert ! lines[4].include?('"_:routing"')
@@ -708,17 +704,19 @@ module Tire
               assert_match /"_parent":"5678"/,                   lines[10]
 
               assert_match /"_timestamp":"2013-02-15 11:00:33"/, lines[12]
-            }.
+
+              true
+            end.
             returns(mock_response('{}'), 200)
 
           @index.bulk :index,
                       [
-                          {:id => '1', :title => 'One', :_routing => 'A'},
-                          {:id => '2', :title => 'Two', :_ttl => '1d', :_parent => false},
+                          {:id => '1', :title => 'One',   :_routing => 'A'},
+                          {:id => '2', :title => 'Two',   :_ttl => '1d', :_parent => false},
                           {:id => '3', :title => 'Three', :_version => '1234', :_routing => ""},
-                          {:id => '4', :title => 'Four', :_version_type => 'external', :_garbage => "stuff"},
-                          {:id => '5', :title => 'Five', :_percolate => 'color:green'},
-                          {:id => '6', :title => 'Six', :_parent => '5678'},
+                          {:id => '4', :title => 'Four',  :_version_type => 'external', :_garbage => "stuff"},
+                          {:id => '5', :title => 'Five',  :_percolate => 'color:green'},
+                          {:id => '6', :title => 'Six',   :_parent => '5678'},
                           {:id => '7', :title => 'Seven', :_timestamp => '2013-02-15 11:00:33'},
                       ]
         end
