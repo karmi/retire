@@ -237,8 +237,16 @@ module Tire::Search
 
     context "IDs query" do
       should "search for documents by IDs" do
+        assert_equal( { :ids => { :values => [1, 2] }  },
+                      Query.new.ids([1, 2]) )
+      end
+      should "search for documents by IDs and type" do
         assert_equal( { :ids => { :values => [1, 2], :type => 'foo' }  },
                       Query.new.ids([1, 2], 'foo') )
+      end
+      should "convert argument to Array" do
+        assert_equal( { :ids => { :values => [1] }  },
+                      Query.new.ids(1) )
       end
     end
 

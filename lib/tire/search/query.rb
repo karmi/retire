@@ -91,8 +91,10 @@ module Tire
         @value
       end
 
-      def ids(values, type)
-        @value = { :ids => { :values => values, :type => type }  }
+      def ids(values, type=nil)
+        @value = { :ids => { :values => Array(values) }  }
+        @value[:ids].update(:type => type) if type
+        @value
       end
 
       def boosting(options={}, &block)
