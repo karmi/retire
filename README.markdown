@@ -573,6 +573,24 @@ control on how the documents are added to or removed from the index:
     end
 ```
 
+Sometimes, you might want to have complete control about the indexing process. In such situations,
+just drop down one layer and use the `Tire::Index#store` and `Tire::Index#remove` methods directly:
+
+```ruby
+    class Article < ActiveRecord::Base
+      acts_as_paranoid
+      include Tire::Model::Search
+
+      after_save do
+        if deleted_at.nil?
+          self.index.store self
+        else
+          self.index.remove self
+        end
+      end
+    end
+```
+
 When you're integrating _Tire_ with ActiveRecord models, you should use the `after_commit`
 and `after_rollback` hooks to keep the index in sync with your database.
 
