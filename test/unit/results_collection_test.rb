@@ -393,7 +393,38 @@ module Tire
           assert @collection.results.empty?, 'Collection results should be empty'
           assert_equal 0, @collection.size
         end
+      end
 
+      context "with ActiveModel::Serializers" do
+        setup do
+          require 'active_model_serializers'
+
+          Tire::Results::Collection.send :include, ActiveModel::ArraySerializerSupport
+
+          class ::MyItemWithSerializer < Tire::Results::Item
+            include ActiveModel::SerializerSupport
+
+            def active_model_serializer
+              ::MyItemSerializer
+            end
+          end
+
+          class ::MyItemSerializer < ActiveModel::Serializer
+            attribute :title,  :key => :name
+            attribute :author, :key => :owner
+          end
+        end
+
+        should "be serializable" do
+          assert_nothing_raised do
+            collection = Results::Collection.new(@default_response, :wrapper => ::MyItemWithSerializer)
+            serializer = collection.active_model_serializer.new(collection)
+
+            hash = serializer.as_json.first
+            assert_equal 'Test',    hash[:name]
+            assert_equal 'John', hash[:owner]
+          end
+        end
       end
 
     end

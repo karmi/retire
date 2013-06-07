@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mocha",        "~> 0.13"
   s.add_development_dependency "minitest",     "~> 2.12"
   s.add_development_dependency "activerecord", ">= 3.0"
+  s.add_development_dependency "active_model_serializers"
   s.add_development_dependency "mongoid",      "~> 2.2"
   s.add_development_dependency "redis-persistence"
   s.add_development_dependency "faraday"

@@ -20,7 +20,7 @@ module Tire
                                       :awards  => { :best_fiction => { :year => '1925' } },
                                       :reviews => [ { :stars => 5, :comment => 'great' },
                                                     { :stars => 3, :comment => 'decent' } ]
-                                                     
+
       end
 
       should "be initialized with a Hash or Hash like object" do
@@ -178,6 +178,35 @@ module Tire
           assert_equal Tire::Results::Item, document.class
         end
 
+      end
+
+      context "with ActiveModel::Serializers" do
+        setup do
+          require 'active_model_serializers'
+
+          class ::MyItemWithSerializer < Tire::Results::Item
+            include ActiveModel::SerializerSupport
+          end
+          class ::MyItemSerializer < ActiveModel::Serializer
+            attribute :tags
+            attribute :title, :key => :name
+
+            def tags
+              object.tags.join('-')
+            end
+          end
+        end
+
+        should "be serializable" do
+          assert_nothing_raised do
+            doc = ::MyItemWithSerializer.new :title => 'Test', :tags => ['foo', 'bar']
+            doc_serializer = ::MyItemSerializer.new(doc)
+
+            hash = doc_serializer.as_json
+            assert_equal 'Test',    hash[:my_item][:name]
+            assert_equal 'foo-bar', hash[:my_item][:tags]
+          end
+        end
       end
 
     end
