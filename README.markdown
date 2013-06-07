@@ -471,6 +471,10 @@ In this case, just wrap the `mapping` method in a `settings` one, passing it the
     end
 ```
 
+Note, that the index will ve created with settings and mappings only when it doesn't yet exist.
+To re-create the index with correct configuration, delete it first: `URL.index.delete` and
+create it afterwards: `URL.create_elasticsearch_index`.
+
 It may well be reasonable to wrap the index creation logic declared with `Tire.index('urls').create`
 in a class method of your model, in a module method, etc, to have better control on index creation when
 bootstrapping the application with Rake tasks or when setting up the test suite.
@@ -680,11 +684,11 @@ Are we saying you have to fiddle with this thing in a `rails console` or silly R
 Just call the included _Rake_ task on the command line:
 
 ```bash
-    $ rake environment tire:import CLASS='Article'
+    $ rake environment tire:import:all
 ```
 
-You can also force-import the data by deleting the index first (and creating it with mapping
-provided by the `mapping` block in your model):
+You can also force-import the data by deleting the index first (and creating it with
+correct settings and/or mappings provided by the `mapping` block in your model):
 
 ```bash
     $ rake environment tire:import CLASS='Article' FORCE=true
