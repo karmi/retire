@@ -471,7 +471,7 @@ In this case, just wrap the `mapping` method in a `settings` one, passing it the
     end
 ```
 
-Note, that the index will ve created with settings and mappings only when it doesn't yet exist.
+Note, that the index will be created with settings and mappings only when it doesn't exist yet.
 To re-create the index with correct configuration, delete it first: `URL.index.delete` and
 create it afterwards: `URL.create_elasticsearch_index`.
 
