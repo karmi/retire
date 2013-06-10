@@ -18,6 +18,12 @@ module Tire
         @value = { :term => query }
       end
 
+      def regexp(field, value, options={})
+        query = { field => { :value => value } }
+        query[field].update(options)
+        @value = { :regexp => query }
+      end
+
       def terms(field, value, options={})
         @value = { :terms => { field => value } }
         @value[:terms].update(options)
