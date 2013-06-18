@@ -595,6 +595,20 @@ just drop down one layer and use the `Tire::Index#store` and `Tire::Index#remove
     end
 ```
 
+Of course, in this way, you're still performing an HTTP request during your database transaction,
+which is not optimal for large-scale applications. In these situations, a better option would be processing
+the index operations in background, with something like [Resque](https://github.com/resque/resque) or
+[Sidekiq](https://github.com/mperham/sidekiq):
+
+```ruby
+    class Article < ActiveRecord::Base
+      include Tire::Model::Search
+
+      after_save    { Indexer::Index.perform_async(document) }
+      after_destroy { Indexer::Remove.perform_async(document) }
+    end
+```
+
 When you're integrating _Tire_ with ActiveRecord models, you should use the `after_commit`
 and `after_rollback` hooks to keep the index in sync with your database.
 
