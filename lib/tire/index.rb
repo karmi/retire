@@ -120,7 +120,7 @@ module Tire
     end
 
     def nodes(options={})
-      url = "#{url}/_nodes"
+      url = "#{self.url}/_nodes"
       unless options.empty?
         params = options.map { |k, v| "#{k}=#{v}" }
         url += "?#{params.join('&')}" if params
