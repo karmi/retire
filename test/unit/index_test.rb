@@ -240,6 +240,28 @@ module Tire
 
       end
 
+      context "nodes" do
+
+        should "return array of node information" do
+          json =<<-JSON
+          {
+            "nodes" : {
+              "Vkl9oiR_SNyOQRuLFNU9Vw" : { // This appears to be a unique node identifier
+                "name" : "node_name",
+                "transport_address" : "inet[/127.0.0.1:9300]",
+                "hostname" : "test_host",
+                "version" : "0.90.1",
+                "http_address" : "inet[/127.0.0.1:9200]"
+              }
+            }
+          }
+          JSON
+          Configuration.client.stubs(:get).returns(mock_response(json))
+
+          assert_equal 'node_name', @index.nodes.first['name']
+        end
+      end
+
       context "when storing" do
 
         should "set type from Hash :type property" do

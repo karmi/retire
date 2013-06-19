@@ -119,6 +119,16 @@ module Tire
       MultiJson.decode(@response.body)[@name]['settings']
     end
 
+    def nodes(options={})
+      url = "#{url}/_nodes"
+      unless options.empty?
+        params = options.map { |k, v| "#{k}=#{v}" }
+        url += "?#{params.join('&')}" if params
+      end
+      @response = Configuration.client.get(url)
+      MultiJson.decode(@response.body)['nodes'].values
+    end
+
     def store(*args)
       document, options = args
 
