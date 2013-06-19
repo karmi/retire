@@ -120,13 +120,16 @@ module Tire
     end
 
     def nodes(options={})
-      url = "#{self.url}/_nodes"
+      url = "#{Configuration.url}/_nodes"
       unless options.empty?
         params = options.map { |k, v| "#{k}=#{v}" }
         url += "?#{params.join('&')}" if params
       end
       @response = Configuration.client.get(url)
       MultiJson.decode(@response.body)['nodes'].values
+    ensure
+      curl = %Q|curl -X GET "#{url}"|
+      logged('GET NODES', curl)
     end
 
     def store(*args)
