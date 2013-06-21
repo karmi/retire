@@ -48,7 +48,7 @@ module Tire
       end
 
       def params
-        options = @options.except(:wrapper, :payload)
+        options = @options.except(:wrapper, :payload, :load)
         options.empty? ? '' : '?' + options.to_param
       end
 
