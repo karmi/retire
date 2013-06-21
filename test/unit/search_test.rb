@@ -128,6 +128,14 @@ module Tire
         assert_match /index_1,index_2/, s.to_curl
       end
 
+      should 'not include the load option in queries' do
+        s = Search::Search.new(:load => { :includes => [:author, {:nested => :relation}] }) do
+          query { string 'title:foo' }
+        end
+
+        assert_nil s.to_hash[:load], 'Make sure to ignore load in URL params'
+      end
+
       should "return itself as a Hash" do
         s = Search::Search.new('index') do
           query { string 'title:foo' }
