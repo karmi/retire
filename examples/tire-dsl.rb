@@ -816,6 +816,49 @@ s = Tire.search 'articles' do
   highlight :title, :body, :options => { :tag => '<strong class="highlight">' }
 end
 
+#### Suggest
+
+#
+# _Elasticsearch_
+# [suggest](http://www.elasticsearch.org/guide/reference/api/search/suggest/)
+# feature suggests similar looking terms based on a provided text by using a suggester.
+# You can easily specify either the term or phrase suggester in the Tire dsl.
+#
+s = Tire.search 'articles' do
+
+  # To define a suggest using the term suggester, first provide an arbitrary name of the suggest and the suggest text.
+  #
+  suggest :term_suggest1, 'thrree blind mice' do
+    # Next, specify the suggester field that you want to use and any options.
+    #
+    term :title, size: 3, sort: 'frequency'
+  end
+
+  # To define a suggest using the phrase suggest, start with the arbitrary name and suggest text as before.
+  suggest :phrase_suggest1, 'thrree blind mice' do
+    # Then specify the suggester field that you want to use and any options.
+    #
+    phrase :title, size: 3 do
+      # If you want to specify the smoothing model, you can along with any options you want.
+      #
+      smoothing :stupid_backoff, discount: 0.5
+
+      # You can also specify one or more candidate generators and any options for them.
+      generator "generator_field", min_word_len: 1
+    end
+  end
+end
+
+# The results will be available in the suggestions array
+s.results.suggestions.each do |suggestion|
+  suggestion.each do |s|
+    puts s["text"]
+    puts s["offset"]
+    puts s["per_page"]
+    puts s["options"]
+  end
+end
+
 #### Percolation
 
 # _Elasticsearch_ comes with one very interesting, and rather unique feature:

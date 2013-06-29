@@ -339,6 +339,31 @@ module Tire
 
       end
 
+      context "suggest" do
+        should "allow to specify term suggest" do
+          s = Search::Search.new('index') do
+            suggest :suggest_name, 'text' do
+              term :candidate_field
+            end
+          end
+
+          hash = MultiJson.decode( s.to_json )
+          assert_not_nil hash['suggest']
+        end
+
+        should "allow to specify phrase suggest" do
+          s = Search::Search.new('index') do
+            suggest :suggest_name, 'text' do
+              phrase :candidate_field
+            end
+          end
+
+          hash = MultiJson.decode( s.to_json )
+          assert_not_nil hash['suggest']
+        end
+
+      end
+
       context "with version" do
 
         should "set the version" do
