@@ -81,6 +81,12 @@ module Tire
         self
       end
 
+      def suggest(name, text, options={}, &block)
+        @suggest ||= {}
+        @suggest.update Suggest.new(name, text, options, &block).to_hash
+        self
+      end
+
       def highlight(*args)
         unless args.empty?
           @highlight = Highlight.new(*args)
@@ -160,6 +166,7 @@ module Tire
           request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
           request.update( { :filter => { :and => @filters.map {|filter| filter.to_hash} } } ) if  @filters && @filters.size > 1
           request.update( { :highlight => @highlight.to_hash } ) if @highlight
+          request.update( { :suggest => @suggest.to_hash } ) if @suggest
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
