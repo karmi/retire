@@ -31,8 +31,18 @@ module Tire
         doc = s.results.first
         d = doc._explanation.details.first
 
+<<<<<<< suggest
         assert d.description.include?("product of:")
         assert_not_nil d.details
+=======
+        explanation = doc._explanation
+
+        assert explanation.description.include?("result of:")
+        assert explanation.value < 0.6
+        assert_not_nil explanation.details
+        end
+
+>>>>>>> HEAD~1
       end
     end
   end
