@@ -33,7 +33,7 @@ module Tire
 
         explanation = doc._explanation
 
-        assert explanation.description.include?("product of:")
+        assert explanation.description.include?("result of:")
         assert explanation.value < 0.6
         assert_not_nil explanation.details
         end
