@@ -78,6 +78,23 @@ module Tire
         assert_equal [], results.first.tags
       end
 
+      context "with deleting" do
+        should "search with simple query" do
+          PersistentArticle.create :id => 1, :title => 'One'
+          PersistentArticle.index.refresh
+
+          results = PersistentArticle.search 'one'
+          assert_equal 1, results.size
+
+          PersistentArticle.delete do
+            term :title, 'one'
+          end
+
+          results = PersistentArticle.search 'one'
+          assert_equal 0, results.size
+        end
+      end
+
       context "with pagination" do
 
         setup do

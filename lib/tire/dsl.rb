@@ -105,6 +105,10 @@ module Tire
       Search::Count.new(indices, options, &block).value
     end
 
+    def delete(indices=nil, options={}, &block)
+      DeleteByQuery.new(indices, options, &block).perform
+    end
+
     def index(name, &block)
       Index.new(name, &block)
     end
