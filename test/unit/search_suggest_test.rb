@@ -11,13 +11,13 @@ module Tire::Search
       end
 
       should "allow you to specify name and text" do
-        assert_equal( {suggest_name: {text: "suggest_text"}}.to_json,
+        assert_equal( { :suggest_name => { :text => "suggest_text"}}.to_json,
                       Suggest.new(:suggest_name, "suggest_text").to_json)
       end
 
       should "allow you to specify additional options" do
-        assert_equal( {suggest_name: {text: "suggest_text", option1: "option_value"}}.to_json,
-                      Suggest.new(:suggest_name, "suggest_text", option1: "option_value").to_json)
+        assert_equal( { :suggest_name => { :text => "suggest_text", :option1 => "option_value"}}.to_json,
+                      Suggest.new(:suggest_name, "suggest_text", :option1 => "option_value").to_json)
       end
 
       context "term suggest" do
@@ -26,16 +26,16 @@ module Tire::Search
             term "candidate_field"
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", term: { field: "candidate_field" }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :term => { :field => "candidate_field" }}}.to_json,
                         suggest.to_json)
         end
 
         should "allow you to specify term suggest options" do
           suggest = Suggest.new :suggest_name, "suggest_text" do
-            term "candidate_field", size: 3, sort: "frequency"
+            term "candidate_field", :size => 3, :sort => "frequency"
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", term: { field: "candidate_field", size: 3, sort: "frequency" }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :term => { :field => "candidate_field", :size => 3, :sort => "frequency" }}}.to_json,
                         suggest.to_json)
         end
       end
@@ -46,27 +46,27 @@ module Tire::Search
             phrase "candidate_field"
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", phrase: { field: "candidate_field" }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :phrase => { :field => "candidate_field" }}}.to_json,
                         suggest.to_json)
         end
 
         should "allow you to specify phrase suggest options" do
           suggest = Suggest.new :suggest_name, "suggest_text" do
-            phrase "candidate_field", gram_size: 2, max_errors: 0.5
+            phrase "candidate_field", :gram_size => 2, :max_errors => 0.5
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", phrase: { field: "candidate_field", gram_size: 2, max_errors: 0.5 }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :phrase => { :field => "candidate_field", :gram_size => 2, :max_errors => 0.5 }}}.to_json,
                         suggest.to_json)
         end
 
         should "allow you to specify the smoothing model" do
           suggest = Suggest.new :suggest_name, "suggest_text" do
             phrase "candidate_field" do
-              smoothing :stupid_backoff, discount: 0.5
+              smoothing :stupid_backoff, :discount => 0.5
             end
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", phrase: { field: "candidate_field", smoothing: { stupid_backoff: { discount: 0.5 }} }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :phrase => { :field => "candidate_field", :smoothing => { :stupid_backoff => { :discount => 0.5 }} }}}.to_json,
                         suggest.to_json)
         end
 
@@ -77,18 +77,18 @@ module Tire::Search
             end
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", phrase: { field: "candidate_field", direct_generator: [ { field: "generator_field" } ] }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :phrase => { :field => "candidate_field", :direct_generator => [ { :field => "generator_field" } ] }}}.to_json,
                         suggest.to_json)
         end
 
         should "allow you to specify a direct generator options" do
           suggest = Suggest.new :suggest_name, "suggest_text" do
             phrase "candidate_field" do
-              generator "generator_field", min_word_len: 1
+              generator "generator_field", :min_word_len => 1
             end
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", phrase: { field: "candidate_field", direct_generator: [ { field: "generator_field", min_word_len: 1 } ] }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :phrase => { :field => "candidate_field", :direct_generator => [ { :field => "generator_field", :min_word_len => 1 } ] }}}.to_json,
                         suggest.to_json)
         end
 
@@ -100,7 +100,7 @@ module Tire::Search
             end
           end
 
-          assert_equal( {suggest_name: {text: "suggest_text", phrase: { field: "candidate_field", direct_generator: [ { field: "generator_field" }, { field: "generator_field2" } ] }}}.to_json,
+          assert_equal( { :suggest_name => { :text => "suggest_text", :phrase => { :field => "candidate_field", :direct_generator => [ { :field => "generator_field" }, { :field => "generator_field2" } ] }}}.to_json,
                         suggest.to_json)
         end
       end
