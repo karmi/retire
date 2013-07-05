@@ -67,7 +67,7 @@ module Tire
           include Base
           def import &block
             items = []
-            klass.all.each do |item|
+            klass.all.no_timeout.each do |item|
               items << item
               if items.length % options[:per_page] == 0
                 index.import items, options, &block
