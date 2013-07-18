@@ -5,6 +5,8 @@ module Tire
     module Client
 
       class RestClient
+        require 'ostruct'
+
         ConnectionExceptions = [::RestClient::ServerBrokeConnection, ::RestClient::RequestTimeout]
 
         def self.get(url, data=nil)
@@ -54,7 +56,12 @@ module Tire
         private
 
         def self.perform(response)
-          Response.new response.body, response.code, response.headers
+          if Configuration.off?
+            # returns an empty object
+            OpenStruct.new()
+          else
+            Response.new response.body, response.code, response.headers
+          end
         end
 
       end
