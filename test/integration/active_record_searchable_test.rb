@@ -610,10 +610,10 @@ module Tire
 
       end
 
-      context "percolated search" do
+      travis_context "percolated search" do
         setup do
           delete_registered_queries
-          delete_percolator_index if ENV['TRAVIS']
+          delete_percolator_index
           ActiveRecordModelWithPercolation.index.register_percolator_query('alert') { string 'warning' }
           Tire.index('_percolator').refresh
         end
