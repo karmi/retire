@@ -487,7 +487,7 @@ module Tire
         when document.is_a?(Hash)
           document[:_id] || document['_id'] || document[:id] || document['id']
         when document.respond_to?(:id) && document.id != document.object_id
-          document.id.as_json
+          document.id.to_s
       end
       $VERBOSE = old_verbose
       id

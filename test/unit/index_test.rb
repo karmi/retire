@@ -363,13 +363,11 @@ module Tire
             @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
           end
 
-          should "convert document ID to string or number" do
-            # This is related to issues #529, #535:
-            # When using Mongoid and the Yajl gem, document IDs from Mongo (Moped::BSON::ObjectId)
-            # are incorrectly serialized to JSON, and documents are stored with incorrect, auto-generated IDs.
+          should "convert document ID to string" do
+            # This is related to issues #529, #535, #775
             class Document1; def id; "one"; end; end
             class Document2; def id; 1;     end; end
-            class Document3; class ID; def as_json; 'c'; end; end
+            class Document3; class ID; def to_s; 'c'; end; end
                              def id;   ID.new; end
             end
 
@@ -378,7 +376,7 @@ module Tire
             document_3 = Document3.new
 
             assert_equal 'one', @index.get_id_from_document(document_1)
-            assert_equal 1,     @index.get_id_from_document(document_2)
+            assert_equal '1',   @index.get_id_from_document(document_2)
             assert_equal 'c',   @index.get_id_from_document(document_3)
           end
 
