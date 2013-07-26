@@ -263,7 +263,7 @@ module Tire
           Tire::Results::Strategy::ActiveRecord => lambda { |model| ActiveRecordArticle.expects(:where).with(:id => [1]).returns([model]) }
         }.each_pair do |strategy, expects|
           should "yield the model instance and the raw hit for #{strategy}" do
-            Tire::Results::Strategy.stubs(:from_class).returns(strategy.new(ActiveRecordArticle, load: true))
+            Tire::Results::Strategy.stubs(:from_class).returns(strategy.new(ActiveRecordArticle, :load => true))
 
             response = { 'hits' => { 'hits' => [ {'_id' => 1, '_score' => 0.5, '_type' => 'active_record_article'} ] } }
 
