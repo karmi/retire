@@ -258,25 +258,30 @@ module Tire
           end
         end
 
-        should "yield the model instance and the raw hit" do
-          response = { 'hits' => { 'hits' => [ {'_id' => 1, '_score' => 0.5, '_type' => 'active_record_article'} ] } }
+        {
+          Tire::Results::Strategy::Default => lambda { |model| ActiveRecordArticle.expects(:find).with([1]).returns([model]) },
+          Tire::Results::Strategy::ActiveRecord => lambda { |model| ActiveRecordArticle.expects(:where).with(:id => [1]).returns([model]) }
+        }.each_pair do |strategy, expects|
+          should "yield the model instance and the raw hit for #{strategy}" do
+            Tire::Results::Strategy.stubs(:from_class).returns(strategy.new(ActiveRecordArticle, load: true))
 
-          ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":memory:" )
-          ActiveRecord::Migration.verbose = false
-          ActiveRecord::Schema.define(:version => 1) { create_table(:active_record_articles) { |t| t.string(:title) } }
-          model = ActiveRecordArticle.new(:title => 'Test'); model.id = 1
+            response = { 'hits' => { 'hits' => [ {'_id' => 1, '_score' => 0.5, '_type' => 'active_record_article'} ] } }
 
-          ActiveRecordArticle.expects(:find).with([1]).returns([ model] )
+            ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":memory:" )
+            ActiveRecord::Migration.verbose = false
+            ActiveRecord::Schema.define(:version => 1) { create_table(:active_record_articles) { |t| t.string(:title) } }
+            model = ActiveRecordArticle.new(:title => 'Test'); model.id = 1
 
-          Results::Collection.new(response, :load => true).each_with_hit do |result, hit|
-            assert_instance_of ActiveRecordArticle, result
-            assert_instance_of Hash, hit
-            assert_equal 'Test',   result.title
-            assert_equal 0.5, hit['_score']
+            expects.call(model)
+
+            Results::Collection.new(response, :load => true).each_with_hit do |result, hit|
+              assert_instance_of ActiveRecordArticle, result
+              assert_instance_of Hash, hit
+              assert_equal 'Test',   result.title
+              assert_equal 0.5, hit['_score']
+            end
           end
-
         end
-
 
       end
 
@@ -344,28 +349,54 @@ module Tire
           ActiveRecordArticle.stubs(:inspect).returns("<ActiveRecordArticle>")
         end
 
-        should "load the records via model find method from database" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
-          Results::Collection.new(@response, :load => true).results
+        {
+          Tire::Results::Strategy::Default => lambda { |ids, items| ActiveRecordArticle.expects(:find).with(ids).returns(items) },
+          Tire::Results::Strategy::ActiveRecord => lambda { |ids, items| ActiveRecordArticle.expects(:where).with(:id => ids).returns(items) }
+        }.each_pair do |strategy, expects|
+          should "load the records via model find method from database for #{strategy}" do
+            Tire::Results::Strategy.stubs(:from_class).returns(strategy.new(ActiveRecordArticle, :load => true))
+
+            expects.call([1, 2, 3], [
+              Results::Item.new(:id => 3),
+              Results::Item.new(:id => 1),
+              Results::Item.new(:id => 2)
+            ])
+
+            Results::Collection.new(@response, :load => true).results
+          end
+
+          should "preserve the order of records returned from search for #{strategy}" do
+            Tire::Results::Strategy.stubs(:from_class).returns(strategy.new(ActiveRecordArticle, :load => true))
+
+            expects.call([1, 2, 3], [
+              Results::Item.new(:id => 3),
+              Results::Item.new(:id => 1),
+              Results::Item.new(:id => 2)
+            ])
+
+            assert_equal [1,2,3], Results::Collection.new(@response, :load => true).results.map(&:id)
+          end
         end
 
-        should "pass the :load option Hash to model find metod" do
-          ActiveRecordArticle.expects(:find).with([1,2,3], :include => 'comments').
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
-          Results::Collection.new(@response, :load => { :include => 'comments' }).results
-        end
+        {
+          Tire::Results::Strategy::Default => lambda { |ids, load_options, items| ActiveRecordArticle.expects(:find).with(ids, load_options).returns(items) },
+          Tire::Results::Strategy::ActiveRecord => lambda { |ids, load_options, items|
+            relation = Struct.new(:all)
+            relation.expects(:all).with(load_options).returns(items)
+            ActiveRecordArticle.expects(:where).with(:id => ids).returns(relation)
+          }
+        }.each_pair do |strategy, expects|
+          should "pass the :load option Hash to model find method for #{strategy}" do
+            Tire::Results::Strategy.stubs(:from_class).returns(strategy.new(ActiveRecordArticle, :load => { :include => "comments" }))
 
-        should "preserve the order of records returned from search" do
-          ActiveRecordArticle.expects(:find).with([1,2,3]).
-                              returns([ Results::Item.new(:id => 3),
-                                        Results::Item.new(:id => 1),
-                                        Results::Item.new(:id => 2)  ])
-          assert_equal [1,2,3], Results::Collection.new(@response, :load => true).results.map(&:id)
+            expects.call([1, 2, 3], { :include => "comments" }, [
+               Results::Item.new(:id => 3),
+               Results::Item.new(:id => 1),
+               Results::Item.new(:id => 2)
+            ])
+
+            Results::Collection.new(@response, :load => { :include => 'comments' }).results
+          end
         end
 
         should "raise error when model class cannot be inferred from _type" do
