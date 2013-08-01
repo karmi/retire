@@ -399,6 +399,17 @@ module Tire
       logged('_analyze', curl)
     end
 
+    # Optimize the index for faster search operations. See
+    # http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
+    def optimize(options={})
+      params  = options.to_param
+      @response = Configuration.client.post "#{url}/_optimize?#{params}", ''
+
+    ensure
+      curl = %Q|curl -X POST "#{url}/_optimize?#{params}"|
+      logged('_optimize', curl)
+    end
+
     def register_percolator_query(name, options={}, &block)
       options[:query] = Search::Query.new(&block).to_hash if block_given?
 
