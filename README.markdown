@@ -52,7 +52,12 @@ To test-drive the core _Elasticsearch_ functionality, let's require the gem:
 ```
 
 By default Tire will connect to a local instance of Elastic Search; if you're connecting to a remote
-host then you must set the environment variable ELASTICSEARCH_URL.
+host then you must set the environment variable ELASTICSEARCH_URL. Additionally you can set the backend 
+URL at runtime in your application:
+
+```ruby
+    Tire.configure { url "http://search.example.com" } 
+```
 
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
 in [examples/tire-dsl.rb](http://karmi.github.com/tire/).
