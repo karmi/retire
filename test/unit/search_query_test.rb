@@ -508,6 +508,16 @@ module Tire::Search
         assert_equal 2, query.to_hash[:bool][:must].size
       end
 
+      should "search for documents by IDs and a field" do
+        query = Query.new
+        query.match(:foo, 'bar')
+        query.ids(1)
+
+        assert_equal( [{ :match => { :foo => { :query => 'bar' } } },
+                       { :ids => { :values => [1] } }],
+                      query.to_hash[:bool][:must] )
+      end
+
     end
 
     context "NestedQuery" do
