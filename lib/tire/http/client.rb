@@ -48,7 +48,7 @@ module Tire
         end
 
         def self.__host_unreachable_exceptions
-          [Errno::ECONNREFUSED, ::RestClient::ServerBrokeConnection, ::RestClient::RequestTimeout]
+          [Errno::ECONNREFUSED, Errno::ETIMEDOUT, ::RestClient::ServerBrokeConnection, ::RestClient::RequestTimeout, SocketError]
         end
 
         private
