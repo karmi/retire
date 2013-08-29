@@ -11,7 +11,10 @@ class ActiveRecordArticle < ActiveRecord::Base
     mapping do
       indexes :title,      :type => 'string', :boost => 10, :analyzer => 'snowball'
       indexes :created_at, :type => 'date'
-
+      indexes :suggest, :type => :completion,
+                        :index_analyzer => :simple,
+                        :search_analyzer => :simple,
+                        :payloads => true
       indexes :comments do
         indexes :author
         indexes :body
@@ -23,6 +26,7 @@ class ActiveRecordArticle < ActiveRecord::Base
     {
       :title        => title,
       :length       => length,
+      :suggest      => suggest,
 
       :comments     => comments.map { |c| { :_type  => 'active_record_comment',
                                             :_id    => c.id,
@@ -30,6 +34,14 @@ class ActiveRecordArticle < ActiveRecord::Base
                                             :body   => c.body  } },
       :stats        => stats.map    { |s| { :pageviews  => s.pageviews } }
     }.to_json
+  end
+
+  def suggest
+    { 
+      input: self.title.split(/\W/).reject(&:empty?),
+      output: self.title,
+      payload: { length: length, comment_authors: comment_authors}
+    }
   end
 
   def length
