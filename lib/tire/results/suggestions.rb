@@ -38,17 +38,17 @@ module Tire
 
       def texts(suggestion=:all)
         if suggestion == :all
-          results.map {|k,v| v.map{|s| s['options']['text']}}.flatten
+          results.map {|k,v| v.map{|s| s['options'].map {|o| o['text']}}}.flatten
         else
-          response[suggestion].map{|s| s['options']['text']}.flatten
+          response[suggestion].map{|s| s['options'].map {|o| o['text']}}.flatten
         end
       end
 
       def payloads(suggestion=:all)
         if suggestion == :all
-          results.map {|k,v| v.map{|s| s['options']['payload']}}.flatten
+          results.map {|k,v| v.map{|s| s['options'].map {|o| o['payload']}}}.flatten
         else
-          response[suggestion].map{|s| s['options']['payload']}.flatten
+          response[suggestion].map{|s| s['options'].map {|o| o['payload']}}.flatten
         end
       end
 
