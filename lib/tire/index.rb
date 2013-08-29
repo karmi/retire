@@ -154,13 +154,13 @@ module Tire
     #
     #     @myindex.bulk :index, [ {id: 1, title: 'One'}, { id: 2, title: 'Two', _version: 3 } ], refresh: true
     #
-    # Pass the action (`index`, `create`, `delete`) as the first argument, the collection of documents as
+    # Pass the action (`index`, `create`, `delete`, `update`) as the first argument, the collection of documents as
     # the second argument, and URL parameters as the last option.
     #
     # Any _meta_ information contained in documents (such as `_routing` or `_parent`) is extracted
     # and added to the "header" line.
     #
-    # Shortcut methods `bulk_store`, `bulk_delete` and `bulk_create` are available.
+    # Shortcut methods `bulk_store`, `bulk_delete`, `bulk_create`, and `bulk_update` are available.
     #
     def bulk(action, documents, options={})
       return false if documents.empty?
@@ -181,12 +181,22 @@ module Tire
           STDERR.puts "[ERROR] Document #{document.inspect} does not have ID" unless id
         end
 
+        if action.to_sym == :update
+          raise ArgumentError, "Cannot update without document type" unless type
+          raise ArgumentError, "Cannot update without document ID" unless id
+          raise ArgumentError, "Update requires a hash document" unless document.respond_to?(:to_hash)
+          document = document.to_hash
+          raise ArgumentError, "Update requires either a script or a partial document" unless document[:script] || document[:doc]
+        end
+
         header = { action.to_sym => { :_index => name, :_type => type, :_id => id } }
+        header[action.to_sym].update({:_retry_on_conflict => options[:retry_on_conflict]}) if options[:retry_on_conflict]
 
         if document.respond_to?(:to_hash) && doc_hash = document.to_hash
           meta = doc_hash.select do |k,v|
             [ :_parent,
               :_percolate,
+              :_retry_on_conflict,
               :_routing,
               :_timestamp,
               :_ttl,
@@ -202,6 +212,19 @@ module Tire
           #   hash
           # }
           header[action.to_sym].update(meta)
+        end
+
+        if action.to_sym == :update
+          document.keep_if do |k,_|
+            [
+              :doc,
+              :upsert,
+              :doc_as_upsert,
+              :script,
+              :params,
+              :lang
+            ].include?(k)
+          end
         end
 
         output = []
@@ -252,6 +275,10 @@ module Tire
 
     def bulk_delete(documents, options={})
       bulk :delete, documents, options
+    end
+
+    def bulk_update(documents, options={})
+      bulk :update, documents, options
     end
 
     def import(klass_or_collection, options={})
