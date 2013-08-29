@@ -616,7 +616,7 @@ module Tire
       end
 
       context "when performing a bulk api action" do
-        # Possible Bulk API actions are `index`, `create`, `delete`
+        # Possible Bulk API actions are `index`, `create`, `delete`, `update`
         #
         # The expected JSON looks like this:
         #
@@ -625,6 +625,8 @@ module Tire
         # {"create":{"_index":"dummy","_type":"document","_id":"2"}}
         # {"id":"2","title":"Two"}
         # {"delete":{"_index":"dummy","_type":"document","_id":"2"}}
+        # {"update":{"_index":"dummy","_type":"document","_id":"1","_retry_on_conflict": 3}}
+        # {"doc":{"title":"Updated One"}}
         #
         # See http://www.elasticsearch.org/guide/reference/api/bulk.html
 
@@ -679,6 +681,39 @@ module Tire
             returns(mock_response('{}'), 200)
 
           @index.bulk :delete, [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
+        end
+
+        should "serialize payload for update action" do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              assert_equal "#{@index.url}/_bulk", url
+              assert_match /"update"/, payload
+              assert_match /"_index":"dummy"/, payload
+              assert_match /"_type":"document"/, payload
+              assert_match /"_id":"1"/, payload
+              assert_match /"_id":"2"/, payload
+              lines = payload.split("\n")
+              assert_equal 'One', MultiJson.decode(lines[1])['doc']['title']
+              assert_equal 'Two', MultiJson.decode(lines[3])['doc']['title']
+              assert_equal true, MultiJson.decode(lines[3])['doc_as_upsert']
+            end.
+            returns(mock_response('{}'), 200)
+
+          @index.bulk :update, [ {:id => '1', :doc => {:title => 'One'}}, {:id => '2', :doc => {:title => 'Two'}, :doc_as_upsert => true} ]
+        end
+
+        should 'serialize _retry_on_conflict parameter into payload header' do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              lines = payload.split("\n")
+              assert_equal 3, MultiJson.decode(lines[0])['update']['_retry_on_conflict']
+              assert_equal 3, MultiJson.decode(lines[2])['update']['_retry_on_conflict']
+            end.
+            returns(mock_response('{}'), 200)
+
+          @index.bulk :update, [ {:id => '1', :doc => {:title => 'One'}}, {:id => '2', :doc => {:title => 'Two'}} ], :retry_on_conflict => 3
         end
 
         should "serialize meta parameters into payload header" do
