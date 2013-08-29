@@ -225,6 +225,7 @@ module Tire
         include Tire::Model::Import::ClassMethods
         include Tire::Model::Indexing::ClassMethods
         include Tire::Model::Percolate::ClassMethods
+        include Tire::Model::Suggest::ClassMethods
         include ClassMethods
 
         INTERFACE = public_instance_methods.map(&:to_sym) - Object.public_instance_methods.map(&:to_sym)
