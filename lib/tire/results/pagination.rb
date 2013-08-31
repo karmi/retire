@@ -52,6 +52,7 @@ module Tire
       alias :total_count  :total_entries
       alias :num_pages    :total_pages
       alias :offset_value :offset
+      alias :out_of_range? :out_of_bounds?
 
       def first_page?
         current_page == 1
