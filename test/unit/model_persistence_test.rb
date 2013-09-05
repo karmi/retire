@@ -311,6 +311,13 @@ module Tire
             assert_equal '4chan',       article.comments.first.nick
           end
 
+          should "automatically cast value to defined property type on strings, integers, and floats" do
+            article = PersistentArticleWithTypes.new :title => 12345, :comment_count => '12', :average_score => 10
+            assert_equal '12345', article.title
+            assert_equal 12, article.comment_count
+            assert_equal 10.0, article.average_score
+          end
+
           should "automatically format strings in ISO8601 with the default UTC designator" do
             article = PersistentArticle.new :published_on => '2011-11-01T23:00:00Z'
             assert_instance_of Time, article.published_on
