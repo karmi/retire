@@ -46,7 +46,7 @@ module Tire
 
             # Save property default value (when relevant):
             unless (default_value = options.delete(:default)).nil?
-              property_defaults[name.to_sym] = default_value.respond_to?(:call) ? default_value.call : default_value
+              property_defaults[name.to_sym] = default_value
             end
 
             # Save property casting (when relevant):
@@ -92,7 +92,15 @@ module Tire
             #
             property_defaults = self.class.property_defaults.inject({}) do |hash, item|
               key, value = item
-              hash[key.to_sym] = value.class.respond_to?(:new) ? value.clone : value
+
+              hash[key.to_sym] = if value.respond_to?(:call)
+                value.call
+              elsif value.class.respond_to?(:new)
+                value.clone
+              else
+                value
+              end
+
               hash
             end
             __update_attributes(property_defaults.merge(attributes))
