@@ -214,9 +214,11 @@ module Tire
             assert_equal false, article.hidden
           end
 
-          should "evaluate lambdas as default values" do
+          should "evaluate lambdas as default values at time of initialization" do
+            now = Time.now
+            Time.stubs(:now).returns(now)
             article = PersistentArticleWithDefaults.new
-            assert_equal Time.now.year, article.created_at.year
+            assert_equal now, article.created_at
           end
 
           should "not affect default value" do
