@@ -316,7 +316,7 @@ module Tire
             posted_at = article_created + 10.minutes
             article = PersistentArticleWithCastedCollection.new :created_at => article_created,
                                                                 :title => 'Test',
-                                                                :comments => [{:nick => '4chan', :body => 'WHY U NO?', posted_at: posted_at}]
+                                                                :comments => [{:nick => '4chan', :body => 'WHY U NO?', :posted_at => posted_at}]
             comment = article.comments.first
             assert_equal comment.posted_within, 10.minutes
           end
