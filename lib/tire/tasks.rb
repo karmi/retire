@@ -124,6 +124,9 @@ namespace :tire do
         require path
 
         model_filename = path[/#{Regexp.escape(dir.to_s)}\/([^\.]+).rb/, 1]
+
+        next if model_filename.match(/^concerns\//i) # Skip concerns/ folder
+
         klass          = model_filename.camelize.constantize
 
         # Skip if the class doesn't have Tire integration
