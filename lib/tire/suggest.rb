@@ -56,7 +56,7 @@ module Tire
         @response = Configuration.client.get(self.url + self.params, self.to_json)
         if @response.failure?
           STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
-          raise SearchRequestFailed, @response.to_s
+          raise Tire::Search::SearchRequestFailed, @response.to_s
         end
         @json = MultiJson.decode(@response.body)
         @results = Results::Suggestions.new(@json, @options)
