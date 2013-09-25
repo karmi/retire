@@ -68,13 +68,13 @@ Gem::Specification.new do |s|
    your models (incrementally upon saving, or in bulk), searching and
    paginating the results.
 
-   Please check the documentation at <http://karmi.github.com/tire/>.
+   Please check the documentation at <http://karmi.github.com/retire/>.
   DESC
 
   s.post_install_message =<<-CHANGELOG.gsub(/^  /, '')
   ================================================================================
 
-    Please check the documentation at <http://karmi.github.com/tire/>.
+    Please check the documentation at <http://karmi.github.com/retire/>.
 
   --------------------------------------------------------------------------------
 
