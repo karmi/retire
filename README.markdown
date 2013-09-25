@@ -20,7 +20,7 @@ full-text search engine and database with
 [powerful aggregation features](http://www.elasticsearch.org/guide/reference/api/search/facets/),
 communicating by JSON over RESTful HTTP, based on [Lucene](http://lucene.apache.org/), written in Java.
 
-This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/tire/>.
+This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/retire/>.
 
 Both of these documents contain a lot of information. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please see the project [Wiki](https://github.com/karmi/tire/wiki/_pages), search the [issues](https://github.com/karmi/tire/issues), and refer to the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration).
 
@@ -63,7 +63,7 @@ To test-drive the core _Elasticsearch_ functionality, let's require the gem:
 ```
 
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
-in [examples/tire-dsl.rb](http://karmi.github.com/tire/).
+in [examples/tire-dsl.rb](http://karmi.github.com/retire/).
 
 Also, note that we're doing some heavy JSON lifting here. _Tire_ uses the
 [_multi_json_](https://github.com/intridea/multi_json) gem as a generic JSON wrapper,
