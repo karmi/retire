@@ -121,10 +121,12 @@ namespace :tire do
 
       puts "[IMPORT] Loading models from: #{dir}"
       Dir.glob(File.join("#{dir}/**/*.rb")).each do |path|
-        require path
-
         model_filename = path[/#{Regexp.escape(dir.to_s)}\/([^\.]+).rb/, 1]
-        klass          = model_filename.camelize.constantize
+        begin
+          klass = model_filename.camelize.constantize
+        rescue NameError
+          require(path) ? retry : raise
+        end
 
         # Skip if the class doesn't have Tire integration
         next unless klass.respond_to?(:tire)
