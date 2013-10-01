@@ -1,6 +1,17 @@
 Tire
 =========
 
+---------------------------------------------------------------------------------------------------
+
+  NOTICE: This library has been renamed and retired in September 2013
+          ([read the explanation](https://github.com/karmi/retire/wiki/Tire-Retire)).
+
+  Have a look at the **<http://github.com/elasticsearch/elasticsearch-ruby>**
+  suite of gems, which will contain similar set of features for
+  ActiveRecord and Rails integration as Tire.
+
+---------------------------------------------------------------------------------------------------
+
 _Tire_ is a Ruby (1.8 or 1.9) client for the [Elasticsearch](http://www.elasticsearch.org/)
 search engine/database.
 
