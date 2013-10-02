@@ -49,6 +49,24 @@ module Tire
         assert_equal 0, Tire.search('bulk-test') { query {all} }.results.size
       end
 
+      should 'update documents in bulk' do
+        @index.bulk_store @articles, refresh: true
+
+        documents = @articles.map do |a|
+          {
+            id: a[:id],
+            type: a[:type],
+            doc: { title: "#{a[:title]}-updated" }
+          }
+        end
+        @index.bulk_update documents, refresh: true
+
+        documents = Tire.search('bulk-test') { query {all} }.results.to_a
+        assert_equal 'one-updated', documents[0][:title]
+        assert_equal 'two-updated', documents[1][:title]
+        assert_equal 'three-updated', documents[2][:title]
+      end
+
       should "allow to feed search results to bulk API" do
         (1..10).to_a.each { |i| @index.store id: i }
         @index.refresh
