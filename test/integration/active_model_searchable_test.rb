@@ -86,6 +86,21 @@ module Tire
         assert_equal 'abc123', results.first.id
       end
 
+      should "return facets" do
+        a = SupermodelArticle.new :title => 'Test'
+        a.save
+        a.index.refresh
+
+        s = SupermodelArticle.search do
+          query { match :title, 'test' }
+          facet 'title' do
+            terms :title
+          end
+        end
+
+        assert_equal 1, s.facets['title']['terms'][0]['count']
+      end
+
       context "within Rails" do
 
         setup do
