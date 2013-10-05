@@ -67,11 +67,13 @@ module Tire
           include Base
           def import &block
             items = []
-            klass.all.each do |item|
-              items << item
-              if items.length % options[:per_page] == 0
-                index.import items, options, &block
-                items = []
+            ::Mongoid.unit_of_work(:disable => :all) do
+              klass.all.each do |item|
+                items << item
+                if items.length % options[:per_page] == 0
+                  index.import items, options, &block
+                  items = []
+                end
               end
             end
             index.import items, options, &block unless items.empty?
