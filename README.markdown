@@ -446,7 +446,7 @@ In this case, _only_ the defined model attributes are indexed. The `mapping` dec
 index when the class is loaded or when the importing features are used, and _only_ when it does not yet exist.
 
 You can define different [_analyzers_](http://www.elasticsearch.org/guide/reference/index-modules/analysis/index.html),
-[_boost_](http://www.elasticsearch.org/guide/reference/mapping/boost-field.html) levels for different properties,
+[_boost_](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-boost-field.html) levels for different properties,
 or any other configuration for _elasticsearch_.
 
 You're not limited to 1:1 mapping between your model properties and the serialized document. With the `:as` option,
