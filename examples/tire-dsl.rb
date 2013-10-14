@@ -117,7 +117,7 @@ Tire.index 'articles' do
   refresh
 end
 
-# We may want to define a specific [mapping](http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index.html)
+# We may want to define a specific [mapping](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-create-index.html)
 # for the index.
 
 Tire.index 'articles' do
@@ -154,7 +154,7 @@ end
 #### Bulk Indexing
 
 # Of course, we may have large amounts of data, and adding them to the index one by one really isn't the best idea.
-# We can use _Elasticsearch's_ [bulk API](http://www.elasticsearch.org/guide/reference/api/bulk.html)
+# We can use _Elasticsearch's_ [bulk API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html)
 # for importing the data.
 
 # So, for demonstration purposes, let's suppose we have a simple collection of hashes to store.
@@ -410,7 +410,7 @@ end
 
 # Quite often, we need complex queries with boolean logic.
 # Instead of composing long query strings such as `tags:ruby OR tags:java AND NOT tags:python`,
-# we can use the [_bool_](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
+# we can use the [_bool_](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)
 # query.
 
 s = Tire.search('articles') do
@@ -475,15 +475,15 @@ end
 #
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
 #
-# * [string](http://www.elasticsearch.org/guide/reference/query-dsl/query-string-query.html)
-# * [text](http://www.elasticsearch.org/guide/reference/query-dsl/text-query.html)
-# * [term](http://elasticsearch.org/guide/reference/query-dsl/term-query.html)
-# * [terms](http://elasticsearch.org/guide/reference/query-dsl/terms-query.html)
-# * [bool](http://www.elasticsearch.org/guide/reference/query-dsl/bool-query.html)
-# * [custom_score](http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html)
-# * [fuzzy](http://www.elasticsearch.org/guide/reference/query-dsl/fuzzy-query.html)
-# * [all](http://www.elasticsearch.org/guide/reference/query-dsl/match-all-query.html)
-# * [ids](http://www.elasticsearch.org/guide/reference/query-dsl/ids-query.html)
+# * [string](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)
+# * [text](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-text-query.html)
+# * [term](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-term-query.html)
+# * [terms](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html)
+# * [bool](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)
+# * [custom_score](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-custom-score-query.html)
+# * [fuzzy](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html)
+# * [all](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html)
+# * [ids](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html)
 
 #### Faceted Search
 
@@ -583,13 +583,15 @@ end
 #
 # Eventually, _Tire_ will support all of them. So far, only these are supported:
 #
-# * [terms](http://www.elasticsearch.org/guide/reference/api/search/facets/terms-facet.html)
-# * [date](http://www.elasticsearch.org/guide/reference/api/search/facets/date-histogram-facet.html)
-# * [range](http://www.elasticsearch.org/guide/reference/api/search/facets/range-facet.html)
-# * [histogram](http://www.elasticsearch.org/guide/reference/api/search/facets/histogram-facet.html)
-# * [statistical](http://www.elasticsearch.org/guide/reference/api/search/facets/statistical-facet.html)
-# * [terms_stats](http://www.elasticsearch.org/guide/reference/api/search/facets/terms-stats-facet.html)
-# * [query](http://www.elasticsearch.org/guide/reference/api/search/facets/query-facet.html)
+# * [terms](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-facet.html)
+# * [range](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-range-facet.html)
+# * [histogram](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-histogram-facet.html)
+# * [date_histogram](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-date-histogram-facet.html)
+# * [filter](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-filter-facet.html)
+# * [query](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-query-facet.html)
+# * [statistical](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-statistical-facet.html)
+# * [terms_stats](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-stats-facet.html)
+# * [geo_distance](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-geo-distance-facet.html)
 
 # We have seen that _Elasticsearch_ facets enable us to fetch complex aggregations from our data.
 #
@@ -732,8 +734,8 @@ end
 # We need to query parts of the document as if they were separate entities.
 
 # _Elasticsearch_ provides a specific `nested`
-# [field type](http://www.elasticsearch.org/guide/reference/mapping/nested-type.html) and
-# [query](http://www.elasticsearch.org/guide/reference/query-dsl/nested-query.html)
+# [field type](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-nested-type.html) and
+# [query](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html)
 # for working with "embedded" documents like these.
 
 # So, let's update the mapping for the index first, adding the `comments` property as a `nested` type:
@@ -778,7 +780,7 @@ end
 
 # Often, we want to highlight the snippets matching our query in the displayed results.
 # _Elasticsearch_ provides rich
-# [highlighting](http://www.elasticsearch.org/guide/reference/api/search/highlighting.html)
+# [highlighting](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-highlighting.html)
 # features, and _Tire_ makes them trivial to use.
 #
 s = Tire.search 'articles' do
@@ -819,7 +821,7 @@ end
 #### Percolation
 
 # _Elasticsearch_ comes with one very interesting, and rather unique feature:
-# [_percolation_](http://www.elasticsearch.org/guide/reference/api/percolate.html).
+# [_percolation_](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html).
 
 # It works in a „reverse search“ manner to regular search workflow of adding
 # documents to the index and then querying them.
