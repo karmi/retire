@@ -1,7 +1,7 @@
 module Tire
   module Search
 
-    # http://www.elasticsearch.org/guide/reference/api/search/highlighting.html
+    # http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-highlighting.html
     #
     class Highlight
 
