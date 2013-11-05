@@ -125,8 +125,6 @@ namespace :tire do
 
         next if model_filename.match(/^concerns\//i) # Skip concerns/ folder
 
-        klass          = model_filename.camelize.constantize
-
         begin
           klass = model_filename.camelize.constantize
         rescue NameError
