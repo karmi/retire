@@ -2,11 +2,16 @@ module Tire
   module Search
 
     class Query
-      attr_accessor :value
+      attr_accessor :value, :context
 
-      def initialize(&block)
+      def initialize(options = {}, &block)
         @value = {}
+        @context = options[:context]
         block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def method_missing(method, *args, &block)
+        context.send method, *args, &block
       end
 
       def term(field, value, options={})

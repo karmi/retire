@@ -40,10 +40,15 @@ module Tire
           Tire::Search::Search.
             expects(:new).
             with('active_model_articles', { :type => 'active_model_article' }).
-            returns(@stub).
-            twice
+            returns(@stub)
 
           ActiveModelArticle.search 'foo'
+
+          Tire::Search::Search.
+            expects(:new).
+            with('active_model_articles', { :type => 'active_model_article', :context => self }).
+            returns(@stub)
+
           ActiveModelArticle.search { query { string 'foo' } }
         end
 
@@ -52,27 +57,65 @@ module Tire
           second = 'another-custom-index-name'
           expected_options = { :type => ActiveModelArticleWithCustomIndexName.document_type }
 
-          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub).twice
+          Tire::Search::Search.
+            expects(:new).
+            with(first, expected_options).
+            returns(@stub)
           ActiveModelArticleWithCustomIndexName.index_name first
           ActiveModelArticleWithCustomIndexName.search 'foo'
+
+          Tire::Search::Search.
+            expects(:new).
+            with(first, expected_options.merge(:context => self)).
+            returns(@stub)
+
           ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
 
-          Tire::Search::Search.expects(:new).with(second, expected_options).returns(@stub).twice
+          Tire::Search::Search.
+            expects(:new).
+            with(second, expected_options).
+            returns(@stub)
           ActiveModelArticleWithCustomIndexName.index_name second
           ActiveModelArticleWithCustomIndexName.search 'foo'
+
+          Tire::Search::Search.
+            expects(:new).
+            with(second, expected_options.merge(:context => self)).
+            returns(@stub)
+
           ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
 
-          Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub).twice
+          Tire::Search::Search.
+            expects(:new).
+            with(first, expected_options).
+            returns(@stub)
+
           ActiveModelArticleWithCustomIndexName.index_name first
           ActiveModelArticleWithCustomIndexName.search 'foo'
+
+          Tire::Search::Search.
+            expects(:new).
+            with(first, expected_options.merge(:context => self)).
+            returns(@stub)
+
           ActiveModelArticleWithCustomIndexName.search { query { string 'foo' } }
         end
 
         should "search in custom type" do
           name = ActiveModelArticleWithCustomDocumentType.index_name
-          Tire::Search::Search.expects(:new).with(name, { :type => 'my_custom_type' }).returns(@stub).twice
+          Tire::Search::Search.
+            expects(:new).
+            with(name, { :type => 'my_custom_type' }).
+            returns(@stub)
 
           ActiveModelArticleWithCustomDocumentType.search 'foo'
+
+          Tire::Search::Search.
+            expects(:new).
+            with(name, { :type => 'my_custom_type', :context => self }).
+            returns(@stub)
+
+
           ActiveModelArticleWithCustomDocumentType.search { query { string 'foo' } }
         end
 
@@ -80,10 +123,16 @@ module Tire
           Tire::Search::Search.
             expects(:new).
             with(ActiveModelArticle.index_name, { :type => 'custom_type' }).
-            returns(@stub).
-            twice
+            returns(@stub)
 
           ActiveModelArticle.search 'foo', :type => 'custom_type'
+
+          Tire::Search::Search.
+            expects(:new).
+            with(ActiveModelArticle.index_name, { :type => 'custom_type', :context => self }).
+            returns(@stub)
+
+
           ActiveModelArticle.search( :type => 'custom_type' ) { query { string 'foo' } }
         end
 
@@ -91,10 +140,16 @@ module Tire
           Tire::Search::Search.
             expects(:new).
             with('custom_index', { :type => ActiveModelArticle.document_type }).
-            returns(@stub).
-            twice
+            returns(@stub)
 
           ActiveModelArticle.search 'foo', :index => 'custom_index'
+
+          Tire::Search::Search.
+            expects(:new).
+            with('custom_index', { :type => ActiveModelArticle.document_type, :context => self }).
+            returns(@stub)
+
+
           ActiveModelArticle.search( :index => 'custom_index' ) do
             query { string 'foo' }
           end

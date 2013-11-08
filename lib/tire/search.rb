@@ -4,7 +4,8 @@ module Tire
 
     class Search
 
-      attr_reader :indices, :types, :query, :facets, :filters, :options, :explain, :script_fields
+      attr_reader :indices, :types, :query, :facets, :filters, :options, :explain,
+                  :script_fields, :context
 
       def initialize(indices=nil, options={}, &block)
         if indices.is_a?(Hash)
@@ -15,6 +16,7 @@ module Tire
         end
         @types   = Array(options.delete(:type)).map { |type| Utils.escape(type) }
         @options = options
+        @context = options[:context]
 
         @path    = ['/', @indices.join(','), @types.join(','), '_search'].compact.join('/').squeeze('/')
 
@@ -53,7 +55,7 @@ module Tire
       end
 
       def query(&block)
-        @query = Query.new
+        @query = Query.new(context: context)
         block.arity < 1 ? @query.instance_eval(&block) : block.call(@query)
         self
       end

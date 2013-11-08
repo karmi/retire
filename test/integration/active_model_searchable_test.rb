@@ -18,6 +18,10 @@ module Tire
       SupermodelArticle.all.each { |a| a.destroy }
     end
 
+    def dummy_method_for_block_context
+      "test"
+    end
+
     context "ActiveModel integration" do
 
       setup    do
@@ -85,6 +89,20 @@ module Tire
         assert_equal 'bar',    results.first.title
         assert_equal 'abc123', results.first.id
       end
+
+      should "return result of query when using methods defined in the scope" do
+        a = SupermodelArticle.new :title => 'Test'
+        a.save
+        a.index.refresh
+
+        s = SupermodelArticle.search do
+          query { match :title, dummy_method_for_block_context }
+        end
+
+        assert_equal 1, s.results.count
+      end
+
+
 
       should "return facets" do
         a = SupermodelArticle.new :title => 'Test'
