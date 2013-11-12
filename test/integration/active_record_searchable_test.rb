@@ -490,7 +490,7 @@ module Tire
 
 
            ActiveRecordVideo.create! :title => 'Title One', timestamp: Time.now.to_i
-           ActiveRecordPhoto.create! :title => 'Title Two', timestamp: Time.now.to_i
+           ActiveRecordPhoto.create! :title => 'Title Two', timestamp: Time.now.to_i + 1.minute
            ActiveRecordAsset.tire.index.refresh
          end
 
