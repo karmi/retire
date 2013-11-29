@@ -117,6 +117,10 @@ module Tire
       Search::Scan.new(names, options, &block)
     end
 
+    def suggest(indices=nil, options={}, &block)
+      Suggest::Suggest.new(indices, options, &block)
+    end
+
     def aliases
       Alias.all
     end
