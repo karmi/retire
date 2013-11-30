@@ -342,7 +342,8 @@ module Tire
       context "suggest" do
         should "allow to specify term suggest" do
           s = Search::Search.new('index') do
-            suggest :suggest_name, 'text' do
+            suggest :suggest_name do
+              text 'text'
               term :candidate_field
             end
           end
@@ -353,7 +354,8 @@ module Tire
 
         should "allow to specify phrase suggest" do
           s = Search::Search.new('index') do
-            suggest :suggest_name, 'text' do
+            suggest :suggest_name do
+              text 'text'
               phrase :candidate_field
             end
           end
