@@ -820,22 +820,33 @@ end
 
 #
 # _Elasticsearch_
-# [suggest](http://www.elasticsearch.org/guide/reference/api/search/suggest/)
+# [suggest](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-suggesters.html)
 # feature suggests similar looking terms based on a provided text by using a suggester.
 # You can easily specify either the term or phrase suggester in the Tire dsl.
+# Additionally you can use the completion suggest to get blazing fast completions of user inputs.
+
+# Suggestion API is available either as standalone call or embedded into search request.
+
+# To get search suggestions while doing a search just add a call to the suggest api
 #
 s = Tire.search 'articles' do
 
-  # To define a suggest using the term suggester, first provide an arbitrary name of the suggest and the suggest text.
+  # To define a suggest using the term suggester, first provide an arbitrary name for the suggest.
   #
-  suggest :term_suggest1, 'thrree blind mice' do
+  suggest :term_suggest1 do
+    # Specify the text you want to correct
+    #
+    text 'thrree blind mice'
     # Next, specify the suggester field that you want to use and any options.
     #
     term :title, size: 3, sort: 'frequency'
   end
 
-  # To define a suggest using the phrase suggest, start with the arbitrary name and suggest text as before.
-  suggest :phrase_suggest1, 'thrree blind mice' do
+  # To define a suggest using the phrase suggest, start with the arbitrary name.
+  suggest :phrase_suggest1 do
+    # Specify the text you want to correct
+    #
+    text 'thrree blind mice'
     # Then specify the suggester field that you want to use and any options.
     #
     phrase :title, size: 3 do
@@ -844,19 +855,107 @@ s = Tire.search 'articles' do
       smoothing :stupid_backoff, discount: 0.5
 
       # You can also specify one or more candidate generators and any options for them.
-      generator "generator_field", min_word_len: 1
+      generator :title, min_word_len: 1
     end
   end
 end
 
-# The results will be available in the suggestions array
-s.results.suggestions.each do |suggestion|
-  suggestion.each do |s|
-    puts s["text"]
-    puts s["offset"]
-    puts s["per_page"]
-    puts s["options"]
+# The results will be available in the suggestions field (which is iterable)
+s.results.suggestions.each do |name, options|
+  puts "Suggestion returned for #{name}:\n"
+  options.each do |option|
+    puts "* Raw result: #{option}"
   end
+end
+
+# You can also use helper methods available in suggestions results to get only suggested
+# terms or phrases
+#
+puts "Available corrections for term_suggest1: #{s.results.suggestions.texts(:term_suggest1).join(', ')}"
+
+# You can use the standalone API to achieve the same result, i.e.
+s = Tire.suggest('articles') do
+
+  # Notice that for standalone api the block method is suggestion rather than suggest
+  #
+  suggestion :term_suggest do
+    text 'thrree'
+    term :title, size: 3, sort: 'frequency'
+  end
+
+end
+
+# You'll get the same object as above but as top level object
+#
+puts "Available corrections: #{s.results.texts.join(', ')}"
+
+#### Completion
+
+# In order to use _Elasticsearch_ completion you'll need to update your mappings to provide a field
+# with completion type. [Blog post](http://www.elasticsearch.org/blog/you-complete-me/)
+#
+
+# For example given an index named _hotel_
+index = Tire.index('hotels') do
+  delete
+
+  # Notice the type completion for the field _name_suggest_
+  #
+  create :mappings => {
+      :hotel => {
+          :properties => {
+              :name => {:type => 'string'},
+              :city => {:type => 'string'},
+              :name_suggest => {:type => 'completion'}
+          }
+      }
+  }
+
+  # And some basic documents into this index
+  import([
+             {:id => '1', :type => 'hotel', :name => 'Mercure Hotel Munich', :city => 'Munich', :name_suggest => 'Mercure Hotel Munich'},
+             {:id => '2', :type => 'hotel', :name => 'Hotel Monaco', :city => 'Munich', :name_suggest => 'Hotel Monaco'},
+         ])
+  refresh
+
+end
+
+# We can ask for all hotels starting with a given prefix with this query
+s = Tire.suggest('hotels') do
+  suggestion 'complete' do
+    text 'm'
+    completion 'name_suggest'
+  end
+end
+
+# And retrieve results as above with the same object
+puts "There are #{s.results.texts.size} hotels starting with m:"
+s.results.texts.each do |hotel|
+  puts "* #{hotel}"
+end
+
+# You can use some advanced features of completion such as multiple inputs and unified output for
+# the same document.
+
+# If you add a document which has inputs and output values for the suggest field
+index.store({:id => '1', :type => 'hotel', :name => 'Mercure Hotel Munich', :city => 'Munich',
+             :name_suggest => {:input => ['Mercure Hotel Munich', 'Mercure Munich'], :output => 'Hotel Mercure'}})
+index.store({:id => '2', :type => 'hotel', :name => 'Hotel Monaco', :city => 'Munich',
+             :name_suggest => {:input => ['Monaco Munich', 'Hotel Monaco'], :output => 'Hotel Monaco'}})
+index.refresh
+
+# a completion request with the same input as above
+s = Tire.suggest('hotels') do
+  suggestion 'complete' do
+    text 'm'
+    completion 'name_suggest'
+  end
+end
+
+# will match multiple inputs for the same document and have unified output in results
+puts "There are #{s.results.texts.size} hotels starting with m:"
+s.results.texts.each do |hotel|
+  puts "* #{hotel}"
 end
 
 #### Percolation
