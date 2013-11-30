@@ -23,7 +23,7 @@ module Tire
       should 'add suggestions field to the results using the phrase suggester' do
         # Tire::Configuration.logger STDERR, :level => 'debug'
         s = Tire.search('articles-test') do
-          suggest :term_suggest1 do
+          suggest :phrase_suggest1 do
             text 'thrree'
             phrase :title
           end
@@ -31,6 +31,36 @@ module Tire
 
         assert_equal 1, s.results.suggestions.size
         assert_equal 'three', s.results.suggestions.texts.first
+      end
+
+    end
+
+    context 'Standalone term and phrase suggest' do
+
+      should 'return term suggestions when used with standalone api' do
+        # Tire::Configuration.logger STDERR, :level => 'debug'
+        s = Tire.suggest('articles-test') do
+          suggestion :term_suggest do
+            text 'thrree'
+            term :title
+          end
+        end
+
+        assert_equal 1, s.results.texts.size
+        assert_equal 'three', s.results.texts.first
+      end
+
+      should 'return phrase suggestions when used with standalone api' do
+        # Tire::Configuration.logger STDERR, :level => 'debug'
+        s = Tire.suggest('articles-test') do
+          suggestion :prhase_suggest do
+            text 'thrree'
+            phrase :title
+          end
+        end
+
+        assert_equal 1, s.results.texts.size
+        assert_equal 'three', s.results.texts.first
       end
 
     end
