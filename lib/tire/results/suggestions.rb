@@ -32,7 +32,7 @@ module Tire
         if suggestion == :all
           results.map {|k,v| v.map{|s| s['options']}}.flatten
         else
-          response[suggestion].map{|s| s['options']}.flatten
+          results[suggestion.to_s].map{|s| s['options']}.flatten
         end
       end
 
@@ -40,7 +40,7 @@ module Tire
         if suggestion == :all
           results.map {|k,v| v.map{|s| s['options'].map {|o| o['text']}}}.flatten
         else
-          response[suggestion].map{|s| s['options'].map {|o| o['text']}}.flatten
+          results[suggestion.to_s].map{|s| s['options'].map {|o| o['text']}}.flatten
         end
       end
 
@@ -48,7 +48,7 @@ module Tire
         if suggestion == :all
           results.map {|k,v| v.map{|s| s['options'].map {|o| o['payload']}}}.flatten
         else
-          response[suggestion].map{|s| s['options'].map {|o| o['payload']}}.flatten
+          results[suggestion.to_s].map{|s| s['options'].map {|o| o['payload']}}.flatten
         end
       end
 
