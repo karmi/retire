@@ -81,9 +81,9 @@ module Tire
         self
       end
 
-      def suggest(name, text, options={}, &block)
+      def suggest(name, &block)
         @suggest ||= {}
-        @suggest.update Suggest.new(name, text, options, &block).to_hash
+        @suggest.update Tire::Suggest::Suggestion.new(name, &block).to_hash
         self
       end
 
