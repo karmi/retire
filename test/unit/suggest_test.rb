@@ -47,9 +47,18 @@ module Tire
         end
         assert_nothing_raised do
           assert_instance_of Hash,  s.to_hash
-          puts s.to_hash
           assert_equal "foo", s.to_hash[:default_suggestion][:text]
         end
+      end
+
+      should "allow to pass options for completion queries" do
+        s = Suggest::Suggest.new do
+          suggestion 'default_suggestion' do
+            text 'foo'
+            completion 'bar', :fuzzy => true
+          end
+        end
+        assert_equal true, s.to_hash[:default_suggestion][:completion][:fuzzy]
       end
 
       should "perform the suggest lazily" do
