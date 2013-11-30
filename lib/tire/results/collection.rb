@@ -13,7 +13,7 @@ module Tire
         @time        = response['took'].to_i
         @total       = response['hits']['total'].to_i rescue nil
         @facets      = response['facets']
-        @suggestions = response['suggest']
+        @suggestions = Suggestions.new(response['suggest'])
         @max_score   = response['hits']['max_score'].to_f rescue nil
         @wrapper     = options[:wrapper] || Configuration.wrapper
       end

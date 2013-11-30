@@ -12,22 +12,22 @@ module Tire
 
       def text(value)
         @value[:text] = value
-        @value
+        self
       end
 
       def completion(value)
         @value[:completion] = {field: value}
-        @value
+        self
       end
 
-      # TODO TERM SUGGEST check http://www.elasticsearch.org/guide/reference/api/search/term-suggest/
       def term(value, options={})
-        @value
+        @value[:term] = { :field => value }.update(options)
+        self
       end
 
-      # TODO PHRASE SUGGEST http://www.elasticsearch.org/guide/reference/api/search/phrase-suggest/
-      def simple_phrase(&block)
-        @value
+      def phrase(field, options={}, &block)
+        @value[:phrase] = PhraseSuggester.new(field, options, &block).to_hash
+        self
       end
 
       def to_hash
@@ -38,7 +38,39 @@ module Tire
         to_hash.to_json
       end
 
-	  end
+    end
+
+    # Used to generate phrase suggestions
+    class PhraseSuggester
+
+      def initialize(field, options={}, &block)
+        @options = options
+        @value   = { :field => field }
+        block.arity < 1 ? self.instance_eval(&block) : block.call(self) if block_given?
+      end
+
+      def generator(field, options={})
+        @generators ||= []
+        @generators << { :field => field }.update(options).to_hash
+        self
+      end
+
+      def smoothing(type, options={})
+        @value[:smoothing] = { type => options }
+      end
+
+      def to_json(options={})
+        to_hash.to_json
+      end
+
+      def to_hash
+        @value.update(@options)
+        @value.update( { :direct_generator => @generators } ) if @generators && @generators.size > 0
+
+        @value
+      end
+
+    end
 
     class MultiSuggestion
       attr_accessor :suggestions
