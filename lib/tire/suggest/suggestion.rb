@@ -62,7 +62,7 @@ module Tire
       def to_hash
         @value.update @suggestions
         @value[:text] = @global_text if @global_text
-        {:suggest => @value}
+        @value
       end
 
       def to_json(options={})
