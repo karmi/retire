@@ -15,8 +15,8 @@ module Tire
         self
       end
 
-      def completion(value)
-        @value[:completion] = {field: value}
+      def completion(value, options={})
+        @value[:completion] = {:field => value}.update(options)
         self
       end
 
