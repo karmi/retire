@@ -820,3 +820,5 @@ You can send feedback via [e-mail](mailto:karmi@karmi.cz) or via [Github Issues]
 -----
 
 [Karel Minarik](http://karmi.cz) and [contributors](http://github.com/karmi/tire/contributors)
+
+![](https://ga-beacon.appspot.com/UA-46901128-1/karmi/retire?pixel)
