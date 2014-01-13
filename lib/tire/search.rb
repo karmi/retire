@@ -75,6 +75,12 @@ module Tire
         self
       end
 
+      def indexed_terms_filter(type, field, *options)
+        @filters ||= []
+        @filters << IndexedTermsFilter.new(type, field, *options).to_hash
+        self
+      end
+
       def script_field(name, options={})
         @script_fields ||= {}
         @script_fields.merge! ScriptField.new(name, options).to_hash
