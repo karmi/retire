@@ -61,7 +61,7 @@ module Tire
         end
         @index.bulk_update documents, refresh: true
 
-        documents = Tire.search('bulk-test') { query {all} }.results.to_a
+        documents = Tire.search('bulk-test') { query {all} }.results.to_a.sort { |a,b| a.id <=> b.id }
         assert_equal 'one-updated', documents[0][:title]
         assert_equal 'two-updated', documents[1][:title]
         assert_equal 'three-updated', documents[2][:title]
