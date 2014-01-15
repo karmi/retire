@@ -1,15 +1,11 @@
 module Tire
-  VERSION   = "0.6.1"
+  VERSION   = "0.6.2"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Added support for bulk update
-    * Improved Kaminari support
-    * Improved the behaviour of `default` properties in Tire::Persistence
-    * Added the information about the gem "retirement" and other documentation improvements
-    * Fixed errors due to NewRelic's patching of Curl
-    * [ACTIVEMODEL] Use Object#id#to_s in `get_id_from_document`
-    * Added support for "Delete By Query" API
+    19e524c [ACTIVEMODEL] Exposed the response from `MyModel#.update_index` as the `response` method on return value
+    bfcde21 [#916] Added support for the Suggest API (@marc-villanueva)
+    710451d [#857] Added support for the Suggest API (@fbatista)
   END
 end
