@@ -356,6 +356,9 @@ module Tire
       params_encoded      = params.empty? ? '' : "?#{params.to_param}"
 
       @response = Configuration.client.get "#{url}#{params_encoded}"
+      if @response && @response.failure? && @response.code != 404
+        raise RuntimeError, "#{@response.code} > #{@response.body}"
+      end
 
       h = MultiJson.decode(@response.body)
       wrapper = options[:wrapper] || Configuration.wrapper
