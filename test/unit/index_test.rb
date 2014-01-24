@@ -442,6 +442,15 @@ module Tire
           assert_equal nil, article
         end
 
+        should "raise an error for server errors" do
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
+                                             returns(mock_response('BOOM', 500))
+          assert_raise RuntimeError do
+            article = @index.retrieve :article, 'id-1'
+            assert_equal nil, article
+          end
+        end
+
         should "raise error when no ID passed" do
           assert_raise ArgumentError do
             @index.retrieve 'article', nil
