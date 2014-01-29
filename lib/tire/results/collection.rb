@@ -120,7 +120,12 @@ module Tire
             end
 
             # Return an instance of the "wrapper" class
-            @wrapper.new(document)
+            if @wrapper.respond_to? :call
+              class_name = @wrapper.call( document )
+              class_name.new(document)
+            else
+              @wrapper.new(document)
+            end
           end
         end
       end
