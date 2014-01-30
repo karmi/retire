@@ -1,11 +1,6 @@
 module Tire
   module Search
 
-    #--
-    # TODO: Implement all elastic search facets (geo, histogram, range, etc)
-    # http://elasticsearch.org/guide/reference/api/search/facets/
-    #++
-
     class Facet
 
       def initialize(name, options={}, &block)
@@ -45,6 +40,11 @@ module Tire
 
       def statistical(field, options={})
         @value[:statistical] = (options.delete(:statistical) || {:field => field}.update(options))
+        self
+      end
+
+      def geo_distance(field, point, ranges=[], options={})
+        @value[:geo_distance] = { field => point, :ranges => ranges }.update(options)
         self
       end
 

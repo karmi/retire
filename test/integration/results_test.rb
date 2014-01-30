@@ -10,13 +10,18 @@ module Tire
       should "allow easy access to returned documents" do
         q = 'title:one'
         s = Tire.search('articles-test') { query { string q } }
+
         assert_equal 'One',  s.results.first.title
         assert_equal 'ruby', s.results.first.tags[0]
       end
 
       should "allow easy access to returned documents with limited fields" do
         q = 'title:one'
-        s = Tire.search('articles-test') { query { string q }.fields :title }
+        s = Tire.search('articles-test') do
+          query { string q }
+          fields :title
+        end
+
         assert_equal 'One', s.results.first.title
         assert_nil s.results.first.tags
       end
@@ -27,9 +32,34 @@ module Tire
           query { string q }
           fields 'title', 'tags'
         end
+
         assert_equal 'One',  s.results.first.title
         assert_equal 'ruby', s.results.first.tags[0]
         assert_nil s.results.first.published_on
+      end
+
+      should "return script fields" do
+        s = Tire.search('articles-test') do
+          query { string 'title:one' }
+          fields :title
+          script_field :words_double, :script => "doc.words.value * 2"
+        end
+
+        assert_equal 'One', s.results.first.title
+        assert_equal 250,   s.results.first.words_double
+      end
+
+      should "return specific fields, script fields and _source fields" do
+        # Tire.configure { logger STDERR, level: 'debug' }
+
+        s = Tire.search('articles-test') do
+          query { string 'title:one' }
+          fields :title, :_source
+          script_field :words_double, :script => "doc.words.value * 2"
+        end
+
+        assert_equal 'One', s.results.first.title
+        assert_equal 250,   s.results.first.words_double
       end
 
       should "iterate results with hits" do

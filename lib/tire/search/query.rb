@@ -28,13 +28,6 @@ module Tire
         @value = { :range => { field => value } }
       end
 
-      def text(field, value, options={})
-        Tire.warn "The 'text' query has been deprecated, please use a 'match' query."
-        query_options = { :query => value }.update(options)
-        @value = { :text => { field => query_options } }
-        @value
-      end
-
       def string(value, options={})
         @value = { :query_string => { :query => value } }
         @value[:query_string].update(options)
@@ -98,8 +91,10 @@ module Tire
         @value
       end
 
-      def ids(values, type)
-        @value = { :ids => { :values => values, :type => type }  }
+      def ids(values, type=nil)
+        @value = { :ids => { :values => Array(values) }  }
+        @value[:ids].update(:type => type) if type
+        @value
       end
 
       def boosting(options={}, &block)
@@ -193,7 +188,10 @@ module Tire
       end
 
       def filter(type, *options)
-        @value.update(:filter => Filter.new(type, *options).to_hash)
+        @value[:filter] ||= {}
+        @value[:filter][:and] ||= []
+        @value[:filter][:and] << Filter.new(type, *options).to_hash
+        @value
       end
 
       def query(&block)

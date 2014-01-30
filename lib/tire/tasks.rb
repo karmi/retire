@@ -87,11 +87,6 @@ namespace :tire do
   namespace :import do
     desc import_model_desc
     task :model do
-      if defined?(Rails)
-        puts "[IMPORT] Rails detected, loading environment..."
-        Rake::Task["environment"].invoke
-      end
-
       if ENV['CLASS'].to_s == ''
         puts '='*90, 'USAGE', '='*90, import_model_desc, ""
         exit(1)
@@ -121,20 +116,22 @@ namespace :tire do
 
     desc import_all_desc
     task :all do
-      if defined?(Rails)
-        puts "[IMPORT] Rails detected, loading environment..."
-        Rake::Task["environment"].invoke
-      end
-
       dir    = ENV['DIR'].to_s != '' ? ENV['DIR'] : Rails.root.join("app/models")
       params = eval(ENV['PARAMS'].to_s) || {}
 
       puts "[IMPORT] Loading models from: #{dir}"
       Dir.glob(File.join("#{dir}/**/*.rb")).each do |path|
-        require path
-
         model_filename = path[/#{Regexp.escape(dir.to_s)}\/([^\.]+).rb/, 1]
-        klass          = model_filename.classify.constantize
+
+        next if model_filename.match(/^concerns\//i) # Skip concerns/ folder
+
+        klass          = model_filename.camelize.constantize
+
+        begin
+          klass = model_filename.camelize.constantize
+        rescue NameError
+          require(path) ? retry : raise
+        end
 
         # Skip if the class doesn't have Tire integration
         next unless klass.respond_to?(:tire)

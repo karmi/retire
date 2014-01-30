@@ -68,7 +68,7 @@ module Tire
           query do
             # Replace documents score with parameterized computation
             #
-            custom_score :script => "doc['words'].doubleValue / max(a, b)",
+            custom_score :script => "doc['words'].value.doubleValue() / max(a, b)",
                          :params => { :a => 1, :b => 2 } do
               string "title:T*"
             end

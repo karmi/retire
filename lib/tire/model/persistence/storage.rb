@@ -23,6 +23,10 @@ module Tire
               result
             end
           end
+
+          def delete(&block)
+            DeleteByQuery.new(index_name, {:type => document_type}, &block).perform
+          end
         end
 
         module InstanceMethods

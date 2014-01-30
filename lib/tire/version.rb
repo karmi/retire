@@ -1,14 +1,11 @@
 module Tire
-  VERSION   = "0.5.8"
+  VERSION   = "0.6.2"
 
   CHANGELOG =<<-END
     IMPORTANT CHANGES LATELY:
 
-    * Fixed, that Model::Persistence uses "string" as the default mapping type
-    * Fixed, that Model::Persistence returns true/false for #save and #destroy operations
-    * Fixed the `uninitialized constant HRULE` in Rake tasks
-    * Fixed `Item#to_hash` functionality to work with Arrays
-    * Updated the Rails application template and install instructions
-    * Improved the test suite for Travis
+    19e524c [ACTIVEMODEL] Exposed the response from `MyModel#.update_index` as the `response` method on return value
+    bfcde21 [#916] Added support for the Suggest API (@marc-villanueva)
+    710451d [#857] Added support for the Suggest API (@fbatista)
   END
 end

@@ -194,6 +194,53 @@ module Tire
 
       end
 
+      context "geo distance" do
+        setup do
+          @index = Tire.index('bars-test') do
+            delete
+            create :mappings => {
+                     :bar => {
+                       :properties => {
+                         :name =>     { :type => 'string' },
+                         :location => { :type => 'geo_point', :lat_lon => true }
+                       }
+                     }
+                   }
+
+            store :type => 'bar',
+                  :name => 'one',
+                  :location => {:lat => 53.54412, :lon => 9.94021}
+            store :type => 'bar',
+                  :name => 'two',
+                  :location => {:lat => 53.54421, :lon => 9.94673}
+            store :type => 'bar',
+                  :name => 'three',
+                  :location => {:lat => 53.55099, :lon => 10.02527}
+            refresh
+          end
+        end
+
+        teardown { @index.delete }
+
+        should "return aggregated values for all results" do
+          s = Tire.search('bars-test') do
+            query { all }
+            facet 'geo' do
+              geo_distance :location,
+                           {:lat => 53.54507, :lon => 9.95309},
+                           [{:to => 1}, {:from => 1, :to => 10}, {:from => 50}],
+                           unit: 'km'
+            end
+          end
+
+          facets = s.results.facets['geo']['ranges']
+          assert_equal 3, facets.size, facets.inspect
+          assert_equal 2, facets.entries[0]['total_count'], facets.inspect
+          assert_equal 1, facets.entries[1]['total_count'], facets.inspect
+          assert_equal 0, facets.entries[2]['total_count'], facets.inspect
+        end
+      end
+
       context "statistical" do
 
         should "return computed statistical data on a numeric field" do

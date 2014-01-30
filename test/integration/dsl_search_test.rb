@@ -39,6 +39,38 @@ module Tire
         assert_equal 1, s.results.count
       end
 
+      context "when passing the wrapper option" do
+        class ::MyCustomWrapper < Tire::Results::Item
+          def title_size
+            self.title.size
+          end
+        end
+
+        should "be allowed when passing a block" do
+          s = Tire.search 'articles-test', wrapper: ::MyCustomWrapper do
+            query { match :title, 'one' }
+          end
+
+          assert_equal ::MyCustomWrapper, s.options[:wrapper]
+
+          assert_instance_of ::MyCustomWrapper, s.results.first
+          assert_equal 3, s.results.first.title_size
+        end
+
+        should "be allowed when not passing a block" do
+          s = Tire.search(
+            'articles-test',
+            payload: { query: { match: { title: 'one' } } },
+            wrapper: ::MyCustomWrapper
+          )
+
+          assert_equal ::MyCustomWrapper, s.options[:wrapper]
+
+          assert_instance_of ::MyCustomWrapper, s.results.first
+          assert_equal 3, s.results.first.title_size
+        end
+      end
+
     end
 
   end

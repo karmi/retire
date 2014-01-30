@@ -5,16 +5,17 @@ module Tire
       include Enumerable
       include Pagination
 
-      attr_reader :time, :total, :options, :facets, :max_score
+      attr_reader :time, :total, :options, :facets, :max_score, :suggestions
 
       def initialize(response, options={})
-        @response  = response
-        @options   = options
-        @time      = response['took'].to_i
-        @total     = response['hits']['total'].to_i rescue nil
-        @facets    = response['facets']
-        @max_score = response['hits']['max_score'].to_f rescue nil
-        @wrapper   = options[:wrapper] || Configuration.wrapper
+        @response    = response
+        @options     = options
+        @time        = response['took'].to_i
+        @total       = response['hits']['total'].to_i rescue nil
+        @facets      = response['facets']
+        @suggestions = Suggestions.new(response['suggest']) if response['suggest']
+        @max_score   = response['hits']['max_score'].to_f rescue nil
+        @wrapper     = options[:wrapper] || Configuration.wrapper
       end
 
       def results
@@ -58,7 +59,7 @@ module Tire
       alias :[] :slice
 
       def to_ary
-        self
+        results
       end
 
       def as_json(options=nil)
@@ -106,12 +107,17 @@ module Tire
           hits.map do |h|
             document = {}
 
-            # Update the document with content and ID
-            document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
-            document.update( {'id' => h['_id']} )
+            # Update the document with fields and/or source
+            document.update h['_source'] if h['_source']
+            document.update __parse_fields__(h['fields']) if h['fields']
+
+            # Set document ID
+            document['id'] = h['_id']
 
             # Update the document with meta information
-            ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
+            ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each do |key|
+              document.update key => h[key]
+            end
 
             # Return an instance of the "wrapper" class
             @wrapper.new(document)

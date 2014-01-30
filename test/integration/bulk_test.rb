@@ -49,6 +49,24 @@ module Tire
         assert_equal 0, Tire.search('bulk-test') { query {all} }.results.size
       end
 
+      should 'update documents in bulk' do
+        @index.bulk_store @articles, refresh: true
+
+        documents = @articles.map do |a|
+          {
+            id: a[:id],
+            type: a[:type],
+            doc: { title: "#{a[:title]}-updated" }
+          }
+        end
+        @index.bulk_update documents, refresh: true
+
+        documents = Tire.search('bulk-test') { query {all} }.results.to_a.sort { |a,b| a.id <=> b.id }
+        assert_equal 'one-updated', documents[0][:title]
+        assert_equal 'two-updated', documents[1][:title]
+        assert_equal 'three-updated', documents[2][:title]
+      end
+
       should "allow to feed search results to bulk API" do
         (1..10).to_a.each { |i| @index.store id: i }
         @index.refresh
@@ -78,6 +96,19 @@ module Tire
                                                raise: true
           end
         end
+      end
+
+      should "take external versioning into account" do
+        # Tire.configure { logger STDERR, level: 'verbose' }
+        index = Tire.index 'bulk-test-external-versioning' do
+          delete
+          create
+          store id: '1', title: 'A', _version: 10, _version_type: 'external'
+        end
+
+        response = index.bulk_store [ { id: '1', title: 'A', _version: 0, _version_type: 'external'} ]
+
+        assert_match /VersionConflictEngineException/, MultiJson.load(response.body)['items'][0]['index']['error']
       end
     end
 

@@ -41,6 +41,19 @@ module Tire
           end
         end
 
+        should "convert params objects to hash" do
+          class ::MyParamsObject;
+            def initialize(hash)
+              @hash = hash
+            end
+            def to_hash
+              @hash
+            end
+          end
+
+          Tire.search 'dummy', ::MyParamsObject.new(:foo => 'bar')
+        end
+
         should "extract URL parameters from options" do
           payload = { :query => { :match => { :foo => 'bar' } } }
 

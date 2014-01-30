@@ -48,7 +48,7 @@ module Tire
       end
 
       def params
-        options = @options.except(:wrapper, :payload)
+        options = @options.except(:wrapper, :payload, :load)
         options.empty? ? '' : '?' + options.to_param
       end
 
@@ -78,6 +78,12 @@ module Tire
       def script_field(name, options={})
         @script_fields ||= {}
         @script_fields.merge! ScriptField.new(name, options).to_hash
+        self
+      end
+
+      def suggest(name, &block)
+        @suggest ||= {}
+        @suggest.update Tire::Suggest::Suggestion.new(name, &block).to_hash
         self
       end
 
@@ -160,6 +166,7 @@ module Tire
           request.update( { :filter => @filters.first.to_hash } ) if @filters && @filters.size == 1
           request.update( { :filter => { :and => @filters.map {|filter| filter.to_hash} } } ) if  @filters && @filters.size > 1
           request.update( { :highlight => @highlight.to_hash } ) if @highlight
+          request.update( { :suggest => @suggest.to_hash } ) if @suggest
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields

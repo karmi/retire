@@ -13,8 +13,8 @@
 # * Git
 # * Ruby >= 1.8.7
 # * Rubygems
-# * Rails >= 3.0.7
-# * Sun Java 6 (for Elasticsearch)
+# * Rails >= 3
+# * Java 6 or 7 (for Elasticsearch)
 #
 #
 # Usage
@@ -181,14 +181,13 @@ file 'app/models/article.rb', <<-CODE
 class Article < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
-
-  attr_accessible :title, :content, :published_on
 end
 CODE
 
 initializer 'tire.rb', <<-CODE
 Tire.configure do
-  logger STDERR
+  # url    'http://localhost:9200'
+  # logger STDERR
 end
 CODE
 
@@ -201,7 +200,7 @@ puts        '-'*80, ''; sleep 1
 gsub_file 'app/controllers/articles_controller.rb', %r{# GET /articles/1$}, <<-CODE
   # GET /articles/search
   def search
-    @articles = Article.search params[:q]
+    @articles = Article.tire.search params[:q]
 
     render :action => "index"
   end
@@ -238,7 +237,7 @@ puts
 say_status  "Index", "Indexing the database...", :yellow
 puts        '-'*80, ''; sleep 0.5
 
-rake "environment tire:import CLASS='Article' FORCE=true"
+rake "environment tire:import:model CLASS='Article' FORCE=true"
 
 puts
 say_status  "Git", "Details about the application:", :yellow

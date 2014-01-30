@@ -78,6 +78,23 @@ module Tire
         assert_equal [], results.first.tags
       end
 
+      context "with deleting" do
+        should "search with simple query" do
+          PersistentArticle.create :id => 1, :title => 'One'
+          PersistentArticle.index.refresh
+
+          results = PersistentArticle.search 'one'
+          assert_equal 1, results.size
+
+          PersistentArticle.delete do
+            term :title, 'one'
+          end
+
+          results = PersistentArticle.search 'one'
+          assert_equal 0, results.size
+        end
+      end
+
       context "with pagination" do
 
         setup do
@@ -188,7 +205,7 @@ module Tire
       context "percolated search" do
         setup do
           delete_registered_queries
-          delete_percolator_index if ENV['TRAVIS']
+          delete_percolator_index
           PersistentArticleWithPercolation.index.register_percolator_query('alert') { string 'warning' }
           Tire.index('_percolator').refresh
         end
@@ -206,7 +223,7 @@ module Tire
           a = PersistentArticleWithPercolation.create :title => 'Warning!'
           assert_contains a.matches, 'alert'
         end
-      end
+      end if ENV['TRAVIS']
 
       context "with strict mapping" do
         should "successfuly save valid model" do

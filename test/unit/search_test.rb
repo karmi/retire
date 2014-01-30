@@ -128,6 +128,14 @@ module Tire
         assert_match /index_1,index_2/, s.to_curl
       end
 
+      should 'not include the load option in queries' do
+        s = Search::Search.new(:load => { :includes => [:author, {:nested => :relation}] }) do
+          query { string 'title:foo' }
+        end
+
+        assert_nil s.to_hash[:load], 'Make sure to ignore load in URL params'
+      end
+
       should "return itself as a Hash" do
         s = Search::Search.new('index') do
           query { string 'title:foo' }
@@ -327,6 +335,33 @@ module Tire
 
           assert_not_nil s.highlight
           assert_instance_of Tire::Search::Highlight, s.highlight
+        end
+
+      end
+
+      context "suggest" do
+        should "allow to specify term suggest" do
+          s = Search::Search.new('index') do
+            suggest :suggest_name do
+              text 'text'
+              term :candidate_field
+            end
+          end
+
+          hash = MultiJson.decode( s.to_json )
+          assert_not_nil hash['suggest']
+        end
+
+        should "allow to specify phrase suggest" do
+          s = Search::Search.new('index') do
+            suggest :suggest_name do
+              text 'text'
+              phrase :candidate_field
+            end
+          end
+
+          hash = MultiJson.decode( s.to_json )
+          assert_not_nil hash['suggest']
         end
 
       end

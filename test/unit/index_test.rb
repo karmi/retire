@@ -335,6 +335,16 @@ module Tire
           @index.store({:title => 'Test'}, {:replication => 'async'})
         end
 
+        should "extract the version from options" do
+          Configuration.client.expects(:post).
+            with do |url, payload|
+              assert_equal "#{Configuration.url}/dummy/document/?version=123", url
+            end.
+            returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          @index.store({:title => 'Test'}, {:version => 123})
+        end
+
         context "document with ID" do
 
           should "store a Hash under its ID property" do
@@ -353,13 +363,11 @@ module Tire
             @index.store Article.new(:id => 123, :title => 'Test', :body => 'Lorem')
           end
 
-          should "convert document ID to string or number" do
-            # This is related to issues #529, #535:
-            # When using Mongoid and the Yajl gem, document IDs from Mongo (Moped::BSON::ObjectId)
-            # are incorrectly serialized to JSON, and documents are stored with incorrect, auto-generated IDs.
+          should "convert document ID to string" do
+            # This is related to issues #529, #535, #775
             class Document1; def id; "one"; end; end
             class Document2; def id; 1;     end; end
-            class Document3; class ID; def as_json; 'c'; end; end
+            class Document3; class ID; def to_s; 'c'; end; end
                              def id;   ID.new; end
             end
 
@@ -368,7 +376,7 @@ module Tire
             document_3 = Document3.new
 
             assert_equal 'one', @index.get_id_from_document(document_1)
-            assert_equal 1,     @index.get_id_from_document(document_2)
+            assert_equal '1',   @index.get_id_from_document(document_2)
             assert_equal 'c',   @index.get_id_from_document(document_3)
           end
 
@@ -432,6 +440,15 @@ module Tire
                                              returns(mock_response('{"_id":"id-1","exists":false}'))
           article = @index.retrieve :article, 'id-1'
           assert_equal nil, article
+        end
+
+        should "raise an error for server errors" do
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
+                                             returns(mock_response('BOOM', 500))
+          assert_raise RuntimeError do
+            article = @index.retrieve :article, 'id-1'
+            assert_equal nil, article
+          end
         end
 
         should "raise error when no ID passed" do
@@ -606,7 +623,7 @@ module Tire
       end
 
       context "when performing a bulk api action" do
-        # Possible Bulk API actions are `index`, `create`, `delete`
+        # Possible Bulk API actions are `index`, `create`, `delete`, `update`
         #
         # The expected JSON looks like this:
         #
@@ -615,6 +632,8 @@ module Tire
         # {"create":{"_index":"dummy","_type":"document","_id":"2"}}
         # {"id":"2","title":"Two"}
         # {"delete":{"_index":"dummy","_type":"document","_id":"2"}}
+        # {"update":{"_index":"dummy","_type":"document","_id":"1","_retry_on_conflict": 3}}
+        # {"doc":{"title":"Updated One"}}
         #
         # See http://www.elasticsearch.org/guide/reference/api/bulk.html
 
@@ -671,26 +690,77 @@ module Tire
           @index.bulk :delete, [ {:id => '1', :title => 'One'}, {:id => '2', :title => 'Two'} ]
         end
 
-        should "serialize meta parameters such as routing into payload header" do
+        should "serialize payload for update action" do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              assert_equal "#{@index.url}/_bulk", url
+              assert_match /"update"/, payload
+              assert_match /"_index":"dummy"/, payload
+              assert_match /"_type":"document"/, payload
+              assert_match /"_id":"1"/, payload
+              assert_match /"_id":"2"/, payload
+              lines = payload.split("\n")
+              assert_equal 'One', MultiJson.decode(lines[1])['doc']['title']
+              assert_equal 'Two', MultiJson.decode(lines[3])['doc']['title']
+              assert_equal true, MultiJson.decode(lines[3])['doc_as_upsert']
+            end.
+            returns(mock_response('{}'), 200)
+
+          @index.bulk :update, [ {:id => '1', :doc => {:title => 'One'}}, {:id => '2', :doc => {:title => 'Two'}, :doc_as_upsert => true} ]
+        end
+
+        should 'serialize _retry_on_conflict parameter into payload header' do
+          Configuration.client.
+            expects(:post).
+            with do |url, payload|
+              lines = payload.split("\n")
+              assert_equal 3, MultiJson.decode(lines[0])['update']['_retry_on_conflict']
+              assert_equal 3, MultiJson.decode(lines[2])['update']['_retry_on_conflict']
+            end.
+            returns(mock_response('{}'), 200)
+
+          @index.bulk :update, [ {:id => '1', :doc => {:title => 'One'}}, {:id => '2', :doc => {:title => 'Two'}} ], :retry_on_conflict => 3
+        end
+
+        should "serialize meta parameters into payload header" do
           Configuration.client.
             expects(:post).
             with do |url, payload|
               # print payload
               lines = payload.split("\n")
-              assert_match /"_routing":"A"/, lines[0]
-              assert_match /"_routing":"B"/, lines[2]
-              assert_match /"_ttl":"1d"/,    lines[2]
-              assert ! lines[4].include?('"_routing"')
+
+              assert_match /"_routing":"A"/,                     lines[0]
+
+              assert_match /"_ttl":"1d"/,                        lines[2]
+              assert ! lines[2].include?('"_:parent"')
+
+              assert_match /"_version":"1234"/,                  lines[4]
+              assert ! lines[4].include?('"_:routing"')
+
+              assert_match /"_version_type":"external"/,         lines[6]
+              assert ! lines[6].include?('"_:garbage"')
+
+              assert_match /"_percolate":"color:green"/,         lines[8]
+
+              assert_match /"_parent":"5678"/,                   lines[10]
+
+              assert_match /"_timestamp":"2013-02-15 11:00:33"/, lines[12]
+
+              true
             end.
             returns(mock_response('{}'), 200)
 
           @index.bulk :index,
                       [
-                        {:id => '1', :title => 'One', :_routing => 'A'},
-                        {:id => '2', :title => 'Two', :_routing => 'B', :_ttl => '1d'},
-                        {:id => '3', :title => 'Three'}
+                          {:id => '1', :title => 'One',   :_routing => 'A'},
+                          {:id => '2', :title => 'Two',   :_ttl => '1d', :_parent => false},
+                          {:id => '3', :title => 'Three', :_version => '1234', :_routing => ""},
+                          {:id => '4', :title => 'Four',  :_version_type => 'external', :_garbage => "stuff"},
+                          {:id => '5', :title => 'Five',  :_percolate => 'color:green'},
+                          {:id => '6', :title => 'Six',   :_parent => '5678'},
+                          {:id => '7', :title => 'Seven', :_timestamp => '2013-02-15 11:00:33'},
                       ]
-
         end
 
         should "pass URL parameters such as refresh or consistency" do

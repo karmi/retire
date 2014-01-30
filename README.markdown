@@ -1,6 +1,17 @@
 Tire
 =========
 
+---------------------------------------------------------------------------------------------------
+
+  NOTICE: This library has been renamed and retired in September 2013
+          ([read the explanation](https://github.com/karmi/retire/wiki/Tire-Retire)).
+
+  Have a look at the **<http://github.com/elasticsearch/elasticsearch-ruby>**
+  suite of gems, which will contain similar set of features for
+  ActiveRecord and Rails integration as Tire.
+
+---------------------------------------------------------------------------------------------------
+
 _Tire_ is a Ruby (1.8 or 1.9) client for the [Elasticsearch](http://www.elasticsearch.org/)
 search engine/database.
 
@@ -9,7 +20,7 @@ full-text search engine and database with
 [powerful aggregation features](http://www.elasticsearch.org/guide/reference/api/search/facets/),
 communicating by JSON over RESTful HTTP, based on [Lucene](http://lucene.apache.org/), written in Java.
 
-This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/tire/>.
+This Readme provides a brief overview of _Tire's_ features. The more detailed documentation is at <http://karmi.github.com/retire/>.
 
 Both of these documents contain a lot of information. Please set aside some time to read them thoroughly, before you blindly dive into „somehow making it work“. Just skimming through it **won't work** for you. For more information, please see the project [Wiki](https://github.com/karmi/tire/wiki/_pages), search the [issues](https://github.com/karmi/tire/issues), and refer to the [integration test suite](https://github.com/karmi/tire/tree/master/test/integration).
 
@@ -52,7 +63,7 @@ To test-drive the core _Elasticsearch_ functionality, let's require the gem:
 ```
 
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
-in [examples/tire-dsl.rb](http://karmi.github.com/tire/).
+in [examples/tire-dsl.rb](http://karmi.github.com/retire/).
 
 Also, note that we're doing some heavy JSON lifting here. _Tire_ uses the
 [_multi_json_](https://github.com/intridea/multi_json) gem as a generic JSON wrapper,
@@ -471,6 +482,10 @@ In this case, just wrap the `mapping` method in a `settings` one, passing it the
     end
 ```
 
+Note, that the index will be created with settings and mappings only when it doesn't exist yet.
+To re-create the index with correct configuration, delete it first: `URL.index.delete` and
+create it afterwards: `URL.create_elasticsearch_index`.
+
 It may well be reasonable to wrap the index creation logic declared with `Tire.index('urls').create`
 in a class method of your model, in a module method, etc, to have better control on index creation when
 bootstrapping the application with Rake tasks or when setting up the test suite.
@@ -573,6 +588,38 @@ control on how the documents are added to or removed from the index:
     end
 ```
 
+Sometimes, you might want to have complete control about the indexing process. In such situations,
+just drop down one layer and use the `Tire::Index#store` and `Tire::Index#remove` methods directly:
+
+```ruby
+    class Article < ActiveRecord::Base
+      acts_as_paranoid
+      include Tire::Model::Search
+
+      after_save do
+        if deleted_at.nil?
+          self.index.store self
+        else
+          self.index.remove self
+        end
+      end
+    end
+```
+
+Of course, in this way, you're still performing an HTTP request during your database transaction,
+which is not optimal for large-scale applications. In these situations, a better option would be processing
+the index operations in background, with something like [Resque](https://github.com/resque/resque) or
+[Sidekiq](https://github.com/mperham/sidekiq):
+
+```ruby
+    class Article < ActiveRecord::Base
+      include Tire::Model::Search
+
+      after_save    { Indexer::Index.perform_async(document) }
+      after_destroy { Indexer::Remove.perform_async(document) }
+    end
+```
+
 When you're integrating _Tire_ with ActiveRecord models, you should use the `after_commit`
 and `after_rollback` hooks to keep the index in sync with your database.
 
@@ -662,11 +709,11 @@ Are we saying you have to fiddle with this thing in a `rails console` or silly R
 Just call the included _Rake_ task on the command line:
 
 ```bash
-    $ rake environment tire:import CLASS='Article'
+    $ rake environment tire:import:all
 ```
 
-You can also force-import the data by deleting the index first (and creating it with mapping
-provided by the `mapping` block in your model):
+You can also force-import the data by deleting the index first (and creating it with
+correct settings and/or mappings provided by the `mapping` block in your model):
 
 ```bash
     $ rake environment tire:import CLASS='Article' FORCE=true
@@ -773,3 +820,5 @@ You can send feedback via [e-mail](mailto:karmi@karmi.cz) or via [Github Issues]
 -----
 
 [Karel Minarik](http://karmi.cz) and [contributors](http://github.com/karmi/tire/contributors)
+
+![](https://ga-beacon.appspot.com/UA-46901128-1/karmi/retire?pixel)

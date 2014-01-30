@@ -145,8 +145,8 @@ module Tire
             if instance.destroyed?
               index.remove instance
             else
-              response = index.store( instance, {:percolate => percolator} )
-              instance.tire.matches = response['matches'] if instance.tire.respond_to?(:matches=)
+              @response = index.store( instance, {:percolate => percolator} )
+              instance.tire.matches = @response['matches'] if instance.tire.respond_to?(:matches=)
               self
             end
           end
@@ -225,6 +225,7 @@ module Tire
         include Tire::Model::Import::ClassMethods
         include Tire::Model::Indexing::ClassMethods
         include Tire::Model::Percolate::ClassMethods
+        include Tire::Model::Suggest::ClassMethods
         include ClassMethods
 
         INTERFACE = public_instance_methods.map(&:to_sym) - Object.public_instance_methods.map(&:to_sym)
@@ -245,9 +246,10 @@ module Tire
 
         INTERFACE = public_instance_methods.map(&:to_sym) - Object.public_instance_methods.map(&:to_sym)
 
-        attr_reader :instance
+        attr_reader :instance, :response
         def initialize(instance)
           @instance = instance
+          @response = {}
         end
       end
 

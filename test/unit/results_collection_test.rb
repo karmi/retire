@@ -69,7 +69,7 @@ module Tire
 
       should "be kaminari compatible" do
         collection = Results::Collection.new(@default_response)
-        %w(limit_value total_count num_pages offset_value first_page? last_page?).each do |method|
+        %w(limit_value total_count num_pages offset_value first_page? last_page? out_of_range?).each do |method|
           assert_respond_to collection, method
         end
       end
@@ -77,6 +77,11 @@ module Tire
       should "have max_score" do
         collection = Results::Collection.new(@default_response)
         assert_equal 1.0, collection.max_score
+      end
+
+      should "return an array" do
+        collection = Results::Collection.new(@default_response)
+        assert_instance_of Array, collection.to_ary
       end
 
       context "serialization" do
@@ -213,6 +218,32 @@ module Tire
           assert_equal 3,         @item.track.info.duration.minutes
         end
 
+      end
+
+      context "using fields when also returning the _source" do
+        setup do
+          Configuration.reset
+          @default_response = { 'hits' => { 'hits' =>
+            [ { '_id' => 1, '_score' => 0.5, '_index' => 'testing', '_type' => 'article',
+                '_source' => {
+                  'title' => 'Knee Deep in JSON'
+                },
+                'fields' => {
+                  '_parent' => '4f99f98ea2b279ec3d002522'
+                }
+              }
+            ] } }
+          collection = Results::Collection.new(@default_response)
+          @item      = collection.first
+        end
+
+        should "return an individual field" do
+          assert_equal '4f99f98ea2b279ec3d002522', @item._parent
+        end
+
+        should "return fields from the _source as well" do
+          assert_equal 'Knee Deep in JSON', @item.title
+        end
       end
 
       context "returning results with hits" do
@@ -362,7 +393,38 @@ module Tire
           assert @collection.results.empty?, 'Collection results should be empty'
           assert_equal 0, @collection.size
         end
+      end
 
+      context "with ActiveModel::Serializers" do
+        setup do
+          require 'active_model_serializers'
+
+          Tire::Results::Collection.send :include, ActiveModel::ArraySerializerSupport
+
+          class ::MyItemWithSerializer < Tire::Results::Item
+            include ActiveModel::SerializerSupport
+
+            def active_model_serializer
+              ::MyItemSerializer
+            end
+          end
+
+          class ::MyItemSerializer < ActiveModel::Serializer
+            attribute :title,  :key => :name
+            attribute :author, :key => :owner
+          end
+        end
+
+        should "be serializable" do
+          assert_nothing_raised do
+            collection = Results::Collection.new(@default_response, :wrapper => ::MyItemWithSerializer)
+            serializer = collection.active_model_serializer.new(collection)
+
+            hash = serializer.as_json.first
+            assert_equal 'Test',    hash[:name]
+            assert_equal 'John', hash[:owner]
+          end
+        end
       end
 
     end
