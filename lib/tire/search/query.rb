@@ -35,10 +35,10 @@ module Tire
       end
 
       def prefix(field, value, options={})
-        if options[:boost]
-          @value = { :prefix => { field => { :prefix => value, :boost => options[:boost] } } }
+        @value = if options[:boost]
+          { :prefix => { field => { :prefix => value, :boost => options[:boost] } } }
         else
-          @value = { :prefix => { field => value } }
+          { :prefix => { field => value } }
         end
       end
 
