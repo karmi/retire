@@ -124,7 +124,7 @@ module Tire
         end
 
         def mapping_to_hash
-          { document_type.to_sym => mapping_options.merge({ :properties => mapping }) }
+          { tire_document_type.to_sym => mapping_options.merge({ :properties => mapping }) }
         end
 
       end

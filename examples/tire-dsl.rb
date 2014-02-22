@@ -88,7 +88,7 @@ Tire.index 'articles' do
       @attributes.each_pair { |name,value| instance_variable_set :"@#{name}", value }
     end
 
-    # It must provide a `type`, `_type` or `document_type` method for propper mapping.
+    # It must provide a `type`, `_type` or `tire_document_type` method for propper mapping.
     #
     def type
       'article'

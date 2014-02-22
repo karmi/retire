@@ -67,15 +67,15 @@ module Tire
         #
         # To get the document type:
         #
-        #     Article.document_type
+        #     Article.tire_document_type
         #
         # To set the document type:
         #
-        #     Article.document_type 'my-custom-type'
+        #     Article.tire_document_type 'my-custom-type'
         #
-        def document_type name=nil
-          @document_type = name if name
-          @document_type || klass.model_name.to_s.underscore
+        def tire_document_type name=nil
+          @tire_document_type = name if name
+          @tire_document_type || klass.model_name.to_s.underscore
         end
       end
 
@@ -87,10 +87,10 @@ module Tire
           instance.class.tire.index_name
         end
 
-        # Proxy to instance method `document_type`.
+        # Proxy to instance method `tire_document_type`.
         #
-        def document_type
-          instance.class.tire.document_type
+        def tire_document_type
+          instance.class.tire.tire_document_type
         end
       end
 
