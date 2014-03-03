@@ -82,6 +82,10 @@ module Tire
         assert @document.respond_to?(:title, true)
       end
 
+      should "not raise errors when unserializing" do
+        assert_nothing_raised { YAML.load(YAML.dump(@document)) }
+      end
+
       should "return nil for non-existing keys/methods" do
         assert_nothing_raised { @document.whatever }
         assert_nil @document.whatever
