@@ -7,7 +7,6 @@ module Tire
       else
         File.open(device, 'a')
       end
-      @device.sync = true if @device.respond_to?(:sync)
       @options = options
       # at_exit { @device.close unless @device.closed? } if @device.respond_to?(:closed?) && @device.respond_to?(:close)
     end
@@ -25,13 +24,12 @@ module Tire
       #
       # curl -X POST ....
       #
-      content  = "# #{time}"
-      content += " [#{endpoint}]"
-      content += " (#{params.inspect})" if params
-      content += "\n#\n"
-      content += curl
-      content += "\n\n"
-      write content
+      write "# #{time}"
+      write " [#{endpoint}]"
+      write " (#{params.inspect})" if params
+      write "\n#\n"
+      write curl
+      write "\n\n"
     end
 
     def log_response(status, took=nil, json='')
@@ -43,13 +41,12 @@ module Tire
       #   ...
       # }
       #
-      content  = "# #{time}"
-      content += " [#{status}]"
-      content += " (#{took} msec)" if took
-      content += "\n#\n" unless json.to_s !~ /\S/
-      json.to_s.each_line { |line| content += "# #{line}" } unless json.to_s !~ /\S/
-      content += "\n\n"
-      write content
+      write "# #{time}"
+      write " [#{status}]"
+      write " (#{took} msec)" if took
+      write "\n#\n" unless json.to_s !~ /\S/
+      json.to_s.each_line { |line| write "# #{line}" } unless json.to_s !~ /\S/
+      write "\n\n"
     end
 
     def time
