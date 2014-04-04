@@ -75,6 +75,12 @@ module Tire
         self
       end
 
+      def indexed_terms_filter(type, field, *options)
+        @filters ||= []
+        @filters << IndexedTermsFilter.new(type, field, *options).to_hash
+        self
+      end
+
       def script_field(name, options={})
         @script_fields ||= {}
         @script_fields.merge! ScriptField.new(name, options).to_hash
@@ -110,6 +116,13 @@ module Tire
 
       def fields(*fields)
         @fields = Array(fields.flatten)
+        self
+      end
+      
+      # Since ES 1.0.0 field values, in response to the fields parameter, are now always returned as arrays.
+      # They recommend the _source field to be used.
+      def source_fields(*fields)
+        @source_fields = Array(fields.flatten)
         self
       end
 
@@ -170,6 +183,7 @@ module Tire
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
+          request.update( { :_source => @source_fields } )   if @source_fields
           request.update( { :partial_fields => @partial_fields } ) if @partial_fields
           request.update( { :script_fields => @script_fields } ) if @script_fields
           request.update( { :version => @version } )         if @version
