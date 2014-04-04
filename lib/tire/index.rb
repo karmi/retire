@@ -356,12 +356,15 @@ module Tire
       params_encoded      = params.empty? ? '' : "?#{params.to_param}"
 
       @response = Configuration.client.get "#{url}#{params_encoded}"
+      if @response && @response.failure? && @response.code != 404
+        raise RuntimeError, "#{@response.code} > #{@response.body}"
+      end
 
       h = MultiJson.decode(@response.body)
       wrapper = options[:wrapper] || Configuration.wrapper
       if wrapper == Hash then h
       else
-        return nil if h['exists'] == false
+        return nil if (h['exists'] || h['found']) == false
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
         wrapper.new(document)
