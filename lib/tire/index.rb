@@ -93,7 +93,7 @@ module Tire
       end
 
       url  = "#{self.url}/#{type}/_mapping"
-      url += "?#{params.to_param}" unless params.empty?
+      url << "?#{params.to_param}" unless params.empty?
 
       payload = { type => mapping }.to_json
 
@@ -383,7 +383,7 @@ module Tire
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{Utils.escape(id)}/_update"
-      url      += "?#{options.to_param}" unless options.keys.empty?
+      url      << "?#{options.to_param}" unless options.keys.empty?
       @response = Configuration.client.post url, MultiJson.encode(payload)
       MultiJson.decode(@response.body)
 

@@ -41,7 +41,7 @@ module Tire
 
       should "transform documents with a passed lambda" do
         Tire.index('reindex-test').reindex 'reindex-test-new', transform: lambda { |document|
-                                                                            document[:title] += 'UPDATED'
+                                                                            document[:title] << 'UPDATED'
                                                                             document
                                                                           }
 
