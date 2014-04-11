@@ -105,9 +105,9 @@ module Tire
           # 2011-03-19 11:00:00:000 [200 OK] (4 msec)
           #
         log;
-        # log += json.split.map { |line| "# #{line}" }.join("\n")
-        json.each_line { |line| log += "# #{line}" }
-        log += "\n\n"
+        # log << json.split.map { |line| "# #{line}" }.join("\n")
+        json.each_line { |line| log << "# #{line}" }
+        log << "\n\n"
         @logger.expects(:write).with do |payload|
           payload =~ Regexp.new( Regexp.escape('2011-03-19 11:00:00') )
           payload =~ Regexp.new( Regexp.escape('[200 OK]') )
