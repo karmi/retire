@@ -61,6 +61,10 @@ module Tire
         persisted? ? [id] : nil
       end
 
+      def to_param
+        @attributes[:to_param] || [id] if persisted?
+      end
+
       def to_hash
         @attributes.reduce({}) do |sum, item|
           if item.last.is_a?(Array)
