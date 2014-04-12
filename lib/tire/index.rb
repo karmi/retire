@@ -258,7 +258,7 @@ module Tire
         end
 
       ensure
-        data = Configuration.logger && Configuration.logger.level.to_s == 'verbose' ? payload.join("\n") : '... data omitted ...'
+        data = Configuration.logger && Configuration.logger.level.to_s == 'debug' ? payload.join("\n") : '... data omitted ...'
         curl = %Q|curl -X POST "#{url}/_bulk" --data-binary '#{data}'|
         logged('_bulk', curl)
       end
