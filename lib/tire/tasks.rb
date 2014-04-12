@@ -46,7 +46,7 @@ module Tire
         unless progress_bar(klass)
           puts "[IMPORT] Importing '#{klass.to_s}'"
         end
-        klass.tire.import(params) do |documents|
+        Tire::Model::Import::Strategy::from_class(klass, params).import do |documents|
           progress_bar(klass).inc documents.size if progress_bar(klass)
           documents
         end
