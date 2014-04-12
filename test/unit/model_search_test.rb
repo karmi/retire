@@ -36,7 +36,7 @@ module Tire
           assert_respond_to ::ModelWithIndexCallbacks, :after_update_elasticsearch_index
         end
 
-        should "limit searching in index for documents matching the model 'document_type'" do
+        should "limit searching in index for documents matching the model 'tire_document_type'" do
           Tire::Search::Search.
             expects(:new).
             with('active_model_articles', { :type => 'active_model_article' }).
@@ -50,7 +50,7 @@ module Tire
         should "search in custom name" do
           first  = 'custom-index-name'
           second = 'another-custom-index-name'
-          expected_options = { :type => ActiveModelArticleWithCustomIndexName.document_type }
+          expected_options = { :type => ActiveModelArticleWithCustomIndexName.tire_document_type }
 
           Tire::Search::Search.expects(:new).with(first, expected_options).returns(@stub).twice
           ActiveModelArticleWithCustomIndexName.index_name first
@@ -90,7 +90,7 @@ module Tire
         should "allow to pass custom index name" do
           Tire::Search::Search.
             expects(:new).
-            with('custom_index', { :type => ActiveModelArticle.document_type }).
+            with('custom_index', { :type => ActiveModelArticle.tire_document_type }).
             returns(@stub).
             twice
 

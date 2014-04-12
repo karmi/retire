@@ -25,7 +25,7 @@ module Tire
           end
 
           def delete(&block)
-            DeleteByQuery.new(index_name, {:type => document_type}, &block).perform
+            DeleteByQuery.new(index_name, {:type => tire_document_type}, &block).perform
           end
         end
 

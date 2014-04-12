@@ -287,7 +287,7 @@ module Tire
 
           module MyNamespace
             class MyModel
-              def document_type;   "my_namespace/my_model"; end
+              def tire_document_type;   "my_namespace/my_model"; end
               def to_indexed_json; "{}";                    end
             end
           end
@@ -826,7 +826,7 @@ module Tire
             returns(mock_response('{}'), 200)
 
           class MyModel
-            def document_type;   "my_model";                                      end
+            def tire_document_type;   "my_model";                                      end
             def to_hash;         { :id => 1, :title => 'Foo', :_routing => 'A' }; end
             def to_indexed_json; MultiJson.encode(to_hash);                       end
           end
@@ -836,7 +836,7 @@ module Tire
 
         context "with namespaced models" do
 
-          should "not URL-escape the document_type" do
+          should "not URL-escape the tire_document_type" do
             Configuration.client.expects(:post).with do |url, payload|
               # puts url, payload
               assert_equal "#{Configuration.url}/my_namespace_my_models/_bulk", url
@@ -846,7 +846,7 @@ module Tire
 
             module MyNamespace
               class MyModel
-                def document_type;   "my_namespace/my_model"; end
+                def tire_document_type;   "my_namespace/my_model"; end
                 def to_indexed_json; "{}";                    end
               end
             end

@@ -3,7 +3,7 @@ module Tire
     module Suggest
       module ClassMethods
         def suggest(*args, &block)
-          default_options = {:type => document_type, :index => index.name}
+          default_options = {:type => tire_document_type, :index => index.name}
 
           if block_given?
             options = args.shift || {}

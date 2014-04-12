@@ -63,7 +63,7 @@ module Tire
         #     Article.search :load => { :include => 'comments' } do ... end
         #
         def search(*args, &block)
-          default_options = {:type => document_type, :index => index.name}
+          default_options = {:type => tire_document_type, :index => index.name}
 
           if block_given?
             options = args.shift || {}
@@ -106,7 +106,7 @@ module Tire
         end
 
         def multi_search(options={}, &block)
-          default_options = {:type => document_type}
+          default_options = {:type => tire_document_type}
           options         = default_options.update(options)
           Tire::Search::Multi::Search.new(index.name, options, &block).results
         end
