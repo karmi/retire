@@ -617,6 +617,7 @@ module Tire
           delete_percolator_index if ENV['TRAVIS']
           ActiveRecordModelWithPercolation.index.register_percolator_query('alert') { string 'warning' }
           Tire.index('_percolator').refresh
+          sleep 1
         end
 
         teardown do
