@@ -47,7 +47,7 @@ module Tire
       end
 
       should "expose the index response on successful update" do
-        assert_equal @response.response["ok"], true
+        assert_not_nil @response.response['_version']
       end
 
     end
