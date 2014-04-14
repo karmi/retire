@@ -129,6 +129,9 @@ module Tire
           # instances and automatically convert UTC formatted strings to Time.
           #
           def __cast_value(name, value)
+            default = self.class.property_defaults[name.to_sym]
+            # elasticsearch v1 returns field data wrapped in an array
+            value = value.first unless !value.is_a?(Array) || default.is_a?(Array) || value.nil?
             case
 
               when klass = self.class.property_types[name.to_sym]
