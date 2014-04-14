@@ -82,7 +82,7 @@ module Tire
         def to_hash
           @value[:functions] ?
           @value :
-          @value.merge(:functions => [CustomFilter.new{ filter(:match_all); boost(1) }.to_hash]) # Needs at least one filter
+          @value.merge(:functions => [CustomFilter.new{ filter(:match_all); boost_factor(1) }.to_hash]) # Needs at least one filter
         end
 
         def to_json

@@ -28,7 +28,7 @@ module Tire
     #           query { term :title, 'Harry Potter' }
     #           filter do
     #             filter :match_all
-    #             boost 1.1
+    #             boost_factor 1.1
     #           end
     #           filter do
     #             filter :term, :author => 'Rowling',
@@ -66,8 +66,8 @@ module Tire
             @value
           end
 
-          def boost(value)
-            @value[:boost] = value
+          def boost_factor(value)
+            @value[:boost_factor] = value
             @value
           end
 
@@ -116,7 +116,7 @@ module Tire
         def to_hash
           @value[:filters] ?
           @value :
-          @value.merge(:filters => [CustomFilter.new{ filter(:match_all); boost(1) }.to_hash]) # Needs at least one filter
+          @value.merge(:filters => [CustomFilter.new{ filter(:match_all); boost_factor(1) }.to_hash]) # Needs at least one filter
         end
 
         def to_json
