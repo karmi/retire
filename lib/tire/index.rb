@@ -93,7 +93,7 @@ module Tire
       end
 
       url  = "#{self.url}/#{type}/_mapping"
-      url += "?#{params.to_param}" unless params.empty?
+      url << "?#{params.to_param}" unless params.empty?
 
       payload = { type => mapping }.to_json
 
@@ -356,15 +356,16 @@ module Tire
       params_encoded      = params.empty? ? '' : "?#{params.to_param}"
 
       @response = Configuration.client.get "#{url}#{params_encoded}"
-      if @response && @response.failure? && @response.code != 404
-        raise RuntimeError, "#{@response.code} > #{@response.body}"
-      end
+      raise RuntimeError, "#{@response.code} > #{@response.body}" if @response && @response.failure? && @response.code != 404
+
+      return nil if @response && @response.failure? && @response.code == 404
 
       h = MultiJson.decode(@response.body)
+      return nil if h['exists'] == false || h['found'] == false
+
       wrapper = options[:wrapper] || Configuration.wrapper
       if wrapper == Hash then h
       else
-        return nil if h['exists'] == false
         document = h['_source'] || h['fields'] || {}
         document.update('id' => h['_id'], '_type' => h['_type'], '_index' => h['_index'], '_version' => h['_version'])
         wrapper.new(document)
@@ -382,7 +383,7 @@ module Tire
 
       type      = Utils.escape(type)
       url       = "#{self.url}/#{type}/#{Utils.escape(id)}/_update"
-      url      += "?#{options.to_param}" unless options.keys.empty?
+      url      << "?#{options.to_param}" unless options.keys.empty?
       @response = Configuration.client.post url, MultiJson.encode(payload)
       MultiJson.decode(@response.body)
 

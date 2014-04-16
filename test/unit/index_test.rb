@@ -442,6 +442,20 @@ module Tire
           assert_equal nil, article
         end
 
+        should "return nil for missing document on 1.x" do
+          Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
+                                             returns(mock_response('{"_id":"id-1","found":false}'))
+          article = @index.retrieve :article, 'id-1'
+          assert_equal nil, article
+        end
+
+        should "return nil for missing index" do
+          Configuration.client.expects(:get).with("#{@index.url}/missing/id-1").
+                                             returns(mock_response('MISSING', 404))
+          article = @index.retrieve :missing, 'id-1'
+          assert_equal nil, article
+        end
+
         should "raise an error for server errors" do
           Configuration.client.expects(:get).with("#{@index.url}/article/id-1").
                                              returns(mock_response('BOOM', 500))

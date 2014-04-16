@@ -477,6 +477,7 @@ module Tire
 
       context "with multiple class instances in one index" do
          setup do
+           # Tire.configure { logger STDERR, level: 'debug' }
            ActiveRecord::Schema.define do
              create_table(:active_record_assets)    { |t| t.string :title, :timestamp }
              create_table(:active_record_model_one) { |t| t.string :title, :timestamp }
@@ -484,13 +485,13 @@ module Tire
            end
 
            ActiveRecordModelOne.create :title => 'Title One', timestamp: Time.now.to_i
-           ActiveRecordModelTwo.create :title => 'Title Two', timestamp: Time.now.to_i
+           ActiveRecordModelTwo.create :title => 'Title Two', timestamp: Time.now.to_i+1
            ActiveRecordModelOne.tire.index.refresh
            ActiveRecordModelTwo.tire.index.refresh
 
 
            ActiveRecordVideo.create! :title => 'Title One', timestamp: Time.now.to_i
-           ActiveRecordPhoto.create! :title => 'Title Two', timestamp: Time.now.to_i
+           ActiveRecordPhoto.create! :title => 'Title Two', timestamp: Time.now.to_i+1
            ActiveRecordAsset.tire.index.refresh
          end
 
@@ -616,6 +617,7 @@ module Tire
           delete_percolator_index if ENV['TRAVIS']
           ActiveRecordModelWithPercolation.index.register_percolator_query('alert') { string 'warning' }
           Tire.index('_percolator').refresh
+          sleep 1
         end
 
         teardown do
