@@ -44,7 +44,7 @@ module Tire
     end
 
     def to_json(options={})
-      query.to_json
+      {query: query}.to_json
     end
 
     def to_curl
