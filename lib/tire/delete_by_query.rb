@@ -10,8 +10,7 @@ module Tire
       @options = options
 
       if block_given?
-        @query = Search::Query.new
-        block.arity < 1 ? @query.instance_eval(&block) : block.call(@query)
+        @query = Search::Query.new(&block)
       else
         raise "no query given for #{self.class}"
       end
