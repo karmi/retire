@@ -19,7 +19,7 @@ module Tire
     def perform
       @response = Configuration.client.delete url
       if @response.failure?
-        STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
+        STDERR.puts "[REQUEST FAILED] #{to_curl}\n"
         raise DeleteByQueryRequestFailed, @response.to_s
       end
       @json = MultiJson.decode(@response.body)
