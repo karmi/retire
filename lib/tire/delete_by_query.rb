@@ -28,6 +28,10 @@ module Tire
       logged
     end
 
+    def as_json(options={})
+      {query: query}.as_json(options)
+    end
+
     private
 
     def path
@@ -41,10 +45,6 @@ module Tire
 
     def url
       "#{Configuration.url}#{path}/?source=#{Utils.escape(to_json)}"
-    end
-
-    def to_json(options={})
-      {query: query}.to_json
     end
 
     def to_curl
