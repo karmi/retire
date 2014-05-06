@@ -10,8 +10,7 @@ module Tire
       @options = options
 
       if block_given?
-        @query = Search::Query.new
-        block.arity < 1 ? @query.instance_eval(&block) : block.call(@query)
+        @query = Search::Query.new(&block)
       else
         raise "no query given for #{self.class}"
       end
@@ -29,6 +28,10 @@ module Tire
       logged
     end
 
+    def as_json(options={})
+      {query: query}.as_json(options)
+    end
+
     private
 
     def path
@@ -42,10 +45,6 @@ module Tire
 
     def url
       "#{Configuration.url}#{path}/?source=#{Utils.escape(to_json)}"
-    end
-
-    def to_json(options={})
-      query.to_json
     end
 
     def to_curl
