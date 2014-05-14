@@ -154,7 +154,55 @@ module Tire
       end
 
       def __find_records_by_ids(klass, ids)
-        @options[:load] === true ? klass.find(ids) : klass.find(ids, @options[:load])
+        Strategy.from_class(klass, @options).find(ids)
+      end
+    end
+
+    # Importing strategies for common persistence frameworks (ActiveModel, Mongoid), as well as
+    # pagination libraries (WillPaginate, Kaminari), or a custom strategy.
+    module Strategy
+      def self.from_class(klass, options={})
+        return const_get(options[:strategy]).new(klass, options) if options[:strategy]
+
+        case
+        when defined?(::ActiveRecord) && klass.ancestors.include?(::ActiveRecord::Base)
+          ActiveRecord.new klass, options
+        else
+          Default.new klass, options
+        end
+      end
+
+      module Base
+        attr_reader :klass, :options
+
+        def initialize(klass, options={})
+          @klass   = klass
+          @options = options
+        end
+      end
+
+      class ActiveRecord
+        include Base
+
+        def find(ids)
+          if options[:load] === true
+            klass.where(:id => ids)
+          else
+            klass.where(:id => ids).all(options[:load])
+          end
+        end
+      end
+
+      class Default
+        include Base
+
+        def find(ids)
+          if options[:load] === true
+            klass.find(ids)
+          else
+            klass.find(ids, options[:load])
+          end
+        end
       end
     end
 
