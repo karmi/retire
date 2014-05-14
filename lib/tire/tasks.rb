@@ -184,4 +184,15 @@ namespace :tire do
 
   end
 
+  namespace :indices do
+    desc 'List existing indices'
+    task :list do
+      status_url      = "#{Tire::Configuration.url}/_status"
+      status_response = Tire::HTTP::Client::RestClient.get(status_url)
+      status_data     = MultiJson.decode(status_response.body)
+
+      puts status_data['indices'].keys
+    end
+  end
+
 end
