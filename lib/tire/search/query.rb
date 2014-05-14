@@ -92,8 +92,19 @@ module Tire
       end
 
       def ids(values, type=nil)
-        @value = { :ids => { :values => Array(values) }  }
-        @value[:ids].update(:type => type) if type
+        value = { :values => Array(values) }
+        value.update(:type => type) if type
+
+        if @value[:match] && !@value[:bool]
+          # Construct boolean block if a `match` query is already given.
+          original_query = @value.dup
+          @value = { :bool => {} }
+          @value[:bool][:must] = [original_query, { :ids => value }]
+        elsif @value[:bool]
+          (@value[:bool][:must] ||= []) << { :ids => value }
+        else
+          @value[:ids] = value
+        end
         @value
       end
 
