@@ -313,6 +313,16 @@ module Tire
             assert_equal '4chan',       article.comments.first.nick
           end
 
+          should "be referenced by the custom class" do
+            article_created = Time.now
+            posted_at = article_created + 10.minutes
+            article = PersistentArticleWithCastedCollection.new :created_at => article_created,
+                                                                :title => 'Test',
+                                                                :comments => [{:nick => '4chan', :body => 'WHY U NO?', :posted_at => posted_at}]
+            comment = article.comments.first
+            assert_equal comment.posted_within, 10.minutes
+          end
+
           should "automatically format strings in ISO8601 with the default UTC designator" do
             article = PersistentArticle.new :published_on => '2011-11-01T23:00:00Z'
             assert_instance_of Time, article.published_on
