@@ -557,5 +557,15 @@ module Tire::Search
 
     end
 
+    context "Regexp query" do
+      should "allow search for a simple regexp value" do
+        assert_equal( { :regexp => { :name => { :value => '[0-9]+*' } } }, Query.new.regexp(:name, '[0-9]+*') )
+      end
+
+      should "allow search for a simple regexp value using an options hash" do
+        assert_equal( { :regexp => { :name => { :value => '[0-9]+*', :boost => 2.0 } } }, Query.new.regexp(:name, '[0-9]+*', :boost => 2.0) )
+      end
+    end
+
   end
 end
