@@ -46,6 +46,7 @@ require File.dirname(__FILE__) + '/models/active_model_article_with_custom_docum
 require File.dirname(__FILE__) + '/models/active_model_article_with_custom_index_name'
 require File.dirname(__FILE__) + '/models/active_record_models'
 require File.dirname(__FILE__) + '/models/article'
+require File.dirname(__FILE__) + '/models/mongoid_models'
 require File.dirname(__FILE__) + '/models/persistent_article'
 require File.dirname(__FILE__) + '/models/persistent_article_in_index'
 require File.dirname(__FILE__) + '/models/persistent_article_in_namespace'
