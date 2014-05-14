@@ -138,6 +138,7 @@ module Tire
       params[:routing] = options[:routing] if options[:routing]
       params[:replication] = options[:replication] if options[:replication]
       params[:version] = options[:version] if options[:version]
+      params[:refresh] = options[:refresh] if options[:refresh]
 
       params_encoded = params.empty? ? '' : "?#{params.to_param}"
 

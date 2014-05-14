@@ -335,6 +335,16 @@ module Tire
           @index.store({:title => 'Test'}, {:replication => 'async'})
         end
 
+        should "extract the refresh type from options" do
+          Configuration.client.expects(:post).
+            with do |url, payload|
+              assert_equal "#{Configuration.url}/dummy/document/?refresh=true", url
+            end.
+            returns(mock_response('{"ok":true,"_id":"test"}'))
+
+          @index.store({:title => 'Test'}, {:refresh => 'true'})
+        end
+
         should "extract the version from options" do
           Configuration.client.expects(:post).
             with do |url, payload|
