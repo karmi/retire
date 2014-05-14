@@ -73,6 +73,7 @@ module Tire
           end
 
           options   = default_options.update(options)
+          options[:context] = eval "self", block.binding if block_given?
           sort      = Array( options.delete(:order) || options.delete(:sort) )
 
           s = Tire::Search::Search.new(options.delete(:index), options)
