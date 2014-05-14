@@ -394,6 +394,38 @@ module Tire
 
       end
 
+      context "when checking a document" do
+        setup do
+          Configuration.reset :wrapper
+
+          Configuration.client.stubs(:post).with do |url, payload|
+                                              url     == "#{@index.url}/article/" &&
+                                              payload =~ /"title":"Test"/
+                                            end.
+                                            returns(mock_response('{"ok":true,"_id":"id-1"}'))
+          @index.store :type => 'article', :title => 'Test'
+        end
+
+        should "return a HTTP response" do
+          assert_respond_to @index, :response
+
+          Configuration.client.expects(:head).returns(mock_response('OK'))
+          @index.has_document? :article , 'id-1'
+          assert_equal      'OK', @index.response.body
+        end
+
+        should "return true when exists" do
+          Configuration.client.expects(:head).returns(mock_response(''))
+          assert @index.has_document? :article , 'id-1'
+        end
+
+        should "return false when does not exist" do
+          Configuration.client.expects(:head).returns(mock_response('', 404))
+          assert ! @index.has_document?(:article , 'id-1')
+        end
+
+      end
+
       context "when retrieving" do
 
         setup do
