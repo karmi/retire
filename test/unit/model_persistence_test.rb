@@ -264,6 +264,18 @@ module Tire
             assert article.respond_to?(:published_on)
           end
 
+          should "return true for has_attribute? calls for defined attributes" do
+            article = PersistentArticle.new :title => 'Test'
+
+            assert article.has_attribute?(:title)
+            assert article.has_attribute?(:published_on)
+          end
+
+          should "return false for has_attribute? calls for unknown attributes" do
+            article = PersistentArticle.new :title => 'Test'
+            assert ! article.has_attribute?(:krapulitz)
+          end
+
           should "have attribute names" do
             article = PersistentArticle.new :title => 'Test', :tags => ['one', 'two']
             assert_equal ['published_on', 'tags', 'title'], article.attribute_names

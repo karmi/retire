@@ -116,7 +116,7 @@ module Tire
           end
 
           def has_attribute?(name)
-            properties.include?(name.to_s)
+            self.class.properties.include?(name.to_s)
           end
           alias :has_property? :has_attribute?
 
