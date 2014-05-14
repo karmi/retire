@@ -91,13 +91,16 @@ module Tire
     #
     def self.all(index=nil)
       @response = Configuration.client.get [Configuration.url, index, '_aliases'].compact.join('/')
-
+      return [] if @response.code != 200
+      
       aliases = MultiJson.decode(@response.body).inject({}) do |result, (index, value)|
         # 1] Skip indices without aliases
         next result if value['aliases'].empty?
 
         # 2] Build a reverse map of hashes (alias => indices, config)
-        value['aliases'].each do |key, value| (result[key] ||= { 'indices' => [] }).update(value)['indices'].push(index) end
+        value['aliases'].each do |key, value| 
+          (result[key] ||= { 'indices' => [] }).update(value)['indices'].push(index) 
+        end
         result
       end
 

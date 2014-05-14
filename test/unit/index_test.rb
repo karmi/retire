@@ -91,6 +91,16 @@ module Tire
 
         assert_equal ['foo'], @index.aliases.map(&:name)
       end
+      
+      should "return an empty array of aliases for a non-existant index" do
+        json = <<-JSON
+        {"error":"IndexMissingException[[zomg] missing]","status":404}
+        JSON
+        
+        Configuration.client.expects(:get).returns(mock_response(json, 404))
+        
+        assert_equal [], Tire.index('zomg').aliases
+      end
 
       should "return properties of an alias" do
         json = {'dummy' => { 'aliases' => {'foo' => { 'filter' => { 'term' => { 'user' => 'john' } }}} }}.to_json
