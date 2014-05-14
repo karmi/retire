@@ -63,7 +63,7 @@ To test-drive the core _Elasticsearch_ functionality, let's require the gem:
 ```
 
 Please note that you can copy these snippets from the much more extensive and heavily annotated file
-in [examples/tire-dsl.rb](http://karmi.github.com/retire/).
+in [examples/tire-dsl.rb](https://github.com/karmi/retire/blob/master/examples/tire-dsl.rb).
 
 Also, note that we're doing some heavy JSON lifting here. _Tire_ uses the
 [_multi_json_](https://github.com/intridea/multi_json) gem as a generic JSON wrapper,
