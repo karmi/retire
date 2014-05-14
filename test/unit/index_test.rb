@@ -237,7 +237,16 @@ module Tire
 
           assert_equal '20', @index.settings['index.number_of_shards']
         end
-
+        
+        should "return a blank hash for settings if the index is missing" do
+          json = <<-JSON
+            {"error":"IndexMissingException[[foo] missing]","status":404}
+          JSON
+          
+          Configuration.client.stubs(:get).returns(mock_response(json, 404))
+          
+          assert_equal ({}), Tire.index('foo').settings
+        end
       end
 
       context "when storing" do

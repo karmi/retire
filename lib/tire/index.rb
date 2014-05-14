@@ -116,7 +116,7 @@ module Tire
 
     def settings
       @response = Configuration.client.get("#{url}/_settings")
-      MultiJson.decode(@response.body)[@name]['settings']
+      MultiJson.decode(@response.body).fetch(@name, {}).fetch('settings', {})
     end
 
     def store(*args)
