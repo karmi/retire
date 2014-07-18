@@ -12,6 +12,17 @@ module Tire
         self
       end
 
+      def by_script(script, type, order)
+        @value << {
+            _script: {
+              script: script,
+              type: type.to_s,
+              order: order.to_s
+            }
+          }
+        self
+      end
+
       def to_ary
         @value
       end
