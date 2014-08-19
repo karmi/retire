@@ -59,6 +59,12 @@ module Tire
           @value
         end
 
+        def script_score(hash)
+          @value[:functions] ||= []
+          @value[:functions] << { "script_score" => hash }
+          @value
+        end
+
         def score_mode(value)
           @value[:score_mode] = value
           @value
