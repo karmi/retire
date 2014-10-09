@@ -56,6 +56,7 @@ require 'tire/model/persistence/attributes'
 require 'tire/model/persistence/storage'
 require 'tire/model/persistence'
 require 'tire/tasks'
+require 'find_with_options'
 
 module Tire
   extend DSL
