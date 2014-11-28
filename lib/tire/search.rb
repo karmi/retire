@@ -113,6 +113,33 @@ module Tire
         self
       end
 
+      # NOTE:
+      # This is a breaking change in ES 1.x. Without this fix, following error is thrown - 
+      #
+      #   org.elasticsearch.ElasticsearchIllegalArgumentException: field [category_keywords] isn't a leaf field
+      #
+      # Look at source-filtering for more details
+      # 
+      #   http://www.elasticsearch.org/guide/en/elasticsearch/reference/1.x/search-request-source-filtering.html
+      #
+      def source(*complex_fields)
+        @complex_fields = Array(complex_fields.flatten)
+        self
+      end
+
+      # Please look at the "Return values" section at
+      #
+      #   https://github.com/elasticsearch/elasticsearch/blob/2c777cef24603f2b7d79bd23c450dbc23927a24a/docs/reference/migration/migrate_1_0.asciidoc#search-request-source-filtering
+      #
+      # Field values, in response to the fields parameter, are now always returned as arrays. A field could 
+      # have single or multiple values, which meant that sometimes they were returned as scalars and sometimes as arrays. 
+      # By always returning arrays, this simplifies user code
+      #
+      def vectors(*vector_fields)
+        @vector_fields = Array(vector_fields.flatten)
+        self
+      end
+
       def partial_field(name, options)
         @partial_fields ||= {}
         @partial_fields[name] = options
@@ -145,7 +172,7 @@ module Tire
           raise SearchRequestFailed, @response.to_s
         end
         @json     = MultiJson.decode(@response.body)
-        @results  = Results::Collection.new(@json, @options)
+        @results  = Results::Collection.new(@json, @options.merge(:vector_fields => @vector_fields))
         return self
       ensure
         logged
@@ -170,6 +197,7 @@ module Tire
           request.update( { :size => @size } )               if @size
           request.update( { :from => @from } )               if @from
           request.update( { :fields => @fields } )           if @fields
+          request.update( { :_source => @complex_fields } )  if @complex_fields
           request.update( { :partial_fields => @partial_fields } ) if @partial_fields
           request.update( { :script_fields => @script_fields } ) if @script_fields
           request.update( { :version => @version } )         if @version

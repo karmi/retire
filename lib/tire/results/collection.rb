@@ -109,7 +109,23 @@ module Tire
 
             # Update the document with fields and/or source
             document.update h['_source'] if h['_source']
-            document.update __parse_fields__(h['fields']) if h['fields']
+            
+            # Please look at the "Return values" section at
+            #
+            #   https://github.com/elasticsearch/elasticsearch/blob/2c777cef24603f2b7d79bd23c450dbc23927a24a/docs/reference/migration/migrate_1_0.asciidoc#search-request-source-filtering
+            #
+            # Field values, in response to the fields parameter, are now always returned as arrays. A field could 
+            # have single or multiple values, which meant that sometimes they were returned as scalars and sometimes as arrays. 
+            # By always returning arrays, this simplifies user code
+            #
+            if h['fields']
+              document.update __parse_fields__(h['fields']) 
+              h['fields'].each_pair do |key, value|
+                if !@options[:vector_fields].include?(key.to_s.to_sym)
+                  document[key] = value.first
+                end
+              end
+            end
 
             # Set document ID
             document['id'] = h['_id']
