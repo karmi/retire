@@ -22,7 +22,7 @@ module Tire
 
         # Extract URL parameters from payload
         #
-        search_params = %w| search_type routing scroll from size timeout |
+        search_params = %w| search_type routing scroll from size timeout preference |
 
         search_options = search_params.inject({}) do |sum,item|
           if param = (payload.delete(item) || payload.delete(item.to_sym))

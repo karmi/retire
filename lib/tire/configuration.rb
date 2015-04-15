@@ -6,6 +6,23 @@ module Tire
       @url = (value ? value.to_s.gsub(%r|/*$|, '') : nil) || @url || ENV['ELASTICSEARCH_URL'] || "http://localhost:9200"
     end
 
+    def self.urls(values=nil)
+      unless values.nil?
+        @urls = values
+        @url = @urls.first
+      end
+      @urls
+    end
+
+    def self.shift_server
+      unless @urls.nil? or @urls.empty?
+        @urls.shift
+        @url = @urls.first
+        STDERR.puts "[INFO] Switching to server #{self.url}"
+        @url
+      end
+    end
+
     def self.client(klass=nil)
       @client = klass || @client || HTTP::Client::RestClient
     end

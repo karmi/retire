@@ -139,7 +139,15 @@ module Tire
       end
 
       def perform
-        @response = Configuration.client.get(self.url + self.params, self.to_json)
+        begin
+          @response = Configuration.client.get(self.url + self.params, self.to_json)
+        rescue Errno::ECONNREFUSED
+          unless Configuration.shift_server.nil?
+            retry
+          end
+          raise
+        end
+
         if @response.failure?
           STDERR.puts "[REQUEST FAILED] #{self.to_curl}\n"
           raise SearchRequestFailed, @response.to_s

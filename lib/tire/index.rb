@@ -254,6 +254,12 @@ module Tire
           retry
         else
           STDERR.puts "[ERROR] Too many exceptions occured, giving up. The HTTP response was: #{error.message}"
+
+          unless Configuration.shift_server.nil?
+            count = 0
+            retry
+          end
+
           raise if options[:raise]
         end
 
