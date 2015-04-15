@@ -77,6 +77,15 @@ module Tire
         assert_equal          'http://localhost:9200', Configuration.url
         assert_equal          HTTP::Client::RestClient, Configuration.client
       end
+
+      should "allow multiple urls" do
+        urls = [
+          "http://localhost:9200",
+          "http://localhost:9201"
+        ]
+        Configuration.urls    urls
+        assert_equal          urls.first, Configuration.url
+      end
     end
 
   end
