@@ -213,7 +213,7 @@ module Tire
         # for the search method.
         #
         def load(options=nil)
-          options ? self.class.find(self.id, options) : self.class.find(self.id)
+          options ? FindWithOptions.for(self.class, self.id, options) : self.class.find(self.id)
         end
 
       end
