@@ -65,6 +65,10 @@ module Tire
         @value
       end
 
+      def simple_query_string(json)
+        @value[:simple_query_string] = @value.merge(json)
+      end
+
       def filtered(&block)
         @filtered = FilteredQuery.new
         block.arity < 1 ? @filtered.instance_eval(&block) : block.call(@filtered) if block_given?
@@ -147,6 +151,10 @@ module Tire
       def should(&block)
         (@value[:should] ||= []) << Query.new(&block).to_hash
         @value
+      end
+
+      def simple_query_string(json)
+        @value[:simple_query_string] = @value.merge(json)
       end
 
       def to_hash
