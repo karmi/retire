@@ -71,7 +71,7 @@ module Tire
       end
 
       def success?
-        error.to_s.empty?
+        error.to_s.empty? && @response['hits']
       end
 
       def failure?
