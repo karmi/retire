@@ -183,6 +183,10 @@ module Tire
             assert_nothing_raised { PersistentArticle.new }
           end
 
+          should "have getter methods for underscore-attributes of unsaved models" do
+            assert_nothing_raised { PersistentArticle.new._version }
+          end
+
           should "have getter methods for attributes" do
             assert_not_nil @article.title
             assert_equal 'Test', @article.title

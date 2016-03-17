@@ -11,4 +11,5 @@ examples/*.html
 *.log
 .rvmrc
 .rbenv-version
+.idea/
 tmp/
