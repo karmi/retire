@@ -125,5 +125,13 @@ module Tire
       Alias.all
     end
 
+    def delete
+      Configuration.client.delete Configuration.url
+    end
+
+    def cluster(&block)
+      Cluster.new(&block)
+    end
+
   end
 end
