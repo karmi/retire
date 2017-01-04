@@ -1239,6 +1239,38 @@ module Tire
 
       end
 
+      context "flush" do
+
+        should "send flush request" do
+          Configuration.client.expects(:post).with do |url, payload|
+            assert url.match /_flush/
+          end.returns mock_response({}.to_json)
+
+          @index.flush
+        end
+      end
+
+      context "optimize" do
+
+        should "send optimize request" do
+          Configuration.client.expects(:post).with do |url, payload|
+            assert url.match /_optimize/
+          end.returns mock_response({}.to_json)
+
+          @index.optimize
+        end
+
+        should "pass through parameters" do
+          Configuration.client.expects(:post).with do |url, payload|
+            assert payload.match /max_num_segments=1/
+            assert payload.match /refresh=false/
+          end.returns mock_response({}.to_json)
+
+          @index.optimize max_num_segments: 1, refresh: false
+        end
+
+      end
+
     end
 
   end
