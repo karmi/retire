@@ -129,6 +129,10 @@ module Tire
           # instances and automatically convert UTC formatted strings to Time.
           #
           def __cast_value(name, value)
+
+            property_mapping = self.class.mapping[name.to_sym]
+            type_class = property_mapping[:type].camelize if property_mapping
+
             case
 
               when klass = self.class.property_types[name.to_sym]
@@ -140,6 +144,13 @@ module Tire
 
               when value.is_a?(Hash)
                 Hashr.new(value)
+              
+              # if the property type can be easily casted to and
+              # the value's type does not match the mapping type
+              when %w[String Float Integer].include?(type_class) &&
+                   %w[String Float Integer Fixnum].include?(value.class.name) &&
+                   !value.is_a?(type_class.constantize)
+                send(type_class, value)
 
               else
                 # Strings formatted as <http://en.wikipedia.org/wiki/ISO8601> are automatically converted to Time
