@@ -104,6 +104,11 @@ module Tire
         @value
       end
 
+      def geo_shape(field, value)
+        @value = { :geo_shape => { field => value }}
+        @value
+      end
+
       def to_hash
         @value
       end
