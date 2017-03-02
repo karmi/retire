@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_dependency "hashr",       "~> 0.0.19"
   s.add_dependency "activesupport"
   s.add_dependency "ansi"
+  s.add_dependency "common-pool"
 
   # = Development dependencies
   #
