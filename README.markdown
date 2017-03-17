@@ -1,4 +1,4 @@
-Tire
+Tire [![Build Status](https://secure.travis-ci.org/karmi/tire.png)](http://travis-ci.org/karmi/tire)
 =========
 
 ---------------------------------------------------------------------------------------------------
