@@ -197,7 +197,7 @@ Let's display the results:
 Let's display the global facets (distribution of tags across the whole database):
 
 ```ruby
-    s.results.facets['global-tags']['terms'].each do |f|
+    s.facets['global-tags']['terms'].each do |f|
       puts "#{f['term'].ljust(10)} #{f['count']}"
     end
 
@@ -212,7 +212,7 @@ tagged with 'java' is included, even though it's not returned by our query;
 count for articles tagged 'php' is excluded, since they don't match the current query):
 
 ```ruby
-    s.results.facets['current-tags']['terms'].each do |f|
+    s.facets['current-tags']['terms'].each do |f|
       puts "#{f['term'].ljust(10)} #{f['count']}"
     end
 
