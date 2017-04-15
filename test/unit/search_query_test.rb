@@ -262,6 +262,16 @@ module Tire::Search
 
     end
 
+    context "MoreLikeThatQuery" do
+      should "allow mlt search" do
+        assert_equal({ :more_like_this => { :fields => [:foo], :like_text => 'bar' } }, Query.new.mlt(:foo, 'bar'))
+      end
+
+      should "allow mlt search with options" do
+        assert_equal({ :more_like_this => { :fields => [:foo], :like_text => 'bar', :percent_terms_to_match => 0.4, :min_doc_freq => 10 } }, Query.new.mlt(:foo, 'bar', :percent_terms_to_match => 0.4, :min_doc_freq => 10))
+      end
+    end
+
     context "BooleanQuery" do
 
       should "not raise an error when no block is given" do

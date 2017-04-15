@@ -58,6 +58,11 @@ module Tire
         @value = { :fuzzy => query }
       end
 
+      def mlt(fields, value, options = {})
+        query = { :fields => Array.wrap(fields), :like_text => value }.deep_merge(options)
+        @value = { :more_like_this => query }
+      end
+
       def boolean(options={}, &block)
         @boolean ||= BooleanQuery.new(options)
         block.arity < 1 ? @boolean.instance_eval(&block) : block.call(@boolean) if block_given?
