@@ -104,6 +104,11 @@ module Tire
         assert_nothing_raised { assert @index.refresh }
       end
 
+      should "optimize the index" do
+        Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_shards":{}}'))
+        assert_nothing_raised { assert @index.optimize }
+      end
+
       should "open the index" do
         Configuration.client.expects(:post).returns(mock_response('{"ok":true,"_shards":{}}'))
         assert_nothing_raised { assert @index.open }
