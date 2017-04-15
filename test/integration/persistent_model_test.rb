@@ -202,7 +202,7 @@ module Tire
         end
       end
 
-      context "percolated search" do
+      travis_context "percolated search" do
         setup do
           delete_registered_queries
           delete_percolator_index

@@ -79,6 +79,14 @@ end
 module Test::Integration
   URL = "http://localhost:9200"
 
+  def self.included(clazz)
+    clazz.instance_eval do
+      def travis_context(*args, &block)
+        context(*args, &block) if ENV['TRAVIS']
+      end
+    end
+  end
+
   def setup
     begin; Object.send(:remove_const, :Rails); rescue; end
 

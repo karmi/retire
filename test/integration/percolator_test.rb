@@ -5,7 +5,7 @@ module Tire
   class PercolatorIntegrationTest < Test::Unit::TestCase
     include Test::Integration
 
-    context "Percolator" do
+    travis_context "Percolator" do
       setup do
         delete_registered_queries
         delete_percolator_index
