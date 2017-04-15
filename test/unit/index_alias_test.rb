@@ -83,7 +83,7 @@ module Tire
       context "updating" do
         setup do
           Configuration.client.expects(:get).
-                               returns( mock_response(                               %q|{"index_A":{"aliases":{}},"index_B":{"aliases":{"alias_john":{"filter":{"term":{"user":"john"}}},"alias_martha":{"filter":{"term":{"user":"martha"}}}}},"mongoid_articles":{"aliases":{}},"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}}}}}}|), 200 ).at_least_once
+                               returns( mock_response(                               %q|{"index_A":{"aliases":{}},"index_B":{"aliases":{"alias_john":{"filter":{"term":{"user":"john"}}},"alias_martha":{"filter":{"term":{"user":"martha"}}}}},"mongoid_articles":{"aliases":{}},"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}},"index_routing":"1","search_routing":"2"}}}}|), 200 ).at_least_once
         end
 
         should "add indices to alias" do
@@ -155,7 +155,7 @@ module Tire
         setup do
           Configuration.client.expects(:get).with do |url, json|
               url  == "#{Configuration.url}/_aliases"
-            end.returns( mock_response(                               %q|{"index_A":{"aliases":{}},"index_B":{"aliases":{"alias_john":{"filter":{"term":{"user":"john"}}},"alias_martha":{"filter":{"term":{"user":"martha"}}}}},"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}}}}}}|), 200 )
+            end.returns( mock_response(                               %q|{"index_A":{"aliases":{}},"index_B":{"aliases":{"alias_john":{"filter":{"term":{"user":"john"}}},"alias_martha":{"filter":{"term":{"user":"martha"}}}}},"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}},"index_routing":"1","search_routing":"2"}}}}|), 200 )
         end
 
         should "find all aliases" do
@@ -169,7 +169,7 @@ module Tire
           Configuration.client.unstub(:get)
           Configuration.client.expects(:get).with do |url, json|
               url  == "#{Configuration.url}/index_C/_aliases"
-            end.returns( mock_response(                               %q|{"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}}}}}}|), 200 )
+            end.returns( mock_response(                               %q|{"index_C":{"aliases":{"alias_martha":{"filter":{"term":{"user":"martha"}},"index_routing":"1","search_routing":"2"}}}}|), 200 )
 
           aliases = Alias.all('index_C')
           # p aliases
