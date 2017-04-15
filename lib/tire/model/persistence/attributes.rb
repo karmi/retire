@@ -130,6 +130,8 @@ module Tire
           #
           def __cast_value(name, value)
             case
+              when value == nil
+                value
 
               when klass = self.class.property_types[name.to_sym]
                 if klass.is_a?(Array) && value.is_a?(Array)
