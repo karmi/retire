@@ -13,8 +13,8 @@
 # * Git
 # * Ruby >= 1.8.7
 # * Rubygems
-# * Rails >= 3
-# * Java 6 or 7 (for Elasticsearch)
+# * Rails >= 3.0.7
+# * Sun Java 6 (for Elasticsearch)
 #
 #
 # Usage
@@ -62,7 +62,7 @@ file ".gitignore", <<-END.gsub(/  /, '')
   tmp/**/*
   config/database.yml
   db/*.sqlite3
-  vendor/elasticsearch-0.20.6/
+  vendor/elasticsearch-0.20.2/
 END
 
 git :init
@@ -71,11 +71,11 @@ git :commit => "-m 'Initial commit: Clean application'"
 
 unless (RestClient.get('http://localhost:9200') rescue false)
   COMMAND = <<-COMMAND.gsub(/^    /, '')
-    curl -k -L -# -o elasticsearch-0.20.6.tar.gz \
-      "http://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.20.6.tar.gz"
-    tar -zxf elasticsearch-0.20.6.tar.gz
-    rm  -f   elasticsearch-0.20.6.tar.gz
-    ./elasticsearch-0.20.6/bin/elasticsearch -p #{destination_root}/tmp/pids/elasticsearch.pid
+    curl -k -L -# -o elasticsearch-0.20.2.tar.gz \
+      "http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.20.2.tar.gz"
+    tar -zxf elasticsearch-0.20.2.tar.gz
+    rm  -f   elasticsearch-0.20.2.tar.gz
+    ./elasticsearch-0.20.2/bin/elasticsearch -p #{destination_root}/tmp/pids/elasticsearch.pid
   COMMAND
 
   puts        "\n"
@@ -107,7 +107,7 @@ puts        '-'*80, ''; sleep 1
 
 gem 'tire', :git => 'git://github.com/karmi/tire.git'
 gem 'will_paginate', '~> 3.0'
-gem 'therubyracer'
+gen 'therubyracer'
 
 git :add => '.'
 git :commit => "-m 'Added gems'"
@@ -182,13 +182,14 @@ file 'app/models/article.rb', <<-CODE
 class Article < ActiveRecord::Base
   include Tire::Model::Search
   include Tire::Model::Callbacks
+
+  attr_accessible :title, :content, :published_on
 end
 CODE
 
 initializer 'tire.rb', <<-CODE
 Tire.configure do
-  # url    'http://localhost:9200'
-  # logger STDERR
+  logger STDERR
 end
 CODE
 
@@ -201,7 +202,7 @@ puts        '-'*80, ''; sleep 1
 gsub_file 'app/controllers/articles_controller.rb', %r{# GET /articles/1$}, <<-CODE
   # GET /articles/search
   def search
-    @articles = Article.tire.search params[:q]
+    @articles = Article.search params[:q]
 
     render :action => "index"
   end
@@ -238,7 +239,7 @@ puts
 say_status  "Index", "Indexing the database...", :yellow
 puts        '-'*80, ''; sleep 0.5
 
-rake "environment tire:import:model CLASS='Article' FORCE=true"
+rake "environment tire:import CLASS='Article' FORCE=true"
 
 puts
 say_status  "Git", "Details about the application:", :yellow
