@@ -47,6 +47,26 @@ class ModelWithoutTireAutoCallbacks
   def destroy; _run_destroy_callbacks {}; end
 end
 
+class ModelWithCallbackUpdatedOnIndexedAttributeChanges < ModelTwo
+	include ActiveModel::Dirty
+	define_attribute_methods [:name]
+	should_tire_only_update_on_index_changes true
+
+	def name
+		@name
+	end
+
+	def name=(val)
+		name_will_change! unless val == @name
+		@name = val
+	end
+
+	tire.mapping do
+		indexes :name,   analyzer: 'snowball'
+	end
+
+end
+
 module Tire
   module Model
 
@@ -73,6 +93,24 @@ module Tire
           m.save
           m.destroy
         end
+
+				should "execute both callbacks when changes to the index exist" do
+					m = ModelWithCallbackUpdatedOnIndexedAttributeChanges.new
+					m.tire.expects(:update_index).twice
+
+					m.name = 'Django'
+
+					m.save
+					m.destroy
+				end
+
+				should "execute only the destroy callback when changes to the index do not exist" do
+					m = ModelWithCallbackUpdatedOnIndexedAttributeChanges.new
+					m.tire.expects(:update_index).once
+
+					m.save
+					m.destroy
+				end
 
       end
 
