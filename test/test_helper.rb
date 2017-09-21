@@ -4,7 +4,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'pathname'
-require 'test/unit'
+#require 'test/unit'
 
 JRUBY = defined?(JRUBY_VERSION)
 

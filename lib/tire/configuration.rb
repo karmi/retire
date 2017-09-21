@@ -19,6 +19,10 @@ module Tire
       @logger || nil
     end
 
+    def self.timeout(seconds=nil)
+      @timeout = seconds || @timeout || 10
+    end
+
     def self.pretty(value=nil, options={})
       if value === false
         return @pretty = false
