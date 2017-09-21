@@ -64,13 +64,13 @@ module Tire
           should "use POST method if request body passed" do
             ::Curl::Easy.any_instance.expects(:http_post)
 
-            response = Configuration.client.get "http://localhost:3000", '{ "query_string" : { "query" : "apple" }}'
+            response = Configuration.client.get ENV["ELASTICSEARCH_URL"], '{ "query_string" : { "query" : "apple" }}'
           end
 
           should "use GET method if request body is nil" do
             ::Curl::Easy.any_instance.expects(:http_get)
 
-            response = Configuration.client.get "http://localhost:9200/articles/article/1"
+            response = Configuration.client.get "#{ENV["ELASTICSEARCH_URL"]}/articles/article/1"
           end
 
           should "be threadsafe" do

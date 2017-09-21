@@ -38,6 +38,8 @@ Gem::Specification.new do |s|
   #
   s.add_development_dependency "bundler",      "~> 1.0"
   s.add_development_dependency "shoulda-context"
+  s.add_development_dependency "test-unit"
+  s.add_development_dependency "pry"
   s.add_development_dependency "mocha",        "~> 0.13"
   s.add_development_dependency "minitest",     "~> 2.12"
   s.add_development_dependency "activerecord", ">= 3.0"

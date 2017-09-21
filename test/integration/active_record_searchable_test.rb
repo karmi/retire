@@ -626,11 +626,13 @@ module Tire
 
         should "return matching queries when percolating" do
           a = ActiveRecordModelWithPercolation.new :title => 'Warning!'
+          binding.pry
           assert_contains a.percolate, 'alert'
         end
 
         should "return matching queries when saving" do
           a = ActiveRecordModelWithPercolation.create! :title => 'Warning!'
+          binding.pry
           assert_contains a.matches, 'alert'
         end
       end

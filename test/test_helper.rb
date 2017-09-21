@@ -4,7 +4,8 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'pathname'
-#require 'test/unit'
+require 'test/unit'
+require 'pry'
 
 JRUBY = defined?(JRUBY_VERSION)
 
@@ -77,7 +78,7 @@ class Test::Unit::TestCase
 end
 
 module Test::Integration
-  URL = "http://localhost:9200"
+  URL = ENV["ELASTICSEARCH_URL"] || raise("set ELASTICSEARCH_URL") #"http://localhost:9200"
 
   def setup
     begin; Object.send(:remove_const, :Rails); rescue; end
