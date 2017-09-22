@@ -70,10 +70,6 @@ module Tire
       end
 
       should "allow to reset the configuration for all properties" do
-        puts ENV.keys.inspect
-        puts ENV["ELASTICSEARCH_URL"]
-        binding.pry
-
         Configuration.url     'http://example.com'
         Configuration.wrapper Hash
         assert_equal          'http://example.com', Configuration.url

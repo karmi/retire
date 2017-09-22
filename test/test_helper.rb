@@ -78,7 +78,7 @@ class Test::Unit::TestCase
 end
 
 module Test::Integration
-  URL = ENV["ELASTICSEARCH_URL"] || raise("set ELASTICSEARCH_URL") #"http://localhost:9200"
+  URL = ENV["ELASTICSEARCH_URL"] || "http://localhost:9200"
 
   def setup
     begin; Object.send(:remove_const, :Rails); rescue; end

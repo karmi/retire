@@ -462,8 +462,6 @@ module Tire
       payload.update( :query => query ) if query
 
       @response = Configuration.client.get "#{url}/#{type}/_percolate", MultiJson.encode(payload)
-      binding.pry
-
       MultiJson.decode(@response.body)['matches']
 
     ensure
