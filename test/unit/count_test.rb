@@ -15,7 +15,7 @@ module Tire
       should "count all documents by the leaving index empty" do
         c = Search::Count.new
         assert c.indices.empty?, "#{c.indices.inspect} should be empty"
-        assert_match %r|localhost:9200/_count|, c.url
+        assert_match %r|foobarbaz:9200/_count|, c.url
       end
 
       should "limit count with document type" do
@@ -47,7 +47,7 @@ module Tire
 
       should "return curl snippet for debugging" do
         c = Search::Count.new('index') { term :title, 'foo' }
-        assert_match %r|curl \-X GET 'http://localhost:9200/index/_count\?pretty' -d |, c.to_curl
+        assert_match %r|curl \-X GET 'http://foobarbaz:9200/index/_count\?pretty' -d |, c.to_curl
         assert_match %r|"term"\s*:\s*"foo"|, c.to_curl
       end
 

@@ -7,8 +7,8 @@ require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
   test.test_files = FileList['test/unit/*_test.rb', 'test/integration/*_test.rb']
-  test.verbose = true
-  # test.warning = true
+  test.verbose = false
+  test.warning = false
 end
 
 namespace :test do

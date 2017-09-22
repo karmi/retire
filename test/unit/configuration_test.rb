@@ -6,7 +6,7 @@ module Tire
 
     def teardown
       Tire::Configuration.reset
-      ENV['ELASTICSEARCH_URL'] = nil
+      #ENV['ELASTICSEARCH_URL'] = nil
     end
 
     context "Configuration" do
@@ -20,13 +20,13 @@ module Tire
       end
 
       should "return default URL" do
-        assert_equal 'http://localhost:9200', Configuration.url
+        assert_equal ENV["ELASTICSEARCH_URL"], Configuration.url
       end
 
-      should "use environment variable, if present" do
-        ENV['ELASTICSEARCH_URL'] = 'http://es.example.com'
-        assert_equal 'http://es.example.com', Configuration.url
-      end
+      #should "use environment variable, if present" do
+      #  ENV['ELASTICSEARCH_URL'] = 'http://es.example.com'
+      #  assert_equal 'http://es.example.com', Configuration.url
+      #end
 
       should "allow setting and retrieving the URL" do
         assert_nothing_raised { Configuration.url 'http://example.com' }
@@ -66,7 +66,7 @@ module Tire
         Configuration.url 'http://example.com'
         assert_equal      'http://example.com', Configuration.url
         Configuration.reset :url
-        assert_equal      'http://localhost:9200', Configuration.url
+        assert_equal      ENV['ELASTICSEARCH_URL'], Configuration.url
       end
 
       should "allow to reset the configuration for all properties" do
@@ -74,8 +74,17 @@ module Tire
         Configuration.wrapper Hash
         assert_equal          'http://example.com', Configuration.url
         Configuration.reset
-        assert_equal          'http://localhost:9200', Configuration.url
+        assert_equal          ENV['ELASTICSEARCH_URL'], Configuration.url
         assert_equal          HTTP::Client::RestClient, Configuration.client
+      end
+
+      should "return 10 seconds at default timeout" do
+        assert_equal Configuration.timeout, 10
+      end
+
+      should "set and return timeout" do
+        Configuration.timeout 30
+        assert_equal Configuration.timeout, 30
       end
     end
 
