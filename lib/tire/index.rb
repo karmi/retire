@@ -143,7 +143,7 @@ module Tire
 
       url  = id ? "#{self.url}/#{type}/#{Utils.escape(id)}#{params_encoded}" : "#{self.url}/#{type}/#{params_encoded}"
 
-      @response = Configuration.client.post url, document
+      @response = Configuration.client.post(url, document)
       MultiJson.decode(@response.body)
     ensure
       curl = %Q|curl -X POST "#{url}" -d '#{document}'|
