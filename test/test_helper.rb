@@ -4,7 +4,6 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'pathname'
-require 'test/unit'
 
 JRUBY = defined?(JRUBY_VERSION)
 
@@ -27,7 +26,6 @@ end
 
 require 'shoulda-context'
 require 'mocha/setup'
-require 'turn/autorun' unless ENV["TM_FILEPATH"] || JRUBY
 
 require 'active_support/core_ext/hash/indifferent_access'
 
